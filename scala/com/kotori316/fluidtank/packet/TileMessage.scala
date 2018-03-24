@@ -1,14 +1,13 @@
 package com.kotori316.fluidtank.packet
 
+import com.kotori316.fluidtank.FluidTank
 import io.netty.buffer.ByteBuf
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.PacketBuffer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
-import net.minecraftforge.fml.client.FMLClientHandler
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.network.simpleimpl.{IMessage, IMessageHandler, MessageContext}
-import net.minecraftforge.fml.relauncher.Side
 
 /**
   * To both client and server.
@@ -44,11 +43,7 @@ object TileMessage extends IMessageHandler[TileMessage, IMessage] {
     def apply(tile: TileEntity): TileMessage = new TileMessage(tile)
 
     override def onMessage(message: TileMessage, ctx: MessageContext): IMessage = {
-        val world = if (ctx.side == Side.SERVER) {
-            ctx.getServerHandler.player.getEntityWorld
-        } else {
-            FMLClientHandler.instance().getWorldClient
-        }
+        val world = FluidTank.proxy.getWorld(ctx.netHandler)
         val tile = world.getTileEntity(message.pos)
         if (message.dim == world.provider.getDimension && tile != null)
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(new Runnable {

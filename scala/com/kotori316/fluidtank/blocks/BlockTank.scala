@@ -10,7 +10,6 @@ import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Enchantments
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.stats.StatList
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
@@ -50,7 +49,6 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
                 if (result.isSuccess) {
                     playerIn.setHeldItem(hand, result.getResult)
                 }
-                // TODO send packet to client.
             }
             return true
         }
@@ -85,7 +83,7 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
     }
 
     private def saveTankNBT(tileEntity: TileEntity, stack: ItemStack) = {
-        Option(tileEntity).collect { case tank: TileTank if tank.shouldSaveToNBT => tank.writeToNBT(new NBTTagCompound) }
+        Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
           .foreach(tag => stack.setTagInfo("BlockEntityTag", tag))
     }
 

@@ -12,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -23,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
+import com.kotori316.fluidtank.packet.Proxy;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 /**
@@ -35,6 +37,8 @@ public class FluidTank {
     public static final String MOD_NAME = "FluidTank";
     public static final String modID = "fluidtank";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
+    @SidedProxy(clientSide = "com.kotori316.fluidtank.packet.ClientProxy", serverSide = "com.kotori316.fluidtank.packet.ServerProxy")
+    public static Proxy proxy;
 
     public static final List<BlockTank> BLOCK_TANKS =
         Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(), BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6());
@@ -46,6 +50,7 @@ public class FluidTank {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(instance);
+        proxy.registerTESR();
     }
 
     @EventHandler

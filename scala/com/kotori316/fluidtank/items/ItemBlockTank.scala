@@ -6,7 +6,6 @@ import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.tiles.Tiers
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
-import net.minecraft.client.resources.I18n
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{EnumRarity, ItemBlock, ItemStack}
 import net.minecraft.world.World
@@ -42,7 +41,7 @@ class ItemBlockTank(block: BlockTank, val rank: Int) extends ItemBlock(block) {
             val tankNBT = nbt.getCompoundTag("tank")
             val fluid = Option(FluidStack.loadFluidStackFromNBT(tankNBT))
             val c = tankNBT.getInteger("capacity")
-            tooltip.add(I18n.format(fluid.fold("Empty")(_.getUnlocalizedName)) + " : " + fluid.fold(0)(_.amount) + " mB / " + c + " mB")
+            tooltip.add(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0)(_.amount) + " mB / " + c + " mB")
         }
     }
 }
