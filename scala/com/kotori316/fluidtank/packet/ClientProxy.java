@@ -11,7 +11,7 @@ import com.kotori316.fluidtank.tiles.RenderTank;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 @SideOnly(Side.CLIENT)
-public class ClientProxy implements Proxy {
+public class ClientProxy implements SideProxy {
 
     @Override
     public World getWorld(INetHandler handler) {

@@ -1,13 +1,14 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.items.ItemBlockTank
+import com.kotori316.fluidtank.packet.SideProxy
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
 import com.kotori316.fluidtank.{FluidTank, Utils}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, ITileEntityProvider}
 import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.{EntityLiving, EntityLivingBase}
 import net.minecraft.init.Enchantments
 import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
@@ -16,6 +17,7 @@ import net.minecraft.util.math.{BlockPos, RayTraceResult}
 import net.minecraft.util.{BlockRenderLayer, EnumFacing, EnumHand}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.event.ForgeEventFactory
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.fluids.{Fluid, FluidUtil}
 import net.minecraftforge.items.CapabilityItemHandler
 
@@ -42,8 +44,8 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
         val stack = playerIn.getHeldItem(hand)
         val tileTank = worldIn.getTileEntity(pos).asInstanceOf[TileTank]
         if (FluidUtil.getFluidHandler(stack) != null && tileTank != null) {
-            if (!worldIn.isRemote) {
-                val handler = tileTank.tank
+            if (SideProxy.isServer(tileTank)) {
+                val handler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
                 val result = FluidUtil.tryEmptyContainerAndStow(stack, handler, playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP),
                     Fluid.BUCKET_VOLUME, playerIn, true)
                 if (result.isSuccess) {
@@ -53,6 +55,13 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
             return true
         }
         super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+    }
+
+    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
+        worldIn.getTileEntity(pos) match {
+            case tank: TileTank => tank.neighborChanged()
+        }
     }
 
     override final def createNewTileEntity(worldIn: World, meta: Int) = new TileTank(getTierByMeta(meta))
@@ -102,6 +111,13 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
             }
         }
         harvesters.set(null)
+    }
+
+    override def neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos): Unit = {
+        worldIn.getTileEntity(pos) match {
+            case tank: TileTank => tank.neighborChanged()
+            case _ =>
+        }
     }
 }
 

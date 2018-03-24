@@ -4,7 +4,8 @@ import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.mutable
 
-sealed class Tiers(val rank: Int, val amount: Int, override val toString: String) {
+sealed class Tiers private(val rank: Int, a: Int, override val toString: String) {
+    val amount = a * 1000
     Tiers.map.put(toString, this)
     Tiers.list.append(this)
     Tiers.rankList(rank) = Tiers.rankList(rank) + 1

@@ -24,12 +24,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
-import com.kotori316.fluidtank.packet.Proxy;
+import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-/**
- * TODO implement {@link buildcraft.api.transport.pipe.ICustomPipeConnection}
- */
 @Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}")
 public class FluidTank {
 
@@ -38,7 +35,7 @@ public class FluidTank {
     public static final String modID = "fluidtank";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     @SidedProxy(clientSide = "com.kotori316.fluidtank.packet.ClientProxy", serverSide = "com.kotori316.fluidtank.packet.ServerProxy")
-    public static Proxy proxy;
+    public static SideProxy proxy;
 
     public static final List<BlockTank> BLOCK_TANKS =
         Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(), BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6());
