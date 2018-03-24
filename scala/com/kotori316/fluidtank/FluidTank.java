@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 /**
@@ -49,7 +50,7 @@ public class FluidTank {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-
+        PacketHandler.init();
     }
 
     @EventHandler

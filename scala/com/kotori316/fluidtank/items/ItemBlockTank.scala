@@ -1,10 +1,17 @@
 package com.kotori316.fluidtank.items
 
+import java.util
+
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.tiles.Tiers
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
+import net.minecraft.client.resources.I18n
+import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{EnumRarity, ItemBlock, ItemStack}
+import net.minecraft.world.World
+import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.JavaConverters._
 
@@ -27,4 +34,15 @@ class ItemBlockTank(block: BlockTank, val rank: Int) extends ItemBlock(block) {
     }
 
     override def getMetadata(damage: Int): Int = damage
+
+    @SideOnly(Side.CLIENT)
+    override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag): Unit = {
+        val nbt = stack.getSubCompound("BlockEntityTag")
+        if (nbt != null) {
+            val tankNBT = nbt.getCompoundTag("tank")
+            val fluid = Option(FluidStack.loadFluidStackFromNBT(tankNBT))
+            val c = tankNBT.getInteger("capacity")
+            tooltip.add(I18n.format(fluid.fold("Empty")(_.getUnlocalizedName)) + " : " + fluid.fold(0)(_.amount) + " mB / " + c + " mB")
+        }
+    }
 }

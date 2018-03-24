@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.tiles
 
+import com.kotori316.fluidtank.packet.{PacketHandler, TileMessage}
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
@@ -42,14 +43,24 @@ class TileTank(var tier: Tiers) extends TileEntity {
     class Tank extends net.minecraftforge.fluids.FluidTank(tier.amount * 1000) {
         setTileEntity(self)
 
+        override def onContentsChanged(): Unit = {
+            super.onContentsChanged()
+            if (self.hasWorld && !self.getWorld.isRemote) {
+                PacketHandler.WRAPPER.sendToDimension(TileMessage(self), self.getWorld.provider.getDimension)
+            }
+        }
+
         override def readFromNBT(nbt: NBTTagCompound): FluidTank = {
-            setCapacity(nbt.getInteger("capacity"))
             super.readFromNBT(nbt)
+            setCapacity(nbt.getInteger("capacity"))
+            onContentsChanged()
+            this
         }
 
         override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-            nbt.setInteger("capacity", getCapacity)
             super.writeToNBT(nbt)
+            nbt.setInteger("capacity", getCapacity)
+            nbt
         }
 
         override def toString: String = {
