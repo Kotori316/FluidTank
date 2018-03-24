@@ -1,0 +1,13 @@
+tile.fluidtank.blocktank1.wood.name=Wood Tank
+tile.fluidtank.blocktank2.stone.name=Stone Tank
+tile.fluidtank.blocktank2.copper.name=Copper Tank
+tile.fluidtank.blocktank2.tin.name=Tin Tank
+tile.fluidtank.blocktank3.iron.name=Iron Tank
+tile.fluidtank.blocktank3.bronze.name=Bronze Tank
+tile.fluidtank.blocktank3.lead.name=Lead Tank
+tile.fluidtank.blocktank3.silver.name=Silver Tank
+tile.fluidtank.blocktank4.gold.name=Gold Tank
+tile.fluidtank.blocktank5.diamond.name=Diamond Tank
+tile.fluidtank.blocktank6.emerald.name=Emerald Tank
+
+itemGroup.FluidTank=FluidTanks

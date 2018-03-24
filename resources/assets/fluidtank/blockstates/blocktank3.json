@@ -1,0 +1,27 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "fluidtank:tanks",
+    "textures": {
+      "side": "fluidtank:blocks/iron1",
+      "top": "fluidtank:blocks/iron2"
+    }
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "variant": {
+      "0": {},
+      "1": {
+      },
+      "2": {
+      },
+      "3": {
+      }
+    },
+    "inventory": [
+      {}
+    ]
+  }
+}
