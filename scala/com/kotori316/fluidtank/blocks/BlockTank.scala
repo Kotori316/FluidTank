@@ -61,6 +61,7 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
         worldIn.getTileEntity(pos) match {
             case tank: TileTank => tank.neighborChanged()
+            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
     }
 
@@ -116,7 +117,7 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
     override def neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos): Unit = {
         worldIn.getTileEntity(pos) match {
             case tank: TileTank => tank.neighborChanged()
-            case _ =>
+            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
     }
 }

@@ -1,20 +1,26 @@
 package com.kotori316.fluidtank.tiles
 
+import java.util
+
+import buildcraft.api.tiles.IDebuggable
+import buildcraft.api.transport.pipe.ICustomPipeConnection
 import com.kotori316.fluidtank.packet.{PacketHandler, SideProxy, TileMessage}
+import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.{FluidStack, FluidTank}
+import net.minecraftforge.fml.common.Optional
 
-/**
-  * TODO implement [[buildcraft.api.transport.pipe.ICustomPipeConnection]]
-  */
-
-class TileTank(var tier: Tiers) extends TileEntity {
+@Optional.Interface(modid = "BuildCraftAPI|transport", iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
+@Optional.Interface(modid = "BuildCraftAPI|tiles", iface = "buildcraft.api.tiles.IDebuggable")
+class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection with IDebuggable {
     self =>
 
     def this() {
@@ -22,7 +28,7 @@ class TileTank(var tier: Tiers) extends TileEntity {
     }
 
     val tank = new Tank
-    private var connection = new Connection(this, Seq(this))
+    private var connection = Connection.invalid
 
     override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
         compound.setTag("tank", tank.writeToNBT(new NBTTagCompound))
@@ -73,14 +79,25 @@ class TileTank(var tier: Tiers) extends TileEntity {
         updateConnection()
     }
 
-    def updateConnection(): Unit = {
+    private def updateConnection(): Unit = {
         if (SideProxy.isServer(this)) {
-            val function: BlockPos => Boolean = getWorld.getTileEntity(_).isInstanceOf[TileTank]
+            var connectionFluid = this.tank.getFluid
+            val function: BlockPos => Boolean = { p =>
+                getWorld.getTileEntity(p) match {
+                    case that: TileTank =>
+                        if (connectionFluid == null) {
+                            connectionFluid = that.tank.getFluid
+                            true
+                        } else {
+                            that.tank.getFluid == null || connectionFluid.isFluidEqual(that.tank.getFluid)
+                        }
+                    case _ => false
+                }
+            }
             val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.last
             val tanks = Iterator.iterate(lowest)(_.up())
               .takeWhile(function).map(getWorld.getTileEntity(_).asInstanceOf[TileTank]).toList
-            val newConnection = Connection(tanks.headOption, tanks)
-            tanks.foreach(_.connection = newConnection)
+            Connection.setConnection(tanks, c => tile => tile.connection = c)
         }
     }
 
@@ -118,4 +135,18 @@ class TileTank(var tier: Tiers) extends TileEntity {
         }
     }
 
+    @Optional.Method(modid = "BuildCraftAPI|transport")
+    override def getExtension(world: World, pos: BlockPos, face: EnumFacing, state: IBlockState): Float =
+        if (face.getAxis == Axis.Y) 0 else 2 / 16f
+
+    @Optional.Method(modid = "BuildCraftAPI|tiles")
+    override def getDebugInfo(left: util.List[String], right: util.List[String], side: EnumFacing): Unit = {
+        if (SideProxy.isServer(this)) {
+            left add getClass.getName
+            left add connection.toString
+        }
+        left.add("Tier : " + tier)
+        left add tank.toString
+
+    }
 }
