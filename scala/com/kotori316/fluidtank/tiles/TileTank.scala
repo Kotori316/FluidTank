@@ -29,10 +29,12 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     val tank = new Tank
     private var connection = Connection.invalid
+    var f: FluidStack = _
 
     override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
         compound.setTag("tank", tank.writeToNBT(new NBTTagCompound))
         compound.setTag("tier", tier.toNBTTag)
+        Option(connection.getFluidStack).foreach(s => compound.setTag("f", s.writeToNBT(new NBTTagCompound)))
         super.writeToNBT(compound)
     }
 
@@ -50,6 +52,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         super.readFromNBT(compound)
         tank.readFromNBT(compound.getCompoundTag("tank"))
         tier = Tiers.fromNBT(compound.getCompoundTag("tier"))
+        f = FluidStack.loadFluidStackFromNBT(compound.getCompoundTag("f"))
     }
 
     override def onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity): Unit = handleUpdateTag(pkt.getNbtCompound)
@@ -81,7 +84,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     private def updateConnection(): Unit = {
         if (SideProxy.isServer(this)) {
-            var connectionFluid = this.tank.getFluid
+            var connectionFluid = Option(connection.getFluidStack).orElse(Option(this.tank.getFluid)).getOrElse(f)
             val function: BlockPos => Boolean = { p =>
                 getWorld.getTileEntity(p) match {
                     case that: TileTank =>
@@ -89,14 +92,16 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
                             connectionFluid = that.tank.getFluid
                             true
                         } else {
-                            that.tank.getFluid == null || connectionFluid.isFluidEqual(that.tank.getFluid)
+                            (that.tank.getFluid == null || connectionFluid.isFluidEqual(that.tank.getFluid)) &&
+                              (that.connection.getFluidStack == null || connectionFluid.isFluidEqual(that.connection.getFluidStack)) &&
+                              (that.f == null || connectionFluid.isFluidEqual(that.f))
                         }
                     case _ => false
                 }
             }
             val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.last
             val tanks = Iterator.iterate(lowest)(_.up())
-              .takeWhile(function).map(getWorld.getTileEntity(_).asInstanceOf[TileTank]).toList
+              .takeWhile(function).map(getWorld.getTileEntity(_).asInstanceOf[TileTank]).toIndexedSeq
             Connection.setConnection(tanks, c => tile => tile.connection = c)
         }
     }
@@ -147,6 +152,5 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         }
         left.add("Tier : " + tier)
         left add tank.toString
-
     }
 }

@@ -16,7 +16,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
             }
             val resource = kind.copy()
             var total = 0
-            for (tileTank <- seq) {
+            for (tileTank <- tankSeq(kind)) {
                 if (resource.amount > 0) {
                     val filled = tileTank.tank.fill(resource, doFill)
                     total += filled
@@ -32,7 +32,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
             }
             val resource = kind.copy()
             var total: FluidStack = null
-            for (tileTank <- seq.reverse) {
+            for (tileTank <- tankSeq(getFluidStack).reverse) {
                 if (resource.amount > 0) {
                     val drained = tileTank.tank.drain(resource, doDrain)
                     if (drained != null) {
@@ -53,7 +53,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
             }
             var toDrain = maxDrain
             var total: FluidStack = null
-            for (tileTank <- seq.reverse) {
+            for (tileTank <- tankSeq(getFluidStack).reverse) {
                 if (toDrain > 0) {
                     if (total == null) {
                         total = tileTank.tank.drain(toDrain, doDrain)
@@ -75,23 +75,35 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
         }
 
         override def getTankProperties: Array[IFluidTankProperties] = {
-            val fluid = fluidType
-            if (fluid != null) {
-                Array(new FluidTankProperties(new FluidStack(fluidType, Utils.toInt(amount)), Utils.toInt(capacity)))
-            } else {
-                Array(new FluidTankProperties(null, Utils.toInt(capacity)))
-            }
+            Array(new FluidTankProperties(getFluidStack, Utils.toInt(capacity)))
         }
     }
 
-    def transfer() =
-        seq.foreach(tileTank => FluidUtil.tryFluidTransfer(handler, tileTank.tank, tileTank.tank.getFluid, true))
+    def tankSeq(stack: FluidStack): Seq[TileTank] = {
+        val fluid = stack.getFluid
+        if (fluid == null || !fluid.isGaseous(stack)) {
+            seq
+        } else {
+            seq.reverse
+        }
+    }
 
-    def fluidType = Option(fisrt.tank.getFluid).map(_.getFluid).orNull
+    def transfer() = seq.foreach(tileTank => FluidUtil.tryFluidTransfer(handler, tileTank.tank, tileTank.tank.getFluid, true))
+
+    def fluidType = {
+        seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).map(_.getFluid).orNull
+    }
 
     def capacity = seq.map(_.tier.amount.toLong).sum
 
     def amount = seq.map(_.tank.getFluidAmount.toLong).sum
+
+    def getFluidStack = {
+        val fluid = fluidType
+        if (fluid != null)
+            new FluidStack(fluid, Utils.toInt(amount))
+        else null
+    }
 
     def hasChain = seq.size > 1
 
@@ -107,7 +119,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
         capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
 
     override def toString: String = {
-        val fluid = fisrt.tank.getFluid
+        val fluid = getFluidStack
         if (fluid == null) {
             s"Connection of null : $amount / $capacity mB"
         } else {
@@ -129,6 +141,8 @@ object Connection {
 
         override val toString: String = "Connection.Invalid"
     }
+
+    val stackFromTile: TileTank => Option[FluidStack] = t => Option(t.tank.getFluid)
 
     def setConnection(tanks: Seq[TileTank], callback: Connection => TileTank => Unit): Unit = {
         val newConnection = Connection(tanks.headOption, tanks)
