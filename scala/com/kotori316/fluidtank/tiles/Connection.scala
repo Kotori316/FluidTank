@@ -9,7 +9,6 @@ import net.minecraftforge.fluids.{Fluid, FluidStack, FluidUtil}
 
 class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvider {
 
-    //TODO strict fluid to be inserted.
     val handler: IFluidHandler = new FluidHandlerConcatenate(seq.map(_.tank): _*) {
         override def getTankProperties: Array[IFluidTankProperties] = {
             val fluid = fluidType

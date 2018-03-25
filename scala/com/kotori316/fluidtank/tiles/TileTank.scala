@@ -6,6 +6,7 @@ import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.{FluidStack, FluidTank}
 
@@ -74,7 +75,7 @@ class TileTank(var tier: Tiers) extends TileEntity {
 
     def updateConnection(): Unit = {
         if (SideProxy.isServer(this)) {
-            val function = getWorld.getTileEntity(_).isInstanceOf[TileTank]
+            val function: BlockPos => Boolean = getWorld.getTileEntity(_).isInstanceOf[TileTank]
             val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.last
             val tanks = Iterator.iterate(lowest)(_.up())
               .takeWhile(function).map(getWorld.getTileEntity(_).asInstanceOf[TileTank]).toList
@@ -107,7 +108,13 @@ class TileTank(var tier: Tiers) extends TileEntity {
 
         override def toString: String = {
             val fluid = getFluid
-            if (fluid == null) "Tank : no fluid : Capacity = " + getCapacity else "Tank : " + fluid.getLocalizedName + " " + getFluidAmount + "mB : Capacity = " + getCapacity
+            if (fluid == null) "Tank : no fluid : Capacity = " + getCapacity
+            else "Tank : " + fluid.getLocalizedName + " " + getFluidAmount + "mB : Capacity = " + getCapacity
+        }
+
+        override def canFillFluidType(fluid: FluidStack): Boolean = {
+            val fluidType = connection.fluidType
+            fluidType == null || fluidType == fluid.getFluid
         }
     }
 
