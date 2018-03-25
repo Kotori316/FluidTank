@@ -4,11 +4,11 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-public interface SideProxy {
+public abstract class SideProxy {
 
-    public World getWorld(INetHandler handler);
+    public abstract World getWorld(INetHandler handler);
 
-    public void registerTESR();
+    public abstract void registerTESR();
 
     public static boolean isServer(TileEntity entity) {
         return entity.hasWorld() && !entity.getWorld().isRemote;

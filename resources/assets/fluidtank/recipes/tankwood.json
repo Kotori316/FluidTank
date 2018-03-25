@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "x x",
+    "xpx",
+    "xxx"
+  ],
+  "key": {
+    "x": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    },
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    }
+  },
+  "result": {
+    "item": "fluidtank:blocktank1",
+    "count": 1,
+    "data": 0
+  }
+}

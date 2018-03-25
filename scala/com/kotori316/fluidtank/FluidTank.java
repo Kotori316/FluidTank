@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -25,6 +26,8 @@ import org.apache.logging.log4j.Logger;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
+import com.kotori316.fluidtank.recipes.TankRecipe;
+import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 @Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}")
@@ -69,6 +72,22 @@ public class FluidTank {
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(BLOCK_TANKS.stream().map(BlockTank::itemBlock).toArray(Item[]::new));
+    }
+
+    @SubscribeEvent
+    public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        List<TankRecipe> tankRecipes = Arrays.asList(
+            new TankRecipe(modID + ":tankstone", Tiers.STONE(), "stone"),
+            new TankRecipe(modID + ":tankcopper", Tiers.COPPER(), "ingotCopper"),
+            new TankRecipe(modID + ":tanktin", Tiers.TIN(), "ingotTin"),
+            new TankRecipe(modID + ":tankiron", Tiers.IRON(), "ingotIron"),
+            new TankRecipe(modID + ":tankbronze", Tiers.BRONZE(), "ingotBronze"),
+            new TankRecipe(modID + ":tanklead", Tiers.LEAD(), "ingotLead"),
+            new TankRecipe(modID + ":tanksilver", Tiers.SILVER(), "ingotSilver"),
+            new TankRecipe(modID + ":tankgold", Tiers.GOLD(), "ingotGold"),
+            new TankRecipe(modID + ":tankdiamond", Tiers.DIAMOND(), "gemDiamond"),
+            new TankRecipe(modID + ":tankemerald", Tiers.EMERALD(), "gemEmerald"));
+        event.getRegistry().registerAll(tankRecipes.stream().filter(TankRecipe::isValid).toArray(IRecipe[]::new));
     }
 
     @SubscribeEvent

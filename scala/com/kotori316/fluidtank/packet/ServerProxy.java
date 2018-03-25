@@ -4,7 +4,7 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.world.World;
 
-public class ServerProxy implements SideProxy {
+public class ServerProxy extends SideProxy {
 
     @Override
     public World getWorld(INetHandler handler) {
