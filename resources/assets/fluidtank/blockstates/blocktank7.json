@@ -3,9 +3,9 @@
   "defaults": {
     "model": "fluidtank:tanks",
     "textures": {
-      "particle": "fluidtank:blocks/wood1",
-      "side": "fluidtank:blocks/wood1",
-      "top": "fluidtank:blocks/wood2"
+      "particle": "fluidtank:blocks/star1",
+      "side": "fluidtank:blocks/star1",
+      "top": "fluidtank:blocks/star2"
     }
   },
   "variants": {

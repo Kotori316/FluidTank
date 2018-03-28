@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.tiles
 
 import com.kotori316.fluidtank.Utils
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.MathHelper
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankProperties, IFluidHandler, IFluidTankProperties}
@@ -80,11 +81,10 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
     }
 
     def tankSeq(stack: FluidStack): Seq[TileTank] = {
-        val fluid = stack.getFluid
-        if (fluid == null || !fluid.isGaseous(stack)) {
-            seq
-        } else {
+        if (Option(stack).flatMap(s => Option(s.getFluid)).exists(_.isGaseous(stack))) {
             seq.reverse
+        } else {
+            seq
         }
     }
 
@@ -106,6 +106,16 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
     }
 
     def hasChain = seq.size > 1
+
+    def getComparatorLevel: Int = {
+        if (amount > 0)
+            MathHelper.floor(amount.toDouble / capacity.toDouble * 14) + 1
+        else 0
+    }
+
+    def updateComparator(): Unit = {
+        seq.foreach(_.markDirty())
+    }
 
     override def getCapability[T](capability: Capability[T], facing: EnumFacing) = {
         if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
@@ -140,6 +150,8 @@ object Connection {
         override val handler: IFluidHandler = EmptyFluidHandler.INSTANCE
 
         override val toString: String = "Connection.Invalid"
+
+        override def getComparatorLevel: Int = 0
     }
 
     val stackFromTile: TileTank => Option[FluidStack] = t => Option(t.tank.getFluid)

@@ -30,7 +30,7 @@ import com.kotori316.fluidtank.recipes.TankRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-@Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}")
+@Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@")
 public class FluidTank {
 
     public static final FluidTank instance;
@@ -41,7 +41,8 @@ public class FluidTank {
     public static SideProxy proxy;
 
     public static final List<BlockTank> BLOCK_TANKS =
-        Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(), BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6());
+        Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(),
+            BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6(), BlockTank.blockTank7());
 
     static {
         instance = new FluidTank();
@@ -76,18 +77,7 @@ public class FluidTank {
 
     @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-        List<TankRecipe> tankRecipes = Arrays.asList(
-            new TankRecipe(modID + ":tankstone", Tiers.STONE(), "stone"),
-            new TankRecipe(modID + ":tankcopper", Tiers.COPPER(), "ingotCopper"),
-            new TankRecipe(modID + ":tanktin", Tiers.TIN(), "ingotTin"),
-            new TankRecipe(modID + ":tankiron", Tiers.IRON(), "ingotIron"),
-            new TankRecipe(modID + ":tankbronze", Tiers.BRONZE(), "ingotBronze"),
-            new TankRecipe(modID + ":tanklead", Tiers.LEAD(), "ingotLead"),
-            new TankRecipe(modID + ":tanksilver", Tiers.SILVER(), "ingotSilver"),
-            new TankRecipe(modID + ":tankgold", Tiers.GOLD(), "ingotGold"),
-            new TankRecipe(modID + ":tankdiamond", Tiers.DIAMOND(), "gemDiamond"),
-            new TankRecipe(modID + ":tankemerald", Tiers.EMERALD(), "gemEmerald"));
-        event.getRegistry().registerAll(tankRecipes.stream().filter(TankRecipe::isValid).toArray(IRecipe[]::new));
+        event.getRegistry().registerAll(Tiers.jList().stream().map(TankRecipe::new).filter(TankRecipe::isValid).toArray(IRecipe[]::new));
     }
 
     @SubscribeEvent

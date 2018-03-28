@@ -9,5 +9,6 @@ tile.fluidtank.blocktank3.silver.name=Silver Tank
 tile.fluidtank.blocktank4.gold.name=Gold Tank
 tile.fluidtank.blocktank5.diamond.name=Diamond Tank
 tile.fluidtank.blocktank6.emerald.name=Emerald Tank
+tile.fluidtank.blocktank7.star.name=Star Tank
 
 itemGroup.FluidTank=FluidTanks

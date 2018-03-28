@@ -3,6 +3,7 @@
   "defaults": {
     "model": "fluidtank:tanks",
     "textures": {
+      "particle": "fluidtank:blocks/iron1",
       "side": "fluidtank:blocks/iron1",
       "top": "fluidtank:blocks/iron2"
     }

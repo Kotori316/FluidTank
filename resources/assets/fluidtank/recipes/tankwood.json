@@ -12,7 +12,7 @@
     },
     "p": {
       "type": "forge:ore_dict",
-      "ore": "plankWood"
+      "ore": "logWood"
     }
   },
   "result": {

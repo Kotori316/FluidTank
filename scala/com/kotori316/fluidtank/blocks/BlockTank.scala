@@ -46,10 +46,15 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
         if (FluidUtil.getFluidHandler(stack) != null && tileTank != null) {
             if (SideProxy.isServer(tileTank)) {
                 val handler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
-                val result = FluidUtil.tryEmptyContainerAndStow(stack, handler, playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP),
-                    Fluid.BUCKET_VOLUME, playerIn, true)
-                if (result.isSuccess) {
-                    playerIn.setHeldItem(hand, result.getResult)
+                val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
+                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, handler, itemHandler, Fluid.BUCKET_VOLUME, playerIn, true)
+                if (resultFill.isSuccess) {
+                    playerIn.setHeldItem(hand, resultFill.getResult)
+                } else {
+                    val resultDrain = FluidUtil.tryFillContainerAndStow(stack, handler, itemHandler, Fluid.BUCKET_VOLUME, playerIn, true)
+                    if (resultDrain.isSuccess) {
+                        playerIn.setHeldItem(hand, resultDrain.getResult)
+                    }
                 }
             }
             return true
@@ -120,6 +125,15 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
     }
+
+    override def hasComparatorInputOverride(state: IBlockState): Boolean = true
+
+    override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
+        worldIn.getTileEntity(pos) match {
+            case tileTank: TileTank => tileTank.getComparatorLevel
+            case _ => 0
+        }
+    }
 }
 
 object BlockTank {
@@ -148,5 +162,10 @@ object BlockTank {
         override def rank = 6
 
         override def getTierByMeta(meta: Int) = Tiers.EMERALD
+    }
+    val blockTank7 = new BlockTank {
+        override def rank: Int = 7
+
+        override def getTierByMeta(meta: Int): Tiers = Tiers.STAR
     }
 }

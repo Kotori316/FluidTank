@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.recipes;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import net.minecraft.inventory.InventoryCrafting;
@@ -21,16 +22,18 @@ public class TankRecipe extends ShapedRecipes {
     private final Tiers tiers;
     private final boolean valid;
 
-    public TankRecipe(@Nonnull String location, Tiers tiers, String oreName) {
+    public TankRecipe(Tiers tiers) {
         super("", 3, 3, NonNullList.withSize(9, Ingredient.EMPTY), ItemStack.EMPTY);
 
-        setRegistryName(new ResourceLocation(location));
+        setRegistryName(new ResourceLocation(FluidTank.modID + ":tank" + tiers.toString().toLowerCase(Locale.US)));
         this.tiers = tiers;
-        OreIngredient oreIngredient = new OreIngredient(oreName);
-        valid = OreDictionary.doesOreNameExist(oreName);
-        TierIngredient tierIngredient = new TierIngredient(tiers.rank() - 1);
-        Arrays.stream(new int[]{0, 2, 6, 8}).forEach(value -> recipeItems.set(value, oreIngredient));
-        Arrays.stream(new int[]{1, 3, 5, 7}).forEach(value -> recipeItems.set(value, tierIngredient));
+        OreIngredient oreIngredient = new OreIngredient(tiers.oreName());
+        valid = tiers.rank() > 1 && OreDictionary.doesOreNameExist(tiers.oreName());
+        if (valid) {
+            TierIngredient tierIngredient = new TierIngredient(tiers.rank() - 1);
+            Arrays.stream(new int[]{0, 2, 6, 8}).forEach(value -> recipeItems.set(value, oreIngredient));
+            Arrays.stream(new int[]{1, 3, 5, 7}).forEach(value -> recipeItems.set(value, tierIngredient));
+        }
     }
 
     /**
@@ -77,7 +80,7 @@ public class TankRecipe extends ShapedRecipes {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return new ItemStack(FluidTank.BLOCK_TANKS.get(tiers.rank() - 1), 1, tiers.meta());
+        return valid ? new ItemStack(FluidTank.BLOCK_TANKS.get(tiers.rank() - 1), 1, tiers.meta()) : super.getRecipeOutput();
     }
 
     public boolean isValid() {

@@ -82,6 +82,8 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         updateConnection()
     }
 
+    def getComparatorLevel: Int = connection.getComparatorLevel
+
     private def updateConnection(): Unit = {
         if (SideProxy.isServer(this)) {
             var connectionFluid = Option(connection.getFluidStack).orElse(Option(this.tank.getFluid)).getOrElse(f)
@@ -112,6 +114,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         override def onContentsChanged(): Unit = {
             super.onContentsChanged()
             sendPacket()
+            connection.updateComparator()
         }
 
         override def readFromNBT(nbt: NBTTagCompound): FluidTank = {

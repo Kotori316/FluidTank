@@ -1,7 +1,4 @@
 {
-  "textures": {
-    "particle": "fluidtank:blocks/wood1"
-  },
   "elements": [
     {
       "name": "Cube",
