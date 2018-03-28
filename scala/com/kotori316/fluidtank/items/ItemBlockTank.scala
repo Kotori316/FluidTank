@@ -44,6 +44,8 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
             val fluid = Option(FluidStack.loadFluidStackFromNBT(tankNBT))
             val c = tankNBT.getInteger("capacity")
             tooltip.add(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0)(_.amount) + " mB / " + c + " mB")
+        } else {
+            tooltip.add("Capacity : " + blockTank.getTierByMeta(stack.getItemDamage).amount + "mB")
         }
     }
 

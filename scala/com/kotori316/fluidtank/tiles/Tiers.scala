@@ -35,8 +35,8 @@ object Tiers {
     val EMERALD = new Tiers(6, 1 << 16, "Emerald", 0, "gemEmerald")
     val STAR = new Tiers(7, 1 << 20, "Star", 0, "netherStar")
 
-    val COPPER = new Tiers(2, 1 << 6, "Copper", 1, "ingotCopper")
-    val TIN = new Tiers(2, 1 << 7, "Tin", 2, "ingotTin")
+    val COPPER = new Tiers(2, 1 << 5, "Copper", 1, "ingotCopper")
+    val TIN = new Tiers(2, 1 << 6, "Tin", 2, "ingotTin")
     val BRONZE = new Tiers(3, 1 << 9, "Bronze", 1, "ingotBronze")
     val LEAD = new Tiers(3, 1 << 8, "Lead", 2, "ingotLead")
     val SILVER = new Tiers(3, 1 << 10, "Silver", 3, "ingotSilver")

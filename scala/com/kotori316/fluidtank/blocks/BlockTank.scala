@@ -29,7 +29,12 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
 
     final val itemBlock = new ItemBlockTank(this, rank)
 
-    def getTierByMeta(meta: Int): Tiers = tierArray(meta)
+    def getTierByMeta(meta: Int): Tiers = {
+        if (meta < tierArray.length)
+            tierArray(meta)
+        else
+            tierArray(0)
+    }
 
     setRegistryName(FluidTank.modID, "blocktank" + rank)
     setUnlocalizedName(FluidTank.modID + ".blocktank" + rank)
@@ -43,7 +48,7 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
                                   hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
         val stack = playerIn.getHeldItem(hand)
         val tileTank = worldIn.getTileEntity(pos).asInstanceOf[TileTank]
-        if (FluidUtil.getFluidHandler(stack) != null && tileTank != null) {
+        if (FluidUtil.getFluidHandler(stack) != null && tileTank != null && !stack.getItem.isInstanceOf[ItemBlockTank]) {
             if (SideProxy.isServer(tileTank)) {
                 val handler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
                 val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)

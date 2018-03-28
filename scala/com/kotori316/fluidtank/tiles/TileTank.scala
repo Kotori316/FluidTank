@@ -4,6 +4,7 @@ import java.util
 
 import buildcraft.api.tiles.IDebuggable
 import buildcraft.api.transport.pipe.ICustomPipeConnection
+import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.packet.{PacketHandler, SideProxy, TileMessage}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
@@ -15,7 +16,7 @@ import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.fluids.{FluidStack, FluidTank}
+import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fml.common.Optional
 
 @Optional.Interface(modid = "BuildCraftAPI|transport", iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
@@ -101,7 +102,10 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
                     case _ => false
                 }
             }
-            val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.last
+            val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.lastOption.getOrElse({
+                FluidTank.LOGGER.info("No lowest tank")
+                getPos
+            })
             val tanks = Iterator.iterate(lowest)(_.up())
               .takeWhile(function).map(getWorld.getTileEntity(_).asInstanceOf[TileTank]).toIndexedSeq
             Connection.setConnection(tanks, c => tile => tile.connection = c)
@@ -117,7 +121,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
             connection.updateComparator()
         }
 
-        override def readFromNBT(nbt: NBTTagCompound): FluidTank = {
+        override def readFromNBT(nbt: NBTTagCompound) = {
             setCapacity(nbt.getInteger("capacity"))
             val fluid = FluidStack.loadFluidStackFromNBT(nbt)
             setFluid(fluid)

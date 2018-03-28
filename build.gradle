@@ -43,6 +43,7 @@ sourceSets {
         }
         resources {
             srcDir 'resources'
+            exclude 'image2.png'
         }
     }
 }
@@ -72,7 +73,7 @@ processResources {
         
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude 'mcmod.info', 'image2.png'
     }
 }
 
