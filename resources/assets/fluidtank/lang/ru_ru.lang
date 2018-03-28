@@ -1,0 +1,14 @@
+tile.fluidtank.blocktank1.wood.name=Деревянный резервуар
+tile.fluidtank.blocktank2.stone.name=Каменный резервуар
+tile.fluidtank.blocktank2.copper.name=Медный резервуар
+tile.fluidtank.blocktank2.tin.name=Оловянный резервуар
+tile.fluidtank.blocktank3.iron.name=Железный резервуар
+tile.fluidtank.blocktank3.bronze.name=Бронзовый резервуар
+tile.fluidtank.blocktank3.lead.name=Свинцовый резервуар
+tile.fluidtank.blocktank3.silver.name=Серебряный резервуар
+tile.fluidtank.blocktank4.gold.name=Золотой резервуар
+tile.fluidtank.blocktank5.diamond.name=Алмазный резервуар
+tile.fluidtank.blocktank6.emerald.name=Изумрудный резервуар
+tile.fluidtank.blocktank7.star.name=Звёздный резервуар
+
+itemGroup.FluidTank=FluidTanks
