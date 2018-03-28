@@ -6,11 +6,13 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -46,6 +48,8 @@ public class FluidTank {
 
     static {
         instance = new FluidTank();
+        if ((Boolean) Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", Boolean.FALSE))
+            FluidRegistry.enableUniversalBucket();
     }
 
     @EventHandler
@@ -66,7 +70,7 @@ public class FluidTank {
 
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().registerAll(BLOCK_TANKS.toArray(new BlockTank[BLOCK_TANKS.size()]));
+        event.getRegistry().registerAll(BLOCK_TANKS.toArray(new BlockTank[0]));
         TileEntity.register(modID + ":tiletank", TileTank.class);
     }
 

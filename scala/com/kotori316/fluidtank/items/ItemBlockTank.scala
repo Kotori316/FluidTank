@@ -8,13 +8,15 @@ import com.kotori316.fluidtank.tiles.Tiers
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.{EnumRarity, ItemBlock, ItemStack}
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.world.World
+import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.JavaConverters._
 
-class ItemBlockTank(block: BlockTank, val rank: Int) extends ItemBlock(block) {
+class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(blockTank) {
     setHasSubtypes(true)
     setCreativeTab(Utils.CREATIVE_TABS)
 
@@ -24,7 +26,7 @@ class ItemBlockTank(block: BlockTank, val rank: Int) extends ItemBlock(block) {
 
     def getModelResouceLocation(meta: Int) = new ModelResourceLocation(getRegistryName + tierName(meta), "inventory")
 
-    private def tierName(meta: Int) = block.getTierByMeta(meta).toString.toLowerCase
+    private def tierName(meta: Int) = blockTank.getTierByMeta(meta).toString.toLowerCase
 
     def itemList: java.util.List[((ItemBlockTank, Integer))] = (0 until Tiers.rankList(rank)).map(i => (this, Int.box(i))).asJava
 
@@ -43,5 +45,9 @@ class ItemBlockTank(block: BlockTank, val rank: Int) extends ItemBlock(block) {
             val c = tankNBT.getInteger("capacity")
             tooltip.add(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0)(_.amount) + " mB / " + c + " mB")
         }
+    }
+
+    override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
+        new TankItemFluidHander(stack)
     }
 }
