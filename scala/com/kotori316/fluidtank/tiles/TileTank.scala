@@ -68,10 +68,10 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         if (c != null) c else super.getCapability(capability, facing)
     }
 
-    override def hasCapability(capability: Capability[_], facing: EnumFacing) =
+    override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
         connection.hasCapability(capability, facing) || super.hasCapability(capability, facing)
 
-    private def sendPacket() = {
+    private def sendPacket(): Unit = {
         if (SideProxy.isServer(this)) PacketHandler.WRAPPER.sendToDimension(TileMessage(this), getWorld.provider.getDimension)
     }
 
@@ -114,11 +114,31 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     class Tank extends net.minecraftforge.fluids.FluidTank(tier.amount) {
         setTileEntity(self)
+        var box: Box = _
 
         override def onContentsChanged(): Unit = {
             super.onContentsChanged()
             sendPacket()
             connection.updateComparator()
+            if (!SideProxy.isServer(self) && getCapacity != 0) {
+                val percent = getFluidAmount.toDouble / getCapacity.toDouble
+                val a = 0.001
+                if (percent > a) {
+                    val d = 1d / 16d
+                    var maxY = 0d
+                    var minY = 0d
+                    if (tank.getFluid.getFluid.isGaseous(tank.getFluid)) {
+                        maxY = 1d - a
+                        minY = 1d - percent + a
+                    } else {
+                        minY = a
+                        maxY = percent - a
+                    }
+                    box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
+                } else {
+                    box = null
+                }
+            }
         }
 
         override def readFromNBT(nbt: NBTTagCompound) = {
