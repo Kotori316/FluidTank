@@ -22,6 +22,7 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreIngredient;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 
@@ -37,8 +38,8 @@ public class TankRecipe extends ShapedRecipes {
 
         setRegistryName(new ResourceLocation(FluidTank.modID + ":tank" + tiers.toString().toLowerCase(Locale.US)));
         this.tiers = tiers;
-        OreIngredient oreIngredient = new OreIngredient(tiers.oreName());
-        valid = tiers.rank() > 1 && OreDictionary.doesOreNameExist(tiers.oreName());
+        OreIngredient oreIngredient = new OreIngredient(Config.content().oreNameMap().apply(tiers));
+        valid = tiers.rank() > 1 && OreDictionary.doesOreNameExist(Config.content().oreNameMap().apply(tiers));
         if (valid) {
             TierIngredient tierIngredient = new TierIngredient(tiers.rank() - 1);
             Arrays.stream(new int[]{0, 2, 6, 8}).forEach(value -> recipeItems.set(value, oreIngredient));

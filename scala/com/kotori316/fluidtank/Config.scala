@@ -2,6 +2,7 @@ package com.kotori316.fluidtank
 
 import java.io.File
 
+import com.kotori316.fluidtank.tiles.Tiers
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 object Config {
+    val CATEGORY_RECIPE = "recipe"
     private var configuration: Configuration = _
     private var mConetent: Content = _
 
@@ -41,6 +43,13 @@ object Config {
         private val removeRecipeProperty = configuration.get(Configuration.CATEGORY_GENERAL, "RemoveRecipe", false)
         removeRecipeProperty.setRequiresMcRestart(true)
         val removeRecipe = removeRecipeProperty.getBoolean
+
+        val oreNameMap: Map[Tiers, String] = Tiers.list.drop(2).map(tier => {
+            val property = configuration.get(CATEGORY_RECIPE, tier + "OreName", tier.oreName)
+            property.setRequiresMcRestart(true)
+            (tier, property.getString)
+        }).toMap + ((Tiers.Invalid, "Unknown")) + ((Tiers.WOOD, "logWood"))
+
         if (configuration.hasChanged)
             configuration.save()
     }
