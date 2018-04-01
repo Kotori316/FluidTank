@@ -56,6 +56,7 @@ public class FluidTank {
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(instance);
         proxy.registerTESR();
+        Config.load(event.getSuggestedConfigurationFile());
     }
 
     @EventHandler
@@ -81,7 +82,8 @@ public class FluidTank {
 
     @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-        event.getRegistry().registerAll(Tiers.jList().stream().map(TankRecipe::new).filter(TankRecipe::isValid).toArray(IRecipe[]::new));
+        if (!Config.content().removeRecipe())
+            event.getRegistry().registerAll(Tiers.jList().stream().map(TankRecipe::new).filter(TankRecipe::isValid).toArray(IRecipe[]::new));
     }
 
     @SubscribeEvent
