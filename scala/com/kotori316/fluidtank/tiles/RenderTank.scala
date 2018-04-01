@@ -7,8 +7,6 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 @SideOnly(Side.CLIENT)
 class RenderTank extends FastTESR[TileTank] {
-    val d = 1d / 16d
-    val a = 0.001
 
     override def renderTileEntityFast(te: TileTank, x: Double, y: Double, z: Double, partialTicks: Float,
                                       destroyStage: Int, partial: Float, buffer: BufferBuilder) = {

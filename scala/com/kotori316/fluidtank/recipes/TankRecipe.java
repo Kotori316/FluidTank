@@ -2,6 +2,9 @@ package com.kotori316.fluidtank.recipes;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import net.minecraft.inventory.InventoryCrafting;
@@ -11,6 +14,11 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.OreIngredient;
 
@@ -19,6 +27,8 @@ import com.kotori316.fluidtank.tiles.Tiers;
 
 public class TankRecipe extends ShapedRecipes {
 
+    private static final Function<ItemStack, IFluidHandlerItem> itemHanlder =
+        s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
     private final Tiers tiers;
     private final boolean valid;
 
@@ -55,6 +65,7 @@ public class TankRecipe extends ShapedRecipes {
      * Based on {@link net.minecraft.item.crafting.ShapedRecipes#checkMatch(InventoryCrafting, int, int, boolean)}
      */
     protected boolean checkMatch(InventoryCrafting inv, int startX, int startY) {
+        FluidStack stack = null;
         for (int x = 0; x < inv.getWidth(); x++) {
             for (int y = 0; y < inv.getHeight(); y++) {
                 int subX = x - startX;
@@ -65,7 +76,22 @@ public class TankRecipe extends ShapedRecipes {
                     target = recipeItems.get(subX + subY * 3);
                 }
 
-                if (!target.apply(inv.getStackInRowAndColumn(x, y))) {
+                ItemStack stackInRowAndColumn = inv.getStackInRowAndColumn(x, y);
+                if (target.apply(stackInRowAndColumn)) {
+                    if (target instanceof TierIngredient) {
+                        FluidStack fluidStack = Optional.ofNullable(itemHanlder.apply(stackInRowAndColumn))
+                            .map(h -> h.getTankProperties()[0]).map(IFluidTankProperties::getContents).orElse(null);
+                        if (stack == null) {
+                            if (fluidStack != null) {
+                                stack = fluidStack;
+                            }
+                        } else {
+                            if (fluidStack != null && !stack.isFluidEqual(fluidStack)) {
+                                return false;
+                            }
+                        }
+                    }
+                } else {
                     return false;
                 }
             }
@@ -75,7 +101,15 @@ public class TankRecipe extends ShapedRecipes {
 
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        return getRecipeOutput().copy();
+        FluidStack stack = Arrays.stream(new int[]{1, 3, 5, 7}).mapToObj(inv::getStackInSlot)
+            .map(itemHanlder)
+            .map(IFluidHandler::getTankProperties)
+            .flatMap(WrapFluid::newStreamWithValidStack)
+            .reduce(WrapFluid::combine)
+            .map(WrapFluid::getStack).orElse(null);
+        ItemStack copy = getRecipeOutput().copy();
+        Optional.ofNullable(itemHanlder.apply(copy)).ifPresent(h -> h.fill(stack, true));
+        return copy;
     }
 
     @Override
@@ -85,5 +119,32 @@ public class TankRecipe extends ShapedRecipes {
 
     public boolean isValid() {
         return valid;
+    }
+
+    private static class WrapFluid {
+        private FluidStack stack;
+
+        private WrapFluid(FluidStack stack) {
+            this.stack = stack;
+        }
+
+        private static WrapFluid combine(WrapFluid w1, WrapFluid w2) {
+            w1.stack.amount += w2.stack.amount;
+            return w1;
+        }
+
+        private static Stream<WrapFluid> newStreamWithValidStack(IFluidTankProperties[] properties) {
+            if (properties.length > 0) {
+                FluidStack stack = properties[0].getContents();
+                if (stack != null) {
+                    return Stream.of(new WrapFluid(stack));
+                }
+            }
+            return Stream.empty();
+        }
+
+        public FluidStack getStack() {
+            return stack;
+        }
     }
 }
