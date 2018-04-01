@@ -1,5 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {"type": "fluidtank:config"}
+  ],
   "pattern": [
     "x x",
     "xpx",

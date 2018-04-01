@@ -9,6 +9,7 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankPr
 import net.minecraftforge.fluids.{Fluid, FluidStack, FluidUtil}
 
 class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvider {
+    val reversed = seq.reverse
 
     val handler: IFluidHandler = new IFluidHandler {
         override def fill(kind: FluidStack, doFill: Boolean): Int = {
@@ -82,7 +83,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
 
     def tankSeq(stack: FluidStack): Seq[TileTank] = {
         if (Option(stack).flatMap(s => Option(s.getFluid)).exists(_.isGaseous(stack))) {
-            seq.reverse
+            reversed
         } else {
             seq
         }

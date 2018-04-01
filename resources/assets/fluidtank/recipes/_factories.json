@@ -1,0 +1,5 @@
+{
+  "conditions": {
+    "config": "com.kotori316.fluidtank.recipes.ConfigCondition"
+  }
+}
