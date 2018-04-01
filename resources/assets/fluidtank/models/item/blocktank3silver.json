@@ -2,9 +2,9 @@
   "parent": "block/block",
   "ambientocclusion": false,
   "textures": {
-    "particle": "fluidtank:blocks/iron1",
-    "side": "fluidtank:blocks/iron1",
-    "top": "fluidtank:blocks/iron2"
+    "particle": "fluidtank:blocks/silver1",
+    "side": "fluidtank:blocks/silver1",
+    "top": "fluidtank:blocks/silver2"
   },
   "elements": [
     {

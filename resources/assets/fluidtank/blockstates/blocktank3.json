@@ -15,10 +15,25 @@
     "variant": {
       "0": {},
       "1": {
+        "textures": {
+          "particle": "fluidtank:blocks/bronze1",
+          "side": "fluidtank:blocks/bronze1",
+          "top": "fluidtank:blocks/bronze2"
+        }
       },
       "2": {
+        "textures": {
+          "particle": "fluidtank:blocks/lead1",
+          "side": "fluidtank:blocks/lead1",
+          "top": "fluidtank:blocks/lead2"
+        }
       },
       "3": {
+        "textures": {
+          "particle": "fluidtank:blocks/silver1",
+          "side": "fluidtank:blocks/silver1",
+          "top": "fluidtank:blocks/silver2"
+        }
       }
     },
     "inventory": [

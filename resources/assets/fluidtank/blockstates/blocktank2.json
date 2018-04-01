@@ -15,8 +15,18 @@
     "variant": {
       "0": {},
       "1": {
+        "textures": {
+          "particle": "fluidtank:blocks/copper1",
+          "side": "fluidtank:blocks/copper1",
+          "top": "fluidtank:blocks/copper2"
+        }
       },
       "2": {
+        "textures": {
+          "particle": "fluidtank:blocks/tin1",
+          "side": "fluidtank:blocks/tin1",
+          "top": "fluidtank:blocks/tin2"
+        }
       },
       "3": {
       }

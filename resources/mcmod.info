@@ -2,15 +2,16 @@
   {
     "modid": "fluidtank",
     "name": "FluidTank",
-    "description": "FluidTank.",
+    "description": "Add large fluid tanks.",
     "version": "${version}",
     "mcversion": "1.12.2",
-    "url": "",
-    "updateUrl": "",
+    "url": "https://minecraft.curseforge.com/projects/largefluidtank",
+    "updateUrl": "https://minecraft.curseforge.com/projects/largefluidtank",
     "authorList": [ "Kotori316" ],
-    "credits": "The Forge and FML guys, for making this example",
+    "credits": "Kotori316",
     "logoFile": "",
     "screenshots": [ ],
-    "dependencies": [ ]
+    "dependencies": [ ],
+    "updateJSON": "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json"
   }
 ]

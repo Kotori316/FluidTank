@@ -32,7 +32,8 @@ import com.kotori316.fluidtank.recipes.TankRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-@Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@")
+@Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@",
+    updateJSON = "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json")
 public class FluidTank {
 
     public static final FluidTank instance;
