@@ -1,0 +1,9 @@
+{
+  "homepage": "https://minecraft.curseforge.com/projects/largefluidtank",
+  "promos": {
+    "1.12.2-recommended": "1.2"
+  },
+  "1.12.2": {
+    "1.2": "More smart recipe."
+  }
+}
