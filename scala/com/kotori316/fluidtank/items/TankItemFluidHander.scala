@@ -5,7 +5,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankProperties, IFluidHandlerItem, IFluidTankProperties}
 
 class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
@@ -22,8 +21,7 @@ class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapa
 
     override def getTankProperties: Array[IFluidTankProperties] = {
         val fluid = FluidStack.loadFluidStackFromNBT(tankNbt)
-        if (fluid == null) EmptyFluidHandler.EMPTY_TANK_PROPERTIES_ARRAY
-        else Array(new FluidTankProperties(fluid, tiers.amount))
+        Array(new FluidTankProperties(fluid, tiers.amount))
     }
 
     override def fill(resource: FluidStack, doFill: Boolean): Int = {

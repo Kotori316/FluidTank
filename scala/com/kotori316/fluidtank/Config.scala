@@ -50,6 +50,8 @@ object Config {
             (tier, property.getString)
         }).toMap + ((Tiers.Invalid, "Unknown")) + ((Tiers.WOOD, "logWood"))
 
+        assert(Tiers.list.forall(oreNameMap.contains))
+
         if (configuration.hasChanged)
             configuration.save()
     }

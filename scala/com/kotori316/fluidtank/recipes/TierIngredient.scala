@@ -1,0 +1,9 @@
+package com.kotori316.fluidtank.recipes
+
+import com.kotori316.fluidtank.FluidTank
+import net.minecraft.item.ItemStack
+import net.minecraft.item.crafting.Ingredient
+
+class TierIngredient(val rank: Int) extends Ingredient(
+    FluidTank.BLOCK_TANKS.get(rank - 1).itemBlock.itemList.map { case (i, m) => new ItemStack(i, 1, m) }: _*
+)

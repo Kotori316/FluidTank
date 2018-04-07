@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.recipes;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
@@ -42,8 +42,8 @@ public class TankRecipe extends ShapedRecipes {
         valid = tiers.rank() > 1 && OreDictionary.doesOreNameExist(Config.content().oreNameMap().apply(tiers));
         if (valid) {
             TierIngredient tierIngredient = new TierIngredient(tiers.rank() - 1);
-            Arrays.stream(new int[]{0, 2, 6, 8}).forEach(value -> recipeItems.set(value, oreIngredient));
-            Arrays.stream(new int[]{1, 3, 5, 7}).forEach(value -> recipeItems.set(value, tierIngredient));
+            IntStream.of(0, 2, 6, 8).forEach(value -> recipeItems.set(value, oreIngredient));
+            IntStream.of(1, 3, 5, 7).forEach(value -> recipeItems.set(value, tierIngredient));
         }
     }
 
@@ -80,7 +80,7 @@ public class TankRecipe extends ShapedRecipes {
                 ItemStack stackInRowAndColumn = inv.getStackInRowAndColumn(x, y);
                 if (target.apply(stackInRowAndColumn)) {
                     if (target instanceof TierIngredient) {
-                        FluidStack fluidStack = Optional.ofNullable(itemHanlder.apply(stackInRowAndColumn))
+                        FluidStack fluidStack = Optional.of(stackInRowAndColumn).map(itemHanlder)
                             .map(h -> h.getTankProperties()[0]).map(IFluidTankProperties::getContents).orElse(null);
                         if (stack == null) {
                             if (fluidStack != null) {
@@ -102,14 +102,14 @@ public class TankRecipe extends ShapedRecipes {
 
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        FluidStack stack = Arrays.stream(new int[]{1, 3, 5, 7}).mapToObj(inv::getStackInSlot)
+        FluidStack stack = IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot)
             .map(itemHanlder)
             .map(IFluidHandler::getTankProperties)
             .flatMap(WrapFluid::newStreamWithValidStack)
             .reduce(WrapFluid::combine)
             .map(WrapFluid::getStack).orElse(null);
         ItemStack copy = getRecipeOutput().copy();
-        Optional.ofNullable(itemHanlder.apply(copy)).ifPresent(h -> h.fill(stack, true));
+        Optional.of(copy).map(itemHanlder).ifPresent(h -> h.fill(stack, true));
         return copy;
     }
 
@@ -120,6 +120,11 @@ public class TankRecipe extends ShapedRecipes {
 
     public boolean isValid() {
         return valid;
+    }
+
+    @Override
+    public String toString() {
+        return "Recipe of " + tiers + " valid = " + valid;
     }
 
     private static class WrapFluid {

@@ -103,7 +103,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
                 }
             }
             val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.lastOption.getOrElse({
-                FluidTank.LOGGER.info("No lowest tank")
+                FluidTank.LOGGER.fatal("No lowest tank", new IllegalArgumentException("No lowest tank"))
                 getPos
             })
             val tanks = Iterator.iterate(lowest)(_.up())

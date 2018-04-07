@@ -21,7 +21,7 @@ sealed class Tiers private(val rank: Int, a: Int, override val toString: String,
 }
 
 object Tiers {
-    val rankList = Array(0, 0, 0, 0, 0, 0, 0, 0)
+    val rankList = Array.fill(8)(0)
 
     val map = mutable.Map.empty[String, Tiers]
     val list = mutable.ArrayBuffer.empty[Tiers]

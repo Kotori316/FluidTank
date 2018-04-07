@@ -1,7 +1,5 @@
 package com.kotori316.fluidtank.items
 
-import java.util
-
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.tiles.Tiers
@@ -28,7 +26,9 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
 
     private def tierName(meta: Int) = blockTank.getTierByMeta(meta).toString.toLowerCase
 
-    def itemList: java.util.List[((ItemBlockTank, Integer))] = (0 until Tiers.rankList(rank)).map(i => (this, Int.box(i))).asJava
+    def itemList = (0 until Tiers.rankList(rank)).map(i => (this, Int.box(i)))
+
+    def itemStream: java.util.stream.Stream[(ItemBlockTank, Integer)] = itemList.asJava.stream()
 
     override def getUnlocalizedName(stack: ItemStack): String = {
         super.getUnlocalizedName(stack) + "." + tierName(stack.getItemDamage)
@@ -37,7 +37,7 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
     override def getMetadata(damage: Int): Int = damage
 
     @SideOnly(Side.CLIENT)
-    override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag): Unit = {
+    override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[String], flagIn: ITooltipFlag): Unit = {
         val nbt = stack.getSubCompound("BlockEntityTag")
         if (nbt != null) {
             val tankNBT = nbt.getCompoundTag("tank")

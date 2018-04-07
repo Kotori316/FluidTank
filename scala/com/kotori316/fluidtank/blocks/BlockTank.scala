@@ -22,6 +22,7 @@ import net.minecraftforge.fluids.{Fluid, FluidUtil}
 import net.minecraftforge.items.CapabilityItemHandler
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
 
 abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider {
 
@@ -115,7 +116,7 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
         if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
             val blockStack = new ItemStack(this, 1, damageDropped(state))
             saveTankNBT(te, blockStack)
-            val list = Seq(blockStack)
+            val list = ArrayBuffer(blockStack)
             val chance = ForgeEventFactory.fireBlockHarvesting(list.asJava, worldIn, pos, state, i, 1.0f, false, harvesters.get)
             for (drop <- list) {
                 if (worldIn.rand.nextFloat <= chance) Block.spawnAsEntity(worldIn, pos, drop)

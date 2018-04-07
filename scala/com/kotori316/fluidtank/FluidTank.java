@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.recipes.TankRecipe;
@@ -90,7 +91,7 @@ public class FluidTank {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void registerModels(ModelRegistryEvent event) {
-        BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(i -> i.itemList().stream()).forEach(t ->
+        BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
             ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResouceLocation(t._2)));
     }
 
