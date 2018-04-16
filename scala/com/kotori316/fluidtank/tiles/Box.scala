@@ -308,5 +308,9 @@ object Box {
 
     case class LightValue(l1: Int, l2: Int)
 
-    implicit val lightValue = LightValue(240, 0)
+    object LightValue {
+        def apply(brightness: Int): LightValue = new LightValue(brightness >> 16 & 0xFFFF, brightness >> 0 & 0xFFFF)
+    }
+
+    implicit val lightValue = LightValue(15 * 16, 15 * 16)
 }

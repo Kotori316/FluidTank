@@ -15,8 +15,9 @@ class RenderTank extends FastTESR[TileTank] {
             val tank = te.tank
             if (tank.box != null) {
                 val texture = Minecraft.getMinecraft.getTextureMapBlocks.getAtlasSprite(tank.getFluid.getFluid.getStill.toString)
+                val brightness = te.getWorld.getCombinedLight(te.getPos, tank.getFluid.getFluid.getLuminosity(tank.getFluid))
                 buffer.setTranslation(x, y, z)
-                tank.box.render(buffer, texture)
+                tank.box.render(buffer, texture)(Box.LightValue(brightness))
             }
         }
         Minecraft.getMinecraft.mcProfiler.endSection()
