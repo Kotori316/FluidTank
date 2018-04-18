@@ -33,7 +33,7 @@ public class TankRecipe extends ShapedRecipes {
     private final Tiers tiers;
     private final boolean valid;
 
-    public TankRecipe(Tiers tiers) {
+    public TankRecipe(@Nonnull Tiers tiers) {
         super("", 3, 3, NonNullList.withSize(9, Ingredient.EMPTY), ItemStack.EMPTY);
 
         setRegistryName(new ResourceLocation(FluidTank.modID + ":tank" + tiers.toString().toLowerCase(Locale.US)));
@@ -52,14 +52,9 @@ public class TankRecipe extends ShapedRecipes {
      */
     @Override
     public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World world) {
-        for (int x = 0; x <= inv.getWidth() - 3; x++) {
-            for (int y = 0; y <= inv.getHeight() - 3; ++y) {
-                if (checkMatch(inv, x, y)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return IntStream.rangeClosed(0, inv.getWidth() - 3).allMatch(x ->
+            IntStream.rangeClosed(0, inv.getHeight() - 3)
+                .allMatch(y -> checkMatch(inv, x, y)));
     }
 
     /**
@@ -81,7 +76,7 @@ public class TankRecipe extends ShapedRecipes {
                 if (target.apply(stackInRowAndColumn)) {
                     if (target instanceof TierIngredient) {
                         FluidStack fluidStack = Optional.of(stackInRowAndColumn).map(itemHanlder)
-                            .map(h -> h.getTankProperties()[0]).map(IFluidTankProperties::getContents).orElse(null);
+                            .map(h -> h.getTankProperties()[0].getContents()).orElse(null);
                         if (stack == null) {
                             if (fluidStack != null) {
                                 stack = fluidStack;
@@ -114,6 +109,7 @@ public class TankRecipe extends ShapedRecipes {
     }
 
     @Override
+    @Nonnull
     public ItemStack getRecipeOutput() {
         return valid ? new ItemStack(FluidTank.BLOCK_TANKS.get(tiers.rank() - 1), 1, tiers.meta()) : super.getRecipeOutput();
     }
@@ -130,16 +126,16 @@ public class TankRecipe extends ShapedRecipes {
     private static class WrapFluid {
         private FluidStack stack;
 
-        private WrapFluid(FluidStack stack) {
-            this.stack = stack;
+        private WrapFluid(@Nonnull FluidStack stack) {
+            this.stack = stack.copy();
         }
 
-        private static WrapFluid combine(WrapFluid w1, WrapFluid w2) {
+        private static WrapFluid combine(@Nonnull WrapFluid w1, @Nonnull WrapFluid w2) {
             w1.stack.amount += w2.stack.amount;
             return w1;
         }
 
-        private static Stream<WrapFluid> newStreamWithValidStack(IFluidTankProperties[] properties) {
+        private static Stream<WrapFluid> newStreamWithValidStack(@Nonnull IFluidTankProperties[] properties) {
             if (properties.length > 0) {
                 FluidStack stack = properties[0].getContents();
                 if (stack != null) {
@@ -149,6 +145,7 @@ public class TankRecipe extends ShapedRecipes {
             return Stream.empty();
         }
 
+        @Nonnull
         public FluidStack getStack() {
             return stack;
         }
