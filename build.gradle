@@ -55,7 +55,7 @@ repositories{
 }
 
 dependencies {
-    deobfCompile "com.mod-buildcraft:buildcraft:7.99.15"
+    deobfCompile "com.mod-buildcraft:buildcraft:7.99.16"
 }
 
 processResources {
