@@ -115,7 +115,7 @@ class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapa
 
     def createTag = {
         val tag = new NBTTagCompound
-        tag.setTag("tiers", tiers.toNBTTag)
+        tag.setTag("tier", tiers.toNBTTag)
         val tanktag = new NBTTagCompound
         tanktag.setInteger("capacity", tiers.amount)
         fluid.writeToNBT(tanktag)

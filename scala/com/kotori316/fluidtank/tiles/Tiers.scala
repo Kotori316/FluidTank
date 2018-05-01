@@ -45,6 +45,10 @@ object Tiers {
 
     def fromNBT(nbt: NBTTagCompound): Tiers = {
         val key = nbt.getString("string")
-        map.getOrElse(key, Invalid)
+        map.getOrElse(key, {
+            print("Invaluid pattern returned.")
+            (new Exception).printStackTrace()
+            WOOD
+        })
     }
 }

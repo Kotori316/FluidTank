@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
-import net.minecraft.util.{BlockRenderLayer, EnumFacing, EnumHand}
+import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.event.ForgeEventFactory
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -79,6 +79,8 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
     override final def createNewTileEntity(worldIn: World, meta: Int) = new TileTank(getTierByMeta(meta))
 
     override final def getBlockLayer = BlockRenderLayer.CUTOUT
+
+    override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.ENTITYBLOCK_ANIMATED
 
     override final def isFullCube(state: IBlockState) = false
 
