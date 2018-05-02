@@ -24,26 +24,17 @@ import net.minecraftforge.items.CapabilityItemHandler
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider {
-
-    def rank: Int
+class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL) with ITileEntityProvider {
 
     final val itemBlock = new ItemBlockTank(this, rank)
 
-    def getTierByMeta(meta: Int): Tiers = {
-        if (meta < tierArray.length)
-            tierArray(meta)
-        else
-            tierArray(0)
-    }
+    def getTierByMeta(meta: Int): Tiers = defaultTier
 
     setRegistryName(FluidTank.modID, "blocktank" + rank)
     setUnlocalizedName(FluidTank.modID + ".blocktank" + rank)
     setCreativeTab(Utils.CREATIVE_TABS)
     setHardness(1.0f)
     itemBlock.setRegistryName(FluidTank.modID, "blocktank" + rank)
-
-    final lazy val tierArray = Tiers.list.filter(t => t.rank == rank).toArray
 
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
                                   hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
@@ -89,6 +80,8 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
     override final def hasTileEntity(state: IBlockState) = true
 
     override final def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = Utils.BOUNDING_BOX
+
+    override def getStateFromMeta(meta: Int) = this.getDefaultState
 
     override final def shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing) = true
 
@@ -145,35 +138,11 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
 }
 
 object BlockTank {
-    val blockTank1 = new BlockTank {
-        override def rank = 1
-
-        override def getTierByMeta(meta: Int) = Tiers.WOOD
-    }
-    val blockTank2 = new BlockTankVariants {
-        override def rank = 2
-    }
-    val blockTank3 = new BlockTankVariants {
-        override def rank = 3
-    }
-    val blockTank4 = new BlockTank {
-        override def rank = 4
-
-        override def getTierByMeta(meta: Int) = Tiers.GOLD
-    }
-    val blockTank5 = new BlockTank {
-        override def rank = 5
-
-        override def getTierByMeta(meta: Int) = Tiers.DIAMOND
-    }
-    val blockTank6 = new BlockTank {
-        override def rank = 6
-
-        override def getTierByMeta(meta: Int) = Tiers.EMERALD
-    }
-    val blockTank7 = new BlockTank {
-        override def rank: Int = 7
-
-        override def getTierByMeta(meta: Int): Tiers = Tiers.STAR
-    }
+    val blockTank1 = new BlockTank(1, Tiers.WOOD)
+    val blockTank2 = new BlockTankVariants(2, Tiers.STONE)
+    val blockTank3 = new BlockTankVariants(3, Tiers.IRON)
+    val blockTank4 = new BlockTank(4, Tiers.GOLD)
+    val blockTank5 = new BlockTank(5, Tiers.DIAMOND)
+    val blockTank6 = new BlockTank(6, Tiers.EMERALD)
+    val blockTank7 = new BlockTank(7, Tiers.STAR)
 }

@@ -27,7 +27,7 @@ public class ClientProxy extends SideProxy {
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
     public static final RenderTank RENDER_TANK = new RenderTank();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
-    public static final ModelResourceLocation MODEL_RESOURCE_LOCATION =
+    public static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":fluidtankitem", "inventory");
 
     @Override
@@ -45,13 +45,13 @@ public class ClientProxy extends SideProxy {
     @SubscribeEvent
     public void registerModels(ModelRegistryEvent event) {
         FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(item ->
-            ModelLoader.setCustomMeshDefinition(item, stack -> MODEL_RESOURCE_LOCATION)
+            ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
         );
     }
 
     @SubscribeEvent
     public void onBake(ModelBakeEvent event) {
-        event.getModelRegistry().putObject(MODEL_RESOURCE_LOCATION, MODEL_TANK);
+        event.getModelRegistry().putObject(MESH_MODEL, MODEL_TANK);
         FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t -> {
             ModelResourceLocation modelLocation = t._1.getModelResouceLocation(t._2);
             IBakedModel model = event.getModelManager().getModel(modelLocation);

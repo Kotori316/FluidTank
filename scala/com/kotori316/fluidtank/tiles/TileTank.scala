@@ -77,7 +77,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     def hasContent: Boolean = tank.getFluidAmount > 0
 
-    override def hasFastRenderer = true
+    override def hasFastRenderer = false
 
     def neighborChanged(): Unit = {
         updateConnection()

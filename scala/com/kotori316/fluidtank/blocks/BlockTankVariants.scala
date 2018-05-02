@@ -1,12 +1,23 @@
 package com.kotori316.fluidtank.blocks
 
+import com.kotori316.fluidtank.tiles.Tiers
 import net.minecraft.block.properties.{IProperty, PropertyInteger}
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.ItemStack
 import net.minecraft.util.NonNullList
 
-abstract class BlockTankVariants extends BlockTank {
+class BlockTankVariants(rank: Int, tiers: Tiers) extends BlockTank(rank, defaultTier = tiers) {
+
+    final lazy val tierArray = Tiers.list.filter(t => t.rank == rank).toArray
+
+    override def getTierByMeta(meta: Int) = {
+        if (meta < tierArray.length)
+            tierArray(meta)
+        else
+            tierArray(0)
+    }
+
     final lazy val property = PropertyInteger.create("variant", 0, tierArray.length - 1)
 
     final def properties: Seq[IProperty[_ <: Comparable[_]]] = Seq(property)
