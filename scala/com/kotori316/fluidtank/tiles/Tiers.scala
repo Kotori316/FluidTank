@@ -5,8 +5,8 @@ import net.minecraft.nbt.NBTTagCompound
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-sealed class Tiers private(val rank: Int, a: Int, override val toString: String, val meta: Int, val oreName: String) {
-    val amount = a * 1000
+sealed class Tiers private(val rank: Int, buckets: Int, override val toString: String, val meta: Int, val oreName: String) {
+    val amount = buckets * 1000
     Tiers.map.put(toString, this)
     Tiers.list.append(this)
     Tiers.rankList(rank) = Tiers.rankList(rank) + 1
@@ -45,6 +45,10 @@ object Tiers {
 
     def fromNBT(nbt: NBTTagCompound): Tiers = {
         val key = nbt.getString("string")
-        map.getOrElse(key, Invalid)
+        map.getOrElse(key, {
+            println("Invaluid pattern returned.")
+            (new Exception).printStackTrace()
+            WOOD
+        })
     }
 }

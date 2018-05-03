@@ -48,7 +48,7 @@ object Config {
             val property = configuration.get(CATEGORY_RECIPE, tier + "OreName", tier.oreName)
             property.setRequiresMcRestart(true)
             (tier, property.getString)
-        }).toMap + ((Tiers.Invalid, "Unknown")) + ((Tiers.WOOD, "logWood"))
+        }).toMap + (Tiers.Invalid -> "Unknown") + (Tiers.WOOD -> "logWood")
 
         assert(Tiers.list.forall(oreNameMap.contains))
 
