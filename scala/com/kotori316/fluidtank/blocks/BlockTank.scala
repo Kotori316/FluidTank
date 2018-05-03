@@ -7,8 +7,8 @@ import com.kotori316.fluidtank.{FluidTank, Utils}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, ITileEntityProvider}
 import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.{EntityLiving, EntityLivingBase}
 import net.minecraft.init.Enchantments
 import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
@@ -80,8 +80,11 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     override def canCreatureSpawn(state: IBlockState, world: IBlockAccess, pos: BlockPos, living: EntityLiving.SpawnPlacementType) = false
 
     override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
+        worldIn.getTileEntity(pos) match {
+            case tank: TileTank => tank.onDestory()
+            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+        }
         super.breakBlock(worldIn, pos, state)
-        worldIn.removeTileEntity(pos)
     }
 
     override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack = {
@@ -92,7 +95,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
 
     private def saveTankNBT(tileEntity: TileEntity, stack: ItemStack) = {
         Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
-          .foreach(tag => stack.setTagInfo("BlockEntityTag", tag))
+          .foreach(tag => stack.setTagInfo(TileTank.NBT_BlockTag, tag))
     }
 
     override def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
@@ -112,9 +115,10 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         harvesters.set(null)
     }
 
-    override def neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos): Unit = {
+    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
         worldIn.getTileEntity(pos) match {
-            case tank: TileTank => tank.neighborChanged()
+            case tank: TileTank => tank.onBlockPlacedBy()
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
     }
@@ -124,7 +128,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
         worldIn.getTileEntity(pos) match {
             case tileTank: TileTank => tileTank.getComparatorLevel
-            case _ => 0
+            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
         }
     }
 }

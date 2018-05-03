@@ -1,16 +1,16 @@
 package com.kotori316.fluidtank.tiles
 
-import com.kotori316.fluidtank.Utils
+import com.kotori316.fluidtank.{FluidTank, Utils}
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.{BlockPos, MathHelper}
+import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
+import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankProperties, IFluidHandler, IFluidTankProperties}
-import net.minecraftforge.fluids.{Fluid, FluidStack, FluidUtil}
 
-class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvider {
-    val reversed = seq.reverse
-
+sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
+    val seq: Seq[TileTank] = s.sortBy(_.getPos.getY)
     val handler: IFluidHandler = new IFluidHandler {
         override def fill(kind: FluidStack, doFill: Boolean): Int = {
             if (kind == null || kind.amount <= 0) {
@@ -34,7 +34,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
             }
             val resource = kind.copy()
             var total: FluidStack = null
-            for (tileTank <- tankSeq(getFluidStack).reverse) {
+            for (tileTank <- tankSeq(fluidType).reverse) {
                 if (resource.amount > 0) {
                     val drained = tileTank.tank.drain(resource, doDrain)
                     if (drained != null) {
@@ -55,7 +55,7 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
             }
             var toDrain = maxDrain
             var total: FluidStack = null
-            for (tileTank <- tankSeq(getFluidStack).reverse) {
+            for (tileTank <- tankSeq(fluidType).reverse) {
                 if (toDrain > 0) {
                     if (total == null) {
                         total = tileTank.tank.drain(toDrain, doDrain)
@@ -77,36 +77,71 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
         }
 
         override def getTankProperties: Array[IFluidTankProperties] = {
-            Array(new FluidTankProperties(getFluidStack, Utils.toInt(capacity)))
+            Array(new FluidTankProperties(getFluidStack.orNull, Utils.toInt(capacity)))
         }
     }
 
-    def tankSeq(stack: FluidStack): Seq[TileTank] = {
-        if (Option(stack).flatMap(s => Option(s.getFluid)).exists(_.isGaseous(stack))) {
-            reversed
+    protected def fluidType: FluidStack = {
+        seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).orNull
+    }
+
+    def capacity: Long = seq.map(_.tier.amount.toLong).sum
+
+    def amount: Long = seq.map(_.tank.getFluidAmount.toLong).sum
+
+    def tankSeq(fluid: FluidStack): Seq[TileTank] = {
+        if (fluid != null && fluid.getFluid.isGaseous(fluid)) {
+            seq.reverse
         } else {
             seq
         }
     }
 
-    def transfer() = seq.foreach(tileTank => FluidUtil.tryFluidTransfer(handler, tileTank.tank, tileTank.tank.getFluid, true))
-
-    def fluidType = {
-        seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).map(_.getFluid).orNull
+    def getFluidStack: Option[FluidStack] = {
+        Option(fluidType).map(f => {
+            val stack = f.copy()
+            stack.amount = Utils.toInt(amount)
+            stack
+        })
     }
 
-    def capacity = seq.map(_.tier.amount.toLong).sum
-
-    def amount = seq.map(_.tank.getFluidAmount.toLong).sum
-
-    def getFluidStack = {
-        val fluid = fluidType
-        if (fluid != null)
-            new FluidStack(fluid, Utils.toInt(amount))
-        else null
+    /**
+      * Make connection.
+      *
+      * @param tileTank The tank added to this connection.
+      * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
+      * @return new connection
+      */
+    def add(tileTank: TileTank, facing: EnumFacing): Connection = {
+        val newFluid = tileTank.tank.getFluid
+        if (newFluid == null || fluidType == null || fluidType == newFluid) {
+            // You can connect the tank to this connection.
+            val newSeq = if (facing == EnumFacing.DOWN) {
+                tileTank +: seq
+            } else {
+                seq :+ tileTank
+            }
+            val connection = new Connection(newSeq)
+            val fluidStacks = newSeq.flatMap(t => Option(t.tank.drain(t.tank.getFluid, true)).toList)
+            newSeq.foreach(t => {
+                t.connection = connection
+                t.tank.setFluid(null)
+            })
+            fluidStacks.foreach(connection.handler.fill(_, true))
+            connection
+        } else {
+            // You have to make new connection.
+            val connection = new Connection(Seq(tileTank))
+            tileTank.connection = connection
+            connection
+        }
     }
 
-    def hasChain = seq.size > 1
+    def remove(tileTank: TileTank): Unit = {
+        val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
+        s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
+        s2.tail.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
+    }
 
     def getComparatorLevel: Int = {
         if (amount > 0)
@@ -131,18 +166,15 @@ class Connection(fisrt: TileTank, seq: Seq[TileTank]) extends ICapabilityProvide
 
     override def toString: String = {
         val fluid = getFluidStack
-        if (fluid == null) {
-            s"Connection of null : $amount / $capacity mB"
-        } else {
-            s"Connection of ${fluid.getLocalizedName} : $amount / $capacity mB"
-        }
+        val name = fluid.map(_.getLocalizedName).getOrElse("null")
+        s"Connection of $name : $amount / $capacity mB"
     }
 }
 
 object Connection {
 
-    val invalid: Connection = new Connection(null, Nil) {
-        override def fluidType: Fluid = null
+    val invalid: Connection = new Connection(Nil) {
+        override def fluidType: FluidStack = null
 
         override def capacity: Long = 0
 
@@ -153,19 +185,20 @@ object Connection {
         override val toString: String = "Connection.Invalid"
 
         override def getComparatorLevel: Int = 0
+
+        override def remove(tileTank: TileTank): Unit = ()
     }
 
     val stackFromTile: TileTank => Option[FluidStack] = t => Option(t.tank.getFluid)
 
-    def setConnection(tanks: Seq[TileTank], callback: Connection => TileTank => Unit): Unit = {
-        val newConnection = Connection(tanks.headOption, tanks)
-        tanks.foreach(callback(newConnection))
-        newConnection.transfer()
+    def load(world: World, pos: BlockPos): Unit = {
+        val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => world.getTileEntity(p).isInstanceOf[TileTank])
+          .toList.lastOption.getOrElse({
+            FluidTank.LOGGER.fatal("No lowest tank", new IllegalArgumentException("No lowest tank"))
+            pos
+        })
+        val tanks = Iterator.iterate(lowest)(_.up()).map(world.getTileEntity).takeWhile(_.isInstanceOf[TileTank])
+          .toList.map(_.asInstanceOf[TileTank])
+        tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
     }
-
-    def apply(fisrt: Option[TileTank], seq: Seq[TileTank]): Connection =
-        fisrt match {
-            case Some(tank) => new Connection(tank, seq)
-            case None => invalid
-        }
 }

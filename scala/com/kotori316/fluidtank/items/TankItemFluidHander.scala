@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.items
 
+import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -10,9 +11,9 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankPr
 class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
     val tiers = stack.getItem.asInstanceOf[ItemBlockTank].blockTank.getTierByMeta(stack.getItemDamage)
 
-    def nbt = stack.getSubCompound("BlockEntityTag")
+    def nbt = stack.getSubCompound(TileTank.NBT_BlockTag)
 
-    def tankNbt = if (nbt == null) null else nbt.getCompoundTag("tank")
+    def tankNbt = if (nbt == null) null else nbt.getCompoundTag(TileTank.NBT_Tank)
 
     var inited = false
     var fluid: FluidStack = _
@@ -103,10 +104,10 @@ class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapa
         }
         if (fluid != null) {
             val compound = Option(stack.getTagCompound).getOrElse(new NBTTagCompound)
-            compound.setTag("BlockEntityTag", createTag)
+            compound.setTag(TileTank.NBT_BlockTag, createTag)
             stack.setTagCompound(compound)
         } else {
-            stack.removeSubCompound("BlockEntityTag")
+            stack.removeSubCompound(TileTank.NBT_BlockTag)
             if (stack.hasTagCompound && stack.getTagCompound.hasNoTags) {
                 stack.setTagCompound(null)
             }
@@ -115,11 +116,11 @@ class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapa
 
     def createTag = {
         val tag = new NBTTagCompound
-        tag.setTag("tier", tiers.toNBTTag)
+        tag.setTag(TileTank.NBT_Tier, tiers.toNBTTag)
         val tanktag = new NBTTagCompound
-        tanktag.setInteger("capacity", tiers.amount)
+        tanktag.setInteger(TileTank.NBT_Capacity, tiers.amount)
         fluid.writeToNBT(tanktag)
-        tag.setTag("tank", tanktag)
+        tag.setTag(TileTank.NBT_Tank, tanktag)
         tag
     }
 }

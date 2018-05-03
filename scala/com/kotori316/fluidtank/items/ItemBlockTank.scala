@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.blocks.BlockTank
-import com.kotori316.fluidtank.tiles.Tiers
+import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
@@ -24,7 +24,7 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
     setCreativeTab(Utils.CREATIVE_TABS)
 
     override def getRarity(stack: ItemStack): EnumRarity =
-        if (stack.hasTagCompound && stack.getTagCompound.hasKey("BlockEntityTag")) EnumRarity.RARE
+        if (stack.hasTagCompound && stack.getTagCompound.hasKey(TileTank.NBT_BlockTag)) EnumRarity.RARE
         else EnumRarity.COMMON
 
     def getModelResouceLocation(meta: Int) = new ModelResourceLocation(getRegistryName + tierName(meta), "inventory")
@@ -43,11 +43,11 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
 
     @SideOnly(Side.CLIENT)
     override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[String], flagIn: ITooltipFlag): Unit = {
-        val nbt = stack.getSubCompound("BlockEntityTag")
+        val nbt = stack.getSubCompound(TileTank.NBT_BlockTag)
         if (nbt != null) {
-            val tankNBT = nbt.getCompoundTag("tank")
+            val tankNBT = nbt.getCompoundTag(TileTank.NBT_Tank)
             val fluid = Option(FluidStack.loadFluidStackFromNBT(tankNBT))
-            val c = tankNBT.getInteger("capacity")
+            val c = tankNBT.getInteger(TileTank.NBT_Capacity)
             tooltip.add(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0)(_.amount) + " mB / " + c + " mB")
         } else {
             tooltip.add("Capacity : " + blockTank.getTierByMeta(stack.getItemDamage).amount + "mB")
@@ -65,7 +65,7 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
         val state = worldIn.getBlockState(pos)
         if (state.getBlock eq this.block) {
             if (worldIn.getMinecraftServer != null) {
-                val nbttagcompound = stack.getSubCompound("BlockEntityTag")
+                val nbttagcompound = stack.getSubCompound(TileTank.NBT_BlockTag)
                 if (nbttagcompound != null) {
                     val tileentity = worldIn.getTileEntity(pos)
                     if (tileentity != null) {
@@ -80,6 +80,7 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
                         }
                     }
                 }
+                blockTank.onBlockPlacedBy(worldIn, pos, state, player, stack)
                 player match {
                     case p: EntityPlayerMP => CriteriaTriggers.PLACED_BLOCK.trigger(p, pos, stack)
                     case _ =>

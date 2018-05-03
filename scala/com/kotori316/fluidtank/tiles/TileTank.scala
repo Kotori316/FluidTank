@@ -4,7 +4,6 @@ import java.util
 
 import buildcraft.api.tiles.IDebuggable
 import buildcraft.api.transport.pipe.ICustomPipeConnection
-import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.packet.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
 import net.minecraft.block.state.IBlockState
@@ -30,19 +29,18 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
     }
 
     val tank = new Tank
-    private var connection = Connection.invalid
-    var f: FluidStack = _
+    var connection = Connection.invalid
+    var loading = false
 
     override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
-        compound.setTag("tank", tank.writeToNBT(new NBTTagCompound))
-        compound.setTag("tier", tier.toNBTTag)
-        Option(connection.getFluidStack).foreach(s => compound.setTag("f", s.writeToNBT(new NBTTagCompound)))
+        compound.setTag(TileTank.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
+        compound.setTag(TileTank.NBT_Tier, tier.toNBTTag)
         super.writeToNBT(compound)
     }
 
     def getBlockTag: NBTTagCompound = {
         val nbt = writeToNBT(new NBTTagCompound)
-        Seq("x", "y", "z", "f").foreach(nbt.removeTag)
+        Seq("x", "y", "z").foreach(nbt.removeTag)
         nbt
     }
 
@@ -52,33 +50,24 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     override def readFromNBT(compound: NBTTagCompound): Unit = {
         super.readFromNBT(compound)
-        if (connection == Connection.invalid)
-            tank.readFromNBT(compound.getCompoundTag("tank"))
-        else {
-            val fluidStack = FluidStack.loadFluidStackFromNBT(compound.getCompoundTag("tank"))
-            if (connection.getFluidStack == fluidStack)
-                connection.handler.fill(fluidStack, true)
-            else {
-                connection = Connection.invalid
-                tank.readFromNBT(compound.getCompoundTag("tank"))
-                updateConnection()
-            }
-        }
-
-        tier = Tiers.fromNBT(compound.getCompoundTag("tier"))
-        f = FluidStack.loadFluidStackFromNBT(compound.getCompoundTag("f"))
+        tank.readFromNBT(compound.getCompoundTag(TileTank.NBT_Tank))
+        tier = Tiers.fromNBT(compound.getCompoundTag(TileTank.NBT_Tier))
+        loading = true
     }
 
     def readNBTClient(compound: NBTTagCompound): Unit = {
-        tank.readFromNBT(compound.getCompoundTag("tank"))
-        tier = Tiers.fromNBT(compound.getCompoundTag("tier"))
+        tank.readFromNBT(compound.getCompoundTag(TileTank.NBT_Tank))
+        tier = Tiers.fromNBT(compound.getCompoundTag(TileTank.NBT_Tier))
     }
 
     override def onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity): Unit = handleUpdateTag(pkt.getNbtCompound)
 
     override def onLoad(): Unit = {
         super.onLoad()
-        updateConnection()
+        if (loading && SideProxy.isServer(this)) {
+            Connection.load(getWorld, getPos)
+            loading = false
+        }
     }
 
     override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
@@ -95,40 +84,27 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     def hasContent: Boolean = tank.getFluidAmount > 0
 
-    override def hasFastRenderer = false
-
-    def neighborChanged(): Unit = {
-        updateConnection()
-    }
+    override def hasFastRenderer = true
 
     def getComparatorLevel: Int = connection.getComparatorLevel
 
-    private def updateConnection(): Unit = {
-        if (SideProxy.isServer(this)) {
-            var connectionFluid = Option(connection.getFluidStack).orElse(Option(this.tank.getFluid)).getOrElse(f)
-            //            var connectionFluid = Option(this.tank.getFluid).orElse(Option(connection.getFluidStack)).getOrElse(f)
-            val function: BlockPos => Boolean = { p =>
-                getWorld.getTileEntity(p) match {
-                    case that: TileTank =>
-                        if (connectionFluid == null) {
-                            connectionFluid = that.tank.getFluid
-                            true
-                        } else {
-                            (that.tank.getFluid == null || connectionFluid.isFluidEqual(that.tank.getFluid)) &&
-                              (that.connection.getFluidStack == null || connectionFluid.isFluidEqual(that.connection.getFluidStack)) &&
-                              (that.f == null || connectionFluid.isFluidEqual(that.f))
-                        }
-                    case _ => false
-                }
+    def onBlockPlacedBy(): Unit = {
+        val connected = Seq(EnumFacing.DOWN, EnumFacing.UP).exists(f => {
+            getWorld.getTileEntity(getPos.offset(f)) match {
+                case tank: TileTank =>
+                    tank.connection.add(this, f.getOpposite)
+                    true
+                case _ => false
             }
-            val lowest = Iterator.iterate(getPos)(_.down()).takeWhile(function).toList.lastOption.getOrElse({
-                FluidTank.LOGGER.fatal("No lowest tank", new IllegalArgumentException("No lowest tank"))
-                getPos
-            })
-            val tanks = Iterator.iterate(lowest)(_.up())
-              .takeWhile(function).map(getWorld.getTileEntity(_).asInstanceOf[TileTank]).toIndexedSeq
-            Connection.setConnection(tanks, c => tile => tile.connection = c)
+        })
+
+        if (!connected) {
+            this.connection = new Connection(Seq(this))
         }
+    }
+
+    def onDestory(): Unit = {
+        this.connection.remove(this)
     }
 
     class Tank extends net.minecraftforge.fluids.FluidTank(tier.amount) {
@@ -161,7 +137,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         }
 
         override def readFromNBT(nbt: NBTTagCompound) = {
-            setCapacity(nbt.getInteger("capacity"))
+            setCapacity(nbt.getInteger(TileTank.NBT_Capacity))
             val fluid = FluidStack.loadFluidStackFromNBT(nbt)
             setFluid(fluid)
             onContentsChanged()
@@ -170,7 +146,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
         override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
             super.writeToNBT(nbt)
-            nbt.setInteger("capacity", getCapacity)
+            nbt.setInteger(TileTank.NBT_Capacity, getCapacity)
             nbt
         }
 
@@ -181,8 +157,8 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         }
 
         override def canFillFluidType(fluid: FluidStack): Boolean = {
-            val fluidType = connection.fluidType
-            fluidType == null || fluidType == fluid.getFluid
+            val fluidType = connection.getFluidStack
+            fluidType.isEmpty || fluidType.contains(fluid)
         }
     }
 
@@ -199,4 +175,11 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
         left.add("Tier : " + tier)
         left add tank.toString
     }
+}
+
+object TileTank {
+    final val NBT_Tank = "tank"
+    final val NBT_Tier = "tier"
+    final val NBT_Capacity = "capacity"
+    final val NBT_BlockTag = "BlockEntityTag"
 }

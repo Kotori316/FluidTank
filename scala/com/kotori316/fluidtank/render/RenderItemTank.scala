@@ -23,7 +23,7 @@ class RenderItemTank extends TileEntityItemStackRenderer {
             case tankItem: ItemBlockTank =>
                 tileTank.tier = tankItem.blockTank.getTierByMeta(stack.getMetadata)
                 tileTank.tank.setFluid(null)
-                val compound = stack.getSubCompound("BlockEntityTag")
+                val compound = stack.getSubCompound(TileTank.NBT_BlockTag)
                 if (compound != null)
                     tileTank.readNBTClient(compound)
 
@@ -45,6 +45,7 @@ class RenderItemTank extends TileEntityItemStackRenderer {
                 ClientProxy.RENDER_TANK.renderTileEntityFast(tileTank, 0, 0, 0, partialTicks, -1, 1, buffer)
                 buffer.setTranslation(0, 0, 0)
                 tessellator.draw()
+                //RenderHelper.enableStandardItemLighting()
 
                 val state = FluidTank.BLOCK_TANKS.get(tileTank.tier.rank - 1).getStateFromMeta(tileTank.tier.meta)
                 val model = Minecraft.getMinecraft.getBlockRendererDispatcher.getModelForState(state)
@@ -52,7 +53,6 @@ class RenderItemTank extends TileEntityItemStackRenderer {
                 GlStateManager.translate(0.5f, 0.5f, 0.5f)
                 Minecraft.getMinecraft.getRenderItem.renderItem(stack, model)
                 GlStateManager.popMatrix()
-            //RenderHelper.enableStandardItemLighting()
 
             case _ => FluidTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)
         }

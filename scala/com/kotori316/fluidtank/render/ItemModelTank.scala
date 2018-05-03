@@ -21,9 +21,7 @@ class ItemModelTank extends IBakedModel {
         TransformType.FIRST_PERSON_RIGHT_HAND -> new TRSRTransformation(null, fromDegrees(0, 225, 0), vec(0.4), null),
         TransformType.THIRD_PERSON_LEFT_HAND -> new TRSRTransformation(new Vector3f(0, 2.5f / 16, 0), fromDegrees(75, 45, 0), new Vector3f(-.375f, .375f, .375f), null),
         TransformType.THIRD_PERSON_RIGHT_HAND -> new TRSRTransformation(new Vector3f(0, 2.5f / 16, 0), fromDegrees(75, 45, 0), vec(0.375), null),
-        TransformType.GROUND -> new TRSRTransformation(new Vector3f(0, 3f / 16, 0), null, vec(0.25), null)).map {
-        case (t, trans) => (t, trans)
-    }
+        TransformType.GROUND -> new TRSRTransformation(new Vector3f(0, 3f / 16, 0), null, vec(0.25), null))
 
     @inline
     private def fromDegrees(x: Int, y: Int, z: Int) = TRSRTransformation.quatFromXYZDegrees(new Vector3f(x.toFloat, y.toFloat, z.toFloat))
