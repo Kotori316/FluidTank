@@ -16,9 +16,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
-import com.kotori316.fluidtank.tiles.ItemModelTank;
-import com.kotori316.fluidtank.tiles.RenderItemTank;
-import com.kotori316.fluidtank.tiles.RenderTank;
+import com.kotori316.fluidtank.render.ItemModelTank;
+import com.kotori316.fluidtank.render.RenderItemTank;
+import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 @SideOnly(Side.CLIENT)

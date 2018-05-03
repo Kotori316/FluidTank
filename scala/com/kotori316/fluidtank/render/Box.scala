@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.tiles
+package com.kotori316.fluidtank.render
 
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite

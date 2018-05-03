@@ -1,8 +1,9 @@
-package com.kotori316.fluidtank.tiles
+package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.packet.ClientProxy
+import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
@@ -21,6 +22,7 @@ class RenderItemTank extends TileEntityItemStackRenderer {
                 if (compound != null)
                     tileTank.readFromNBT(compound)
 
+                // TODO: check GLState to change lighting.
                 ClientProxy.RENDER_TANK.render(tileTank, 0d, 0d, 0d, partialTicks, -1, 1.0f)
 
             case _ => FluidTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)

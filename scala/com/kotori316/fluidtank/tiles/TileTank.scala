@@ -6,6 +6,7 @@ import buildcraft.api.tiles.IDebuggable
 import buildcraft.api.transport.pipe.ICustomPipeConnection
 import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.packet.{PacketHandler, SideProxy, TileMessage}
+import com.kotori316.fluidtank.render.Box
 import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager

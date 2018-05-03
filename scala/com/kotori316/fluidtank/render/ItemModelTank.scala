@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.tiles
+package com.kotori316.fluidtank.render
 
 import java.util.Collections
 import javax.vecmath.{Matrix4f, Vector3f}

@@ -1,6 +1,7 @@
-package com.kotori316.fluidtank.tiles
+package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.FluidTank
+import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
