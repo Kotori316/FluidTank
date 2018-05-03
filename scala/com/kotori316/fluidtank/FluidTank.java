@@ -8,8 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -20,13 +18,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
-import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.recipes.TankRecipe;
@@ -57,6 +52,7 @@ public class FluidTank {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(instance);
+        MinecraftForge.EVENT_BUS.register(proxy);
         proxy.registerTESR();
         Config.load(event.getSuggestedConfigurationFile());
     }
@@ -86,13 +82,6 @@ public class FluidTank {
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         if (!Config.content().removeRecipe())
             event.getRegistry().registerAll(Tiers.jList().stream().map(TankRecipe::new).filter(TankRecipe::isValid).toArray(IRecipe[]::new));
-    }
-
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void registerModels(ModelRegistryEvent event) {
-        BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
-            ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResouceLocation(t._2)));
     }
 
     @Mod.InstanceFactory

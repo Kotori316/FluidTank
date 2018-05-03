@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
-import net.minecraft.util.{BlockRenderLayer, EnumFacing, EnumHand}
+import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.event.ForgeEventFactory
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -24,26 +24,17 @@ import net.minecraftforge.items.CapabilityItemHandler
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider {
-
-    def rank: Int
+class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL) with ITileEntityProvider {
 
     final val itemBlock = new ItemBlockTank(this, rank)
 
-    def getTierByMeta(meta: Int): Tiers = {
-        if (meta < tierArray.length)
-            tierArray(meta)
-        else
-            tierArray(0)
-    }
+    def getTierByMeta(meta: Int): Tiers = defaultTier
 
     setRegistryName(FluidTank.modID, "blocktank" + rank)
     setUnlocalizedName(FluidTank.modID + ".blocktank" + rank)
     setCreativeTab(Utils.CREATIVE_TABS)
     setHardness(1.0f)
     itemBlock.setRegistryName(FluidTank.modID, "blocktank" + rank)
-
-    final lazy val tierArray = Tiers.list.filter(t => t.rank == rank).toArray
 
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
                                   hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
@@ -68,17 +59,11 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
         super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     }
 
-    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
-        worldIn.getTileEntity(pos) match {
-            case tank: TileTank => tank.neighborChanged()
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-        }
-    }
-
     override final def createNewTileEntity(worldIn: World, meta: Int) = new TileTank(getTierByMeta(meta))
 
     override final def getBlockLayer = BlockRenderLayer.CUTOUT
+
+    override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
 
     override final def isFullCube(state: IBlockState) = false
 
@@ -88,13 +73,18 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
 
     override final def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = Utils.BOUNDING_BOX
 
+    override def getStateFromMeta(meta: Int) = this.getDefaultState
+
     override final def shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing) = true
 
     override def canCreatureSpawn(state: IBlockState, world: IBlockAccess, pos: BlockPos, living: EntityLiving.SpawnPlacementType) = false
 
     override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
+        worldIn.getTileEntity(pos) match {
+            case tank: TileTank => tank.onDestory()
+            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+        }
         super.breakBlock(worldIn, pos, state)
-        worldIn.removeTileEntity(pos)
     }
 
     override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack = {
@@ -105,7 +95,7 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
 
     private def saveTankNBT(tileEntity: TileEntity, stack: ItemStack) = {
         Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
-          .foreach(tag => stack.setTagInfo("BlockEntityTag", tag))
+          .foreach(tag => stack.setTagInfo(TileTank.NBT_BlockTag, tag))
     }
 
     override def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
@@ -125,9 +115,10 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
         harvesters.set(null)
     }
 
-    override def neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos): Unit = {
+    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
         worldIn.getTileEntity(pos) match {
-            case tank: TileTank => tank.neighborChanged()
+            case tank: TileTank => tank.onBlockPlacedBy()
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
     }
@@ -137,41 +128,17 @@ abstract class BlockTank extends Block(Utils.MATERIAL) with ITileEntityProvider 
     override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
         worldIn.getTileEntity(pos) match {
             case tileTank: TileTank => tileTank.getComparatorLevel
-            case _ => 0
+            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
         }
     }
 }
 
 object BlockTank {
-    val blockTank1 = new BlockTank {
-        override def rank = 1
-
-        override def getTierByMeta(meta: Int) = Tiers.WOOD
-    }
-    val blockTank2 = new BlockTankVariants {
-        override def rank = 2
-    }
-    val blockTank3 = new BlockTankVariants {
-        override def rank = 3
-    }
-    val blockTank4 = new BlockTank {
-        override def rank = 4
-
-        override def getTierByMeta(meta: Int) = Tiers.GOLD
-    }
-    val blockTank5 = new BlockTank {
-        override def rank = 5
-
-        override def getTierByMeta(meta: Int) = Tiers.DIAMOND
-    }
-    val blockTank6 = new BlockTank {
-        override def rank = 6
-
-        override def getTierByMeta(meta: Int) = Tiers.EMERALD
-    }
-    val blockTank7 = new BlockTank {
-        override def rank: Int = 7
-
-        override def getTierByMeta(meta: Int): Tiers = Tiers.STAR
-    }
+    val blockTank1 = new BlockTank(1, Tiers.WOOD)
+    val blockTank2 = new BlockTankVariants(2, Tiers.STONE)
+    val blockTank3 = new BlockTankVariants(3, Tiers.IRON)
+    val blockTank4 = new BlockTank(4, Tiers.GOLD)
+    val blockTank5 = new BlockTank(5, Tiers.DIAMOND)
+    val blockTank6 = new BlockTank(6, Tiers.EMERALD)
+    val blockTank7 = new BlockTank(7, Tiers.STAR)
 }
