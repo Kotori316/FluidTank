@@ -3,10 +3,15 @@ package com.kotori316.fluidtank.items
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.tiles.Tiers
+import net.minecraft.advancements.CriteriaTriggers
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.client.util.ITooltipFlag
+import net.minecraft.entity.player.{EntityPlayer, EntityPlayerMP}
 import net.minecraft.item.{EnumRarity, ItemBlock, ItemStack}
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.FluidStack
@@ -51,5 +56,36 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
 
     override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
         new TankItemFluidHander(stack)
+    }
+
+    override def placeBlockAt(stack: ItemStack, player: EntityPlayer, worldIn: World, pos: BlockPos,
+                              side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float, newState: IBlockState): Boolean = {
+        if (!worldIn.setBlockState(pos, newState, 11)) return false
+
+        val state = worldIn.getBlockState(pos)
+        if (state.getBlock eq this.block) {
+            if (worldIn.getMinecraftServer != null) {
+                val nbttagcompound = stack.getSubCompound("BlockEntityTag")
+                if (nbttagcompound != null) {
+                    val tileentity = worldIn.getTileEntity(pos)
+                    if (tileentity != null) {
+                        if (!(!worldIn.isRemote && tileentity.onlyOpsCanSetNbt) || !(player == null || !player.canUseCommandBlock)) {
+                            val nbttagcompound1 = tileentity.writeToNBT(new NBTTagCompound)
+                            nbttagcompound1.merge(nbttagcompound)
+                            nbttagcompound1.setInteger("x", pos.getX)
+                            nbttagcompound1.setInteger("y", pos.getY)
+                            nbttagcompound1.setInteger("z", pos.getZ)
+                            tileentity.readFromNBT(nbttagcompound1)
+                            tileentity.markDirty()
+                        }
+                    }
+                }
+                player match {
+                    case p: EntityPlayerMP => CriteriaTriggers.PLACED_BLOCK.trigger(p, pos, stack)
+                    case _ =>
+                }
+            }
+        }
+        true
     }
 }

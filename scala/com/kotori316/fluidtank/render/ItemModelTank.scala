@@ -25,8 +25,10 @@ class ItemModelTank extends IBakedModel {
         case (t, trans) => (t, trans)
     }
 
+    @inline
     private def fromDegrees(x: Int, y: Int, z: Int) = TRSRTransformation.quatFromXYZDegrees(new Vector3f(x.toFloat, y.toFloat, z.toFloat))
 
+    @inline
     private def vec(t: Double) = new Vector3f(t.toFloat, t.toFloat, t.toFloat)
 
     override def isGui3d = false

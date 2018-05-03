@@ -7,8 +7,8 @@ import com.kotori316.fluidtank.{FluidTank, Utils}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.block.{Block, ITileEntityProvider}
 import net.minecraft.enchantment.EnchantmentHelper
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.{EntityLiving, EntityLivingBase}
 import net.minecraft.init.Enchantments
 import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
@@ -59,19 +59,11 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     }
 
-    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
-        worldIn.getTileEntity(pos) match {
-            case tank: TileTank => tank.neighborChanged()
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-        }
-    }
-
     override final def createNewTileEntity(worldIn: World, meta: Int) = new TileTank(getTierByMeta(meta))
 
     override final def getBlockLayer = BlockRenderLayer.CUTOUT
 
-    override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.ENTITYBLOCK_ANIMATED
+    override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
 
     override final def isFullCube(state: IBlockState) = false
 

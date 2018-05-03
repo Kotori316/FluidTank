@@ -52,9 +52,26 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
 
     override def readFromNBT(compound: NBTTagCompound): Unit = {
         super.readFromNBT(compound)
-        tank.readFromNBT(compound.getCompoundTag("tank"))
+        if (connection == Connection.invalid)
+            tank.readFromNBT(compound.getCompoundTag("tank"))
+        else {
+            val fluidStack = FluidStack.loadFluidStackFromNBT(compound.getCompoundTag("tank"))
+            if (connection.getFluidStack == fluidStack)
+                connection.handler.fill(fluidStack, true)
+            else {
+                connection = Connection.invalid
+                tank.readFromNBT(compound.getCompoundTag("tank"))
+                updateConnection()
+            }
+        }
+
         tier = Tiers.fromNBT(compound.getCompoundTag("tier"))
         f = FluidStack.loadFluidStackFromNBT(compound.getCompoundTag("f"))
+    }
+
+    def readNBTClient(compound: NBTTagCompound): Unit = {
+        tank.readFromNBT(compound.getCompoundTag("tank"))
+        tier = Tiers.fromNBT(compound.getCompoundTag("tier"))
     }
 
     override def onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity): Unit = handleUpdateTag(pkt.getNbtCompound)
@@ -89,6 +106,7 @@ class TileTank(var tier: Tiers) extends TileEntity with ICustomPipeConnection wi
     private def updateConnection(): Unit = {
         if (SideProxy.isServer(this)) {
             var connectionFluid = Option(connection.getFluidStack).orElse(Option(this.tank.getFluid)).getOrElse(f)
+            //            var connectionFluid = Option(this.tank.getFluid).orElse(Option(connection.getFluidStack)).getOrElse(f)
             val function: BlockPos => Boolean = { p =>
                 getWorld.getTileEntity(p) match {
                     case that: TileTank =>
