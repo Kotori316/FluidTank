@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.recipes;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -52,9 +53,14 @@ public class TankRecipe extends ShapedRecipes {
      */
     @Override
     public boolean matches(@Nonnull InventoryCrafting inv, @Nonnull World world) {
-        return IntStream.rangeClosed(0, inv.getWidth() - 3).allMatch(x ->
-            IntStream.rangeClosed(0, inv.getHeight() - 3)
-                .allMatch(y -> checkMatch(inv, x, y)));
+        for (int i = 0; i <= inv.getWidth() - this.recipeWidth; ++i) {
+            for (int j = 0; j <= inv.getHeight() - this.recipeHeight; ++j) {
+                if (this.checkMatch(inv, i, j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -99,7 +105,7 @@ public class TankRecipe extends ShapedRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         FluidStack stack = IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot)
-            .map(itemHanlder)
+            .map(itemHanlder).filter(Objects::nonNull)
             .map(IFluidHandler::getTankProperties)
             .flatMap(WrapFluid::newStreamWithValidStack)
             .reduce(WrapFluid::combine)
