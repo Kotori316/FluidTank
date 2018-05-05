@@ -8,8 +8,8 @@ import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankProperties, IFluidHandlerItem, IFluidTankProperties}
 
-class TankItemFluidHander(stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
-    val tiers = stack.getItem.asInstanceOf[ItemBlockTank].blockTank.getTierByMeta(stack.getItemDamage)
+class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
+    val tiers = item.blockTank.getTierByMeta(stack.getItemDamage)
 
     def nbt = stack.getSubCompound(TileTank.NBT_BlockTag)
 

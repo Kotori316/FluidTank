@@ -55,7 +55,7 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
     }
 
     override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = {
-        new TankItemFluidHander(stack)
+        new TankItemFluidHander(this, stack)
     }
 
     override def placeBlockAt(stack: ItemStack, player: EntityPlayer, worldIn: World, pos: BlockPos,
