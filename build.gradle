@@ -24,7 +24,7 @@ compileScala {
 minecraft {
     version = "1.12.2-14.23.3.2655"
     runDir = "Minecraft"
-    
+
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
@@ -44,10 +44,12 @@ sourceSets {
         resources {
             srcDir 'resources'
             exclude 'image2.png'
+            exclude 'newrender.png'
+            exclude 'oldrender.png'
         }
     }
 }
-repositories{
+repositories {
     maven {
         name "BuildCraft"
         url = "https://mod-buildcraft.com/maven"
@@ -66,14 +68,14 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info', 'image2.png'
+        exclude 'mcmod.info', 'image2.png', 'newrender.png', 'oldrender.png'
     }
 }
 

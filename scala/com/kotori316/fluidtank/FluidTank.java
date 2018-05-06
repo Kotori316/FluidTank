@@ -53,8 +53,8 @@ public class FluidTank {
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(instance);
         MinecraftForge.EVENT_BUS.register(proxy);
-        proxy.registerTESR();
         Config.load(event.getSuggestedConfigurationFile());
+        proxy.registerTESR();
     }
 
     @EventHandler

@@ -42,7 +42,13 @@ object Config {
     class Content {
         private val removeRecipeProperty = configuration.get(Configuration.CATEGORY_GENERAL, "RemoveRecipe", false)
         removeRecipeProperty.setRequiresMcRestart(true)
+        removeRecipeProperty.setComment("Remove all recipe to make tanks.")
         val removeRecipe = removeRecipeProperty.getBoolean
+
+        private val enableOldRenderProperty = configuration.get(Configuration.CATEGORY_CLIENT, "enableOldRender", false)
+        enableOldRenderProperty.setRequiresMcRestart(true)
+        enableOldRenderProperty.setComment("True to use other render system for item. It doesn't show the content of tanks.")
+        val enableOldRender = enableOldRenderProperty.getBoolean
 
         val oreNameMap: Map[Tiers, String] = Tiers.list.drop(2).map(tier => {
             val property = configuration.get(CATEGORY_RECIPE, tier + "OreName", tier.oreName)

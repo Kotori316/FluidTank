@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
@@ -38,24 +39,34 @@ public class ClientProxy extends SideProxy {
     @Override
     public void registerTESR() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
-        FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(itemBlockTank ->
-            itemBlockTank.setTileEntityItemStackRenderer(RENDER_ITEM_TANK));
+        if (!Config.content().enableOldRender()) {
+            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(itemBlockTank ->
+                itemBlockTank.setTileEntityItemStackRenderer(RENDER_ITEM_TANK));
+        }
     }
 
     @SubscribeEvent
     public void registerModels(ModelRegistryEvent event) {
-        FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(item ->
-            ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
-        );
+        if (!Config.content().enableOldRender()) {
+            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(item ->
+                ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
+            );
+        } else {
+            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
+                ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResouceLocation(t._2)));
+        }
+
     }
 
     @SubscribeEvent
     public void onBake(ModelBakeEvent event) {
-        event.getModelRegistry().putObject(MESH_MODEL, MODEL_TANK);
-        FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t -> {
-            ModelResourceLocation modelLocation = t._1.getModelResouceLocation(t._2);
-            IBakedModel model = event.getModelManager().getModel(modelLocation);
-            event.getModelRegistry().putObject(modelLocation, model);
-        });
+        if (!Config.content().enableOldRender()) {
+            event.getModelRegistry().putObject(MESH_MODEL, MODEL_TANK);
+            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t -> {
+                ModelResourceLocation modelLocation = t._1.getModelResouceLocation(t._2);
+                IBakedModel model = event.getModelManager().getModel(modelLocation);
+                event.getModelRegistry().putObject(modelLocation, model);
+            });
+        }
     }
 }
