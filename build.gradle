@@ -22,7 +22,7 @@ compileScala {
 }
 
 minecraft {
-    version = "1.12.2-14.23.3.2655"
+    version = "1.12.2-14.23.4.2703"
     runDir = "Minecraft"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -57,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "com.mod-buildcraft:buildcraft:7.99.16"
+    deobfCompile "com.mod-buildcraft:buildcraft:7.99.17"
 }
 
 processResources {
