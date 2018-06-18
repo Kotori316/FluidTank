@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
+import net.minecraft.util.text.TextComponentString
 import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.event.ForgeEventFactory
@@ -54,11 +55,21 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
                 if (resultFill.isSuccess) {
                     playerIn.setHeldItem(hand, resultFill.getResult)
                 } else {
-                    val fillAmount = itemFluidHandler.fill(tileTank.tank.getFluid.copywithAmount(Int.MaxValue), false)
+                    val fillAmount = itemFluidHandler.fill(tileTank.connection.getFluidStack.map(_.copywithAmount(Int.MaxValue)).orNull, false)
                     val resultDrain = FluidUtil.tryFillContainerAndStow(stack, handler, itemHandler, fillAmount, playerIn, true)
                     if (resultDrain.isSuccess) {
                         playerIn.setHeldItem(hand, resultDrain.getResult)
                     }
+                }
+            }
+            return true
+        }
+
+        if (playerIn.getHeldItemMainhand.isEmpty) {
+            if (!worldIn.isRemote) {
+                worldIn.getTileEntity(pos) match {
+                    case tileTank: TileTank => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
+                    case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
                 }
             }
             return true

@@ -1,9 +1,10 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/largefluidtank",
   "promos": {
-    "1.12.2-recommended": "2.4"
+    "1.12.2-recommended": "2.5"
   },
   "1.12.2": {
+    "2.5": "Right click a tank to see its content.",
     "2.4": "The amount of fluid to transfer by clicking items is changed.",
     "2.3": "Add option to enable old render.",
     "2.2": "Fixed a crash of ClassCastException when you wear Ring of Magnetization.",

@@ -94,6 +94,7 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
 
     def init(): Unit = {
         if (!inited) {
+            inited = true
             fluid = FluidStack.loadFluidStackFromNBT(tankNbt)
         }
     }
