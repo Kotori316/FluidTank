@@ -166,8 +166,8 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
 
     override def toString: String = {
         val fluid = getFluidStack
-        val name = fluid.map(_.getLocalizedName).getOrElse("null")
-        s"Connection of $name : $amount / $capacity mB, ${seq.length}tank(s) are connected."
+        val name = fluid.fold("null")(_.getLocalizedName)
+        s"Connection of $name : $amount / $capacity mB, Comparator outputs $getComparatorLevel."
     }
 }
 
