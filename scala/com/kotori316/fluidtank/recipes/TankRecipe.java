@@ -82,7 +82,8 @@ public class TankRecipe extends ShapedRecipes {
                 if (target.apply(stackInRowAndColumn)) {
                     if (target instanceof TierIngredient) {
                         FluidStack fluidStack = Optional.of(stackInRowAndColumn).map(itemHanlder)
-                            .map(h -> h.getTankProperties().length > 0 ? h.getTankProperties()[0].getContents() : null)
+                            .filter(h -> h.getTankProperties().length > 0)
+                            .map(h -> h.getTankProperties()[0].getContents())
                             .orElse(null);
                         if (stack == null) {
                             if (fluidStack != null) {
