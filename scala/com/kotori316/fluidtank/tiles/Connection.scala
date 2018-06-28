@@ -122,7 +122,7 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
                 seq :+ tileTank
             }
             val connection = new Connection(newSeq)
-            val fluidStacks = newSeq.flatMap(t => Option(t.tank.drain(t.tank.getFluid, true)).toList)
+            val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, true))) yield i
             newSeq.foreach(t => {
                 t.connection = connection
                 t.tank.setFluid(null)

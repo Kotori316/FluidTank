@@ -50,7 +50,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
             if (SideProxy.isServer(tileTank)) {
                 val handler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
                 val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
-                val drainAmount = Option(itemFluidHandler.drain(Int.MaxValue, false)).map(_.amount).getOrElse(0)
+                val drainAmount = Option(itemFluidHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
                 val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, handler, itemHandler, drainAmount, playerIn, true)
                 if (resultFill.isSuccess) {
                     playerIn.setHeldItem(hand, resultFill.getResult)
