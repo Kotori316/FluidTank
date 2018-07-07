@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.render
 import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.packet.ClientProxy
-import com.kotori316.fluidtank.tiles.TileTank
+import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
@@ -23,7 +23,7 @@ class RenderItemTank extends TileEntityItemStackRenderer {
             case tankItem: ItemBlockTank =>
                 tileTank.tier = tankItem.blockTank.getTierByMeta(stack.getMetadata)
                 tileTank.tank.setFluid(null)
-                val compound = stack.getSubCompound(TileTank.NBT_BlockTag)
+                val compound = stack.getSubCompound(TileTankNoDisplay.NBT_BlockTag)
                 if (compound != null)
                     tileTank.readNBTClient(compound)
 

@@ -47,7 +47,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         val stack = playerIn.getHeldItem(hand)
 
         for (itemFluidHandler <- Option(FluidUtil.getFluidHandler(stack));
-             tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTank])
+             tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
              if !stack.getItem.isInstanceOf[ItemBlockTank]
         ) {
             if (SideProxy.isServer(tileTank)) {
@@ -71,7 +71,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         if (playerIn.getHeldItemMainhand.isEmpty) {
             if (!worldIn.isRemote) {
                 worldIn.getTileEntity(pos) match {
-                    case tileTank: TileTank => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
+                    case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
                     case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
                 }
             }
@@ -102,7 +102,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
 
     override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
         worldIn.getTileEntity(pos) match {
-            case tank: TileTank => tank.onDestory()
+            case tank: TileTankNoDisplay => tank.onDestory()
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
         super.breakBlock(worldIn, pos, state)
@@ -115,8 +115,8 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     }
 
     private def saveTankNBT(tileEntity: TileEntity, stack: ItemStack) = {
-        Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
-          .foreach(tag => stack.setTagInfo(TileTank.NBT_BlockTag, tag))
+        Option(tileEntity).collect { case tank: TileTankNoDisplay if tank.hasContent => tank.getBlockTag }
+          .foreach(tag => stack.setTagInfo(TileTankNoDisplay.NBT_BlockTag, tag))
     }
 
     override def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
@@ -139,7 +139,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
         worldIn.getTileEntity(pos) match {
-            case tank: TileTank => tank.onBlockPlacedBy()
+            case tank: TileTankNoDisplay => tank.onBlockPlacedBy()
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
     }
@@ -148,7 +148,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
 
     override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
         worldIn.getTileEntity(pos) match {
-            case tileTank: TileTank => tileTank.getComparatorLevel
+            case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
         }
     }

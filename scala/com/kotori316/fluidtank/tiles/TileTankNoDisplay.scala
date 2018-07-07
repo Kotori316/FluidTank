@@ -91,7 +91,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     def onBlockPlacedBy(): Unit = {
         val connected = Seq(EnumFacing.DOWN, EnumFacing.UP).exists(f => {
             getWorld.getTileEntity(getPos.offset(f)) match {
-                case tank: TileTank =>
+                case tank: TileTankNoDisplay =>
                     tank.connection.add(this, f.getOpposite)
                     true
                 case _ => false
