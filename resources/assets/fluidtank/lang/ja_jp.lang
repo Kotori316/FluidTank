@@ -11,4 +11,17 @@ tile.fluidtank.blocktank5.diamond.name=ダイアモンドのタンク
 tile.fluidtank.blocktank6.emerald.name=エメラルドのタンク
 tile.fluidtank.blocktank7.star.name=星のタンク
 
+tile.fluidtank.blocktank1.wood.invisible.name=不可視の木のタンク
+tile.fluidtank.blocktank2.stone.invisible.name=不可視の石のタンク
+tile.fluidtank.blocktank2.copper.invisible.name=不可視の銅のタンク
+tile.fluidtank.blocktank2.tin.invisible.name=不可視の錫のタンク
+tile.fluidtank.blocktank3.iron.invisible.name=不可視の鉄のタンク
+tile.fluidtank.blocktank3.bronze.invisible.name=不可視の青銅のタンク
+tile.fluidtank.blocktank3.lead.invisible.name=不可視の鉛のタンク
+tile.fluidtank.blocktank3.silver.invisible.name=不可視の銀のタンク
+tile.fluidtank.blocktank4.gold.invisible.name=不可視の金のタンク
+tile.fluidtank.blocktank5.diamond.invisible.name=不可視のダイアモンドのタンク
+tile.fluidtank.blocktank6.emerald.invisible.name=不可視のエメラルドのタンク
+tile.fluidtank.blocktank7.star.invisible.name=不可視の星のタンク
+
 itemGroup.FluidTank=FluidTanks

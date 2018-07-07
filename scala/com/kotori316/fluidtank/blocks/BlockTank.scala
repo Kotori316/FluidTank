@@ -3,10 +3,11 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.packet.SideProxy
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
-import com.kotori316.fluidtank.{FluidTank, Utils}
+import com.kotori316.fluidtank.{Config, FluidTank, Utils}
 import net.minecraft.block.properties.PropertyBool
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
 import net.minecraft.block.{Block, ITileEntityProvider}
+import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.{EntityLiving, EntityLivingBase}
@@ -16,7 +17,7 @@ import net.minecraft.stats.StatList
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
 import net.minecraft.util.text.TextComponentString
-import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand}
+import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand, NonNullList}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.event.ForgeEventFactory
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -161,6 +162,12 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
 
     override def createBlockState(): BlockStateContainer = new BlockStateContainer(this, Seq(visibleProperty): _*)
 
+    override def getSubBlocks(itemIn: CreativeTabs, items: NonNullList[ItemStack]): Unit = {
+        super.getSubBlocks(itemIn, items)
+        if (Config.content.showInvisibleTank) {
+            items.add(new ItemStack(this, 1, 8))
+        }
+    }
 }
 
 object BlockTank {

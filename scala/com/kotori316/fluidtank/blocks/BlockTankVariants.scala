@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.blocks
 
+import com.kotori316.fluidtank.Config
 import com.kotori316.fluidtank.tiles.Tiers
 import net.minecraft.block.properties.{IProperty, PropertyInteger}
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
@@ -31,6 +32,8 @@ class BlockTankVariants(rank: Int, tiers: Tiers) extends BlockTank(rank, default
     override def getSubBlocks(itemIn: CreativeTabs, items: NonNullList[ItemStack]): Unit = {
         for (i <- tierArray.indices) {
             items.add(new ItemStack(this, 1, i))
+            if (Config.content.showInvisibleTank)
+                items.add(new ItemStack(this, 1, i | 8))
         }
     }
 

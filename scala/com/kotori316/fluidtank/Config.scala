@@ -56,6 +56,10 @@ object Config {
             (tier, property.getString)
         }).toMap + (Tiers.Invalid -> "Unknown") + (Tiers.WOOD -> "logWood")
 
+        private val showInvisibleTankProperty = configuration.get(Configuration.CATEGORY_GENERAL, "showInvisibleTankInTab", false)
+        showInvisibleTankProperty.setComment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
+        val showInvisibleTank = showInvisibleTankProperty.getBoolean
+
         assert(Tiers.list.forall(oreNameMap.contains))
 
         if (configuration.hasChanged)

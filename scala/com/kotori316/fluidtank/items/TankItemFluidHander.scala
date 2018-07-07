@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.items
 
-import com.kotori316.fluidtank.tiles.TileTank
+import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -11,9 +11,9 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankPr
 class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
     val tiers = item.blockTank.getTierByMeta(stack.getItemDamage)
 
-    def nbt = stack.getSubCompound(TileTank.NBT_BlockTag)
+    def nbt = stack.getSubCompound(TileTankNoDisplay.NBT_BlockTag)
 
-    def tankNbt = if (nbt == null) null else nbt.getCompoundTag(TileTank.NBT_Tank)
+    def tankNbt = if (nbt == null) null else nbt.getCompoundTag(TileTankNoDisplay.NBT_Tank)
 
     var inited = false
     var fluid: FluidStack = _
@@ -105,10 +105,10 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
         }
         if (fluid != null) {
             val compound = Option(stack.getTagCompound).getOrElse(new NBTTagCompound)
-            compound.setTag(TileTank.NBT_BlockTag, createTag)
+            compound.setTag(TileTankNoDisplay.NBT_BlockTag, createTag)
             stack.setTagCompound(compound)
         } else {
-            stack.removeSubCompound(TileTank.NBT_BlockTag)
+            stack.removeSubCompound(TileTankNoDisplay.NBT_BlockTag)
             if (stack.hasTagCompound && stack.getTagCompound.hasNoTags) {
                 stack.setTagCompound(null)
             }
@@ -117,11 +117,11 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
 
     def createTag = {
         val tag = new NBTTagCompound
-        tag.setTag(TileTank.NBT_Tier, tiers.toNBTTag)
+        tag.setTag(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
         val tanktag = new NBTTagCompound
-        tanktag.setInteger(TileTank.NBT_Capacity, tiers.amount)
+        tanktag.setInteger(TileTankNoDisplay.NBT_Capacity, tiers.amount)
         fluid.writeToNBT(tanktag)
-        tag.setTag(TileTank.NBT_Tank, tanktag)
+        tag.setTag(TileTankNoDisplay.NBT_Tank, tanktag)
         tag
     }
 }
