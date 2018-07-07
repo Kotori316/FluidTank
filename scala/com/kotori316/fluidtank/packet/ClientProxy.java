@@ -12,6 +12,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.Option;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -32,8 +33,8 @@ public class ClientProxy extends SideProxy {
         new ModelResourceLocation(FluidTank.modID + ":fluidtankitem", "inventory");
 
     @Override
-    public World getWorld(INetHandler handler) {
-        return Minecraft.getMinecraft().world;
+    public Option<World> getWorld(INetHandler handler) {
+        return Option.apply(Minecraft.getMinecraft().world);
     }
 
     @Override

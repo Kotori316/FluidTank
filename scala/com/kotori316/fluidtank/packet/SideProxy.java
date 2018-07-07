@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 
 public abstract class SideProxy {
 
-    public abstract World getWorld(INetHandler handler);
+    public abstract scala.Option<World> getWorld(INetHandler handler);
 
     public abstract void registerTESR();
 

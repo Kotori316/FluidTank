@@ -43,14 +43,14 @@ object TileMessage extends IMessageHandler[TileMessage, IMessage] {
     def apply(tile: TileEntity): TileMessage = new TileMessage(tile)
 
     override def onMessage(message: TileMessage, ctx: MessageContext): IMessage = {
-        val world = FluidTank.proxy.getWorld(ctx.netHandler)
-        val tile = world.getTileEntity(message.pos)
-        if (message.dim == world.provider.getDimension && tile != null)
+        for (world <- FluidTank.proxy.getWorld(ctx.netHandler) if world.provider.getDimension == message.dim;
+             tile <- Option(world.getTileEntity(message.pos))) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(new Runnable {
                 override def run(): Unit = {
                     tile.readFromNBT(message.nbt)
                 }
             })
+        }
         null
     }
 }
