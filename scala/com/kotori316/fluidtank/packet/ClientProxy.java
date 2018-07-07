@@ -55,7 +55,8 @@ public class ClientProxy extends SideProxy {
             FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
                 ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResouceLocation(t._2)));
         }
-
+        FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
+            ModelLoader.setCustomModelResourceLocation(t._1, t._2 | 8, t._1.getModelResouceLocation(t._2)));
     }
 
     @SubscribeEvent

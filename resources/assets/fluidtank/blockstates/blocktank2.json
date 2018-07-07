@@ -12,6 +12,10 @@
     "normal": [
       {}
     ],
+    "visible": {
+      "true": {},
+      "false": {}
+    },
     "variant": {
       "0": {},
       "1": {

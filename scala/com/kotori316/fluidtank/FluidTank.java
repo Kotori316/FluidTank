@@ -27,6 +27,7 @@ import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.recipes.TankRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
+import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 @Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@",
     updateJSON = "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json")
@@ -71,6 +72,7 @@ public class FluidTank {
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().registerAll(BLOCK_TANKS.toArray(new BlockTank[0]));
         TileEntity.register(modID + ":tiletank", TileTank.class);
+        TileEntity.register(modID + ":tiletanknodisplay", TileTankNoDisplay.class);
     }
 
     @SubscribeEvent

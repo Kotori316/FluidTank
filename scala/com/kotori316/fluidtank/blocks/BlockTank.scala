@@ -2,9 +2,10 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.packet.SideProxy
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
+import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
 import com.kotori316.fluidtank.{FluidTank, Utils}
-import net.minecraft.block.state.IBlockState
+import net.minecraft.block.properties.PropertyBool
+import net.minecraft.block.state.{BlockStateContainer, IBlockState}
 import net.minecraft.block.{Block, ITileEntityProvider}
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.EntityPlayer
@@ -30,6 +31,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     import BlockTank._
 
     final val itemBlock = new ItemBlockTank(this, rank)
+    final lazy val visibleProperty = PropertyBool.create("visible")
 
     def getTierByMeta(meta: Int): Tiers = defaultTier
 
@@ -38,6 +40,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     setCreativeTab(Utils.CREATIVE_TABS)
     setHardness(1.0f)
     itemBlock.setRegistryName(FluidTank.modID, "blocktank" + rank)
+    setDefaultState(blockState.getBaseState.withProperty(visibleProperty, Boolean.box(true)))
 
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
                                   hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
@@ -78,7 +81,8 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     }
 
-    override final def createNewTileEntity(worldIn: World, meta: Int) = new TileTank(getTierByMeta(meta))
+    override final def createNewTileEntity(worldIn: World, meta: Int) =
+        if ((meta & 8) != 8) new TileTank(getTierByMeta(meta)) else new TileTankNoDisplay(getTierByMeta(meta))
 
     override final def getBlockLayer = BlockRenderLayer.CUTOUT
 
@@ -91,8 +95,6 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     override final def hasTileEntity(state: IBlockState) = true
 
     override final def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = Utils.BOUNDING_BOX
-
-    override def getStateFromMeta(meta: Int) = this.getDefaultState
 
     override final def shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing) = true
 
@@ -150,6 +152,15 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
             case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
         }
     }
+
+    override def getMetaFromState(state: IBlockState): Int = damageDropped(state)
+
+    override def damageDropped(state: IBlockState): Int = if (state.getValue(visibleProperty)) 0 else 8
+
+    override def getStateFromMeta(meta: Int) = this.getDefaultState.withProperty(visibleProperty, Boolean.box((meta & 8) == 0))
+
+    override def createBlockState(): BlockStateContainer = new BlockStateContainer(this, Seq(visibleProperty): _*)
+
 }
 
 object BlockTank {

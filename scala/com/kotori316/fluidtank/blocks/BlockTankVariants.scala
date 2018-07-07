@@ -12,21 +12,19 @@ class BlockTankVariants(rank: Int, tiers: Tiers) extends BlockTank(rank, default
     final lazy val tierArray = Tiers.list.filter(t => t.rank == rank).toArray
 
     override def getTierByMeta(meta: Int) = {
-        if (meta < tierArray.length)
-            tierArray(meta)
+        if ((meta & 7) < tierArray.length)
+            tierArray(meta & 7)
         else
             tierArray(0)
     }
 
-    final lazy val property = PropertyInteger.create("variant", 0, tierArray.length - 1)
+    final lazy val variantProperty = PropertyInteger.create("variant", 0, tierArray.length - 1)
 
-    final def properties: Seq[IProperty[_ <: Comparable[_]]] = Seq(property)
+    final def properties: Seq[IProperty[_ <: Comparable[_]]] = Seq(variantProperty, visibleProperty)
 
-    setDefaultState(this.blockState.getBaseState.withProperty(property, Int.box(0)))
+    setDefaultState(this.blockState.getBaseState.withProperty(variantProperty, Int.box(0)).withProperty(visibleProperty, Boolean.box(true)))
 
-    override def getStateFromMeta(meta: Int): IBlockState = getDefaultState.withProperty(property, Int.box(meta))
-
-    override def getMetaFromState(state: IBlockState): Int = damageDropped(state)
+    override def getStateFromMeta(meta: Int): IBlockState = super.getStateFromMeta(meta).withProperty(variantProperty, Int.box(meta & 7))
 
     override def createBlockState(): BlockStateContainer = new BlockStateContainer(this, properties: _*)
 
@@ -36,5 +34,6 @@ class BlockTankVariants(rank: Int, tiers: Tiers) extends BlockTank(rank, default
         }
     }
 
-    override def damageDropped(state: IBlockState): Int = state.getValue(property).intValue()
+    override def damageDropped(state: IBlockState): Int =
+        super.damageDropped(state) | state.getValue(variantProperty).intValue()
 }

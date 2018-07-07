@@ -9,8 +9,8 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankProperties, IFluidHandler, IFluidTankProperties}
 
-sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
-    val seq: Seq[TileTank] = s.sortBy(_.getPos.getY)
+sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
+    val seq: Seq[TileTankNoDisplay] = s.sortBy(_.getPos.getY)
     val handler: IFluidHandler = new IFluidHandler {
         override def fill(kind: FluidStack, doFill: Boolean): Int = {
             if (kind == null || kind.amount <= 0) {
@@ -89,7 +89,7 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
 
     def amount: Long = seq.map(_.tank.getFluidAmount.toLong).sum
 
-    def tankSeq(fluid: FluidStack): Seq[TileTank] = {
+    def tankSeq(fluid: FluidStack): Seq[TileTankNoDisplay] = {
         if (fluid != null && fluid.getFluid.isGaseous(fluid)) {
             seq.reverse
         } else {
@@ -112,7 +112,7 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
       * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
       * @return new connection
       */
-    def add(tileTank: TileTank, facing: EnumFacing): Connection = {
+    def add(tileTank: TileTankNoDisplay, facing: EnumFacing): Connection = {
         val newFluid = tileTank.tank.getFluid
         if (newFluid == null || fluidType == null || fluidType == newFluid) {
             // You can connect the tank to this connection.
@@ -137,7 +137,7 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
         }
     }
 
-    def remove(tileTank: TileTank): Unit = {
+    def remove(tileTank: TileTankNoDisplay): Unit = {
         val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
         s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
         s2.tail.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
@@ -186,19 +186,19 @@ object Connection {
 
         override def getComparatorLevel: Int = 0
 
-        override def remove(tileTank: TileTank): Unit = ()
+        override def remove(tileTank: TileTankNoDisplay): Unit = ()
     }
 
-    val stackFromTile: TileTank => Option[FluidStack] = t => Option(t.tank.getFluid)
+    val stackFromTile: TileTankNoDisplay => Option[FluidStack] = t => Option(t.tank.getFluid)
 
     def load(world: World, pos: BlockPos): Unit = {
-        val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => world.getTileEntity(p).isInstanceOf[TileTank])
+        val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => world.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
           .toList.lastOption.getOrElse({
             FluidTank.LOGGER.fatal("No lowest tank", new IllegalArgumentException("No lowest tank"))
             pos
         })
-        val tanks = Iterator.iterate(lowest)(_.up()).map(world.getTileEntity).takeWhile(_.isInstanceOf[TileTank])
-          .toList.map(_.asInstanceOf[TileTank])
+        val tanks = Iterator.iterate(lowest)(_.up()).map(world.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
+          .toList.map(_.asInstanceOf[TileTankNoDisplay])
         tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
     }
 }
