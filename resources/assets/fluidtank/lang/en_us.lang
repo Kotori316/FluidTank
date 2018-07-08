@@ -25,3 +25,4 @@ tile.fluidtank.blocktank6.emerald.invisible.name=Invisible Emerald Tank
 tile.fluidtank.blocktank7.star.invisible.name=Invisible Star Tank
 
 itemGroup.FluidTank=FluidTanks
+fluidtank.recipe.tooltip=Recipe of tanks
