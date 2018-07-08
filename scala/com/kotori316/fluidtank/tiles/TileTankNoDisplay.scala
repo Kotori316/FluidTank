@@ -40,7 +40,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
 
     def getBlockTag: NBTTagCompound = {
         val nbt = writeToNBT(new NBTTagCompound)
-        Seq("x", "y", "z").foreach(nbt.removeTag)
+        Seq("x", "y", "z", "id").foreach(nbt.removeTag)
         nbt
     }
 

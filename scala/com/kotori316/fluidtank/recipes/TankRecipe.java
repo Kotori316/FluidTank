@@ -13,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -37,7 +36,7 @@ public class TankRecipe extends ShapedRecipes {
     public TankRecipe(@Nonnull Tiers tiers) {
         super(FluidTank.modID + ":tank" + tiers.rank(), 3, 3, NonNullList.withSize(9, Ingredient.EMPTY), ItemStack.EMPTY);
 
-        setRegistryName(new ResourceLocation(FluidTank.modID + ":tank" + tiers.toString().toLowerCase(Locale.US)));
+        setRegistryName(FluidTank.modID + ":tank" + tiers.toString().toLowerCase(Locale.US));
         this.tiers = tiers;
         OreIngredient oreIngredient = new OreIngredient(Config.content().oreNameMap().apply(tiers));
         valid = tiers.rank() > 1 && OreDictionary.doesOreNameExist(Config.content().oreNameMap().apply(tiers));

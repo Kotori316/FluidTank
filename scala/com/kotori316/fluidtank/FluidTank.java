@@ -24,13 +24,15 @@ import org.apache.logging.log4j.Logger;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
+import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe$;
 import com.kotori316.fluidtank.recipes.TankRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 @Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@",
-    updateJSON = "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json")
+    updateJSON = "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json",
+    guiFactory = "com.kotori316.fluidtank.GuiFactory")
 public class FluidTank {
 
     public static final FluidTank instance;
@@ -84,6 +86,7 @@ public class FluidTank {
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         if (!Config.content().removeRecipe())
             event.getRegistry().registerAll(Tiers.jList().stream().map(TankRecipe::new).filter(TankRecipe::isValid).toArray(IRecipe[]::new));
+        event.getRegistry().register(ConvertInvisibleRecipe$.MODULE$);
     }
 
     @Mod.InstanceFactory
