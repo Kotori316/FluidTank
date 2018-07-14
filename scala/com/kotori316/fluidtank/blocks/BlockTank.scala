@@ -22,7 +22,7 @@ import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.event.ForgeEventFactory
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
-import net.minecraftforge.items.CapabilityItemHandler
+import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
@@ -46,21 +46,23 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
                                   hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
         val stack = playerIn.getHeldItem(hand)
+        val flag = stack.getCount == 1
+        val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (flag) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
 
-        for (itemFluidHandler <- Option(FluidUtil.getFluidHandler(stack));
+        for (stackHandler <- stackHandlerOption;
              tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
              if !stack.getItem.isInstanceOf[ItemBlockTank]
         ) {
             if (SideProxy.isServer(tileTank)) {
-                val handler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
+                val tankHandler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
                 val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
-                val drainAmount = Option(itemFluidHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
-                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, handler, itemHandler, drainAmount, playerIn, true)
+                val drainAmount = Option(stackHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
+                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
                 if (resultFill.isSuccess) {
                     playerIn.setHeldItem(hand, resultFill.getResult)
                 } else {
-                    val fillAmount = itemFluidHandler.fill(tileTank.connection.getFluidStack.map(_.copywithAmount(Int.MaxValue)).orNull, false)
-                    val resultDrain = FluidUtil.tryFillContainerAndStow(stack, handler, itemHandler, fillAmount, playerIn, true)
+                    val fillAmount = stackHandler.fill(tileTank.connection.getFluidStack.map(_.copywithAmount(Int.MaxValue)).orNull, false)
+                    val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
                     if (resultDrain.isSuccess) {
                         playerIn.setHeldItem(hand, resultDrain.getResult)
                     }
