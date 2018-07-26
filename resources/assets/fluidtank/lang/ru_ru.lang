@@ -11,4 +11,18 @@ tile.fluidtank.blocktank5.diamond.name=Алмазный резервуар
 tile.fluidtank.blocktank6.emerald.name=Изумрудный резервуар
 tile.fluidtank.blocktank7.star.name=Звёздный резервуар
 
+tile.fluidtank.blocktank1.wood.invisible.name=Невидимый деревянный резервуар
+tile.fluidtank.blocktank2.stone.invisible.name=Невидимый каменный резервуар
+tile.fluidtank.blocktank2.copper.invisible.name=Невидимый медный резервуар
+tile.fluidtank.blocktank2.tin.invisible.name=Невидимый оловянный резервуар
+tile.fluidtank.blocktank3.iron.invisible.name=Невидимый железный резервуар
+tile.fluidtank.blocktank3.bronze.invisible.name=Невидимый бронзовый резервуар
+tile.fluidtank.blocktank3.lead.invisible.name=Невидимый свинцовый резервуар
+tile.fluidtank.blocktank3.silver.invisible.name=Невидимый серебряный резервуар
+tile.fluidtank.blocktank4.gold.invisible.name=Невидимый золотой резервуар
+tile.fluidtank.blocktank5.diamond.invisible.name=Невидимый алмазный резервуар
+tile.fluidtank.blocktank6.emerald.invisible.name=Невидимый изумрудный резервуар
+tile.fluidtank.blocktank7.star.invisible.name=Невидимый звёздный резервуар
+
 itemGroup.FluidTank=FluidTanks
+fluidtank.recipe.tooltip=Рецепт резервуаров
