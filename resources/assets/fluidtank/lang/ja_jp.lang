@@ -25,3 +25,4 @@ tile.fluidtank.blocktank6.emerald.invisible.name=不可視のエメラルドの�
 tile.fluidtank.blocktank7.star.invisible.name=不可視の星のタンク
 
 itemGroup.FluidTank=FluidTanks
+fluidtank.recipe.tooltip=タンクのレシピ
