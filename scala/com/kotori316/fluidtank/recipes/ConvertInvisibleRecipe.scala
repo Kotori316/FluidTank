@@ -8,8 +8,6 @@ import net.minecraft.util.NonNullList
 import net.minecraft.world.World
 import net.minecraftforge.registries.IForgeRegistryEntry
 
-import scala.collection.JavaConverters._
-
 object ConvertInvisibleRecipe extends IForgeRegistryEntry.Impl[IRecipe] with IRecipe {
     setRegistryName(FluidTank.modID + ":tankconvert")
 
@@ -35,15 +33,9 @@ object ConvertInvisibleRecipe extends IForgeRegistryEntry.Impl[IRecipe] with IRe
 
     override def getRecipeOutput = new ItemStack(FluidTank.BLOCK_TANKS.get(0).itemBlock, 1, 8)
 
-
-    override def getIngredients = NonNullList.from[Ingredient](TankIngredient)
+    override def getIngredients: NonNullList[Ingredient] = NonNullList.from(TankIngredient)
 
     override def getGroup: String = FluidTank.modID + ":tankconvertrecipe"
 
-    private final object TankIngredient extends Ingredient(
-        FluidTank.BLOCK_TANKS.asScala
-          .flatMap(_.itemBlock.itemList)
-          .flatMap { case (i, m) => Seq(new ItemStack(i, 1, m), new ItemStack(i, 1, m | 8)) }: _*
-    )
-
+    override def isDynamic: Boolean = true
 }

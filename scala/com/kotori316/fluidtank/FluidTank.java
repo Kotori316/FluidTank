@@ -25,6 +25,7 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe$;
+import com.kotori316.fluidtank.recipes.EmptyTankRecipe$;
 import com.kotori316.fluidtank.recipes.TankRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
@@ -87,6 +88,7 @@ public class FluidTank {
         if (!Config.content().removeRecipe())
             event.getRegistry().registerAll(Tiers.jList().stream().map(TankRecipe::new).filter(TankRecipe::isValid).toArray(IRecipe[]::new));
         event.getRegistry().register(ConvertInvisibleRecipe$.MODULE$);
+        event.getRegistry().register(EmptyTankRecipe$.MODULE$);
     }
 
     @Mod.InstanceFactory
