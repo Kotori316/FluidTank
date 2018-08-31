@@ -1,9 +1,10 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/largefluidtank",
   "promos": {
-    "1.12.2-recommended": "2.8"
+    "1.12.2-recommended": "2.9"
   },
   "1.12.2": {
+    "2.9": "No changes.",
     "2.8": "Update lang files.",
     "2.7": "You can fill stacked bucket.",
     "2.5": "Right click a tank to see its content.",
