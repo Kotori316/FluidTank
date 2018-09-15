@@ -18,7 +18,7 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
     val offZ = sizeZ / 2
     val maxSize = Math.max(Math.max(sizeX, sizeY), sizeZ)
 
-    def render(buffer: BufferBuilder, sprite: TextureAtlasSprite)(implicit lightValue: Box.LightValue): Unit = {
+    def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lightValue: Box.LightValue): Unit = {
         val n1X = dx
         val n1Y = Box.normalY(dx, dy, dz)
         val n1Z = dz
@@ -26,12 +26,14 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
         val n2X = dy * n1Z - dz * n1Y
         val n2Z = dx * n1Y - dy * n1X
         val n2Size = Math.sqrt(n2X * n2X + n2Z * n2Z)
-        renderInternal(buffer, sprite, n1X / n1Size / 2, n1Y / n1Size / 2, n1Z / n1Size / 2, n2X / n2Size / 2, n2Z / n2Size / 2, lightValue)
+        renderInternal(buffer, sprite, n1X / n1Size / 2, n1Y / n1Size / 2, n1Z / n1Size / 2, n2X / n2Size / 2, n2Z / n2Size / 2, lightValue,
+            alpha, red, green, blue)
     }
 
     protected final def renderInternal(buffer: BufferBuilder, sprite: TextureAtlasSprite,
                                        n1X: Double, n1Y: Double, n1Z: Double,
-                                       n2X: Double, n2Z: Double, lv: Box.LightValue): Unit = {
+                                       n2X: Double, n2Z: Double, lv: Box.LightValue,
+                                       alpha: Int, red: Int, green: Int, blue: Int): Unit = {
         val eX = dx / length * sizeX
         val eY = dy / length * sizeY
         val eZ = dz / length * sizeZ
@@ -53,40 +55,40 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
         val e4Z = startZ + n1Z * sizeZ - n2Z * sizeZ
 
         if (firstSide) {
-            buffer.pos(e1X, e1Y, e1Z).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e2X, e2Y, e2Z).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e3X, e3Y, e3Z).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e4X, e4Y, e4Z).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e1X, e1Y, e1Z).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e2X, e2Y, e2Z).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e3X, e3Y, e3Z).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e4X, e4Y, e4Z).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
         }
         val l = Math.sqrt(dx / sizeX * dx / sizeX + dy / sizeY * dy / sizeY + dz / sizeZ * dz / sizeZ)
         val lengthFloor = MathHelper.floor(l)
         new Range.Inclusive(0, lengthFloor, 1).foreach(i1 => {
             val i2 = if (i1 == lengthFloor) l else i1 + 1
-            buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
 
-            buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
 
-            buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
 
-            buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
         })
         if (endSide) {
-            buffer.pos(e1X + dx, e1Y + dy, e1Z + dz).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e2X + dx, e2Y + dy, e2Z + dz).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e3X + dx, e3Y + dy, e3Z + dz).color(255, 255, 255, 255).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(e4X + dx, e4Y + dy, e4Z + dz).color(255, 255, 255, 255).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e1X + dx, e1Y + dy, e1Z + dz).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e2X + dx, e2Y + dy, e2Z + dz).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e3X + dx, e3Y + dy, e3Z + dz).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(e4X + dx, e4Y + dy, e4Z + dz).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
         }
     }
 
@@ -110,7 +112,7 @@ private class BoxX(startX: Double,
   extends Box(startX, y, z, endX, y, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
     override val length: Double = dx
 
-    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite)(implicit lv: Box.LightValue): Unit = {
+    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
         val count = MathHelper.floor(length / sizeX)
         val minU = sprite.getMinU
         val minV = sprite.getMinV
@@ -120,40 +122,40 @@ private class BoxX(startX: Double,
         val maZV = sprite.getInterpolatedV(sizeZ / maxSize * 16)
         if (firstSide) {
             //West
-            buffer.pos(startX, y + offY, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX, y - offY, z - offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX, y - offY, z + offZ).color(255, 255, 255, 255).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX, y + offY, z + offZ).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX, y - offY, z - offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX, y - offY, z + offZ).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX, y + offY, z + offZ).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
         }
         new Range.Inclusive(0, count, 1).foreach(i1 => {
             val i2 = if (i1 == count) length / sizeX else i1 + 1d
             //North
-            buffer.pos(startX + sizeX * i2, y + offY, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i2, y - offY, z - offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i1, y - offY, z - offZ).color(255, 255, 255, 255).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i1, y + offY, z - offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y - offY, z - offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y - offY, z - offZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
             //South
-            buffer.pos(startX + sizeX * i1, y + offY, z + offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i1, y - offY, z + offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i2, y - offY, z + offZ).color(255, 255, 255, 255).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i2, y + offY, z + offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y + offY, z + offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y - offY, z + offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y - offY, z + offZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y + offY, z + offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
             //Top
-            buffer.pos(startX + sizeX * i1, y + offY, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i1, y + offY, z + offZ).color(255, 255, 255, 255).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i2, y + offY, z + offZ).color(255, 255, 255, 255).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i2, y + offY, z - offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y + offY, z + offZ).color(red, green, blue, alpha).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y + offY, z + offZ).color(red, green, blue, alpha).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
             //Bottom
-            buffer.pos(startX + sizeX * i2, y - offY, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i2, y - offY, z + offZ).color(255, 255, 255, 255).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i1, y - offY, z + offZ).color(255, 255, 255, 255).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(startX + sizeX * i1, y - offY, z - offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y - offY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i2, y - offY, z + offZ).color(red, green, blue, alpha).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y - offY, z + offZ).color(red, green, blue, alpha).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(startX + sizeX * i1, y - offY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
         })
         if (endSide) {
             //East
-            buffer.pos(endX, y + offY, z + offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(endX, y - offY, z + offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(endX, y - offY, z - offZ).color(255, 255, 255, 255).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(endX, y + offY, z - offZ).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(endX, y + offY, z + offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(endX, y - offY, z + offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(endX, y - offY, z - offZ).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(endX, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
         }
     }
 }
@@ -164,7 +166,7 @@ private class BoxY(startY: Double,
   extends Box(x, startY, z, x, endY, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
     override val length = dy
 
-    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite)(implicit lv: Box.LightValue): Unit = {
+    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
         val count = MathHelper.floor(length / sizeY)
         val minU = sprite.getMinU
         val minV = sprite.getMinV
@@ -175,40 +177,40 @@ private class BoxY(startY: Double,
         val maZV = sprite.getInterpolatedV(sizeZ / maxSize * 16)
         if (firstSide) {
             //Bottom
-            buffer.pos(x + offX, startY, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY, z + offZ).color(255, 255, 255, 255).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY, z + offZ).color(255, 255, 255, 255).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY, z - offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY, z + offZ).color(red, green, blue, alpha).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY, z + offZ).color(red, green, blue, alpha).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
         }
         new Range.Inclusive(0, count, 1).foreach(i1 => {
             val i2 = if (i1 == count) length / sizeY else i1 + 1d
             //West
-            buffer.pos(x - offX, startY + sizeY * i2, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY + sizeY * i1, z - offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY + sizeY * i1, z + offZ).color(255, 255, 255, 255).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY + sizeY * i2, z + offZ).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i2, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i1, z - offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i1, z + offZ).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i2, z + offZ).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
             //East
-            buffer.pos(x + offX, startY + sizeY * i2, z + offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY + sizeY * i1, z + offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY + sizeY * i1, z - offZ).color(255, 255, 255, 255).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY + sizeY * i2, z - offZ).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i2, z + offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i1, z + offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i1, z - offZ).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i2, z - offZ).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
             //North
-            buffer.pos(x + offX, startY + sizeY * i2, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY + sizeY * i1, z - offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY + sizeY * i1, z - offZ).color(255, 255, 255, 255).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY + sizeY * i2, z - offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i2, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i1, z - offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i1, z - offZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i2, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
             //South
-            buffer.pos(x - offX, startY + sizeY * i2, z + offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, startY + sizeY * i1, z + offZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY + sizeY * i1, z + offZ).color(255, 255, 255, 255).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, startY + sizeY * i2, z + offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i2, z + offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, startY + sizeY * i1, z + offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i1, z + offZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, startY + sizeY * i2, z + offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
         })
         if (endSide) {
             //Top
-            buffer.pos(x - offX, endY, z - offZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, endY, z + offZ).color(255, 255, 255, 255).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, endY, z + offZ).color(255, 255, 255, 255).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, endY, z - offZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, endY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, endY, z + offZ).color(red, green, blue, alpha).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, endY, z + offZ).color(red, green, blue, alpha).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, endY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
         }
     }
 }
@@ -219,7 +221,7 @@ private class BoxZ(startZ: Double,
   extends Box(x, y, startZ, x, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
     override val length = dz
 
-    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite)(implicit lv: Box.LightValue): Unit = {
+    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
         val count = MathHelper.floor(length / sizeZ)
         val minU = sprite.getMinU
         val minV = sprite.getMinV
@@ -229,40 +231,40 @@ private class BoxZ(startZ: Double,
         val maZV = sprite.getInterpolatedV(sizeZ / maxSize * 16)
         if (firstSide) {
             //North
-            buffer.pos(x + offX, y + offY, startZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y - offY, startZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y - offY, startZ).color(255, 255, 255, 255).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y + offY, startZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y + offY, startZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y - offY, startZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y - offY, startZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y + offY, startZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
         }
         new Range.Inclusive(0, count, 1).foreach(i1 => {
             val i2 = if (i1 == count) length / sizeZ else i1 + 1d
             //West
-            buffer.pos(x - offX, y + offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y - offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y - offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y + offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y + offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y - offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y - offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y + offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
             //East
-            buffer.pos(x + offX, y + offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y - offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y - offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y + offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y + offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y - offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y - offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y + offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
             //Top
-            buffer.pos(x - offX, y + offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y + offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(maXU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y + offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(maXU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y + offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y + offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y + offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maXU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y + offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maXU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y + offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
             //Bottom
-            buffer.pos(x + offX, y - offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y - offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(maXU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y - offY, startZ + sizeZ * i2).color(255, 255, 255, 255).tex(maXU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y - offY, startZ + sizeZ * i1).color(255, 255, 255, 255).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y - offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y - offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maXU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y - offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maXU, maZV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y - offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
         })
         if (endSide) {
             //South
-            buffer.pos(x - offX, y + offY, endZ).color(255, 255, 255, 255).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x - offX, y - offY, endZ).color(255, 255, 255, 255).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y - offY, endZ).color(255, 255, 255, 255).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-            buffer.pos(x + offX, y + offY, endZ).color(255, 255, 255, 255).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y + offY, endZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x - offX, y - offY, endZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y - offY, endZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
+            buffer.pos(x + offX, y + offY, endZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
         }
     }
 }
@@ -272,9 +274,9 @@ private class BoxXZ(startX: Double, startZ: Double, endX: Double, y: Double, end
   extends Box(startX, y, startZ, endX, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
     override val length = Math.sqrt(dx * dx + dz * dz)
 
-    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite)(implicit lv: Box.LightValue): Unit = {
+    override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
         val n2Size = length
-        renderInternal(buffer, sprite, 0, 0.5, 0, -dz / n2Size / 2, dx / n2Size / 2, lv)
+        renderInternal(buffer, sprite, 0, 0.5, 0, -dz / n2Size / 2, dx / n2Size / 2, lv, alpha, red, green, blue)
     }
 }
 
@@ -306,11 +308,10 @@ object Box {
         -(x * x + z * z) / y
     }
 
-    case class LightValue(l1: Int, l2: Int)
-
-    object LightValue {
-        def apply(brightness: Int): LightValue = new LightValue(brightness >> 16 & 0xFFFF, brightness >> 0 & 0xFFFF)
+    class LightValue(brightness: Int) {
+        final val l1 = brightness >> 16 & 0xFFFF
+        final val l2 = brightness >> 0 & 0xFFFF
     }
 
-    implicit val lightValue = LightValue(15 * 16, 15 * 16)
+    implicit val lightValue = new LightValue(0x00f000f0)
 }
