@@ -126,11 +126,11 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         player.addStat(StatList.getBlockStats(this))
         player.addExhaustion(0.005F)
         harvesters.set(player)
-        val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack)
         if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
             val blockStack = new ItemStack(this, 1, damageDropped(state))
             saveTankNBT(te, blockStack)
             val list = ArrayBuffer(blockStack)
+            val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack)
             val chance = ForgeEventFactory.fireBlockHarvesting(list.asJava, worldIn, pos, state, i, 1.0f, false, harvesters.get)
             for (drop <- list) {
                 if (worldIn.rand.nextFloat <= chance) Block.spawnAsEntity(worldIn, pos, drop)

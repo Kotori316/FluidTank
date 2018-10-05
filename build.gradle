@@ -2,13 +2,16 @@ buildscript {
     repositories {
         jcenter()
         maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
     }
 }
 apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: "com.matthewprenger.cursegradle"
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
@@ -49,6 +52,7 @@ sourceSets {
         }
     }
 }
+
 repositories {
     maven {
         name "BuildCraft"
@@ -112,4 +116,21 @@ task deobfJar(type: Jar) {
 // Tell the artifact system about our extra jars
 artifacts {
     archives srcJar, deobfJar
+}
+
+curseforge {
+    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
+    project {
+        id = '291006'
+        changelogType = 'markdown'
+        changelog = '[See GitHub commits.](https://github.com/Kotori316/FluidTank)'
+        releaseType = 'release'
+        mainArtifact jar
+        addArtifact srcJar
+        addArtifact deobfJar
+        afterEvaluate {
+            gameVersionStrings.remove('Java 8')
+            gameVersionStrings.remove('Java 9')
+        }
+    }
 }
