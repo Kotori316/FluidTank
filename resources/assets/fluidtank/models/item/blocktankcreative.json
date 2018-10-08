@@ -1,0 +1,7 @@
+{
+  "parent": "fluidtank:item/itemtank",
+  "textures": {
+    "1": "fluidtank:blocks/creative1",
+    "2": "fluidtank:blocks/creative2"
+  }
+}

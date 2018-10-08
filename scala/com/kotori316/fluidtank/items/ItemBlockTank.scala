@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.Utils
-import com.kotori316.fluidtank.blocks.BlockTank
+import com.kotori316.fluidtank.blocks.AbstractTank
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.block.state.IBlockState
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.JavaConverters._
 
-class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(blockTank) {
+class ItemBlockTank(val blockTank: AbstractTank, val rank: Int) extends ItemBlock(blockTank) {
     setHasSubtypes(true)
     setCreativeTab(Utils.CREATIVE_TABS)
 
@@ -31,7 +31,7 @@ class ItemBlockTank(val blockTank: BlockTank, val rank: Int) extends ItemBlock(b
 
     private def tierName(meta: Int) = blockTank.getTierByMeta(meta).toString.toLowerCase
 
-    def itemList = (0 until Tiers.rankList(rank)).map(i => (this, Int.box(i)))
+    def itemList: Seq[(ItemBlockTank, Integer)] = (0 until Tiers.rankList(rank)).map(i => (this, Int.box(i)))
 
     def itemStream: java.util.stream.Stream[(ItemBlockTank, Integer)] = itemList.asJava.stream()
 

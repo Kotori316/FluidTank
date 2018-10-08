@@ -10,6 +10,7 @@ tile.fluidtank.blocktank4.gold.name=Золотой резервуар
 tile.fluidtank.blocktank5.diamond.name=Алмазный резервуар
 tile.fluidtank.blocktank6.emerald.name=Изумрудный резервуар
 tile.fluidtank.blocktank7.star.name=Звёздный резервуар
+tile.fluidtank.blocktankcreative.name=Creative Tank
 
 tile.fluidtank.blocktank1.wood.invisible.name=Невидимый деревянный резервуар
 tile.fluidtank.blocktank2.stone.invisible.name=Невидимый каменный резервуар

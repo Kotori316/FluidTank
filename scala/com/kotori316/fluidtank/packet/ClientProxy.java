@@ -16,7 +16,7 @@ import scala.Option;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.blocks.AbstractTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
@@ -41,7 +41,7 @@ public class ClientProxy extends SideProxy {
     public void registerTESR() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
         if (!Config.content().enableOldRender()) {
-            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(itemBlockTank ->
+            FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).forEach(itemBlockTank ->
                 itemBlockTank.setTileEntityItemStackRenderer(RENDER_ITEM_TANK));
         }
     }
@@ -49,14 +49,14 @@ public class ClientProxy extends SideProxy {
     @SubscribeEvent
     public void registerModels(ModelRegistryEvent event) {
         if (!Config.content().enableOldRender()) {
-            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).forEach(item ->
+            FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).forEach(item ->
                 ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
             );
         } else {
-            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
+            FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
                 ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResouceLocation(t._2)));
         }
-        FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
+        FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
             ModelLoader.setCustomModelResourceLocation(t._1, t._2 | 8, t._1.getModelResouceLocation(t._2)));
     }
 
@@ -64,7 +64,7 @@ public class ClientProxy extends SideProxy {
     public void onBake(ModelBakeEvent event) {
         if (!Config.content().enableOldRender()) {
             event.getModelRegistry().putObject(MESH_MODEL, MODEL_TANK);
-            FluidTank.BLOCK_TANKS.stream().map(BlockTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t -> {
+            FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t -> {
                 ModelResourceLocation modelLocation = t._1.getModelResouceLocation(t._2);
                 IBakedModel model = event.getModelManager().getModel(modelLocation);
                 event.getModelRegistry().putObject(modelLocation, model);

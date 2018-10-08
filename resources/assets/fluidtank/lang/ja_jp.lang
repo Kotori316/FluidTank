@@ -10,6 +10,7 @@ tile.fluidtank.blocktank4.gold.name=金のタンク
 tile.fluidtank.blocktank5.diamond.name=ダイアモンドのタンク
 tile.fluidtank.blocktank6.emerald.name=エメラルドのタンク
 tile.fluidtank.blocktank7.star.name=星のタンク
+tile.fluidtank.blocktankcreative.name=無限のタンク
 
 tile.fluidtank.blocktank1.wood.invisible.name=不可視の木のタンク
 tile.fluidtank.blocktank2.stone.invisible.name=不可視の石のタンク

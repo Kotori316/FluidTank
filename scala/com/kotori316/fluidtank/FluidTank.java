@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.kotori316.fluidtank.blocks.AbstractTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
@@ -29,6 +30,7 @@ import com.kotori316.fluidtank.recipes.EmptyTankRecipe$;
 import com.kotori316.fluidtank.recipes.TankRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTank;
+import com.kotori316.fluidtank.tiles.TileTankCreative;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 @Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@",
@@ -43,9 +45,9 @@ public class FluidTank {
     @SidedProxy(clientSide = "com.kotori316.fluidtank.packet.ClientProxy", serverSide = "com.kotori316.fluidtank.packet.ServerProxy")
     public static SideProxy proxy;
 
-    public static final List<BlockTank> BLOCK_TANKS =
+    public static final List<AbstractTank> BLOCK_TANKS =
         Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(),
-            BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6(), BlockTank.blockTank7());
+            BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6(), BlockTank.blockTank7(), BlockTank.blockTankCreative());
 
     static {
         instance = new FluidTank();
@@ -73,14 +75,15 @@ public class FluidTank {
 
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().registerAll(BLOCK_TANKS.toArray(new BlockTank[0]));
+        event.getRegistry().registerAll(BLOCK_TANKS.toArray(new AbstractTank[0]));
         TileEntity.register(modID + ":tiletank", TileTank.class);
         TileEntity.register(modID + ":tiletanknodisplay", TileTankNoDisplay.class);
+        TileEntity.register(modID + ":tiletankcreative", TileTankCreative.class);
     }
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(BLOCK_TANKS.stream().map(BlockTank::itemBlock).toArray(Item[]::new));
+        event.getRegistry().registerAll(BLOCK_TANKS.stream().map(AbstractTank::itemBlock).toArray(Item[]::new));
     }
 
     @SubscribeEvent

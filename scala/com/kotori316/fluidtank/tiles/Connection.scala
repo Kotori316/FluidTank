@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankPr
 
 sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     val seq: Seq[TileTankNoDisplay] = s.sortBy(_.getPos.getY)
+    val hasCreative = seq.exists(_.isInstanceOf[TileTankCreative])
     val handler: IFluidHandler = new IFluidHandler {
         override def fill(kind: FluidStack, doFill: Boolean): Int = {
             if (kind == null || kind.amount <= 0) {
@@ -18,11 +19,20 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
             }
             val resource = kind.copy()
             var total = 0
-            for (tileTank <- tankSeq(kind)) {
-                if (resource.amount > 0) {
-                    val filled = tileTank.tank.fill(resource, doFill)
-                    total += filled
-                    resource.amount -= filled
+            if (hasCreative) {
+                var totalLong = 0l
+                for (tileTank <- tankSeq(kind)) {
+                    val filled = tileTank.tank.fill(new FluidStack(resource, Int.MaxValue), doFill)
+                    totalLong += filled
+                }
+                total = Math.min(totalLong, resource.amount).toInt
+            } else {
+                for (tileTank <- tankSeq(kind)) {
+                    if (resource.amount > 0) {
+                        val filled = tileTank.tank.fill(resource, doFill)
+                        total += filled
+                        resource.amount -= filled
+                    }
                 }
             }
             total
@@ -131,7 +141,13 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
                 t.connection = connection
                 t.tank.setFluid(null)
             })
-            fluidStacks.foreach(connection.handler.fill(_, true))
+            if (connection.hasCreative) {
+                fluidStacks.foreach(s => {
+                    while (connection.amount < connection.capacity)
+                        connection.handler.fill(new FluidStack(s, Int.MaxValue), true)
+                })
+            } else
+                fluidStacks.foreach(connection.handler.fill(_, true))
             connection
         } else {
             // You have to make new connection.

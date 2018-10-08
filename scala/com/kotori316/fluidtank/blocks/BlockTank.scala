@@ -1,35 +1,27 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.packet.SideProxy
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
-import com.kotori316.fluidtank.{Config, FluidTank, Utils}
+import com.kotori316.fluidtank.{Config, FluidTank}
+import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyBool
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
-import net.minecraft.block.{Block, ITileEntityProvider}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.{EntityLiving, EntityLivingBase}
 import net.minecraft.init.Enchantments
 import net.minecraft.item.ItemStack
 import net.minecraft.stats.StatList
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.NonNullList
 import net.minecraft.util.math.{BlockPos, RayTraceResult}
-import net.minecraft.util.text.TextComponentString
-import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand, NonNullList}
-import net.minecraft.world.{IBlockAccess, World}
+import net.minecraft.world.World
 import net.minecraftforge.event.ForgeEventFactory
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
-import net.minecraftforge.fluids.{FluidStack, FluidUtil}
-import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL) with ITileEntityProvider {
-
-    import BlockTank._
+class BlockTank(val rank: Int, defaultTier: Tiers) extends AbstractTank {
 
     final val itemBlock = new ItemBlockTank(this, rank)
     final lazy val visibleProperty = PropertyBool.create("visible")
@@ -38,78 +30,11 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
 
     setRegistryName(FluidTank.modID, "blocktank" + rank)
     setUnlocalizedName(FluidTank.modID + ".blocktank" + rank)
-    setCreativeTab(Utils.CREATIVE_TABS)
-    setHardness(1.0f)
     itemBlock.setRegistryName(FluidTank.modID, "blocktank" + rank)
     setDefaultState(blockState.getBaseState.withProperty(visibleProperty, Boolean.box(true)))
 
-    override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
-                                  hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-        val stack = playerIn.getHeldItem(hand)
-        val flag = stack.getCount == 1
-        val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (flag) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
-
-        for (stackHandler <- stackHandlerOption;
-             tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
-             if !stack.getItem.isInstanceOf[ItemBlockTank]
-        ) {
-            if (SideProxy.isServer(tileTank)) {
-                val tankHandler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
-                val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
-                val drainAmount = Option(stackHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
-                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
-                if (resultFill.isSuccess) {
-                    playerIn.setHeldItem(hand, resultFill.getResult)
-                } else {
-                    val fillAmount = stackHandler.fill(tileTank.connection.getFluidStack.map(_.copywithAmount(Int.MaxValue)).orNull, false)
-                    val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
-                    if (resultDrain.isSuccess) {
-                        playerIn.setHeldItem(hand, resultDrain.getResult)
-                    }
-                }
-            }
-            return true
-        }
-
-        if (playerIn.getHeldItemMainhand.isEmpty) {
-            if (!worldIn.isRemote) {
-                worldIn.getTileEntity(pos) match {
-                    case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
-                    case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-                }
-            }
-            return true
-        }
-
-        super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
-    }
-
     override final def createNewTileEntity(worldIn: World, meta: Int) =
         if ((meta & 8) != 8) new TileTank(getTierByMeta(meta)) else new TileTankNoDisplay(getTierByMeta(meta))
-
-    override final def getBlockLayer = BlockRenderLayer.CUTOUT
-
-    override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
-
-    override final def isFullCube(state: IBlockState) = false
-
-    override final def isOpaqueCube(state: IBlockState) = false
-
-    override final def hasTileEntity(state: IBlockState) = true
-
-    override final def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = Utils.BOUNDING_BOX
-
-    override final def shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing) = true
-
-    override def canCreatureSpawn(state: IBlockState, world: IBlockAccess, pos: BlockPos, living: EntityLiving.SpawnPlacementType) = false
-
-    override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
-        worldIn.getTileEntity(pos) match {
-            case tank: TileTankNoDisplay => tank.onDestory()
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-        }
-        super.breakBlock(worldIn, pos, state)
-    }
 
     override def getPickBlock(state: IBlockState, target: RayTraceResult, world: World, pos: BlockPos, player: EntityPlayer): ItemStack = {
         val stack = super.getPickBlock(state, target, world, pos, player)
@@ -139,25 +64,6 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends Block(Utils.MATERIAL)
         harvesters.set(null)
     }
 
-    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
-        worldIn.getTileEntity(pos) match {
-            case tank: TileTankNoDisplay => tank.onBlockPlacedBy()
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-        }
-    }
-
-    override def hasComparatorInputOverride(state: IBlockState): Boolean = true
-
-    override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
-        worldIn.getTileEntity(pos) match {
-            case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
-        }
-    }
-
-    override def getMetaFromState(state: IBlockState): Int = damageDropped(state)
-
     override def damageDropped(state: IBlockState): Int = if (state.getValue(visibleProperty)) 0 else 8
 
     override def getStateFromMeta(meta: Int) = this.getDefaultState.withProperty(visibleProperty, Boolean.box((meta & 8) == 0))
@@ -180,23 +86,5 @@ object BlockTank {
     val blockTank5 = new BlockTank(5, Tiers.DIAMOND)
     val blockTank6 = new BlockTank(6, Tiers.EMERALD)
     val blockTank7 = new BlockTank(7, Tiers.STAR)
-
-    implicit class FluidStackHelper(val fluidStack: FluidStack) extends AnyVal {
-
-        def copywithAmount(amount: Int): FluidStack = {
-            val copied = fluidStack.copy()
-            copied.amount = amount
-            copied
-        }
-
-        def setAmount(amount: Int): FluidStack = {
-            fluidStack.amount = amount
-            fluidStack
-        }
-
-        def isEmpty: Boolean = {
-            fluidStack == null || fluidStack.amount <= 0
-        }
-    }
-
+    val blockTankCreative = new BlockTankCreative
 }
