@@ -108,11 +108,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     }
 
     def getFluidStack: Option[FluidStack] = {
-        Option(fluidType).map(f => {
-            val stack = f.copy()
-            stack.amount = Utils.toInt(amount)
-            stack
-        })
+        Option(fluidType).map(f => new FluidStack(f, Utils.toInt(amount)))
     }
 
     /**
@@ -185,8 +181,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
 
     override def toString: String = {
-        val fluid = getFluidStack
-        val name = fluid.fold("null")(_.getLocalizedName)
+        val name = getFluidStack.fold("null")(_.getLocalizedName)
         s"Connection of $name : $amount / $capacity mB, Comparator outputs $getComparatorLevel."
     }
 }

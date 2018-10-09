@@ -89,17 +89,14 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     def getComparatorLevel: Int = connection.getComparatorLevel
 
     def onBlockPlacedBy(): Unit = {
-        val connected = Seq(EnumFacing.DOWN, EnumFacing.UP).exists(f => {
-            getWorld.getTileEntity(getPos.offset(f)) match {
-                case tank: TileTankNoDisplay =>
-                    tank.connection.add(this, f.getOpposite)
-                    true
-                case _ => false
-            }
-        })
-
-        if (!connected) {
-            this.connection = new Connection(Seq(this))
+        val dounTank = Option(getWorld.getTileEntity(getPos.down())).collect { case t: TileTankNoDisplay => t }
+        val upTank = Option(getWorld.getTileEntity(getPos.up())).collect { case t: TileTankNoDisplay => t }
+        (dounTank, upTank) match {
+            case (Some(dT), Some(uT)) =>
+                dT.connection.add(this, EnumFacing.UP).add(uT, EnumFacing.UP)
+            case (None, Some(uT)) => uT.connection.add(this, EnumFacing.UP.getOpposite)
+            case (Some(dT), None) => dT.connection.add(this, EnumFacing.DOWN.getOpposite)
+            case (None, None) => this.connection = new Connection(Seq(this))
         }
     }
 
