@@ -65,6 +65,7 @@ public class TankRecipe extends ShapedRecipes {
     /**
      * Based on {@link net.minecraft.item.crafting.ShapedRecipes#checkMatch(InventoryCrafting, int, int, boolean)}
      */
+    @SuppressWarnings("ConstantConditions") // too complex to use scala...
     protected boolean checkMatch(InventoryCrafting inv, int startX, int startY) {
         FluidStack stack = null;
         for (int x = 0; x < inv.getWidth(); x++) {

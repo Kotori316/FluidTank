@@ -29,6 +29,8 @@ class BlockTankCreative extends AbstractTank {
         override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = null
 
         override def getUnlocalizedName(stack: ItemStack): String = "tile.fluidtank.blocktankcreative"
+
+        override def hasRecipe: Boolean = false
     }
 
     override def getTierByMeta(meta: Int): Tiers = Tiers.CREATIVE

@@ -6,6 +6,6 @@ import net.minecraft.item.crafting.Ingredient
 
 class TierIngredient(val rank: Int) extends Ingredient(
     FluidTank.BLOCK_TANKS.get(rank - 1).itemBlock.itemList.flatMap {
-        case (i, m) => Seq(new ItemStack(i, 1, m), new ItemStack(i, 1, m | 8))
+        case (i, m) if i.hasRecipe => Seq(new ItemStack(i, 1, m), new ItemStack(i, 1, m | 8))
     }: _*
 )

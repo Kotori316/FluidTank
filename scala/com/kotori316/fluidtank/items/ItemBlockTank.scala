@@ -35,6 +35,8 @@ class ItemBlockTank(val blockTank: AbstractTank, val rank: Int) extends ItemBloc
 
     def itemStream: java.util.stream.Stream[(ItemBlockTank, Integer)] = itemList.asJava.stream()
 
+    def hasRecipe = true
+
     override def getUnlocalizedName(stack: ItemStack): String = {
         super.getUnlocalizedName(stack) + "." + tierName(stack.getItemDamage) + (if ((stack.getItemDamage & 8) == 8) ".invisible" else "")
     }
