@@ -28,7 +28,9 @@ class RenderTank extends FastTESR[TileTank] {
         Minecraft.getMinecraft.mcProfiler.endSection()
     }
 
-    /** Need here to make public. For [[RenderItemTank.renderByItem(ItemStack, Float)]]
+    /**
+      * Need here to make public.<br>
+      * For [[com.kotori316.fluidtank.render.RenderItemTank]]
       */
     override def bindTexture(location: ResourceLocation) = super.bindTexture(location)
 }
