@@ -1,4 +1,8 @@
 # FluidTank
+
+LICENSE: MIT License  
+Copyright (c) 2018 Kotori316
+
 Add large tanks that can have up to 1048576 buckets of fluid.
 
 There are 7 tiers in this mod, Wood, Stone, Iron, Gold, Diamond, Emerald and Star.
