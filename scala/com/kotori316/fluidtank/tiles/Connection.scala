@@ -48,6 +48,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
                 if (resource.amount > 0) {
                     val drained = tileTank.tank.drain(resource, doDrain)
                     if (drained != null) {
+                        resource.amount -= drained.amount
                         if (total == null) {
                             total = drained
                         } else {
