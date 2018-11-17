@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11
 @SideOnly(Side.CLIENT)
 class RenderItemTank extends TileEntityItemStackRenderer {
 
-    val tileTank = new TileTank()
+    lazy val tileTank = new TileTank()
 
     override def renderByItem(stack: ItemStack, partialTicks: Float) = {
         stack.getItem match {

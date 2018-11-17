@@ -4,6 +4,7 @@ import java.util
 
 import buildcraft.api.tiles.IDebuggable
 import buildcraft.api.transport.pipe.ICustomPipeConnection
+import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.packet.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
 import net.minecraft.block.state.IBlockState
@@ -103,14 +104,14 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
         this.connection.remove(this)
     }
 
-    class Tank extends net.minecraftforge.fluids.FluidTank(tier.amount) {
+    class Tank extends net.minecraftforge.fluids.FluidTank(Utils.toInt(tier.amount)) {
         setTileEntity(self)
         var box: Box = _
 
         override def onContentsChanged(): Unit = {
             super.onContentsChanged()
             sendPacket()
-            connection.updateComparator()
+            connection.updateNeighbors()
             if (!SideProxy.isServer(self) && getCapacity != 0) {
                 val percent = getFluidAmount.toDouble / getCapacity.toDouble
                 val a = 0.001
@@ -179,4 +180,5 @@ object TileTankNoDisplay {
     final val NBT_Capacity = "capacity"
     final val NBT_BlockTag = "BlockEntityTag"
     final val bcid = "buildcraftcore"
+    final val ae2id = "appliedenergistics2"
 }

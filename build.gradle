@@ -58,10 +58,16 @@ repositories {
         name "BuildCraft"
         url = "https://mod-buildcraft.com/maven"
     }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "http://dvs1.progwml6.com/files/maven"
+    }
 }
 
 dependencies {
     deobfCompile "com.mod-buildcraft:buildcraft:7.99.17"
+    deobfCompile "appeng:appliedenergistics2:rv6-stable-4"
 }
 
 processResources {

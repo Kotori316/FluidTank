@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.items
 
+import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -22,7 +23,7 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
 
     override def getTankProperties: Array[IFluidTankProperties] = {
         val fluid = FluidStack.loadFluidStackFromNBT(tankNbt)
-        Array(new FluidTankProperties(fluid, tiers.amount))
+        Array(new FluidTankProperties(fluid, Utils.toInt(tiers.amount)))
     }
 
     override def fill(resource: FluidStack, doFill: Boolean): Int = {
@@ -31,7 +32,7 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
         }
         init()
         if (fluid == null) {
-            val amount = math.min(resource.amount, tiers.amount)
+            val amount = math.min(resource.amount, Utils.toInt(tiers.amount))
             if (doFill) {
                 fluid = resource.copy()
                 fluid.amount = amount
@@ -39,7 +40,7 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
             }
             amount
         } else if (fluid.isFluidEqual(resource)) {
-            val move = math.min(resource.amount, tiers.amount - fluid.amount)
+            val move = math.min(resource.amount, Utils.toInt(tiers.amount) - fluid.amount)
             if (doFill) {
                 fluid.amount += move
                 updateTag()
@@ -119,7 +120,7 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
         val tag = new NBTTagCompound
         tag.setTag(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
         val tanktag = new NBTTagCompound
-        tanktag.setInteger(TileTankNoDisplay.NBT_Capacity, tiers.amount)
+        tanktag.setLong(TileTankNoDisplay.NBT_Capacity, tiers.amount)
         fluid.writeToNBT(tanktag)
         tag.setTag(TileTankNoDisplay.NBT_Tank, tanktag)
         tag

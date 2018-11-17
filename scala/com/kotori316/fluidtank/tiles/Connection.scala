@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.tiles
 
+import com.kotori316.fluidtank.integration.ae2.AE2
 import com.kotori316.fluidtank.{FluidTank, Utils}
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{BlockPos, MathHelper}
@@ -12,6 +13,7 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankPr
 sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     val seq: Seq[TileTankNoDisplay] = s.sortBy(_.getPos.getY)
     val hasCreative = seq.exists(_.isInstanceOf[TileTankCreative])
+    val ae2Integration = AE2.getIntegration(this)
     val handler: IFluidHandler = new IFluidHandler {
         override def fill(kind: FluidStack, doFill: Boolean): Int = {
             if (kind == null || kind.amount <= 0) {
@@ -22,10 +24,11 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
             if (hasCreative) {
                 var totalLong = 0l
                 for (tileTank <- tankSeq(kind)) {
+                    // All tank excepting Creative has less capacity than Int.MaxValue.
                     val filled = tileTank.tank.fill(new FluidStack(resource, Int.MaxValue), doFill)
                     totalLong += filled
                 }
-                total = Math.min(totalLong, resource.amount).toInt
+                total = Utils.toInt(Math.min(totalLong, resource.amount))
             } else {
                 for (tileTank <- tankSeq(kind)) {
                     if (resource.amount > 0) {
@@ -96,9 +99,9 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).orNull
     }
 
-    def capacity: Long = seq.map(_.tier.amount.toLong).sum
+    def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else seq.map(_.tier.amount).sum
 
-    def amount: Long = seq.map(_.tank.getFluidAmount.toLong).sum
+    def amount: Long = if (hasCreative && fluidType != null) Tiers.CREATIVE.amount else seq.map(_.tank.getFluidAmount.toLong).sum
 
     def tankSeq(fluid: FluidStack): Seq[TileTankNoDisplay] = {
         if (fluid != null && fluid.getFluid.isGaseous(fluid)) {
@@ -138,13 +141,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
                 t.connection = connection
                 t.tank.setFluid(null)
             })
-            if (connection.hasCreative) {
-                fluidStacks.foreach(s => {
-                    while (connection.amount < connection.capacity)
-                        connection.handler.fill(new FluidStack(s, Int.MaxValue), true)
-                })
-            } else
-                fluidStacks.foreach(connection.handler.fill(_, true))
+            fluidStacks.foreach(connection.handler.fill(_, true))
             connection
         } else {
             // You have to make new connection.
@@ -166,24 +163,28 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         else 0
     }
 
-    def updateComparator(): Unit = {
+    def updateNeighbors(): Unit = {
         seq.foreach(_.markDirty())
+        AE2.onContentUpdate(this)
     }
 
     override def getCapability[T](capability: Capability[T], facing: EnumFacing) = {
         if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
             CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(handler)
         } else {
-            null.asInstanceOf[T]
+            AE2.getMonitorableAccessor(this, capability)
         }
     }
 
     override def hasCapability(capability: Capability[_], facing: EnumFacing) =
-        capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
+        capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || AE2.isMonitorableAccessor(capability)
 
     override def toString: String = {
         val name = getFluidStack.fold("null")(_.getLocalizedName)
-        s"Connection of $name : $amount / $capacity mB, Comparator outputs $getComparatorLevel."
+        if (!hasCreative)
+            s"Connection of $name : $amount / $capacity mB, Comparator outputs $getComparatorLevel."
+        else
+            s"Connection of $name in creative. Comparator outputs $getComparatorLevel."
     }
 }
 

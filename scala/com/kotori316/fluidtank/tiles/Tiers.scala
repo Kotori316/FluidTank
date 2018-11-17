@@ -6,7 +6,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Tiers private(val rank: Int, buckets: Int, override val toString: String, val meta: Int, val oreName: String) {
-    val amount = buckets * 1000
+    val amount: Long = buckets * 1000
     Tiers.map.put(toString, this)
     Tiers.list.append(this)
     Tiers.rankList(rank) = Tiers.rankList(rank) + 1
@@ -35,7 +35,7 @@ object Tiers {
     val EMERALD = new Tiers(6, 1 << 16, "Emerald", 0, "gemEmerald")
     val STAR = new Tiers(7, 1 << 20, "Star", 0, "netherStar")
     val CREATIVE = new Tiers(8, 0, "Creative", 0, "Unknown") {
-        override val amount: Int = Int.MaxValue
+        override val amount: Long = Long.MaxValue
     }
 
     val COPPER = new Tiers(2, 1 << 5, "Copper", 1, "ingotCopper")
