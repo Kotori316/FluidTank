@@ -120,7 +120,7 @@ class TankItemFluidHander(item: ItemBlockTank, stack: ItemStack) extends IFluidH
         val tag = new NBTTagCompound
         tag.setTag(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
         val tanktag = new NBTTagCompound
-        tanktag.setLong(TileTankNoDisplay.NBT_Capacity, tiers.amount)
+        tanktag.setInteger(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
         fluid.writeToNBT(tanktag)
         tag.setTag(TileTankNoDisplay.NBT_Tank, tanktag)
         tag
