@@ -23,162 +23,162 @@ import net.minecraftforge.fml.common.Optional
 @Optional.Interface(modid = TileTankNoDisplay.bcid, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
 @Optional.Interface(modid = TileTankNoDisplay.bcid, iface = "buildcraft.api.tiles.IDebuggable")
 class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConnection with IDebuggable {
-    self =>
+  self =>
 
-    def this() {
-        this(Tiers.Invalid)
+  def this() {
+    this(Tiers.Invalid)
+  }
+
+  val tank = new Tank
+  var connection = Connection.invalid
+  var loading = false
+
+  override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
+    compound.setTag(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
+    compound.setTag(TileTankNoDisplay.NBT_Tier, tier.toNBTTag)
+    super.writeToNBT(compound)
+  }
+
+  def getBlockTag: NBTTagCompound = {
+    val nbt = writeToNBT(new NBTTagCompound)
+    Seq("x", "y", "z", "id").foreach(nbt.removeTag)
+    nbt
+  }
+
+  override def getUpdateTag: NBTTagCompound = writeToNBT(new NBTTagCompound)
+
+  override def getUpdatePacket = new SPacketUpdateTileEntity(getPos, 0, getUpdateTag)
+
+  override def readFromNBT(compound: NBTTagCompound): Unit = {
+    super.readFromNBT(compound)
+    tank.readFromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tank))
+    tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
+    loading = true
+  }
+
+  def readNBTClient(compound: NBTTagCompound): Unit = {
+    tank.readFromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tank))
+    tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
+  }
+
+  override def onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity): Unit = handleUpdateTag(pkt.getNbtCompound)
+
+  override def onLoad(): Unit = {
+    super.onLoad()
+    if (loading && SideProxy.isServer(this)) {
+      Connection.load(getWorld, getPos)
+      loading = false
     }
+  }
 
-    val tank = new Tank
-    var connection = Connection.invalid
-    var loading = false
+  override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+    val c = connection.getCapability(capability, facing)
+    if (c != null) c else super.getCapability(capability, facing)
+  }
 
-    override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
-        compound.setTag(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
-        compound.setTag(TileTankNoDisplay.NBT_Tier, tier.toNBTTag)
-        super.writeToNBT(compound)
+  override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
+    connection.hasCapability(capability, facing) || super.hasCapability(capability, facing)
+
+  private def sendPacket(): Unit = {
+    if (SideProxy.isServer(this)) PacketHandler.WRAPPER.sendToDimension(TileMessage(this), getWorld.provider.getDimension)
+  }
+
+  def hasContent: Boolean = tank.getFluidAmount > 0
+
+  override def hasFastRenderer = true
+
+  def getComparatorLevel: Int = connection.getComparatorLevel
+
+  def onBlockPlacedBy(): Unit = {
+    val dounTank = Option(getWorld.getTileEntity(getPos.down())).collect { case t: TileTankNoDisplay => t }
+    val upTank = Option(getWorld.getTileEntity(getPos.up())).collect { case t: TileTankNoDisplay => t }
+    (dounTank, upTank) match {
+      case (Some(dT), Some(uT)) => dT.connection.add(this, EnumFacing.UP).add(uT, EnumFacing.UP)
+      case (None, Some(uT)) => uT.connection.add(this, EnumFacing.UP.getOpposite)
+      case (Some(dT), None) => dT.connection.add(this, EnumFacing.DOWN.getOpposite)
+      case (None, None) => this.connection = new Connection(Seq(this))
     }
+  }
 
-    def getBlockTag: NBTTagCompound = {
-        val nbt = writeToNBT(new NBTTagCompound)
-        Seq("x", "y", "z", "id").foreach(nbt.removeTag)
-        nbt
-    }
+  def onDestory(): Unit = {
+    this.connection.remove(this)
+  }
 
-    override def getUpdateTag: NBTTagCompound = writeToNBT(new NBTTagCompound)
+  class Tank extends net.minecraftforge.fluids.FluidTank(Utils.toInt(tier.amount)) {
+    setTileEntity(self)
+    var box: Box = _
 
-    override def getUpdatePacket = new SPacketUpdateTileEntity(getPos, 0, getUpdateTag)
-
-    override def readFromNBT(compound: NBTTagCompound): Unit = {
-        super.readFromNBT(compound)
-        tank.readFromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tank))
-        tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
-        loading = true
-    }
-
-    def readNBTClient(compound: NBTTagCompound): Unit = {
-        tank.readFromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tank))
-        tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
-    }
-
-    override def onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity): Unit = handleUpdateTag(pkt.getNbtCompound)
-
-    override def onLoad(): Unit = {
-        super.onLoad()
-        if (loading && SideProxy.isServer(this)) {
-            Connection.load(getWorld, getPos)
-            loading = false
+    override def onContentsChanged(): Unit = {
+      super.onContentsChanged()
+      sendPacket()
+      connection.updateNeighbors()
+      if (!SideProxy.isServer(self) && getCapacity != 0) {
+        val percent = getFluidAmount.toDouble / getCapacity.toDouble
+        val a = 0.001
+        if (percent > a) {
+          val d = 1d / 16d
+          var maxY = 0d
+          var minY = 0d
+          if (tank.getFluid.getFluid.isGaseous(tank.getFluid)) {
+            maxY = 1d - a
+            minY = 1d - percent + a
+          } else {
+            minY = a
+            maxY = percent - a
+          }
+          box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
+        } else {
+          box = null
         }
+      }
     }
 
-    override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
-        val c = connection.getCapability(capability, facing)
-        if (c != null) c else super.getCapability(capability, facing)
+    override def readFromNBT(nbt: NBTTagCompound) = {
+      setCapacity(nbt.getInteger(TileTankNoDisplay.NBT_Capacity))
+      val fluid = FluidStack.loadFluidStackFromNBT(nbt)
+      setFluid(fluid)
+      onContentsChanged()
+      this
     }
 
-    override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean =
-        connection.hasCapability(capability, facing) || super.hasCapability(capability, facing)
-
-    private def sendPacket(): Unit = {
-        if (SideProxy.isServer(this)) PacketHandler.WRAPPER.sendToDimension(TileMessage(this), getWorld.provider.getDimension)
+    override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
+      super.writeToNBT(nbt)
+      nbt.setInteger(TileTankNoDisplay.NBT_Capacity, getCapacity)
+      nbt
     }
 
-    def hasContent: Boolean = tank.getFluidAmount > 0
-
-    override def hasFastRenderer = true
-
-    def getComparatorLevel: Int = connection.getComparatorLevel
-
-    def onBlockPlacedBy(): Unit = {
-        val dounTank = Option(getWorld.getTileEntity(getPos.down())).collect { case t: TileTankNoDisplay => t }
-        val upTank = Option(getWorld.getTileEntity(getPos.up())).collect { case t: TileTankNoDisplay => t }
-        (dounTank, upTank) match {
-            case (Some(dT), Some(uT)) => dT.connection.add(this, EnumFacing.UP).add(uT, EnumFacing.UP)
-            case (None, Some(uT)) => uT.connection.add(this, EnumFacing.UP.getOpposite)
-            case (Some(dT), None) => dT.connection.add(this, EnumFacing.DOWN.getOpposite)
-            case (None, None) => this.connection = new Connection(Seq(this))
-        }
+    override def toString: String = {
+      val fluid = getFluid
+      if (fluid == null) "Tank : no fluid : Capacity = " + getCapacity
+      else "Tank : " + fluid.getLocalizedName + " " + getFluidAmount + "mB : Capacity = " + getCapacity
     }
 
-    def onDestory(): Unit = {
-        this.connection.remove(this)
+    override def canFillFluidType(fluid: FluidStack): Boolean = {
+      val fluidType = connection.getFluidStack
+      fluidType.isEmpty || fluidType.contains(fluid)
     }
+  }
 
-    class Tank extends net.minecraftforge.fluids.FluidTank(Utils.toInt(tier.amount)) {
-        setTileEntity(self)
-        var box: Box = _
+  @Optional.Method(modid = TileTankNoDisplay.bcid)
+  override def getExtension(world: World, pos: BlockPos, face: EnumFacing, state: IBlockState): Float =
+    if (face.getAxis == Axis.Y) 0 else 2 / 16f
 
-        override def onContentsChanged(): Unit = {
-            super.onContentsChanged()
-            sendPacket()
-            connection.updateNeighbors()
-            if (!SideProxy.isServer(self) && getCapacity != 0) {
-                val percent = getFluidAmount.toDouble / getCapacity.toDouble
-                val a = 0.001
-                if (percent > a) {
-                    val d = 1d / 16d
-                    var maxY = 0d
-                    var minY = 0d
-                    if (tank.getFluid.getFluid.isGaseous(tank.getFluid)) {
-                        maxY = 1d - a
-                        minY = 1d - percent + a
-                    } else {
-                        minY = a
-                        maxY = percent - a
-                    }
-                    box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
-                } else {
-                    box = null
-                }
-            }
-        }
-
-        override def readFromNBT(nbt: NBTTagCompound) = {
-            setCapacity(nbt.getInteger(TileTankNoDisplay.NBT_Capacity))
-            val fluid = FluidStack.loadFluidStackFromNBT(nbt)
-            setFluid(fluid)
-            onContentsChanged()
-            this
-        }
-
-        override def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
-            super.writeToNBT(nbt)
-            nbt.setInteger(TileTankNoDisplay.NBT_Capacity, getCapacity)
-            nbt
-        }
-
-        override def toString: String = {
-            val fluid = getFluid
-            if (fluid == null) "Tank : no fluid : Capacity = " + getCapacity
-            else "Tank : " + fluid.getLocalizedName + " " + getFluidAmount + "mB : Capacity = " + getCapacity
-        }
-
-        override def canFillFluidType(fluid: FluidStack): Boolean = {
-            val fluidType = connection.getFluidStack
-            fluidType.isEmpty || fluidType.contains(fluid)
-        }
+  @Optional.Method(modid = TileTankNoDisplay.bcid)
+  override def getDebugInfo(left: util.List[String], right: util.List[String], side: EnumFacing): Unit = {
+    if (SideProxy.isServer(this)) {
+      left add getClass.getName
+      left add connection.toString
     }
-
-    @Optional.Method(modid = TileTankNoDisplay.bcid)
-    override def getExtension(world: World, pos: BlockPos, face: EnumFacing, state: IBlockState): Float =
-        if (face.getAxis == Axis.Y) 0 else 2 / 16f
-
-    @Optional.Method(modid = TileTankNoDisplay.bcid)
-    override def getDebugInfo(left: util.List[String], right: util.List[String], side: EnumFacing): Unit = {
-        if (SideProxy.isServer(this)) {
-            left add getClass.getName
-            left add connection.toString
-        }
-        left.add("Tier : " + tier)
-        left add tank.toString
-    }
+    left.add("Tier : " + tier)
+    left add tank.toString
+  }
 }
 
 object TileTankNoDisplay {
-    final val NBT_Tank = "tank"
-    final val NBT_Tier = "tier"
-    final val NBT_Capacity = "capacity"
-    final val NBT_BlockTag = "BlockEntityTag"
-    final val bcid = "buildcraftcore"
-    final val ae2id = "appliedenergistics2"
+  final val NBT_Tank = "tank"
+  final val NBT_Tier = "tier"
+  final val NBT_Capacity = "capacity"
+  final val NBT_BlockTag = "BlockEntityTag"
+  final val bcid = "buildcraftcore"
+  final val ae2id = "appliedenergistics2"
 }

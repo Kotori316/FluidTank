@@ -8,7 +8,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 
 public class Utils {
 
-    public static final Material MATERIAL = new TankMaterimal();
+    public static final Material MATERIAL = new TankMaterial();
     private static final double d = 1 / 16d;
     public static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d);
 
@@ -28,8 +28,8 @@ public class Utils {
         }
     }
 
-    private static class TankMaterimal extends Material {
-        public TankMaterimal() {
+    private static class TankMaterial extends Material {
+        TankMaterial() {
             super(MapColor.AIR);
             setImmovableMobility();
         }

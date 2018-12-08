@@ -19,121 +19,121 @@ import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
 
 abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvider {
 
-    setCreativeTab(Utils.CREATIVE_TABS)
-    setHardness(1.0f)
+  setCreativeTab(Utils.CREATIVE_TABS)
+  setHardness(1.0f)
 
-    import AbstractTank._
+  import AbstractTank._
 
-    val itemBlock: ItemBlockTank
+  val itemBlock: ItemBlockTank
 
-    def getTierByMeta(meta: Int): Tiers
+  def getTierByMeta(meta: Int): Tiers
 
-    override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
-                                  hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-        val stack = playerIn.getHeldItem(hand)
-        val flag = stack.getCount == 1
-        val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (flag) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
+  override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
+                                hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+    val stack = playerIn.getHeldItem(hand)
+    val flag = stack.getCount == 1
+    val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (flag) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
 
-        for (stackHandler <- stackHandlerOption;
-             tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
-             if !stack.getItem.isInstanceOf[ItemBlockTank]
-        ) {
-            if (SideProxy.isServer(tileTank)) {
-                val tankHandler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
-                val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
-                val drainAmount = Option(stackHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
-                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
-                if (resultFill.isSuccess) {
-                    playerIn.setHeldItem(hand, resultFill.getResult)
-                } else {
-                    val fillAmount = stackHandler.fill(tileTank.connection.getFluidStack.map(_.copywithAmount(Int.MaxValue)).orNull, false)
-                    val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
-                    if (resultDrain.isSuccess) {
-                        playerIn.setHeldItem(hand, resultDrain.getResult)
-                    }
-                }
-            }
-            return true
+    for (stackHandler <- stackHandlerOption;
+         tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
+         if !stack.getItem.isInstanceOf[ItemBlockTank]
+    ) {
+      if (SideProxy.isServer(tileTank)) {
+        val tankHandler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
+        val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
+        val drainAmount = Option(stackHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
+        val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
+        if (resultFill.isSuccess) {
+          playerIn.setHeldItem(hand, resultFill.getResult)
+        } else {
+          val fillAmount = stackHandler.fill(tileTank.connection.getFluidStack.map(_.copyWithAmount(Int.MaxValue)).orNull, false)
+          val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
+          if (resultDrain.isSuccess) {
+            playerIn.setHeldItem(hand, resultDrain.getResult)
+          }
         }
-
-        if (playerIn.getHeldItemMainhand.isEmpty) {
-            if (!worldIn.isRemote) {
-                worldIn.getTileEntity(pos) match {
-                    case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
-                    case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-                }
-            }
-            return true
-        }
-
-        super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+      }
+      return true
     }
 
-    override final def getBlockLayer = BlockRenderLayer.CUTOUT
-
-    override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
-
-    override final def isFullCube(state: IBlockState) = false
-
-    override final def isOpaqueCube(state: IBlockState) = false
-
-    override final def hasTileEntity(state: IBlockState) = true
-
-    override final def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = Utils.BOUNDING_BOX
-
-    override final def shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing) = true
-
-    override def canCreatureSpawn(state: IBlockState, world: IBlockAccess, pos: BlockPos, living: EntityLiving.SpawnPlacementType) = false
-
-    override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
+    if (playerIn.getHeldItemMainhand.isEmpty) {
+      if (!worldIn.isRemote) {
         worldIn.getTileEntity(pos) match {
-            case tank: TileTankNoDisplay => tank.onDestory()
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+          case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
+          case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
-        super.breakBlock(worldIn, pos, state)
+      }
+      return true
     }
 
-    override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
-        worldIn.getTileEntity(pos) match {
-            case tank: TileTankNoDisplay => tank.onBlockPlacedBy()
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
-        }
+    super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+  }
+
+  override final def getBlockLayer = BlockRenderLayer.CUTOUT
+
+  override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
+
+  override final def isFullCube(state: IBlockState) = false
+
+  override final def isOpaqueCube(state: IBlockState) = false
+
+  override final def hasTileEntity(state: IBlockState) = true
+
+  override final def getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = Utils.BOUNDING_BOX
+
+  override final def shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing) = true
+
+  override def canCreatureSpawn(state: IBlockState, world: IBlockAccess, pos: BlockPos, living: EntityLiving.SpawnPlacementType) = false
+
+  override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
+    worldIn.getTileEntity(pos) match {
+      case tank: TileTankNoDisplay => tank.onDestory()
+      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
     }
+    super.breakBlock(worldIn, pos, state)
+  }
 
-    override def hasComparatorInputOverride(state: IBlockState): Boolean = true
-
-    override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
-        worldIn.getTileEntity(pos) match {
-            case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
-            case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
-        }
+  override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+    super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
+    worldIn.getTileEntity(pos) match {
+      case tank: TileTankNoDisplay => tank.onBlockPlacedBy()
+      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
     }
+  }
 
-    override def getMetaFromState(state: IBlockState): Int = damageDropped(state)
+  override def hasComparatorInputOverride(state: IBlockState): Boolean = true
 
-    override def getStateFromMeta(meta: Int): IBlockState = getDefaultState
+  override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
+    worldIn.getTileEntity(pos) match {
+      case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
+      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
+    }
+  }
+
+  override def getMetaFromState(state: IBlockState): Int = damageDropped(state)
+
+  override def getStateFromMeta(meta: Int): IBlockState = getDefaultState
 }
 
 object AbstractTank {
 
-    implicit class FluidStackHelper(val fluidStack: FluidStack) extends AnyVal {
+  implicit class FluidStackHelper(val fluidStack: FluidStack) extends AnyVal {
 
-        def copywithAmount(amount: Int): FluidStack = {
-            if (fluidStack == null)
-                null
-            else
-                new FluidStack(fluidStack, amount)
-        }
-
-        def setAmount(amount: Int): FluidStack = {
-            fluidStack.amount = amount
-            fluidStack
-        }
-
-        def isEmpty: Boolean = {
-            fluidStack == null || fluidStack.amount <= 0
-        }
+    def copyWithAmount(amount: Int): FluidStack = {
+      if (fluidStack == null)
+        null
+      else
+        new FluidStack(fluidStack, amount)
     }
+
+    def setAmount(amount: Int): FluidStack = {
+      fluidStack.amount = amount
+      fluidStack
+    }
+
+    def isEmpty: Boolean = {
+      fluidStack == null || fluidStack.amount <= 0
+    }
+  }
 
 }

@@ -14,26 +14,26 @@ import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 
 class BlockTankCreative extends AbstractTank {
+  setRegistryName(FluidTank.modID, "blocktankcreative")
+  setUnlocalizedName(FluidTank.modID + ".blocktankcreative")
+
+  final val itemBlock = new ItemBlockTank(this, Tiers.CREATIVE.rank) {
     setRegistryName(FluidTank.modID, "blocktankcreative")
-    setUnlocalizedName(FluidTank.modID + ".blocktankcreative")
 
-    final val itemBlock = new ItemBlockTank(this, Tiers.CREATIVE.rank) {
-        setRegistryName(FluidTank.modID, "blocktankcreative")
-
-        override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag): Unit = {
-            tooltip.add("Creative")
-        }
-
-        override def getModelResouceLocation(meta: Int) = new ModelResourceLocation(getRegistryName, "inventory")
-
-        override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = null
-
-        override def getUnlocalizedName(stack: ItemStack): String = "tile.fluidtank.blocktankcreative"
-
-        override def hasRecipe: Boolean = false
+    override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[String], flagIn: ITooltipFlag): Unit = {
+      tooltip.add("Creative")
     }
 
-    override def getTierByMeta(meta: Int): Tiers = Tiers.CREATIVE
+    override def getModelResourceLocation(meta: Int) = new ModelResourceLocation(getRegistryName, "inventory")
 
-    override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileTankCreative
+    override def initCapabilities(stack: ItemStack, nbt: NBTTagCompound): ICapabilityProvider = null
+
+    override def getUnlocalizedName(stack: ItemStack): String = "tile.fluidtank.blocktankcreative"
+
+    override def hasRecipe: Boolean = false
+  }
+
+  override def getTierByMeta(meta: Int): Tiers = Tiers.CREATIVE
+
+  override def createNewTileEntity(worldIn: World, meta: Int): TileEntity = new TileTankCreative
 }

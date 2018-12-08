@@ -5,7 +5,7 @@ import appeng.api.config.Actionable
 import appeng.api.networking.security.IActionSource
 import appeng.api.storage.channels.IFluidStorageChannel
 import appeng.api.storage.data.{IAEFluidStack, IAEStack, IItemList}
-import appeng.api.storage.{IMEInventory, IMEMonitor, IStorageChannel, IStorageMonitorable, IStorageMonitorableAccessor}
+import appeng.api.storage._
 import appeng.me.helpers.BaseActionSource
 import appeng.me.storage.{MEMonitorPassThrough, NullInventory}
 import com.kotori316.fluidtank.tiles.Connection
@@ -18,48 +18,48 @@ import com.kotori316.fluidtank.tiles.Connection
   */
 class AEFluidInv(self: Connection) extends IMEInventory[IAEFluidStack] with IStorageMonitorableAccessor {
 
-    val mePassThrough = new MEMonitorPassThrough[IAEFluidStack](new NullInventory[IAEFluidStack], getChannel)
+  val mePassThrough = new MEMonitorPassThrough[IAEFluidStack](new NullInventory[IAEFluidStack], getChannel)
 
-    val monitorable = new IStorageMonitorable {
-        override def getInventory[T <: IAEStack[T]](channel: IStorageChannel[T]): IMEMonitor[T] = {
-            if (channel == getChannel) {
-                mePassThrough.setInternal(AEFluidInv.this)
-                mePassThrough.asInstanceOf[IMEMonitor[T]]
-            } else {
-                null
-            }
-        }
+  val monitorable = new IStorageMonitorable {
+    override def getInventory[T <: IAEStack[T]](channel: IStorageChannel[T]): IMEMonitor[T] = {
+      if (channel == getChannel) {
+        mePassThrough.setInternal(AEFluidInv.this)
+        mePassThrough.asInstanceOf[IMEMonitor[T]]
+      } else {
+        null
+      }
     }
+  }
 
-    override def getChannel: IFluidStorageChannel =
-        AEApi.instance().storage().getStorageChannel[IAEFluidStack, IFluidStorageChannel](classOf[IFluidStorageChannel])
+  override def getChannel: IFluidStorageChannel =
+    AEApi.instance().storage().getStorageChannel[IAEFluidStack, IFluidStorageChannel](classOf[IFluidStorageChannel])
 
-    override def injectItems(input: IAEFluidStack, mode: Actionable, src: IActionSource): IAEFluidStack = {
-        val fluidStack = input.getFluidStack
-        val filled = self.handler.fill(fluidStack, mode == Actionable.MODULATE)
-        if (filled == 0) {
-            // Input isn't modified. Tank is full.
-            input
-        } else {
-            val remaing = fluidStack.amount - filled
-            fluidStack.amount = remaing
-            getChannel.createStack(fluidStack)
-        }
+  override def injectItems(input: IAEFluidStack, mode: Actionable, src: IActionSource): IAEFluidStack = {
+    val fluidStack = input.getFluidStack
+    val filled = self.handler.fill(fluidStack, mode == Actionable.MODULATE)
+    if (filled == 0) {
+      // Input isn't modified. Tank is full.
+      input
+    } else {
+      val remaining = fluidStack.amount - filled
+      fluidStack.amount = remaining
+      getChannel.createStack(fluidStack)
     }
+  }
 
-    override def extractItems(request: IAEFluidStack, mode: Actionable, src: IActionSource): IAEFluidStack = {
-        val fluidStack = request.getFluidStack
-        Option(self.handler.drain(fluidStack, mode == Actionable.MODULATE)).map(getChannel.createStack).orNull
-    }
+  override def extractItems(request: IAEFluidStack, mode: Actionable, src: IActionSource): IAEFluidStack = {
+    val fluidStack = request.getFluidStack
+    Option(self.handler.drain(fluidStack, mode == Actionable.MODULATE)).map(getChannel.createStack).orNull
+  }
 
-    override def getAvailableItems(out: IItemList[IAEFluidStack]): IItemList[IAEFluidStack] = {
-        self.getFluidStack.map(getChannel.createStack).map(_.setStackSize(self.amount)).foreach(out.add)
-        out
-    }
+  override def getAvailableItems(out: IItemList[IAEFluidStack]): IItemList[IAEFluidStack] = {
+    self.getFluidStack.map(getChannel.createStack).map(_.setStackSize(self.amount)).foreach(out.add)
+    out
+  }
 
-    override def getInventory(src: IActionSource): IStorageMonitorable = monitorable
+  override def getInventory(src: IActionSource): IStorageMonitorable = monitorable
 
-    def postChanges(): Unit = {
-        mePassThrough.postChange(mePassThrough, mePassThrough.getStorageList, new BaseActionSource())
-    }
+  def postChanges(): Unit = {
+    mePassThrough.postChange(mePassThrough, mePassThrough.getStorageList, new BaseActionSource())
+  }
 }

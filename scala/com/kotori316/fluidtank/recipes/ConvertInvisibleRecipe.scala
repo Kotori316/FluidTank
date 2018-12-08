@@ -9,33 +9,33 @@ import net.minecraft.world.World
 import net.minecraftforge.registries.IForgeRegistryEntry
 
 object ConvertInvisibleRecipe extends IForgeRegistryEntry.Impl[IRecipe] with IRecipe {
-    setRegistryName(FluidTank.modID + ":tankconvert")
+  setRegistryName(FluidTank.modID + ":tankconvert")
 
-    override def canFit(width: Int, height: Int) = width * height >= 1
+  override def canFit(width: Int, height: Int) = width * height >= 1
 
-    override def getCraftingResult(inv: InventoryCrafting) = {
-        val stack = (for (i <- 0 until inv.getWidth;
-                          j <- 0 until inv.getHeight) yield inv.getStackInRowAndColumn(i, j)).filterNot(_.isEmpty).headOption
-        stack.map(_.copy()).map(s => {
-            val d = s.getItemDamage
-            if ((d & 8) == 8) s.setItemDamage(~(~d | 8))
-            else s.setItemDamage(d | 8)
-            s.setCount(1)
-            s
-        }).getOrElse(ItemStack.EMPTY)
-    }
+  override def getCraftingResult(inv: InventoryCrafting) = {
+    val stack = (for (i <- 0 until inv.getWidth;
+                      j <- 0 until inv.getHeight) yield inv.getStackInRowAndColumn(i, j)).filterNot(_.isEmpty).headOption
+    stack.map(_.copy()).map(s => {
+      val d = s.getItemDamage
+      if ((d & 8) == 8) s.setItemDamage(~(~d | 8))
+      else s.setItemDamage(d | 8)
+      s.setCount(1)
+      s
+    }).getOrElse(ItemStack.EMPTY)
+  }
 
-    override def matches(inv: InventoryCrafting, worldIn: World) = {
-        val stacks = (for (i <- 0 until inv.getWidth;
-                           j <- 0 until inv.getHeight) yield inv.getStackInRowAndColumn(i, j)).filterNot(_.isEmpty)
-        stacks.size == 1 && TankIngredient.apply(stacks.head)
-    }
+  override def matches(inv: InventoryCrafting, worldIn: World) = {
+    val stacks = (for (i <- 0 until inv.getWidth;
+                       j <- 0 until inv.getHeight) yield inv.getStackInRowAndColumn(i, j)).filterNot(_.isEmpty)
+    stacks.size == 1 && TankIngredient.apply(stacks.head)
+  }
 
-    override def getRecipeOutput = new ItemStack(FluidTank.BLOCK_TANKS.get(0).itemBlock, 1, 8)
+  override def getRecipeOutput = new ItemStack(FluidTank.BLOCK_TANKS.get(0).itemBlock, 1, 8)
 
-    override def getIngredients: NonNullList[Ingredient] = NonNullList.from(TankIngredient)
+  override def getIngredients: NonNullList[Ingredient] = NonNullList.from(TankIngredient)
 
-    override def getGroup: String = FluidTank.modID + ":tankconvertrecipe"
+  override def getGroup: String = FluidTank.modID + ":tankconvertrecipe"
 
-    override def isDynamic: Boolean = true
+  override def isDynamic: Boolean = true
 }
