@@ -29,7 +29,7 @@ public class ClientProxy extends SideProxy {
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
     public static final RenderTank RENDER_TANK = new RenderTank();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
-    public static final ModelResourceLocation MESH_MODEL =
+    private static final ModelResourceLocation MESH_MODEL =
             new ModelResourceLocation(FluidTank.modID + ":fluidtankitem", "inventory");
 
     @Override

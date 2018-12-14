@@ -8,6 +8,7 @@ import net.minecraftforge.common.crafting.JsonContext;
 
 import com.kotori316.fluidtank.Config;
 
+@SuppressWarnings("unused")
 public class ConfigCondition implements IConditionFactory {
 
     @Override

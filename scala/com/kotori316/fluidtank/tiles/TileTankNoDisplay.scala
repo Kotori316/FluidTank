@@ -90,9 +90,9 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
   def getComparatorLevel: Int = connection.getComparatorLevel
 
   def onBlockPlacedBy(): Unit = {
-    val dounTank = Option(getWorld.getTileEntity(getPos.down())).collect { case t: TileTankNoDisplay => t }
+    val downTank = Option(getWorld.getTileEntity(getPos.down())).collect { case t: TileTankNoDisplay => t }
     val upTank = Option(getWorld.getTileEntity(getPos.up())).collect { case t: TileTankNoDisplay => t }
-    (dounTank, upTank) match {
+    (downTank, upTank) match {
       case (Some(dT), Some(uT)) => dT.connection.add(this, EnumFacing.UP).add(uT, EnumFacing.UP)
       case (None, Some(uT)) => uT.connection.add(this, EnumFacing.UP.getOpposite)
       case (Some(dT), None) => dT.connection.add(this, EnumFacing.DOWN.getOpposite)
@@ -100,7 +100,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     }
   }
 
-  def onDestory(): Unit = {
+  def onDestroy(): Unit = {
     this.connection.remove(this)
   }
 

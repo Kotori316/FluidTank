@@ -18,7 +18,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   @Nullable
   def tankNbt: NBTTagCompound = if (nbt == null) null else nbt.getCompoundTag(TileTankNoDisplay.NBT_Tank)
 
-  var inited = false
+  var initialized = false
   var fluid: FluidStack = _
 
   override def getContainer: ItemStack = stack
@@ -96,8 +96,8 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   }
 
   def init(): Unit = {
-    if (!inited) {
-      inited = true
+    if (!initialized) {
+      initialized = true
       fluid = FluidStack.loadFluidStackFromNBT(tankNbt)
     }
   }
@@ -121,10 +121,10 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   def createTag: NBTTagCompound = {
     val tag = new NBTTagCompound
     tag.setTag(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
-    val tanktag = new NBTTagCompound
-    tanktag.setInteger(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
-    fluid.writeToNBT(tanktag)
-    tag.setTag(TileTankNoDisplay.NBT_Tank, tanktag)
+    val tankTag = new NBTTagCompound
+    tankTag.setInteger(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
+    fluid.writeToNBT(tankTag)
+    tag.setTag(TileTankNoDisplay.NBT_Tank, tankTag)
     tag
   }
 }

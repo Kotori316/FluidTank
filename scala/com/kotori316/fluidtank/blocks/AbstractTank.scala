@@ -69,7 +69,7 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
     super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
   }
 
-  override final def getBlockLayer = BlockRenderLayer.CUTOUT
+  override final def getBlockLayer: BlockRenderLayer = BlockRenderLayer.CUTOUT
 
   override def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
 
@@ -87,7 +87,7 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
 
   override def breakBlock(worldIn: World, pos: BlockPos, state: IBlockState): Unit = {
     worldIn.getTileEntity(pos) match {
-      case tank: TileTankNoDisplay => tank.onDestory()
+      case tank: TileTankNoDisplay => tank.onDestroy()
       case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
     }
     super.breakBlock(worldIn, pos, state)

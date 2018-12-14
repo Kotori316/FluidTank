@@ -62,7 +62,8 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
     }
     val l = Math.sqrt(dx / sizeX * dx / sizeX + dy / sizeY * dy / sizeY + dz / sizeZ * dz / sizeZ)
     val lengthFloor = MathHelper.floor(l)
-    new Range.Inclusive(0, lengthFloor, 1).foreach(i1 => {
+    var i1 = 0
+    while (i1 <= lengthFloor) {
       val i2 = if (i1 == lengthFloor) l else i1 + 1
       buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
@@ -83,7 +84,9 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
       buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-    })
+
+      i1 += 1
+    }
     if (endSide) {
       buffer.pos(e1X + dx, e1Y + dy, e1Z + dz).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(e2X + dx, e2Y + dy, e2Z + dz).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
@@ -127,7 +130,8 @@ private class BoxX(startX: Double,
       buffer.pos(startX, y - offY, z + offZ).color(red, green, blue, alpha).tex(maYU, maZV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(startX, y + offY, z + offZ).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
     }
-    new Range.Inclusive(0, count, 1).foreach(i1 => {
+    var i1 = 0
+    while (i1 <= count) {
       val i2 = if (i1 == count) length / sizeX else i1 + 1d
       //North
       buffer.pos(startX + sizeX * i2, y + offY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -149,7 +153,9 @@ private class BoxX(startX: Double,
       buffer.pos(startX + sizeX * i2, y - offY, z + offZ).color(red, green, blue, alpha).tex(maZU, minV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(startX + sizeX * i1, y - offY, z + offZ).color(red, green, blue, alpha).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(startX + sizeX * i1, y - offY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-    })
+
+      i1 += 1
+    }
     if (endSide) {
       //East
       buffer.pos(endX, y + offY, z + offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -182,7 +188,8 @@ private class BoxY(startY: Double,
       buffer.pos(x - offX, startY, z + offZ).color(red, green, blue, alpha).tex(maZU, maXV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(x - offX, startY, z - offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
     }
-    new Range.Inclusive(0, count, 1).foreach(i1 => {
+    var i1 = 0
+    while (i1 <= count) {
       val i2 = if (i1 == count) length / sizeY else i1 + 1d
       //West
       buffer.pos(x - offX, startY + sizeY * i2, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -204,7 +211,9 @@ private class BoxY(startY: Double,
       buffer.pos(x - offX, startY + sizeY * i1, z + offZ).color(red, green, blue, alpha).tex(maYU, minV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(x + offX, startY + sizeY * i1, z + offZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(x + offX, startY + sizeY * i2, z + offZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
-    })
+
+      i1 += 1
+    }
     if (endSide) {
       //Top
       buffer.pos(x - offX, endY, z - offZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -236,7 +245,8 @@ private class BoxZ(startZ: Double,
       buffer.pos(x - offX, y - offY, startZ).color(red, green, blue, alpha).tex(maYU, maXV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(x - offX, y + offY, startZ).color(red, green, blue, alpha).tex(minU, maXV).lightmap(lv.l1, lv.l2).endVertex()
     }
-    new Range.Inclusive(0, count, 1).foreach(i1 => {
+    var i1 = 0
+    while (i1 <= count) {
       val i2 = if (i1 == count) length / sizeZ else i1 + 1d
       //West
       buffer.pos(x - offX, y + offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -258,7 +268,9 @@ private class BoxZ(startZ: Double,
       buffer.pos(x + offX, y - offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maXU, minV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(x - offX, y - offY, startZ + sizeZ * i2).color(red, green, blue, alpha).tex(maXU, maZV).lightmap(lv.l1, lv.l2).endVertex()
       buffer.pos(x - offX, y - offY, startZ + sizeZ * i1).color(red, green, blue, alpha).tex(minU, maZV).lightmap(lv.l1, lv.l2).endVertex()
-    })
+
+      i1 += 1
+    }
     if (endSide) {
       //South
       buffer.pos(x - offX, y + offY, endZ).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -313,5 +325,5 @@ object Box {
     final val l2 = brightness >> 0 & 0xFFFF
   }
 
-  implicit val lightValue = new LightValue(0x00f000f0)
+  implicit val lightValue: LightValue = new LightValue(0x00f000f0)
 }
