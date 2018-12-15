@@ -18,3 +18,5 @@ Minecraft CurseForge - https://minecraft.curseforge.com/projects/largefluidtank
   * The MIT License (c) 2013 - 2018 AlgorithmX2 et al
 * [Hwyla](https://github.com/TehNut/HWYLA)
   * Licensed under CC BY-NC-SA 4.0
+* [The One Prove](https://github.com/McJtyMods/TheOneProbe)
+  * The MIT License Copyright © 2016 McJty
