@@ -63,11 +63,21 @@ repositories {
         name = "Progwml6 maven"
         url = "http://dvs1.progwml6.com/files/maven"
     }
+    maven {
+        name = "Hwyla"
+        url "http://tehnut.info/maven"
+    }
+    maven { // TThe One Probe
+        name 'tterrag maven'
+        url "https://maven.tterrag.com/"
+    }
 }
 
 dependencies {
     deobfCompile "com.mod-buildcraft:buildcraft:7.99.17"
     deobfCompile "appeng:appliedenergistics2:rv6-stable-4"
+    deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
 }
 
 processResources {
