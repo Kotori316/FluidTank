@@ -53,12 +53,12 @@ object Config {
     enableOldRenderProperty.setComment("True to use other render system for item. It doesn't show the content of tanks.")
     val enableOldRender = enableOldRenderProperty.getBoolean
 
-    val oreNameMap: Map[Tiers, String] = Tiers.list.drop(2).map(tier => {
+    val oreNameMap: Map[Tiers, String] = Tiers.list.filter(_.hasOreRecipe).map(tier => {
       val property = configuration.get(CATEGORY_RECIPE, tier + "OreName", tier.oreName)
       property.setRequiresMcRestart(true)
       property.setComment(s"Set OreDict name of items to craft $tier tank.")
       (tier, property.getString)
-    }).toMap + (Tiers.Invalid -> "Unknown") + (Tiers.WOOD -> "logWood")
+    }).toMap + (Tiers.Invalid -> "Unknown") + (Tiers.WOOD -> "logWood") + (Tiers.CREATIVE -> "Unknown")
 
     private val showInvisibleTankProperty = configuration.get(Configuration.CATEGORY_GENERAL, "showInvisibleTankInTab", false)
     showInvisibleTankProperty.setRequiresMcRestart(true)
