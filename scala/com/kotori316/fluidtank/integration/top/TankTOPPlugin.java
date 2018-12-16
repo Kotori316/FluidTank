@@ -1,14 +1,15 @@
 package com.kotori316.fluidtank.integration.top;
 
-import java.util.function.Function;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
-import mcjty.theoneprobe.api.ITheOneProbe;
-
-public class TankTOPPlugin implements Function<ITheOneProbe, Void> {
-
-    @Override
-    public Void apply(ITheOneProbe impl) {
-        impl.registerProvider(new TankDataProvider());
-        return null;
+public class TankTOPPlugin {
+    public static void register() {
+        if (Loader.isModLoaded("theoneprobe")) {
+            String packageName = TankTOPPlugin.class.getPackage().getName();
+            assert (packageName + ".TankTOPFunction").equals(TankTOPFunction.class.getName());
+            FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe",
+                packageName + ".TankTOPFunction");
+        }
     }
 }

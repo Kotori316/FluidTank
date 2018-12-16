@@ -1,5 +1,8 @@
 package com.kotori316.fluidtank.integration.top;
 
+import java.util.Arrays;
+import java.util.List;
+
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.IProbeInfoProvider;
@@ -14,8 +17,9 @@ import net.minecraftforge.fluids.FluidStack;
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.Utils;
-import com.kotori316.fluidtank.integration.Localize;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+
+import static com.kotori316.fluidtank.integration.Localize.*;
 
 public class TankDataProvider implements IProbeInfoProvider {
 
@@ -31,17 +35,19 @@ public class TankDataProvider implements IProbeInfoProvider {
         TileEntity entity = world.getTileEntity(data.getPos());
         if (entity instanceof TileTankNoDisplay && Config.content().showTOP()) {
             TileTankNoDisplay tank = (TileTankNoDisplay) entity;
-            String tier = I18n.translateToLocalFormatted(Localize.WAILA_TIER, tank.tier().toString());
-            String fluid = I18n.translateToLocalFormatted(Localize.WAILA_CONTENT,
-                Utils.toJava(tank.connection().getFluidStack()).map(FluidStack::getLocalizedName).orElse("Null"));
+            List<String> list;
+            String tier = I18n.translateToLocalFormatted(WAILA_TIER, tank.tier().toString());
+            String fluid = I18n.translateToLocalFormatted(WAILA_CONTENT,
+                    Utils.toJava(tank.connection().getFluidStack()).map(FluidStack::getLocalizedName).orElse(FLUID_NULL));
             if (tank.connection().hasCreative()) {
-                probeInfo.text(tier).text(fluid);
+                list = Arrays.asList(tier, fluid);
             } else {
-                String amount = I18n.translateToLocalFormatted(Localize.WAILA_AMOUNT, tank.connection().amount());
-                String capacity = I18n.translateToLocalFormatted(Localize.WAILA_CAPACITY, tank.connection().capacity());
-                String comparator = I18n.translateToLocalFormatted(Localize.WAILA_COMPARATOR, tank.getComparatorLevel());
-                probeInfo.text(tier).text(fluid).text(amount).text(capacity).text(comparator);
+                String amount = I18n.translateToLocalFormatted(WAILA_AMOUNT, tank.connection().amount());
+                String capacity = I18n.translateToLocalFormatted(WAILA_CAPACITY, tank.connection().capacity());
+                String comparator = I18n.translateToLocalFormatted(WAILA_COMPARATOR, tank.getComparatorLevel());
+                list = Arrays.asList(tier, fluid, amount, capacity, comparator);
             }
+            list.forEach(probeInfo::text);
         }
     }
 }

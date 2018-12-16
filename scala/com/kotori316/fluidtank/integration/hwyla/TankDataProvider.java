@@ -1,6 +1,9 @@
 package com.kotori316.fluidtank.integration.hwyla;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import mcp.mobius.waila.api.ITaggedList;
@@ -13,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Optional;
@@ -23,22 +27,13 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-import static com.kotori316.fluidtank.integration.Localize.WAILA_AMOUNT;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_CAPACITY;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_COMPARATOR;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_CONTENT;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_TANKINFO;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_TIER;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionAmount;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionCapacity;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionComparator;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionFluidName;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_NonCreative;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_Tier;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.Waila_ModId;
+import static com.kotori316.fluidtank.integration.Localize.*;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.*;
 
 @Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = Waila_ModId)
 public class TankDataProvider implements IWailaDataProvider {
+
+    private static final Predicate<Object> NOT_EMPTY = Predicate.isEqual(FLUID_NULL).negate();
 
     @Nonnull
     @Override
@@ -46,20 +41,43 @@ public class TankDataProvider implements IWailaDataProvider {
     @Optional.Method(modid = Waila_ModId)
     public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         TileEntity t = accessor.getTileEntity();
-        if (t instanceof TileTankNoDisplay && config.getConfig(WAILA_TANKINFO)) {
+        if (t instanceof TileTankNoDisplay && config.getConfig(WAILA_TANK_INFO)) {
             ITaggedList<String, String> taggedList = (ITaggedList<String, String>) tooltip;
             taggedList.removeEntries("IFluidHandler");
             NBTTagCompound nbtData = accessor.getNBTData();
-            if (nbtData.getBoolean(NBT_NonCreative)) {
-                taggedList.add(I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)), FluidTank.MOD_NAME);
-                taggedList.add(I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)), FluidTank.MOD_NAME);
-                taggedList.add(I18n.format(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)), FluidTank.MOD_NAME);
-                taggedList.add(I18n.format(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)), FluidTank.MOD_NAME);
-                taggedList.add(I18n.format(WAILA_COMPARATOR, nbtData.getInteger(NBT_ConnectionComparator)), FluidTank.MOD_NAME);
+            List<String> list;
+            if (!config.getConfig(WAILA_SHORT_INFO)) {
+                if (nbtData.getBoolean(NBT_NonCreative)) {
+                    list = Arrays.asList(
+                            I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)),
+                            I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
+                            I18n.format(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
+                            I18n.format(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
+                            I18n.format(WAILA_COMPARATOR, nbtData.getInteger(NBT_ConnectionComparator))
+                    );
+                } else {
+                    list = Arrays.asList(
+                            new TextComponentTranslation(WAILA_TIER, nbtData.getString(NBT_Tier)).getFormattedText(),
+                            new TextComponentTranslation(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)).getFormattedText()
+                    );
+                }
             } else {
-                taggedList.add(I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)), FluidTank.MOD_NAME);
-                taggedList.add(I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)), FluidTank.MOD_NAME);
+                if (nbtData.getBoolean(NBT_NonCreative)) {
+                    list = Collections.singletonList(
+                            new TextComponentTranslation(WAILA_SHORT,
+                                    nbtData.getString(NBT_ConnectionFluidName),
+                                    nbtData.getLong(NBT_ConnectionAmount),
+                                    nbtData.getLong(NBT_ConnectionCapacity)).getFormattedText()
+                    );
+                } else {
+                    list = java.util.Optional.of(nbtData.getString(NBT_ConnectionFluidName))
+                            .filter(NOT_EMPTY)
+                            .map(Collections::singletonList)
+                            .orElse(Collections.emptyList());
+                }
             }
+
+            list.forEach(s -> taggedList.add(s, FluidTank.MOD_NAME));
         }
         return tooltip;
     }
@@ -73,7 +91,7 @@ public class TankDataProvider implements IWailaDataProvider {
 
             tag.setString(NBT_Tier, tank.tier().toString());
             tag.setString(NBT_ConnectionFluidName,
-                Utils.toJava(tank.connection().getFluidStack()).map(FluidStack::getLocalizedName).orElse("Null"));
+                    Utils.toJava(tank.connection().getFluidStack()).map(FluidStack::getLocalizedName).orElse(FLUID_NULL));
             if (!tank.connection().hasCreative()) {
                 tag.setBoolean(NBT_NonCreative, true);
                 tag.setLong(NBT_ConnectionAmount, tank.connection().amount());

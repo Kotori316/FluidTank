@@ -14,13 +14,13 @@ import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 @WailaPlugin
 public class TankWailaPlugin implements IWailaPlugin {
 
-    public static final String Waila_ModId = "waila";
-    public static final String NBT_Tier = "tier";
-    public static final String NBT_ConnectionAmount = "ConnectionAmount";
-    public static final String NBT_ConnectionCapacity = "ConnectionCapacity";
-    public static final String NBT_ConnectionComparator = "Comparator";
-    public static final String NBT_ConnectionFluidName = "FluidName";
-    public static final String NBT_NonCreative = "Normal";
+    static final String Waila_ModId = "waila";
+    static final String NBT_Tier = TileTankNoDisplay.NBT_Tier();
+    static final String NBT_ConnectionAmount = "ConnectionAmount";
+    static final String NBT_ConnectionCapacity = "ConnectionCapacity";
+    static final String NBT_ConnectionComparator = "Comparator";
+    static final String NBT_ConnectionFluidName = "FluidName";
+    static final String NBT_NonCreative = "Normal";
 
     @Override
     public void register(IWailaRegistrar registrar) {
@@ -28,6 +28,7 @@ public class TankWailaPlugin implements IWailaPlugin {
         registrar.registerBodyProvider(provider, TileTankNoDisplay.class);
         registrar.registerNBTProvider(provider, TileTankNoDisplay.class);
 
-        registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_TANKINFO, true);
+        registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_TANK_INFO, true);
+        registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_SHORT_INFO, true);
     }
 }

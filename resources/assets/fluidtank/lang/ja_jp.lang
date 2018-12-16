@@ -29,8 +29,10 @@ itemGroup.FluidTank=FluidTanks
 fluidtank.recipe.tooltip=タンクのレシピ
 
 option.fluidtank.waila.tankinfo=タンクの中身を表示する
+option.fluidtank.waila.shortinfo=短くする
 fluidtank.waila.tier=Tier: %s
 fluidtank.waila.content=内容: %s
-fluidtank.waila.amount=  量: %d mB
-fluidtank.waila.capacity=  容量: %d mB
-fluidtank.waila.comparator=  コンパレータ: %d
+fluidtank.waila.amount=  量: %s mB
+fluidtank.waila.capacity=  容量: %s mB
+fluidtank.waila.comparator=  コンパレータ: %s
+fluidtank.waila.short=%1$s: %2$s/%3$s mB
