@@ -65,6 +65,10 @@ object Config {
     showInvisibleTankProperty.setComment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
     val showInvisibleTank = showInvisibleTankProperty.getBoolean
 
+    private val showTOPProperty = configuration.get(Configuration.CATEGORY_GENERAL, "showTOP", true)
+    showTOPProperty.setComment("Show tank info on TOP tooltip.")
+    val showTOP = showTOPProperty.getBoolean
+
     assert(Tiers.list.forall(oreNameMap.contains))
 
     if (configuration.hasChanged)

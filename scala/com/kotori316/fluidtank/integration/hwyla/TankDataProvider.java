@@ -16,18 +16,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.*;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_AMOUNT;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_CAPACITY;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_COMPARATOR;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_CONTENT;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_TANKINFO;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_TIER;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionAmount;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionCapacity;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionComparator;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionFluidName;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_NonCreative;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_Tier;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.Waila_ModId;
 
 @Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = Waila_ModId)
 public class TankDataProvider implements IWailaDataProvider {
 
     @Nonnull
     @Override
+    @SideOnly(Side.CLIENT)
     @Optional.Method(modid = Waila_ModId)
     public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         TileEntity t = accessor.getTileEntity();
@@ -36,13 +51,13 @@ public class TankDataProvider implements IWailaDataProvider {
             taggedList.removeEntries("IFluidHandler");
             NBTTagCompound nbtData = accessor.getNBTData();
             if (nbtData.getBoolean(NBT_NonCreative)) {
-                taggedList.add(I18n.format(FLUIDTANK_WAILA_TIER, nbtData.getString(NBT_Tier)), FluidTank.MOD_NAME);
+                taggedList.add(I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)), FluidTank.MOD_NAME);
                 taggedList.add(I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)), FluidTank.MOD_NAME);
                 taggedList.add(I18n.format(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)), FluidTank.MOD_NAME);
                 taggedList.add(I18n.format(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)), FluidTank.MOD_NAME);
                 taggedList.add(I18n.format(WAILA_COMPARATOR, nbtData.getInteger(NBT_ConnectionComparator)), FluidTank.MOD_NAME);
             } else {
-                taggedList.add(I18n.format(FLUIDTANK_WAILA_TIER, nbtData.getString(NBT_Tier)), FluidTank.MOD_NAME);
+                taggedList.add(I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)), FluidTank.MOD_NAME);
                 taggedList.add(I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)), FluidTank.MOD_NAME);
             }
         }

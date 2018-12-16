@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.AbstractTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.integration.top.TOPRegister;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe$;
@@ -61,6 +62,7 @@ public class FluidTank {
         MinecraftForge.EVENT_BUS.register(proxy);
         Config.load(event.getSuggestedConfigurationFile());
         proxy.registerTESR();
+        TOPRegister.register();
     }
 
     @EventHandler
