@@ -27,3 +27,10 @@ tile.fluidtank.blocktank7.star.invisible.name=Invisible Star Tank
 
 itemGroup.FluidTank=FluidTanks
 fluidtank.recipe.tooltip=Recipe of tanks
+
+option.fluidtank.waila.tankinfo=Show Tank Info
+fluidtank.waila.tier=Tier: %s
+fluidtank.waila.content=Contents: %s
+fluidtank.waila.amount=  Amount: %d mB
+fluidtank.waila.capacity=  Capacity: %d mB
+fluidtank.waila.comparator=  Comparator: %d

@@ -27,3 +27,10 @@ tile.fluidtank.blocktank7.star.invisible.name=不可視の星のタンク
 
 itemGroup.FluidTank=FluidTanks
 fluidtank.recipe.tooltip=タンクのレシピ
+
+option.fluidtank.waila.tankinfo=タンクの中身を表示する
+fluidtank.waila.tier=Tier: %s
+fluidtank.waila.content=内容: %s
+fluidtank.waila.amount=  量: %d mB
+fluidtank.waila.capacity=  容量: %d mB
+fluidtank.waila.comparator=  コンパレータ: %d

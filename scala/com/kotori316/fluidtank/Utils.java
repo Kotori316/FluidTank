@@ -1,10 +1,13 @@
 package com.kotori316.fluidtank;
 
+import java.util.Optional;
+
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
+import scala.Option;
 
 public class Utils {
 
@@ -25,6 +28,14 @@ public class Utils {
             return i;
         } else {
             return l > 0 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        }
+    }
+
+    public static <T> Optional<T> toJava(Option<T> option) {
+        if (option != null && option.isDefined()) {
+            return Optional.ofNullable(option.get());
+        } else {
+            return Optional.empty();
         }
     }
 
