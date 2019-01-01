@@ -1,7 +1,7 @@
 # FluidTank
 
 LICENSE: MIT License  
-Copyright (c) 2018 Kotori316
+Copyright (c) 2018, 2019 Kotori316
 
 Add large tanks that can have up to 1048576 buckets of fluid.
 
