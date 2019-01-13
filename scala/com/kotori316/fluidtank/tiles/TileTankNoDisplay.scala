@@ -20,8 +20,8 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fml.common.Optional
 
-@Optional.Interface(modid = TileTankNoDisplay.bcid, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
-@Optional.Interface(modid = TileTankNoDisplay.bcid, iface = "buildcraft.api.tiles.IDebuggable")
+@Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
+@Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.tiles.IDebuggable")
 class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConnection with IDebuggable {
   self =>
 
@@ -159,11 +159,11 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     }
   }
 
-  @Optional.Method(modid = TileTankNoDisplay.bcid)
+  @Optional.Method(modid = TileTankNoDisplay.bcId)
   override def getExtension(world: World, pos: BlockPos, face: EnumFacing, state: IBlockState): Float =
     if (face.getAxis == Axis.Y) 0 else 2 / 16f
 
-  @Optional.Method(modid = TileTankNoDisplay.bcid)
+  @Optional.Method(modid = TileTankNoDisplay.bcId)
   override def getDebugInfo(left: util.List[String], right: util.List[String], side: EnumFacing): Unit = {
     if (SideProxy.isServer(this)) {
       left add getClass.getName
@@ -179,6 +179,6 @@ object TileTankNoDisplay {
   final val NBT_Tier = "tier"
   final val NBT_Capacity = "capacity"
   final val NBT_BlockTag = "BlockEntityTag"
-  final val bcid = "buildcraftcore"
+  final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
 }

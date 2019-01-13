@@ -67,17 +67,17 @@ class ItemBlockTank(val blockTank: AbstractTank, val rank: Int) extends ItemBloc
     val state = worldIn.getBlockState(pos)
     if (state.getBlock eq this.block) {
       if (worldIn.getMinecraftServer != null) {
-        val nbttagcompound = stack.getSubCompound(TileTankNoDisplay.NBT_BlockTag)
-        if (nbttagcompound != null) {
+        val subTag = stack.getSubCompound(TileTankNoDisplay.NBT_BlockTag)
+        if (subTag != null) {
           val tileentity = worldIn.getTileEntity(pos)
           if (tileentity != null) {
             if (!(!worldIn.isRemote && tileentity.onlyOpsCanSetNbt) || !(player == null || !player.canUseCommandBlock)) {
-              val nbttagcompound1 = tileentity.writeToNBT(new NBTTagCompound)
-              nbttagcompound1.merge(nbttagcompound)
-              nbttagcompound1.setInteger("x", pos.getX)
-              nbttagcompound1.setInteger("y", pos.getY)
-              nbttagcompound1.setInteger("z", pos.getZ)
-              tileentity.readFromNBT(nbttagcompound1)
+              val nbt = tileentity.writeToNBT(new NBTTagCompound)
+              nbt.merge(subTag)
+              nbt.setInteger("x", pos.getX)
+              nbt.setInteger("y", pos.getY)
+              nbt.setInteger("z", pos.getZ)
+              tileentity.readFromNBT(nbt)
               tileentity.markDirty()
             }
           }

@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.integration;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class Localize {
 
     public static final String WAILA_TIER = "fluidtank.waila.tier";

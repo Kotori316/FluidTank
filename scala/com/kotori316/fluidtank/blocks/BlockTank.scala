@@ -51,7 +51,7 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends AbstractTank {
     player.addStat(StatList.getBlockStats(this))
     player.addExhaustion(0.005F)
     harvesters.set(player)
-    if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockstates, prevents item dupe
+    if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockStates, prevents item dupe
       val blockStack = new ItemStack(this, 1, damageDropped(state))
       saveTankNBT(te, blockStack)
       val list = ArrayBuffer(blockStack)
