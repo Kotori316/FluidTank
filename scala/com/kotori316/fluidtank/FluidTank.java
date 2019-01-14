@@ -23,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.blocks.AbstractTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
-import com.kotori316.fluidtank.integration.top.TankTOPPlugin;
 import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.packet.SideProxy;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe$;
@@ -35,8 +34,8 @@ import com.kotori316.fluidtank.tiles.TileTankCreative;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 @Mod(name = FluidTank.MOD_NAME, modid = FluidTank.modID, version = "${version}", certificateFingerprint = "@FINGERPRINT@",
-        updateJSON = "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json",
-        guiFactory = "com.kotori316.fluidtank.GuiFactory")
+    updateJSON = "https://raw.githubusercontent.com/Kotori316/FluidTank/master/update.json",
+    guiFactory = "com.kotori316.fluidtank.GuiFactory")
 public class FluidTank {
 
     public static final FluidTank instance;
@@ -47,8 +46,8 @@ public class FluidTank {
     public static SideProxy proxy;
 
     public static final List<AbstractTank> BLOCK_TANKS =
-            Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(),
-                    BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6(), BlockTank.blockTank7(), BlockTank.blockTankCreative());
+        Arrays.asList(BlockTank.blockTank1(), BlockTank.blockTank2(), BlockTank.blockTank3(),
+            BlockTank.blockTank4(), BlockTank.blockTank5(), BlockTank.blockTank6(), BlockTank.blockTank7(), BlockTank.blockTankCreative());
 
     static {
         instance = new FluidTank();
@@ -62,7 +61,6 @@ public class FluidTank {
         MinecraftForge.EVENT_BUS.register(proxy);
         Config.load(event.getSuggestedConfigurationFile());
         proxy.registerTESR();
-        TankTOPPlugin.register();
     }
 
     @EventHandler
