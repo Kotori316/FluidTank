@@ -1,19 +1,25 @@
 package com.kotori316.fluidtank.tiles
 
-import com.kotori316.fluidtank.integration.ae2.AE2
 import com.kotori316.fluidtank.{FluidTank, Utils}
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.world.World
-import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
+import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankProperties, IFluidHandler, IFluidTankProperties}
 
+import scala.collection.mutable.ArrayBuffer
+
 sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   val seq: Seq[TileTankNoDisplay] = s.sortBy(_.getPos.getY)
   val hasCreative = seq.exists(_.isInstanceOf[TileTankCreative])
-  val ae2Integration = AE2.getIntegration(this)
+  val updateActions: ArrayBuffer[() => Unit] = ArrayBuffer(
+    () => seq.foreach(_.markDirty())
+  )
+
   val handler: IFluidHandler = new IFluidHandler {
     override def fill(kind: FluidStack, doFill: Boolean): Int = {
       if (kind == null || kind.amount <= 0) {
@@ -95,6 +101,15 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     }
   }
 
+  val capabilities = if (s.nonEmpty) {
+    val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
+    MinecraftForge.EVENT_BUS.post(event)
+    Option(event.getCapabilities).filterNot(_.isEmpty).map(t => new CapabilityDispatcher(t))
+  } else {
+    None
+  }
+
+
   protected def fluidType: FluidStack = {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).orNull
   }
@@ -164,20 +179,20 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   def updateNeighbors(): Unit = {
-    seq.foreach(_.markDirty())
-    AE2.onContentUpdate(this)
+    updateActions.foreach(_.apply())
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing) = {
     if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(handler)
     } else {
-      AE2.getMonitorableAccessor(this, capability)
+      //noinspection GetOrElseNull can't prove T <:< Null
+      capabilities.map(_.getCapability(capability, facing)).getOrElse(null).asInstanceOf[T]
     }
   }
 
   override def hasCapability(capability: Capability[_], facing: EnumFacing) =
-    capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || AE2.isMonitorableAccessor(capability)
+    capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || capabilities.exists(_.hasCapability(capability, facing))
 
   override def toString: String = {
     val name = getFluidStack.fold("null")(_.getLocalizedName)
