@@ -69,6 +69,10 @@ object Config {
     showTOPProperty.setComment("Show tank info on TOP tooltip.")
     val showTOP = showTOPProperty.getBoolean
 
+    private val showToolTipOnMods = configuration.get(Configuration.CATEGORY_GENERAL, "showToolTipOnMods", true)
+    showToolTipOnMods.setComment("True to enable waila and top to show tank info.")
+    val enableWailaAndTOP = showToolTipOnMods.getBoolean
+
     assert(Tiers.list.forall(oreNameMap.contains))
 
     if (configuration.hasChanged)

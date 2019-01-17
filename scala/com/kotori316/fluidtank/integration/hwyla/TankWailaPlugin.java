@@ -4,6 +4,7 @@ import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.IWailaRegistrar;
 import mcp.mobius.waila.api.WailaPlugin;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.integration.Localize;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
@@ -24,11 +25,13 @@ public class TankWailaPlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaRegistrar registrar) {
-        TankDataProvider provider = new TankDataProvider();
-        registrar.registerBodyProvider(provider, TileTankNoDisplay.class);
-        registrar.registerNBTProvider(provider, TileTankNoDisplay.class);
+        if (Config.content().enableWailaAndTOP()) {
+            TankDataProvider provider = new TankDataProvider();
+            registrar.registerBodyProvider(provider, TileTankNoDisplay.class);
+            registrar.registerNBTProvider(provider, TileTankNoDisplay.class);
 
-        registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_TANK_INFO, true);
-        registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_SHORT_INFO, true);
+            registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_TANK_INFO, true);
+            registrar.addConfig(FluidTank.MOD_NAME, Localize.WAILA_SHORT_INFO, true);
+        }
     }
 }
