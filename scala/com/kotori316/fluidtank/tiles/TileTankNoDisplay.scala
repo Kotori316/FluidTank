@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.text.{ITextComponent, TextComponentString}
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.FluidStack
@@ -32,6 +33,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
   val tank = new Tank
   var connection = Connection.invalid
   var loading = false
+  var stackName: String = _
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     compound.setTag(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
@@ -103,6 +105,10 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
   def onDestroy(): Unit = {
     this.connection.remove(this)
   }
+
+  def getStackName: Option[String] = Option(stackName)
+
+  override def getDisplayName: ITextComponent = getStackName.map(new TextComponentString(_)).orNull
 
   class Tank extends net.minecraftforge.fluids.FluidTank(Utils.toInt(tier.amount)) {
     setTileEntity(self)

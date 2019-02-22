@@ -45,6 +45,8 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends AbstractTank {
   private def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
     Option(tileEntity).collect { case tank: TileTankNoDisplay if tank.hasContent => tank.getBlockTag }
       .foreach(tag => stack.setTagInfo(TileTankNoDisplay.NBT_BlockTag, tag))
+    Option(tileEntity).collect { case tank: TileTankNoDisplay => tank.getStackName }.flatten
+      .foreach(stack.setStackDisplayName)
   }
 
   override def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
