@@ -38,6 +38,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     compound.setTag(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
     compound.setTag(TileTankNoDisplay.NBT_Tier, tier.toNBTTag)
+    getStackName.foreach(compound.setString(TileTankNoDisplay.NBT_StackName, _))
     super.writeToNBT(compound)
   }
 
@@ -55,12 +56,18 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     super.readFromNBT(compound)
     tank.readFromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
+    if (compound.hasKey(TileTankNoDisplay.NBT_StackName)) {
+      stackName = compound.getString(TileTankNoDisplay.NBT_StackName)
+    }
     loading = true
   }
 
   def readNBTClient(compound: NBTTagCompound): Unit = {
     tank.readFromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
+    if (compound.hasKey(TileTankNoDisplay.NBT_StackName)) {
+      stackName = compound.getString(TileTankNoDisplay.NBT_StackName)
+    }
   }
 
   override def onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity): Unit = handleUpdateTag(pkt.getNbtCompound)
@@ -185,6 +192,7 @@ object TileTankNoDisplay {
   final val NBT_Tier = "tier"
   final val NBT_Capacity = "capacity"
   final val NBT_BlockTag = "BlockEntityTag"
+  final val NBT_StackName = "stackName"
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
 }

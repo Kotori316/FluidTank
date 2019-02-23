@@ -33,6 +33,7 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
     val stack = playerIn.getHeldItem(hand)
     val flag = stack.getCount == 1
     val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (flag) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
+    var returnFlag = false
 
     for (stackHandler <- stackHandlerOption;
          tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
@@ -53,8 +54,10 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
           }
         }
       }
-      return true
+      returnFlag = true
     }
+    if (returnFlag)
+      return true
 
     if (playerIn.getHeldItemMainhand.isEmpty) {
       if (!worldIn.isRemote) {
@@ -63,10 +66,10 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
           case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
       }
-      return true
+      true
+    } else {
+      super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     }
-
-    super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
   }
 
   override final def getBlockLayer: BlockRenderLayer = BlockRenderLayer.CUTOUT
