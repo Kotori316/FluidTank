@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPreInitia
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.{Loader, Mod, Optional}
 
-@Mod(name = FluidTank.MOD_NAME + "_AE2", modid = FluidTank.modID + "_ae2", version = "${version}", certificateFingerprint = "@FINGERPRINT@", modLanguage = "scala",
+@Mod(name = "FluidTank_AE2", modid = "fluidtank_ae2", version = "${version}", certificateFingerprint = "@FINGERPRINT@", modLanguage = "scala",
   dependencies = "required-after:fluidtank;")
 object AE2 {
   lazy val loaded = Loader.isModLoaded(TileTankNoDisplay.ae2id)
