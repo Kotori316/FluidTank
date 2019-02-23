@@ -7,11 +7,13 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
+        classpath "gradle.plugin.com.github.breadmoirai:github-release:2.2.4"
     }
 }
 apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: "com.matthewprenger.cursegradle"
+apply plugin: "com.github.breadmoirai.github-release"
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
@@ -139,14 +141,25 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        changelog = '[See GitHub commits.](https://github.com/Kotori316/FluidTank)'
+        changelog = file("changes.md")
         releaseType = 'release'
         mainArtifact jar
         addArtifact srcJar
         addArtifact deobfJar
-        afterEvaluate {
-            gameVersionStrings.remove('Java 8')
-            gameVersionStrings.remove('Java 9')
-        }
     }
+    options {
+        debug = false // defaults to false
+        javaVersionAutoDetect = false
+    }
+}
+
+githubRelease {
+    repo = 'FluidTank'
+    token = project.hasProperty("githubToken") ? project.getProperty("githubToken") : ""
+    targetCommitish = 'master'
+    body {
+        file("changes.md").text
+    }
+    FilenameFilter filter = { dir, filename -> filename.contains(project.version) }
+    releaseAssets = file("build\\libs").listFiles filter
 }
