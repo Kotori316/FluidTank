@@ -160,6 +160,6 @@ githubRelease {
     body {
         file("changes.md").text
     }
-    FilenameFilter filter = { dir, filename -> filename.contains(project.version) }
+    FilenameFilter filter = { dir, filename -> filename.contains(getProperty("modversion")) }
     releaseAssets = file("build\\libs").listFiles filter
 }
