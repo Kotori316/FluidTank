@@ -29,7 +29,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   }
 
   override def fill(resource: FluidStack, doFill: Boolean): Int = {
-    if (resource == null || resource.amount <= 0) {
+    if (resource == null || resource.amount <= 0 || stack.getCount > 1) {
       return 0
     }
     init()
@@ -55,7 +55,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
 
   override def drain(resource: FluidStack, doDrain: Boolean): FluidStack = {
     init()
-    if (fluid == null || resource == null || resource.amount <= 0) {
+    if (fluid == null || resource == null || resource.amount <= 0 || stack.getCount > 1) {
       return null
     }
     if (fluid.isFluidEqual(resource)) {
@@ -103,6 +103,9 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   }
 
   def updateTag(): Unit = {
+    if (stack.getCount > 1) {
+      return
+    }
     if (fluid.amount <= 0) {
       fluid = null
     }
