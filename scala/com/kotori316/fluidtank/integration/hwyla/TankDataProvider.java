@@ -23,7 +23,6 @@ import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
@@ -42,42 +41,41 @@ public class TankDataProvider implements IWailaDataProvider {
     public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         TileEntity t = accessor.getTileEntity();
         if (t instanceof TileTankNoDisplay && config.getConfig(WAILA_TANK_INFO)) {
-            ITaggedList<String, String> taggedList = (ITaggedList<String, String>) tooltip;
-            taggedList.removeEntries("IFluidHandler");
+            removeTag(tooltip, "IFluidHandler");
             NBTTagCompound nbtData = accessor.getNBTData();
             List<String> list;
             if (!config.getConfig(WAILA_SHORT_INFO)) {
                 if (nbtData.getBoolean(NBT_NonCreative)) {
                     list = Arrays.asList(
-                            I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)),
-                            I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
-                            I18n.format(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
-                            I18n.format(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
-                            I18n.format(WAILA_COMPARATOR, nbtData.getInteger(NBT_ConnectionComparator))
+                        I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)),
+                        I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
+                        I18n.format(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
+                        I18n.format(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
+                        I18n.format(WAILA_COMPARATOR, nbtData.getInteger(NBT_ConnectionComparator))
                     );
                 } else {
                     list = Arrays.asList(
-                            new TextComponentTranslation(WAILA_TIER, nbtData.getString(NBT_Tier)).getFormattedText(),
-                            new TextComponentTranslation(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)).getFormattedText()
+                        new TextComponentTranslation(WAILA_TIER, nbtData.getString(NBT_Tier)).getFormattedText(),
+                        new TextComponentTranslation(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)).getFormattedText()
                     );
                 }
             } else {
                 if (nbtData.getBoolean(NBT_NonCreative)) {
                     list = Collections.singletonList(
-                            new TextComponentTranslation(WAILA_SHORT,
-                                    nbtData.getString(NBT_ConnectionFluidName),
-                                    nbtData.getLong(NBT_ConnectionAmount),
-                                    nbtData.getLong(NBT_ConnectionCapacity)).getFormattedText()
+                        new TextComponentTranslation(WAILA_SHORT,
+                            nbtData.getString(NBT_ConnectionFluidName),
+                            nbtData.getLong(NBT_ConnectionAmount),
+                            nbtData.getLong(NBT_ConnectionCapacity)).getFormattedText()
                     );
                 } else {
                     list = java.util.Optional.of(nbtData.getString(NBT_ConnectionFluidName))
-                            .filter(NOT_EMPTY)
-                            .map(Collections::singletonList)
-                            .orElse(Collections.emptyList());
+                        .filter(NOT_EMPTY)
+                        .map(Collections::singletonList)
+                        .orElse(Collections.emptyList());
                 }
             }
 
-            list.forEach(s -> taggedList.add(s, FluidTank.MOD_NAME));
+            tooltip.addAll(list);
         }
         return tooltip;
     }
@@ -91,7 +89,7 @@ public class TankDataProvider implements IWailaDataProvider {
 
             tag.setString(NBT_Tier, tank.tier().toString());
             tag.setString(NBT_ConnectionFluidName,
-                    Utils.toJava(tank.connection().getFluidStack()).map(FluidStack::getLocalizedName).orElse(FLUID_NULL));
+                Utils.toJava(tank.connection().getFluidStack()).map(FluidStack::getLocalizedName).orElse(FLUID_NULL));
             if (!tank.connection().hasCreative()) {
                 tag.setBoolean(NBT_NonCreative, true);
                 tag.setLong(NBT_ConnectionAmount, tank.connection().amount());
@@ -102,4 +100,11 @@ public class TankDataProvider implements IWailaDataProvider {
         return tag;
     }
 
+    @SuppressWarnings({"unchecked", "SameParameterValue"})
+    private static void removeTag(List<?> list, String tag) {
+        if (list instanceof ITaggedList) {
+            ITaggedList taggedList = (ITaggedList) list;
+            taggedList.removeEntries(tag);
+        }
+    }
 }

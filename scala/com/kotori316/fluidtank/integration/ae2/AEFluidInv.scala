@@ -3,9 +3,9 @@ package com.kotori316.fluidtank.integration.ae2
 import appeng.api.AEApi
 import appeng.api.config.Actionable
 import appeng.api.networking.security.IActionSource
+import appeng.api.storage._
 import appeng.api.storage.channels.IFluidStorageChannel
 import appeng.api.storage.data.{IAEFluidStack, IAEStack, IItemList}
-import appeng.api.storage._
 import appeng.me.helpers.BaseActionSource
 import appeng.me.storage.{MEMonitorPassThrough, NullInventory}
 import com.kotori316.fluidtank.tiles.Connection

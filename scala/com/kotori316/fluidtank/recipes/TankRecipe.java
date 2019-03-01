@@ -29,7 +29,7 @@ import com.kotori316.fluidtank.tiles.Tiers;
 public class TankRecipe extends ShapedRecipes {
 
     private static final Function<ItemStack, IFluidHandlerItem> itemHandler =
-            s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+        s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
     private final Tiers tiers;
     private final boolean valid;
 
@@ -82,9 +82,9 @@ public class TankRecipe extends ShapedRecipes {
                 if (target.apply(stackInRowAndColumn)) {
                     if (target instanceof TierIngredient) {
                         FluidStack fluidStack = Optional.of(stackInRowAndColumn).map(itemHandler)
-                                .filter(h -> h.getTankProperties().length > 0)
-                                .map(h -> h.getTankProperties()[0].getContents())
-                                .orElse(null);
+                            .filter(h -> h.getTankProperties().length > 0)
+                            .map(h -> h.getTankProperties()[0].getContents())
+                            .orElse(null);
                         if (stack == null) {
                             if (fluidStack != null) {
                                 stack = fluidStack;
@@ -106,11 +106,11 @@ public class TankRecipe extends ShapedRecipes {
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         FluidStack stack = IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot)
-                .map(itemHandler).filter(Objects::nonNull)
-                .map(IFluidHandler::getTankProperties)
-                .flatMap(WrapFluid::newStreamWithValidStack)
-                .reduce(WrapFluid::combine)
-                .map(WrapFluid::getStack).orElse(null);
+            .map(itemHandler).filter(Objects::nonNull)
+            .map(IFluidHandler::getTankProperties)
+            .flatMap(WrapFluid::newStreamWithValidStack)
+            .reduce(WrapFluid::combine)
+            .map(WrapFluid::getStack).orElse(null);
         ItemStack copy = getRecipeOutput().copy();
         Optional.of(copy).map(itemHandler).ifPresent(h -> h.fill(stack, true));
         return copy;

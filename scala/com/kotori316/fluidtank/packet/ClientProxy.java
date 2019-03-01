@@ -30,7 +30,7 @@ public class ClientProxy extends SideProxy {
     public static final RenderTank RENDER_TANK = new RenderTank();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
-            new ModelResourceLocation(FluidTank.modID + ":fluidtankitem", "inventory");
+        new ModelResourceLocation(FluidTank.modID + ":fluidtankitem", "inventory");
 
     @Override
     public Option<World> getWorld(INetHandler handler) {
@@ -42,7 +42,7 @@ public class ClientProxy extends SideProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
         if (!Config.content().enableOldRender()) {
             FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).forEach(itemBlockTank ->
-                    itemBlockTank.setTileEntityItemStackRenderer(RENDER_ITEM_TANK));
+                itemBlockTank.setTileEntityItemStackRenderer(RENDER_ITEM_TANK));
         }
     }
 
@@ -50,14 +50,14 @@ public class ClientProxy extends SideProxy {
     public void registerModels(ModelRegistryEvent event) {
         if (!Config.content().enableOldRender()) {
             FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).forEach(item ->
-                    ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
+                ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
             );
         } else {
             FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
-                    ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResourceLocation(t._2)));
+                ModelLoader.setCustomModelResourceLocation(t._1, t._2, t._1.getModelResourceLocation(t._2)));
         }
         FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).flatMap(ItemBlockTank::itemStream).forEach(t ->
-                ModelLoader.setCustomModelResourceLocation(t._1, t._2 | 8, t._1.getModelResourceLocation(t._2)));
+            ModelLoader.setCustomModelResourceLocation(t._1, t._2 | 8, t._1.getModelResourceLocation(t._2)));
     }
 
     @SubscribeEvent

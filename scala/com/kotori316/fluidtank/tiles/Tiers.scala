@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.tiles
 
+import java.util.Collections
+
 import net.minecraft.nbt.NBTTagCompound
 
 import scala.collection.JavaConverters._
@@ -12,9 +14,7 @@ class Tiers private(val rank: Int,
                     val oreName: String,
                     val hasOreRecipe: Boolean) {
   val amount: Long = buckets * 1000
-  Tiers.map.put(toString, this)
   Tiers.list.append(this)
-  Tiers.rankList(rank) = Tiers.rankList(rank) + 1
 
   override def hashCode(): Int = (rank << 20 + amount) ^ toString.hashCode
 
@@ -26,9 +26,6 @@ class Tiers private(val rank: Int,
 }
 
 object Tiers {
-  val rankList = Array.fill(9)(0)
-
-  val map = mutable.Map.empty[String, Tiers]
   val list = mutable.ArrayBuffer.empty[Tiers]
 
   val Invalid = new Tiers(0, 0, "Invalid", 0, "Unknown", hasOreRecipe = false)
@@ -49,7 +46,10 @@ object Tiers {
   val LEAD = new Tiers(3, 1 << 8, "Lead", 2, "ingotLead", hasOreRecipe = true)
   val SILVER = new Tiers(3, 1 << 10, "Silver", 3, "ingotSilver", hasOreRecipe = true)
 
-  def jList: java.util.List[Tiers] = list.asJava
+  val rankList = list.groupBy(_.rank).map { case (r, ts) => (r, ts.size) }
+  val map = list.map(t => (t.toString, t)).toMap
+
+  def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
 
   def fromNBT(nbt: NBTTagCompound): Tiers = {
     val key = nbt.getString("string")
