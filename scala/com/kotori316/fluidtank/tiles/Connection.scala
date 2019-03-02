@@ -28,12 +28,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       val resource = kind.copy()
       var total = 0
       if (hasCreative) {
-        var totalLong = 0l
-        for (tileTank <- tankSeq(kind)) {
-          // All tank excepting Creative has less capacity than Int.MaxValue.
-          val filled = tileTank.tank.fill(new FluidStack(resource, Int.MaxValue), doFill)
-          totalLong += filled
-        }
+        val totalLong = tankSeq(kind).map(_.tank.fill(new FluidStack(resource, Int.MaxValue), doFill).toLong).sum
         total = Utils.toInt(Math.min(totalLong, resource.amount))
       } else {
         for (tileTank <- tankSeq(kind)) {

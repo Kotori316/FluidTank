@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.kotori316.fluidtank.Utils;
+import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 import static com.kotori316.fluidtank.integration.Localize.*;
@@ -40,22 +41,25 @@ public class TankDataProvider implements IWailaDataProvider {
     public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         TileEntity t = accessor.getTileEntity();
         if (t instanceof TileTankNoDisplay && config.getConfig(WAILA_TANK_INFO)) {
+            TileTankNoDisplay tank = ((TileTankNoDisplay) t);
             removeTag(tooltip, "IFluidHandler");
             NBTTagCompound nbtData = accessor.getNBTData();
             List<String> list;
             if (!config.getConfig(WAILA_SHORT_INFO)) {
+                Tiers tier = tank.tier();
                 if (nbtData.getBoolean(NBT_NonCreative)) {
                     list = Arrays.asList(
-                        I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)),
+                        I18n.format(WAILA_TIER, tier.toString()),
                         I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
                         I18n.format(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
                         I18n.format(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
                         I18n.format(WAILA_COMPARATOR, nbtData.getInteger(NBT_ConnectionComparator))
                     );
                 } else {
+                    String fluidName = getCreativeFluidName(tank);
                     list = Arrays.asList(
-                        I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)),
-                        I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName))
+                        I18n.format(WAILA_TIER, tier.toString()),
+                        I18n.format(WAILA_CONTENT, fluidName)
                     );
                 }
             } else {
@@ -67,7 +71,8 @@ public class TankDataProvider implements IWailaDataProvider {
                             nbtData.getLong(NBT_ConnectionCapacity))
                     );
                 } else {
-                    list = java.util.Optional.of(nbtData.getString(NBT_ConnectionFluidName))
+                    String fluidName = getCreativeFluidName(tank);
+                    list = java.util.Optional.of(fluidName)
                         .filter(NOT_EMPTY)
                         .map(Collections::singletonList)
                         .orElse(Collections.emptyList());
@@ -77,6 +82,11 @@ public class TankDataProvider implements IWailaDataProvider {
             tooltip.addAll(list);
         }
         return tooltip;
+    }
+
+    @Nonnull
+    private static String getCreativeFluidName(TileTankNoDisplay tank) {
+        return java.util.Optional.ofNullable(tank.tank().getFluid()).map(FluidStack::getLocalizedName).orElse(FLUID_NULL);
     }
 
     @Nonnull
