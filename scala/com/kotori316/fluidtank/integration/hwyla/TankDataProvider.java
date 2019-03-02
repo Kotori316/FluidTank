@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Optional;
@@ -55,17 +54,17 @@ public class TankDataProvider implements IWailaDataProvider {
                     );
                 } else {
                     list = Arrays.asList(
-                        new TextComponentTranslation(WAILA_TIER, nbtData.getString(NBT_Tier)).getFormattedText(),
-                        new TextComponentTranslation(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)).getFormattedText()
+                        I18n.format(WAILA_TIER, nbtData.getString(NBT_Tier)),
+                        I18n.format(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName))
                     );
                 }
             } else {
                 if (nbtData.getBoolean(NBT_NonCreative)) {
                     list = Collections.singletonList(
-                        new TextComponentTranslation(WAILA_SHORT,
+                        I18n.format(WAILA_SHORT,
                             nbtData.getString(NBT_ConnectionFluidName),
                             nbtData.getLong(NBT_ConnectionAmount),
-                            nbtData.getLong(NBT_ConnectionCapacity)).getFormattedText()
+                            nbtData.getLong(NBT_ConnectionCapacity))
                     );
                 } else {
                     list = java.util.Optional.of(nbtData.getString(NBT_ConnectionFluidName))

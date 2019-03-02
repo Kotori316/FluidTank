@@ -31,9 +31,9 @@ class ItemBlockTank(val blockTank: AbstractTank, val rank: Int) extends ItemBloc
 
   private def tierName(meta: Int) = blockTank.getTierByMeta(meta).toString.toLowerCase
 
-  def itemList: Seq[(ItemBlockTank, Integer)] = (0 until Tiers.rankList(rank)).map(i => (this, Int.box(i)))
+  def itemList: Seq[(ItemBlockTank, Int)] = (0 until Tiers.rankList(rank)).map(i => (this, i))
 
-  def itemStream: java.util.stream.Stream[(ItemBlockTank, Integer)] = itemList.asJava.stream()
+  def itemStream: java.util.stream.Stream[(ItemBlockTank, Integer)] = itemList.map { case (item, m) => (item, Int.box(m)) }.asJava.stream()
 
   def hasRecipe = true
 

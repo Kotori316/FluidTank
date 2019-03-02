@@ -31,8 +31,7 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer,
                                 hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     val stack = playerIn.getHeldItem(hand)
-    val flag = stack.getCount == 1
-    val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (flag) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
+    val stackHandlerOption = Option(FluidUtil.getFluidHandler(if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)))
     var returnFlag = false
 
     for (stackHandler <- stackHandlerOption;
