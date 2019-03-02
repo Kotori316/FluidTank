@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.client.renderer.{GlStateManager, Tessellator}
+import net.minecraft.client.renderer.{GlStateManager, RenderHelper, Tessellator}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.opengl.GL11
@@ -26,12 +26,13 @@ class RenderItemTank extends TileEntityItemStackRenderer {
         val compound = stack.getSubCompound(TileTankNoDisplay.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
+        val inSlot = Minecraft.getMinecraft.getRenderItem.zLevel > 0
 
         val tessellator = Tessellator.getInstance
         val buffer = tessellator.getBuffer
         ClientProxy.RENDER_TANK.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE)
 
-        //        RenderHelper.disableStandardItemLighting()
+        if (!inSlot) RenderHelper.disableStandardItemLighting()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
         GlStateManager.enableBlend()
         //                GlStateManager.disableCull()
@@ -45,7 +46,7 @@ class RenderItemTank extends TileEntityItemStackRenderer {
         ClientProxy.RENDER_TANK.renderTileEntityFast(tileTank, 0, 0, 0, partialTicks, -1, 1, buffer)
         buffer.setTranslation(0, 0, 0)
         tessellator.draw()
-        //        RenderHelper.enableStandardItemLighting()
+        if (!inSlot) RenderHelper.enableStandardItemLighting()
 
         val state = FluidTank.BLOCK_TANKS.get(tileTank.tier.rank - 1).getStateFromMeta(tileTank.tier.meta)
         val model = Minecraft.getMinecraft.getBlockRendererDispatcher.getModelForState(state)

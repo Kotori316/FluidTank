@@ -67,6 +67,8 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     tier = Tiers.fromNBT(compound.getCompoundTag(TileTankNoDisplay.NBT_Tier))
     if (compound.hasKey(TileTankNoDisplay.NBT_StackName)) {
       stackName = compound.getString(TileTankNoDisplay.NBT_StackName)
+    } else {
+      stackName = null
     }
   }
 
