@@ -161,6 +161,32 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     }
   }
 
+  def add(connection: Connection, facing: EnumFacing): Connection = {
+    val newFluid = connection.fluidType
+    if (newFluid == null || fluidType == null || newFluid == fluidType) {
+      if (seq.exists(connection.seq.contains)) {
+        FluidTank.LOGGER.warn(s"Connection($seq) has same block with ${connection.seq}.")
+        return connection
+      }
+      val newSeq = if (facing == EnumFacing.DOWN) {
+        connection.seq ++ this.seq
+      } else {
+        this.seq ++ connection.seq
+      }
+      val nConnection = new Connection(newSeq)
+      val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, true))) yield i
+      newSeq.foreach(t => {
+        t.connection = nConnection
+        t.tank.setFluid(null)
+      })
+      fluidStacks.foreach(nConnection.handler.fill(_, true))
+      nConnection
+    } else {
+      // Nothing to change.
+      connection
+    }
+  }
+
   def remove(tileTank: TileTankNoDisplay): Unit = {
     val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
     s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
