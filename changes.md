@@ -1,3 +1,3 @@
-## v4.0
-* Refactoring.
-* Enabled lightmap when holding tanks.
+## v4.1
+* Added tr_tr.lang
+* Improved making connection.

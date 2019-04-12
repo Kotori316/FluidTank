@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
-        classpath "gradle.plugin.com.github.breadmoirai:github-release:2.2.4"
+        classpath "gradle.plugin.com.github.breadmoirai:github-release:2.2.8"
     }
 }
 apply plugin: 'scala'
@@ -161,5 +161,11 @@ githubRelease {
         file("changes.md").text
     }
     FilenameFilter filter = { dir, filename -> filename.contains(getProperty("modversion")) }
-    releaseAssets = file("build\\libs").listFiles filter
+    releaseAssets = files(jar.archivePath, srcJar.archivePath, deobfJar.archivePath)
+}
+
+task checkMethod() << {
+    System.out.println("FilePath $jar.archivePath")
+    System.out.println("Name $project.name")
+    System.out.println("ModVersion ${getProperty("modversion")}")
 }
