@@ -160,12 +160,14 @@ githubRelease {
     body {
         file("changes.md").text
     }
-    FilenameFilter filter = { dir, filename -> filename.contains(getProperty("modversion")) }
-    releaseAssets = files(jar.archivePath, srcJar.archivePath, deobfJar.archivePath)
+    releaseAssets = files(srcJar.archivePath, deobfJar.archivePath, jar.archivePath)
 }
 
 task checkMethod() << {
     System.out.println("FilePath $jar.archivePath")
+    System.out.println("FilePath $srcJar.archivePath")
+    System.out.println("FilePath $deobfJar.archivePath")
     System.out.println("Name $project.name")
+    System.out.println("BaseName $archivesBaseName")
     System.out.println("ModVersion ${getProperty("modversion")}")
 }
