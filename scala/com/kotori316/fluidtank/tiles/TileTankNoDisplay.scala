@@ -83,6 +83,11 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
+    if (hasWorld && world.isRemote && capability == net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+      // com.kotori316.fluidtank.FluidTank.LOGGER.info("Called getCapability in client side.")
+      // Returning handler on client side? Not recommend, but Evil Craft requires this. See https://github.com/Kotori316/FluidTank/issues/14 .
+      return net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.tank)
+    }
     val c = connection.getCapability(capability, facing)
     if (c != null) c else super.getCapability(capability, facing)
   }
