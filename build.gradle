@@ -160,7 +160,7 @@ githubRelease {
     body {
         file("changes.md").text
     }
-    releaseAssets = files(srcJar.archivePath, deobfJar.archivePath, jar.archivePath)
+    releaseAssets = files(jar.archivePath, srcJar.archivePath, deobfJar.archivePath)
 }
 
 task checkMethod() << {
