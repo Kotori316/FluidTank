@@ -1,125 +1,106 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
-        maven { url = "https://plugins.gradle.org/m2/" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.1.0"
-        classpath "gradle.plugin.com.github.breadmoirai:github-release:2.2.8"
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
 apply plugin: 'scala'
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: "com.matthewprenger.cursegradle"
-apply plugin: "com.github.breadmoirai.github-release"
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'maven-publish'
 
 version = getProperty("modversion")
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LargeFluidTank"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileScala {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
-    runDir = "Minecraft"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20171003"
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: '20180921-1.13'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    replace "\${version}", project.version
-    replace '@FINGERPRINT@', project.hasProperty('signSHA1') ? project.getProperty('signSHA1') : ""
-}
+    
+    // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
 
-sourceSets {
-    main {
-        scala {
-            srcDir 'scala'
-        }
-        resources {
-            srcDir 'resources'
-            exclude 'image2.png'
-            exclude 'newrender.png'
-            exclude 'oldrender.png'
-        }
-    }
-}
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('Minecraft')
 
-repositories {
-    maven {
-        name "BuildCraft"
-        url = "https://mod-buildcraft.com/maven"
-    }
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = "Hwyla"
-        url "http://tehnut.info/maven"
-    }
-    maven { // TThe One Probe
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'info'
+
+            mods {
+                fluidtank {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run-server')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'info'
+
+            mods {
+                fluidtank {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }
 
 dependencies {
-    deobfCompile "com.mod-buildcraft:buildcraft-main:7.99.22"
-    deobfCompile "appeng:appliedenergistics2:rv6-stable-6"
-    deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.191'
+    implementation "org.scala-lang:scala-library:2.12.8"
+
 }
 
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        // replace version and mcversion
-        expand 'version': project.version, 'mcversion': project.minecraft.version
-    }
-
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info', 'image2.png', 'newrender.png', 'oldrender.png'
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": project.name,
+            "Specification-Vendor": "Kotori316",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"Kotori316",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }
 
-task signJar(type: SignJar, dependsOn: reobfJar) {
-
-    // Skips if the keyStore property is missing.
-    onlyIf {
-        project.hasProperty('keyStore')
-    }
-
-    // findProperty allows us to reference the property without it existing.
-    // Using project.propName would cause the script to fail validation if
-    // the property did not exist.
-    keyStore = project.hasProperty('keyStore') ? project.getProperty("keyStore") : ""
-    alias = project.hasProperty('keyStore') ? project.getProperty('keyStoreAlias') : ""
-    storePass = project.hasProperty('keyStore') ? project.getProperty('keyStorePass') : ""
-    keyPass = project.hasProperty('keyStore') ? project.getProperty('keyStoreKeyPass') : ""
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
+// Example configuration to allow publishing using the maven-publish task
+// we define a custom artifact that is sourced from the reobfJar output task
+// and then declare that to be published
+// Note you'll need to add a repository here
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
 }
-// Runs this task automatically when build is ran.
-build.dependsOn signJar
 
 task srcJar(type: Jar) {
     from sourceSets.main.allSource
@@ -136,38 +117,15 @@ artifacts {
     archives srcJar, deobfJar
 }
 
-curseforge {
-    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
-    project {
-        id = '291006'
-        changelogType = 'markdown'
-        changelog = file("changes.md")
-        releaseType = 'release'
-        mainArtifact jar
-        addArtifact srcJar
-        addArtifact deobfJar
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact reobfArtifact
+        }
     }
-    options {
-        debug = false // defaults to false
-        javaVersionAutoDetect = false
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
     }
-}
-
-githubRelease {
-    repo = 'FluidTank'
-    token = project.hasProperty("githubToken") ? project.getProperty("githubToken") : ""
-    targetCommitish = 'master'
-    body {
-        file("changes.md").text
-    }
-    releaseAssets = files(jar.archivePath, srcJar.archivePath, deobfJar.archivePath)
-}
-
-task checkMethod() << {
-    System.out.println("FilePath $jar.archivePath")
-    System.out.println("FilePath $srcJar.archivePath")
-    System.out.println("FilePath $deobfJar.archivePath")
-    System.out.println("Name $project.name")
-    System.out.println("BaseName $archivesBaseName")
-    System.out.println("ModVersion ${getProperty("modversion")}")
 }

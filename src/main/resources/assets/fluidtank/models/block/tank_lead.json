@@ -1,0 +1,9 @@
+{
+  "parent": "fluidtank:block/tanks",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "fluidtank:blocks/lead1",
+    "side": "fluidtank:blocks/lead1",
+    "top": "fluidtank:blocks/lead2"
+  }
+}
