@@ -161,7 +161,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     worldIn.removeTileEntity(pos)
   }
 
-  private def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
+  protected def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
     Option(tileEntity).collect { case tank: TileTankNoDisplay if tank.hasContent => tank.getBlockTag }
       .foreach(tag => stack.setTagInfo(TileTankNoDisplay.NBT_BlockTag, tag))
     Option(tileEntity).collect { case tank: TileTankNoDisplay => tank.getStackName }.flatten
