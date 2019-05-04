@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeHidden;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -33,9 +32,8 @@ import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 public class TierRecipe extends IRecipeHidden {
     public static final Serializer SERIALIZER = new Serializer();
     private final Tiers tier;
-    private final Set<Tiers> tiersSet;
-    private final Set<Item> items;
-    private final Ingredient ingredient;
+    private final Ingredient tankItems;
+    private final Ingredient subItems;
     private final ItemStack result;
 
     public TierRecipe(ResourceLocation idIn, Tiers tier) {
@@ -43,19 +41,19 @@ public class TierRecipe extends IRecipeHidden {
         this.tier = tier;
 
         result = JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
-        tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
+        Set<Tiers> tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
         Set<BlockTank> tanks = JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         Set<BlockTank> invTanks = JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
-        items = Stream.concat(tanks.stream(), invTanks.stream()).map(BlockTank::itemBlock).collect(Collectors.toSet());
-        ingredient = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(tier.oreName())))
+        tankItems = Ingredient.merge(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).map(Ingredient::fromStacks).collect(Collectors.toList()));
+        subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(tier.oreName())))
             .map(Ingredient::fromTag)
             .orElse(Ingredient.EMPTY);
     }
 
     @Override
     public boolean matches(IInventory inv, World worldIn) {
-        if (!IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot).allMatch(ingredient)) return false;
-        if (!IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot).map(ItemStack::getItem).allMatch(items::contains))
+        if (!IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
+        if (!IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot).allMatch(tankItems))
             return false;
         return IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
@@ -77,10 +75,10 @@ public class TierRecipe extends IRecipeHidden {
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
 
-        if(fluidAmount.nonEmpty()){
+        if (fluidAmount.nonEmpty()) {
             NBTTagCompound compound = new NBTTagCompound();
 
-            NBTTagCompound tankTag  = new NBTTagCompound();
+            NBTTagCompound tankTag = new NBTTagCompound();
             tankTag.setInt(TileTankNoDisplay.NBT_Capacity(), Utils.toInt(tier.amount()));
             fluidAmount.write(tankTag);
 
@@ -106,6 +104,14 @@ public class TierRecipe extends IRecipeHidden {
     @Override
     public ItemStack getRecipeOutput() {
         return result.copy();
+    }
+
+    public Ingredient getTankItems() {
+        return tankItems;
+    }
+
+    public Ingredient getSubItems() {
+        return subItems;
     }
 
     public static class Serializer implements IRecipeSerializer<TierRecipe> {
