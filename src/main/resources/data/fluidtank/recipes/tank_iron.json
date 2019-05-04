@@ -1,0 +1,7 @@
+{
+  "type": "fluidtank:crafting_grade_up",
+  "tier": "iron",
+  "conditions": [
+    {"type": "fluidtank:config"}
+  ]
+}

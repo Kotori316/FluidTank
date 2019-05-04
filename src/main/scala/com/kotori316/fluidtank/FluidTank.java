@@ -28,6 +28,7 @@ import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
+import com.kotori316.fluidtank.recipes.TierRecipe;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -50,6 +51,7 @@ public class FluidTank {
         Config.content().assertion();
         CraftingHelper.register(ConfigCondition.LOCATION, new ConfigCondition());
         RecipeSerializers.register(ConvertInvisibleRecipe.SERIALIZER);
+        RecipeSerializers.register(TierRecipe.SERIALIZER);
     }
 
     @SuppressWarnings("unused")

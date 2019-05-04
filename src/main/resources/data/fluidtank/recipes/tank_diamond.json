@@ -1,0 +1,7 @@
+{
+  "type": "fluidtank:crafting_grade_up",
+  "tier": "diamond",
+  "conditions": [
+    {"type": "fluidtank:config"}
+  ]
+}
