@@ -1,5 +1,7 @@
 # FluidTank
 
+For Minecraft 1.12.2 (master branch)
+
 LICENSE: MIT License  
 Copyright (c) 2018, 2019 Kotori316
 
