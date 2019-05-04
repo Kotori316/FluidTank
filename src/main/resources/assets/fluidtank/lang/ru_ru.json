@@ -25,13 +25,14 @@
   "block.fluidtank.invisible_tank_emerald": "Невидимый изумрудный резервуар",
   "block.fluidtank.invisible_tank_star": "Невидимый звёздный резервуар",
   "itemGroup.FluidTank": "FluidTanks",
-  "fluidtank.recipe.tooltip": "Recipe of tanks",
-  "option.fluidtank.waila.tankinfo": "Show Tank Info",
-  "option.fluidtank.waila.shortinfo": "Short",
-  "fluidtank.waila.tier": "Tier: %s",
-  "fluidtank.waila.content": "Contents: %s",
-  "fluidtank.waila.amount": "Amount: %s mB",
-  "fluidtank.waila.capacity": "Capacity: %s mB",
-  "fluidtank.waila.comparator": "Comparator: %s",
-  "fluidtank.waila.short": "%1$s: %2$s/%3$s mB"
+  "fluidtank.recipe.tooltip": "Рецепт резервуаров",
+  "config.waila.plugin_fluidtank": "Fluidtank",
+  "config.waila.plugin_fluidtank.fluidtank.waila.tankinfo": "Показать информацию о резервуаре",
+  "config.waila.plugin_fluidtank.fluidtank.waila.shortinfo": "Кратко",
+  "fluidtank.waila.tier": "Уровень: %s",
+  "fluidtank.waila.content": "Содержание: %s",
+  "fluidtank.waila.amount": "Количество: %s mB",
+  "fluidtank.waila.capacity": "Вместимость: %s mB",
+  "fluidtank.waila.comparator": "Компаратор: %s",
+  "fluidtank.waila.short": "%1$s: %2$s/%3$s мВ"
 }

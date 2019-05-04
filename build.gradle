@@ -28,7 +28,7 @@ minecraft {
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'snapshot', version: '20180921-1.13'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
@@ -68,6 +68,26 @@ minecraft {
     }
 }
 
+repositories {
+    maven {
+        name "BuildCraft"
+        url = "https://mod-buildcraft.com/maven"
+    }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "http://dvs1.progwml6.com/files/maven"
+    }
+    maven {
+        name = "Hwyla"
+        url "http://tehnut.info/maven"
+    }
+    maven { // TThe One Probe
+        name 'tterrag maven'
+        url "https://maven.tterrag.com/"
+    }
+}
+
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
@@ -75,19 +95,21 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.13.2-25.0.191'
     implementation "org.scala-lang:scala-library:2.12.8"
 
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.2-B58_1.13.2")
+//    implementation  "mcp.mobius.waila:Hwyla:1.10.2-B58_1.13.2:source"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes([
-            "Specification-Title": project.name,
-            "Specification-Vendor": "Kotori316",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"Kotori316",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title"     : project.name,
+                "Specification-Vendor"    : "Kotori316",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "Kotori316",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
