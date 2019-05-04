@@ -107,7 +107,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     if (newFluid.isEmpty || fluidType.isEmpty || fluidType.fluidEqual(newFluid)) {
       // You can connect the tank to this connection.
       if (seq.contains(tileTank) || seq.exists(_.getPos == tileTank.getPos)) {
-        FluidTank.LOGGER.warn(s"TileTank at ${tileTank.getPos} is already added to connection.")
+        FluidTank.LOGGER.warn(s"${tileTank.getClass.getName} at ${tileTank.getPos} is already added to connection.")
         return this
       }
       val newSeq = if (facing == EnumFacing.DOWN) {
