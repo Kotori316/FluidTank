@@ -136,24 +136,24 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     false
   }
 
-  override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+  override final def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
     super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
     worldIn.getTileEntity(pos) match {
-      case tank: TileTankNoDisplay => tank.onBlockPlacedBy()
+      case tank: TileTankNoDisplay => if (!worldIn.isRemote) tank.onBlockPlacedBy()
       case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
     }
   }
 
-  override def hasComparatorInputOverride(state: IBlockState): Boolean = true
+  override final def hasComparatorInputOverride(state: IBlockState): Boolean = true
 
-  override def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
+  override final def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
       case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
     }
   }
 
-  override def onReplaced(state: IBlockState, worldIn: World, pos: BlockPos, newState: IBlockState, isMoving: Boolean): Unit = {
+  override final def onReplaced(state: IBlockState, worldIn: World, pos: BlockPos, newState: IBlockState, isMoving: Boolean): Unit = {
     worldIn.getTileEntity(pos) match {
       case tank: TileTankNoDisplay => tank.onDestroy()
       case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
@@ -168,13 +168,13 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
       .foreach(stack.setDisplayName)
   }
 
-  override def getPickBlock(state: IBlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: EntityPlayer) = {
+  override final def getPickBlock(state: IBlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: EntityPlayer) = {
     val stack = super.getPickBlock(state, target, world, pos, player)
     saveTankNBT(world.getTileEntity(pos), stack)
     stack
   }
 
-  override def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
+  override final def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
     player.addStat(StatList.BLOCK_MINED.get(this))
     player.addExhaustion(0.005F)
     harvesters.set(player)
