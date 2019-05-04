@@ -24,10 +24,10 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.isEmpty || fluidAmount.amount < min) return FluidAmount.EMPTY
-      var total = 0
+      var total = 0l
       var resource = fluidAmount
       if (hasCreative) {
-        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(resource.setAmount(Int.MaxValue), doFill).amount.toLong).sum
+        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(resource.setAmount(Int.MaxValue), doFill).amount).sum
         total = Utils.toInt(Math.min(totalLong, resource.amount))
       } else {
         for (tileTank <- tankSeq(fluidAmount)) {

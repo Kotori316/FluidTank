@@ -40,8 +40,10 @@ public class FluidTank {
         FluidRegistry.enableUniversalBucket();
     }
 
+    @SuppressWarnings("unused")
     public void init(FMLCommonSetupEvent event) {
         PacketHandler.init();
+        Config.content().assertion();
     }
 
     @SuppressWarnings("unused")

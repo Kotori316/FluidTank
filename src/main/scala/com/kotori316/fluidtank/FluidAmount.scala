@@ -7,12 +7,12 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.registry.IRegistry
 
-case class FluidAmount(fluid: Fluid, amount: Int) {
-  def setAmount(newAmount: Int) = FluidAmount(fluid, newAmount)
+case class FluidAmount(fluid: Fluid, amount: Long) {
+  def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount)
 
   def write(tag: NBTTagCompound): NBTTagCompound = {
     tag.setString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
-    tag.setInt(FluidAmount.NBT_amount, amount)
+    tag.setLong(FluidAmount.NBT_amount, amount)
     tag
   }
 
@@ -55,7 +55,7 @@ object FluidAmount {
     if (fluid == EMPTY.fluid) {
       EMPTY
     } else {
-      val amount = tag.getInt(NBT_amount)
+      val amount = tag.getLong(NBT_amount)
       FluidAmount(fluid, amount)
     }
   }

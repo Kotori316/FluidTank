@@ -26,8 +26,8 @@ class TileTankCreative extends TileTank(Tiers.CREATIVE, ModObjects.TANK_CREATIVE
     }
 
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int) = {
-      if (fluid.isEmpty || fluidAmount.amount < min) FluidAmount.EMPTY
-      else fluid.setAmount(fluidAmount.amount)
+      if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidAmount.amount >= min) fluid.setAmount(fluidAmount.amount)
+      else FluidAmount.EMPTY
     }
 
     def drainAll(): Unit = {
