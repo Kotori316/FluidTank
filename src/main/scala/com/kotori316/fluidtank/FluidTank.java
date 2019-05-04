@@ -2,9 +2,11 @@ package com.kotori316.fluidtank;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.RecipeSerializers;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -24,6 +26,8 @@ import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
+import com.kotori316.fluidtank.recipes.ConfigCondition;
+import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -44,6 +48,8 @@ public class FluidTank {
     public void init(FMLCommonSetupEvent event) {
         PacketHandler.init();
         Config.content().assertion();
+        CraftingHelper.register(ConfigCondition.LOCATION, new ConfigCondition());
+        RecipeSerializers.register(ConvertInvisibleRecipe.SERIALIZER);
     }
 
     @SuppressWarnings("unused")
