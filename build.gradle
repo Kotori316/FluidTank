@@ -1,17 +1,20 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = "https://plugins.gradle.org/m2/" }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.2.0'
     }
 }
+
 apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: "com.matthewprenger.cursegradle"
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'maven-publish'
 
 version = getProperty("modversion")
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -145,15 +148,22 @@ artifacts {
     archives srcJar, deobfJar
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact reobfArtifact
+curseforge {
+    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
+    project {
+        id = '291006'
+        changelogType = 'markdown'
+        addGameVersion '1.13.2'
+        changelog = file("changes.md")
+        releaseType = 'alpha'
+        mainArtifact jar
+        addArtifact srcJar
+        relations {
+            requiredDependency 'scalable-cats-force'
         }
     }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
+    options {
+        debug = false // defaults to false
+        javaVersionAutoDetect = false
     }
 }
