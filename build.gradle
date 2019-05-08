@@ -8,13 +8,15 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.2.0'
+        classpath group: "gradle.plugin.com.github.breadmoirai", name: "github-release", version: "2.2.8"
     }
 }
 
 apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: "com.matthewprenger.cursegradle"
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: "com.github.breadmoirai.github-release"
+//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 version = getProperty("modversion")
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -41,10 +43,10 @@ minecraft {
             workingDirectory project.file('Minecraft')
 
             // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
 
             // Recommended logging level for the console
-            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.console.level', 'debug'
 
             mods {
                 fluidtank {
@@ -57,10 +59,10 @@ minecraft {
             workingDirectory project.file('run-server')
 
             // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.markers', 'REGISTRIES'
 
             // Recommended logging level for the console
-            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.console.level', 'debug'
 
             mods {
                 fluidtank {
@@ -97,6 +99,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.13.2-25.0.191'
     implementation "org.scala-lang:scala-library:2.12.8"
+    implementation group: 'org.typelevel', name: "cats-core_2.12", version: '1.6.0'
 
     def mc_version = "1.13.2"
     def jei_version = "5.0.0.20"
@@ -155,7 +158,7 @@ curseforge {
         changelogType = 'markdown'
         addGameVersion '1.13.2'
         changelog = file("changes.md")
-        releaseType = 'alpha'
+        releaseType = 'release'
         mainArtifact jar
         addArtifact srcJar
         relations {
@@ -163,7 +166,30 @@ curseforge {
         }
     }
     options {
-        debug = false // defaults to false
+        debug = true // defaults to false
         javaVersionAutoDetect = false
     }
+}
+
+githubRelease {
+    repo = 'FluidTank'
+    token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
+    targetCommitish = '1.13.2'
+    body {
+        file("changes.md").text
+    }
+    releaseAssets = files(jar.archivePath)
+}
+
+task checkMethod() << {
+    System.out.println("FilePath $jar.archivePath")
+    System.out.println("FilePath $srcJar.archivePath")
+    System.out.println("FilePath $deobfJar.archivePath")
+    System.out.println("Name $project.name")
+    System.out.println("BaseName $archivesBaseName")
+    System.out.println("ModVersion ${getProperty("modversion")}")
+    println()
+    println("changes.md")
+    println(file("changes.md").text)
+    println()
 }
