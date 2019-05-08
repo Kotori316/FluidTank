@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import scala.collection.JavaConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.blocks.BucketEventHandler;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
@@ -43,6 +44,7 @@ public class FluidTank {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
         FluidRegistry.enableUniversalBucket();
+        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
     }
 
     @SuppressWarnings("unused")

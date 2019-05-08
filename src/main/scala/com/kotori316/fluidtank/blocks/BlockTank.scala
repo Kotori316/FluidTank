@@ -39,73 +39,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
 
   override def onBlockActivated(state: IBlockState, worldIn: World, pos: BlockPos, playerIn: EntityPlayer,
                                 hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
-    val stack = playerIn.getHeldItem(hand)
-    // 1.12.2 code
-    /*var returnFlag = false
-
-    for (stackHandler <- FluidUtil.getFluidHandler(if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)).asScala;
-         tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
-         if !stack.getItem.isInstanceOf[ItemBlockTank]
-    ) {
-      if (SideProxy.isServer(tileTank)) {
-        for (tankHandler <- tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing).asScala;
-             itemHandler <- playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP).asScalaIterator
-        ) {
-          val drainAmount = Option(stackHandler.drain(Int.MaxValue, false)).fold(0)(_.amount)
-          val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
-          if (resultFill.isSuccess) {
-            playerIn.setHeldItem(hand, resultFill.getResult)
-          } else {
-            val fillAmount = stackHandler.fill(tileTank.connection.getFluidStack.map(_.copyWithAmount(Int.MaxValue)).orNull, false)
-            val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
-            if (resultDrain.isSuccess) {
-              playerIn.setHeldItem(hand, resultDrain.getResult)
-            }
-          }
-        }
-      }
-      returnFlag = true
-    }
-    if (returnFlag)
-      return true*/
-
-    //1.13.2 code
-    val stackFluid = FluidAmount.fromItem(stack)
-    // Filling tank.
-    if (stackFluid.nonEmpty) {
-      val tileTank = worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay]
-      if (SideProxy.isServer(tileTank)) {
-        val fillAmount = tileTank.connection.handler.fill(stackFluid, doFill = false, min = FluidAmount.AMOUNT_BUCKET)
-        if (fillAmount.nonEmpty) {
-          tileTank.connection.handler.fill(stackFluid, doFill = true, min = FluidAmount.AMOUNT_BUCKET)
-          if (!playerIn.abilities.isCreativeMode) {
-            stack.shrink(1)
-            if (!playerIn.addItemStackToInventory(stack.getContainerItem)) {
-              playerIn.dropItem(stack.getContainerItem, false)
-            }
-          }
-        }
-      }
-      return true
-    }
-    // Drain fluid from tank.
-    if (stack.getItem == Items.BUCKET) {
-      val tileTank = worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay]
-      if (SideProxy.isServer(tileTank)) {
-        val drained = tileTank.connection.handler.drain(FluidAmount.EMPTY.setAmount(FluidAmount.AMOUNT_BUCKET), doDrain = false)
-        if (drained.nonEmpty) {
-          tileTank.connection.handler.drain(FluidAmount.EMPTY.setAmount(FluidAmount.AMOUNT_BUCKET), doDrain = true)
-          if (!playerIn.abilities.isCreativeMode) {
-            stack.shrink(1)
-            if (!playerIn.addItemStackToInventory(new ItemStack(drained.fluid.getFilledBucket))) {
-              playerIn.dropItem(new ItemStack(drained.fluid.getFilledBucket), false)
-            }
-          }
-        }
-      }
-      return true
-    }
-
+    // Bucket filling code is moved to BucketEventHandler and using event.
     if (playerIn.getHeldItemMainhand.isEmpty) {
       if (!worldIn.isRemote) {
         worldIn.getTileEntity(pos) match {
