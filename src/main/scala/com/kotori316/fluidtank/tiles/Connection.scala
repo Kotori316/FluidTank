@@ -1,5 +1,8 @@
 package com.kotori316.fluidtank.tiles
 
+import cats._
+import cats.data._
+import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.{BlockPos, MathHelper}
@@ -24,21 +27,32 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.isEmpty || fluidAmount.amount < min) return FluidAmount.EMPTY
-      var total = 0l
-      var resource = fluidAmount
       if (hasCreative) {
-        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(resource.setAmount(Int.MaxValue), doFill).amount).sum
-        total = Utils.toInt(Math.min(totalLong, resource.amount))
+        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
+        val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
+        fluidAmount.setAmount(total)
       } else {
-        for (tileTank <- tankSeq(fluidAmount)) {
-          if (resource.amount > 0) {
-            val filled = tileTank.tank.fill(resource, doFill)
-            total += filled.amount
-            resource = resource - filled
+        def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[Vector[String], FluidAmount] = {
+          if (toFill.isEmpty) {
+            Writer.tell(Vector("Filled")).map(_ => filled)
+          } else {
+            tanks match {
+              case Nil =>
+                val message = if (filled.isEmpty) "Fill failed." else s"Filled, Amount: ${filled.show}"
+                Writer.tell(Vector(message)).map(_ => filled)
+              case head :: tail =>
+                val fill = head.tank.fill(toFill, doFill)
+                Writer.tell(Vector(s"Filled ${fill.show} to ${head.getPos.show}")).flatMap(_ => internal(tail, toFill - fill, filled + fill))
+            }
           }
         }
+
+        internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
+          case (messages, filled) =>
+            FluidTank.LOGGER.debug(messages.mkString(", ") + (if (doFill) " Real" else " Simulate"))
+            filled
+        }
       }
-      fluidAmount.setAmount(total)
     }
 
     /**
@@ -51,18 +65,25 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.amount < min) return FluidAmount.EMPTY
 
-      var resource = fluidAmount
-      var total = FluidAmount.EMPTY
-      for (tileTank <- tankSeq(fluidType).reverse) {
-        if (resource.amount > 0) {
-          val drained = tileTank.tank.drain(resource, doDrain)
-          if (drained.nonEmpty) {
-            resource -= drained
-            total += drained
+      def internal(tanks: List[TileTankNoDisplay], toDrain: FluidAmount, drained: FluidAmount): Writer[Vector[String], FluidAmount] = {
+        if (toDrain.amount <= 0) {
+          val message = if (drained.isEmpty) "Drain failed." else "Drain Finished."
+          for (_ <- Writer.tell(Vector(message))) yield drained
+        } else {
+          tanks match {
+            case Nil => for (_ <- Writer.tell(Vector(s"Drain Finished. Total amount is ${drained.show}"))) yield drained
+            case ::(head, tl) =>
+              val drain = head.tank.drain(toDrain, doDrain)
+              Writer.tell(Vector(s"Drained ${drain.show} from ${head.getPos.show}")) flatMap { _ => internal(tl, toDrain - drain, drained + drain) }
           }
         }
       }
-      total
+
+      internal(tankSeq(fluidType).reverse.toList, fluidAmount, FluidAmount.EMPTY).run match {
+        case (vec, drained) =>
+          FluidTank.LOGGER.debug(vec.mkString(", ") + (if (doDrain) " Real" else " Simulate"))
+          drained
+      }
     }
   }
 
@@ -209,7 +230,7 @@ object Connection {
     override def remove(tileTank: TileTankNoDisplay): Unit = ()
   }
 
-  val stackFromTile = (t: TileTankNoDisplay) => Option(t.tank.getFluid)
+  val stackFromTile = (t: TileTankNoDisplay) => Option(t.tank.getFluid).filter(_.nonEmpty)
 
   def load(world: World, pos: BlockPos): Unit = {
     val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => world.getTileEntity(p).isInstanceOf[TileTankNoDisplay])

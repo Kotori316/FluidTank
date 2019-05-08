@@ -1,8 +1,10 @@
 package com.kotori316.fluidtank.render
 
+import com.kotori316.fluidtank.FluidAmount
 import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
+import net.minecraft.init.Fluids
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.BiomeColors
@@ -44,14 +46,20 @@ object RenderTank {
   val WATER_LOCATION = new ResourceLocation("minecraft", "block/water_still")
 
   private def textureName(tank: TileTank#Tank) = {
-    if (tank.fluid.fluid.isIn(FluidTags.LAVA)) LAVA_LOCATION else WATER_LOCATION
+    tank.fluid.fluid match {
+      case Fluids.LAVA => LAVA_LOCATION
+      case Fluids.WATER => WATER_LOCATION
+      case fluid =>
+        val location = FluidAmount.registry.getKey(fluid)
+        new ResourceLocation(location.getNamespace, s"block/${location.getPath}_still")
+    }
   }
 
   private def color(tile: TileTank) = {
-    if (tile.tank.fluid.fluid.isIn(FluidTags.LAVA)) 0xFFFFFFFF else {
+    if (tile.tank.fluid.fluid.isIn(FluidTags.WATER)) {
       val world = if (tile.hasWorld) tile.getWorld else Minecraft.getInstance().world
       val pos = if (tile.hasWorld) tile.getPos else Minecraft.getInstance().player.getPosition
       BiomeColors.getWaterColor(world, pos) | 0xFF000000
-    }
+    } else 0xFFFFFFFF
   }
 }

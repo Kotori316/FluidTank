@@ -1,5 +1,7 @@
 package com.kotori316
 
+import cats.Show
+import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
 
@@ -65,4 +67,5 @@ package object fluidtank {
     }
   }
 
+  implicit val showPos:Show[BlockPos] = pos => s"(${pos.getX}, ${pos.getY}, ${pos.getZ})"
 }

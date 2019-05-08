@@ -3,11 +3,13 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank.FluidAmount
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.item.{ItemBucket, ItemStack}
 import net.minecraft.util.math.RayTraceResult
 import net.minecraftforge.event.entity.player.FillBucketEvent
 import net.minecraftforge.eventbus.api.Event.Result
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 
 object BucketEventHandler {
 
@@ -26,11 +28,11 @@ object BucketEventHandler {
             val fillAmount = tileTank.connection.handler.fill(stackFluid, doFill = false, min = FluidAmount.AMOUNT_BUCKET)
             if (fillAmount.nonEmpty) {
               tileTank.connection.handler.fill(stackFluid, doFill = true, min = FluidAmount.AMOUNT_BUCKET)
-              event.setFilledBucket(stack.getContainerItem)
+              event.setFilledBucket(getContainer(stack, event.getEntityPlayer))
               event.setResult(Result.ALLOW)
             }
           } else {
-            event.setFilledBucket(stack.getContainerItem)
+            event.setFilledBucket(getContainer(stack, event.getEntityPlayer))
             event.setResult(Result.ALLOW)
           }
 
@@ -47,6 +49,20 @@ object BucketEventHandler {
           }
         }
       case _ =>
+    }
+  }
+
+  private[this] final val empty_bucket = ObfuscationReflectionHelper.findMethod(classOf[ItemBucket], "func_203790_a", classOf[ItemStack], classOf[EntityPlayer])
+
+  def getContainer(stack: ItemStack, player: EntityPlayer): ItemStack = {
+    if (stack.hasContainerItem)
+      stack.getContainerItem
+    else {
+      stack.getItem match {
+        case bucket: ItemBucket =>
+          if (player != null) empty_bucket.invoke(bucket, stack, player).asInstanceOf[ItemStack] else new ItemStack(Items.BUCKET)
+        case _ => ItemStack.EMPTY
+      }
     }
   }
 }
