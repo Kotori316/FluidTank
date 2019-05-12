@@ -21,6 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import scala.collection.JavaConverters;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
@@ -45,7 +46,7 @@ public class TierRecipe extends IRecipeHidden {
         Set<BlockTank> tanks = JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         Set<BlockTank> invTanks = JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         tankItems = Ingredient.merge(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).map(Ingredient::fromStacks).collect(Collectors.toList()));
-        subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(tier.oreName())))
+        subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().oreNameMap().apply(tier))))
             .map(Ingredient::fromTag)
             .orElse(Ingredient.EMPTY);
     }
