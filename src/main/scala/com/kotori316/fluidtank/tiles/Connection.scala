@@ -197,9 +197,8 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   override def getCapability[T](capability: Capability[T], facing: EnumFacing) = {
-    capabilities.map(_.getCapability(capability, facing)).getOrElse(LazyOptional.empty())
-    //    CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.orEmpty(capability, LazyOptional.of(() => handler))
-    //      .or(capabilities.map(_.getCapability(capability, facing)).getOrElse(LazyOptional.empty()))
+        CapabilityFluidTank.cap.orEmpty(capability, LazyOptional.of(() => handler))
+          .or(capabilities.map(_.getCapability(capability, facing)).getOrElse(LazyOptional.empty()))
   }
 
   override def toString: String = {
