@@ -21,12 +21,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     () => seq.foreach(_.markDirty())
   )
 
-  val handler: FluidAmount.Tank = new FluidAmount.Tank {
+  class TankHandler extends FluidAmount.Tank {
     /**
       * @return Fluid that was accepted by the tank.
       */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
-      if (fluidAmount.isEmpty || fluidAmount.amount < min) return FluidAmount.EMPTY
+      if (fluidAmount.isEmpty || fluidAmount.amount < min || (capacity - amount) < min) return FluidAmount.EMPTY
       if (hasCreative) {
         val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
         val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
@@ -86,6 +86,8 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       }
     }
   }
+
+  val handler: FluidAmount.Tank = new TankHandler
 
   val capabilities = if (s.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
