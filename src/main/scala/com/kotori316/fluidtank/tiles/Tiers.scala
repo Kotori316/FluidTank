@@ -15,7 +15,7 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
 
   def toNBTTag: NBTTagCompound = {
     val nbt = new NBTTagCompound
-    nbt.setString("string", toString)
+    nbt.putString("string", toString)
     nbt
   }
 }

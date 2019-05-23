@@ -104,7 +104,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
     }
     if (fluid != null) {
       val compound = stack.getOrCreateTag()
-      compound.setTag(TileTankNoDisplay.NBT_BlockTag, createTag)
+      compound.put(TileTankNoDisplay.NBT_BlockTag, createTag)
       stack.setTag(compound)
     } else {
       stack.removeChildTag(TileTankNoDisplay.NBT_BlockTag)
@@ -113,11 +113,11 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
 
   def createTag: NBTTagCompound = {
     val tag = new NBTTagCompound
-    tag.setTag(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
+    tag.put(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
     val tankTag = new NBTTagCompound
-    tankTag.setInt(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
+    tankTag.putInt(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
     fluid.writeToNBT(tankTag)
-    tag.setTag(TileTankNoDisplay.NBT_Tank, tankTag)
+    tag.put(TileTankNoDisplay.NBT_Tank, tankTag)
     tag
   }
 }

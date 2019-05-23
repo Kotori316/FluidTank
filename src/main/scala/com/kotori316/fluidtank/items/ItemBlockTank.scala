@@ -18,7 +18,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends ItemBlock(blockTank, Fluid
   setRegistryName(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
 
   override def getRarity(stack: ItemStack): EnumRarity =
-    if (stack.hasTag && stack.getTag.hasKey(TileTankNoDisplay.NBT_BlockTag)) EnumRarity.RARE
+    if (stack.hasTag && stack.getTag.contains(TileTankNoDisplay.NBT_BlockTag)) EnumRarity.RARE
     else EnumRarity.COMMON
 
   def hasRecipe = true
@@ -50,9 +50,9 @@ class ItemBlockTank(val blockTank: BlockTank) extends ItemBlock(blockTank, Fluid
           if (!(!worldIn.isRemote && tileentity.onlyOpsCanSetNbt) || !(player == null || !player.canUseCommandBlock)) {
             val nbt = tileentity.write(new NBTTagCompound)
             nbt.merge(subTag)
-            nbt.setInt("x", pos.getX)
-            nbt.setInt("y", pos.getY)
-            nbt.setInt("z", pos.getZ)
+            nbt.putInt("x", pos.getX)
+            nbt.putInt("y", pos.getY)
+            nbt.putInt("z", pos.getZ)
             tileentity.read(nbt)
             tileentity.markDirty()
           }

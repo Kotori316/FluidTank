@@ -15,8 +15,8 @@ case class FluidAmount(fluid: Fluid, amount: Long) {
   def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount)
 
   def write(tag: NBTTagCompound): NBTTagCompound = {
-    tag.setString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
-    tag.setLong(FluidAmount.NBT_amount, amount)
+    tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
+    tag.putLong(FluidAmount.NBT_amount, amount)
     tag
   }
 
@@ -68,7 +68,7 @@ object FluidAmount {
     }
   }
 
-  def registry = IRegistry.field_212619_h
+  def registry = IRegistry.FLUID
 
   trait Tank {
     /**

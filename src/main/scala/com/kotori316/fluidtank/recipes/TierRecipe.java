@@ -80,11 +80,11 @@ public class TierRecipe extends IRecipeHidden {
             NBTTagCompound compound = new NBTTagCompound();
 
             NBTTagCompound tankTag = new NBTTagCompound();
-            tankTag.setInt(TileTankNoDisplay.NBT_Capacity(), Utils.toInt(tier.amount()));
+            tankTag.putInt(TileTankNoDisplay.NBT_Capacity(), Utils.toInt(tier.amount()));
             fluidAmount.write(tankTag);
 
-            compound.setTag(TileTankNoDisplay.NBT_Tank(), tankTag);
-            compound.setTag(TileTankNoDisplay.NBT_Tier(), tier.toNBTTag());
+            compound.put(TileTankNoDisplay.NBT_Tank(), tankTag);
+            compound.put(TileTankNoDisplay.NBT_Tier(), tier.toNBTTag());
 
             result.setTagInfo(TileTankNoDisplay.NBT_BlockTag(), compound);
         }

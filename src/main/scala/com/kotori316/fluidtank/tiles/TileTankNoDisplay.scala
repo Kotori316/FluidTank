@@ -36,15 +36,15 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   var stackName: ITextComponent = _
 
   override def write(compound: NBTTagCompound): NBTTagCompound = {
-    compound.setTag(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
-    compound.setTag(TileTankNoDisplay.NBT_Tier, tier.toNBTTag)
-    getStackName.foreach(t => compound.setString(TileTankNoDisplay.NBT_StackName, ITextComponent.Serializer.toJson(t)))
+    compound.put(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
+    compound.put(TileTankNoDisplay.NBT_Tier, tier.toNBTTag)
+    getStackName.foreach(t => compound.putString(TileTankNoDisplay.NBT_StackName, ITextComponent.Serializer.toJson(t)))
     super.write(compound)
   }
 
   def getBlockTag: NBTTagCompound = {
     val nbt = write(new NBTTagCompound)
-    Seq("x", "y", "z", "id").foreach(nbt.removeTag)
+    Seq("x", "y", "z", "id").foreach(nbt.remove)
     nbt
   }
 
@@ -56,7 +56,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     super.read(compound)
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tier))
-    if (compound.hasKey(TileTankNoDisplay.NBT_StackName)) {
+    if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
       stackName = ITextComponent.Serializer.fromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
     }
     loading = true
@@ -65,7 +65,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   def readNBTClient(compound: NBTTagCompound): Unit = {
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tier))
-    if (compound.hasKey(TileTankNoDisplay.NBT_StackName)) {
+    if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
       stackName = ITextComponent.Serializer.fromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
     } else {
       stackName = null
@@ -160,7 +160,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
     def writeToNBT(nbt: NBTTagCompound): NBTTagCompound = {
       fluid.write(nbt)
-      nbt.setInt(TileTankNoDisplay.NBT_Capacity, capacity)
+      nbt.putInt(TileTankNoDisplay.NBT_Capacity, capacity)
       nbt
     }
 

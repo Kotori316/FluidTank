@@ -87,14 +87,14 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
         if (te instanceof TileTankNoDisplay) {
             TileTankNoDisplay tank = (TileTankNoDisplay) te;
 
-            tag.setString(NBT_Tier, tank.tier().toString());
-            tag.setString(NBT_ConnectionFluidName,
+            tag.putString(NBT_Tier, tank.tier().toString());
+            tag.putString(NBT_ConnectionFluidName,
                 Utils.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL));
             if (!tank.connection().hasCreative()) {
-                tag.setBoolean(NBT_NonCreative, true);
-                tag.setLong(NBT_ConnectionAmount, tank.connection().amount());
-                tag.setLong(NBT_ConnectionCapacity, tank.connection().capacity());
-                tag.setInt(NBT_ConnectionComparator, tank.getComparatorLevel());
+                tag.putBoolean(NBT_NonCreative, true);
+                tag.putLong(NBT_ConnectionAmount, tank.connection().amount());
+                tag.putLong(NBT_ConnectionCapacity, tank.connection().capacity());
+                tag.putInt(NBT_ConnectionComparator, tank.getComparatorLevel());
             }
         }
     }
