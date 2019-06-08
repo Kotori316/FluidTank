@@ -19,7 +19,7 @@ apply plugin: "com.matthewprenger.cursegradle"
 apply plugin: "com.github.breadmoirai.github-release"
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = getProperty("modversion")
+version = getProperty("modVersion")
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LargeFluidTank"
 
@@ -145,6 +145,17 @@ task srcJar(type: Jar) {
 task deobfJar(type: Jar) {
     from sourceSets.main.output
     classifier = 'deobf'
+    manifest {
+        attributes([
+                "Specification-Title"     : project.name,
+                "Specification-Vendor"    : "Kotori316",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.version,
+                "Implementation-Vendor"   : "Kotori316",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
 // Tell the artifact system about our extra jars
@@ -161,6 +172,7 @@ curseforge {
         changelog = file("changes.md")
         releaseType = 'release'
         mainArtifact jar
+        addArtifact deobfJar
         addArtifact srcJar
         relations {
             requiredDependency 'scalable-cats-force'
@@ -182,13 +194,37 @@ githubRelease {
     releaseAssets = files(jar.archivePath)
 }
 
+task signJar2() << {
+    ant.signjar(
+            jar: jar.archivePath,
+            alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
+            keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
+            storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
+            sigalg: "SHA1withRSA",
+            digestalg: "SHA-256",
+            tsaurl: "http://timestamp.digicert.com"
+    )
+    ant.signjar(
+            jar: deobfJar.archivePath,
+            alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
+            keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
+            storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
+            sigalg: "SHA1withRSA",
+            digestalg: "SHA-256",
+            tsaurl: "http://timestamp.digicert.com"
+    )
+}
+
+// Runs this task automatically when build is ran.
+assemble.dependsOn(signJar2)
+
 task checkMethod() << {
     System.out.println("FilePath $jar.archivePath")
     System.out.println("FilePath $srcJar.archivePath")
     System.out.println("FilePath $deobfJar.archivePath")
     System.out.println("Name $project.name")
     System.out.println("BaseName $archivesBaseName")
-    System.out.println("ModVersion ${getProperty("modversion")}")
+    System.out.println("ModVersion ${getProperty("modVersion")}")
     println()
     println("changes.md")
     println(file("changes.md").text)
