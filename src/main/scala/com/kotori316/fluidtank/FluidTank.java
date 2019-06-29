@@ -32,6 +32,7 @@ import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
+import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -47,6 +48,7 @@ public class FluidTank {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
         FluidRegistry.enableUniversalBucket();
         MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
+        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
 
     @SuppressWarnings("unused")

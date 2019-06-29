@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.{FluidAmount, ModObjects, Utils}
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SUpdateTileEntityPacket
-import net.minecraft.tileentity.{ITickableTileEntity, TileEntity, TileEntityType}
+import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.util.{Direction, INameable}
 import net.minecraftforge.common.capabilities.Capability
@@ -18,7 +18,6 @@ import net.minecraftforge.common.util.LazyOptional
 class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDisplay])
   extends TileEntity(t)
     with INameable
-    with ITickableTileEntity
     /*with ICustomPipeConnection
     with IDebuggable*/ {
   self =>
@@ -75,14 +74,6 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
   override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = handleUpdateTag(pkt.getNbtCompound)
 
-  override def onLoad(): Unit = {
-    super.onLoad()
-//    if (loading && SideProxy.isServer(this)) {
-//      Connection.load(getWorld, getPos)
-//      loading = false
-//    }
-  }
-
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     val c = connection.getCapability(capability, facing)
     if (c.isPresent) c else super.getCapability(capability, facing)
@@ -129,7 +120,8 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
     def onContentsChanged(): Unit = {
       sendPacket()
-      connection.updateNeighbors()
+      if (!loading)
+        connection.updateNeighbors()
       if (!SideProxy.isServer(self) && capacity != 0) {
         val percent = getFluidAmount.toDouble / capacity.toDouble
         val a = 0.001
@@ -255,12 +247,6 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     left.add("Tier : " + tier)
     left add tank.toString
   }*/
-  override def tick(): Unit = {
-    if (loading && SideProxy.isServer(this)) {
-      Connection.load(getWorld, getPos)
-      loading = false
-    }
-  }
 }
 
 object TileTankNoDisplay {
@@ -271,4 +257,19 @@ object TileTankNoDisplay {
   final val NBT_StackName = "stackName"
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
+
+  import net.minecraftforge.event.world.ChunkEvent
+
+  def makeConnectionOnChunkLoad(event: ChunkEvent.Load): Unit = {
+    val chunk = event.getChunk
+    if (event.getWorld != null && !event.getWorld.isRemote && !chunk.getTileEntitiesPos.isEmpty) {
+      import scala.collection.JavaConverters
+      val poses = JavaConverters.asScalaSet(chunk.getTileEntitiesPos)
+      val tanks = poses.map(chunk.getTileEntity).collect { case tank: TileTankNoDisplay => tank }
+      // Getting tiles via world IS NOT AVAILABLE.
+      tanks.foreach { t => Connection.load(chunk, t.getPos) }
+      // Loading finished. Don't turn off the flag with above call.
+      tanks.foreach(_.loading = false)
+    }
+  }
 }

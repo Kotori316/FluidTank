@@ -6,7 +6,7 @@ import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
-import net.minecraft.world.World
+import net.minecraft.world.IBlockReader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
@@ -168,10 +168,10 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       }
       val nConnection = new Connection(newSeq)
       val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, doDrain = true))) yield i
-      newSeq.foreach(t => {
+      newSeq.foreach { t =>
         t.connection = nConnection
         t.tank.setFluid(null)
-      })
+      }
       fluidStacks.foreach(nConnection.handler.fill(_, doFill = true))
       nConnection
     } else {
@@ -233,13 +233,13 @@ object Connection {
 
   val stackFromTile = (t: TileTankNoDisplay) => Option(t.tank.getFluid).filter(_.nonEmpty)
 
-  def load(world: World, pos: BlockPos): Unit = {
-    val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => world.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
+  def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
+    val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
       .toList.lastOption.getOrElse({
       FluidTank.LOGGER.fatal("No lowest tank", new IllegalArgumentException("No lowest tank"))
       pos
     })
-    val tanks = Iterator.iterate(lowest)(_.up()).map(world.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
+    val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
       .toList.map(_.asInstanceOf[TileTankNoDisplay])
     tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
   }
