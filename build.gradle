@@ -230,5 +230,6 @@ task checkMethod() << {
     println(file("changes.md").text)
     println()
     println("hasGitHubToken ${project.hasProperty("githubToken")}")
-    println("hasCurseForgeToken ${project.hasProperty("keyStore")}")
+    println("hasSignToken ${project.hasProperty("keyStore")}")
+    println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}")
 }
