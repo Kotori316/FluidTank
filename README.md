@@ -1,6 +1,6 @@
 # FluidTank
 
-For Minecraft 1.13.2 (1.13.2 branch)
+For Minecraft 1.14.3 (1.14.3 branch)
 
 LICENSE: MIT License  
 Copyright (c) 2019 Kotori316
@@ -18,10 +18,9 @@ Minecraft CurseForge - https://minecraft.curseforge.com/projects/largefluidtank
 
 ### APIs
 
+* **REQUIRED** [Forge](https://files.minecraftforge.net/)
+  * For Minecraft 1.14.3
+
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.12.8
   * Licenced under the Apache License 2.0
-* [Hwyla](https://github.com/TehNut/HWYLA)
-  * Licensed under CC BY-NC-SA 4.0
-* [Jei](https://github.com/mezz/JustEnoughItems)
-  * Licensed under the MIT License
