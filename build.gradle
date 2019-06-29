@@ -32,7 +32,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20190522-1.13.2'
+    mappings channel: 'snapshot', version: '20190621-1.14.2'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -98,17 +98,17 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.219'
+    minecraft 'net.minecraftforge:forge:1.14.3-27.0.15'
     implementation "org.scala-lang:scala-library:2.12.8"
     implementation group: 'org.typelevel', name: "cats-core_2.12", version: '1.6.0'
 
-    def mc_version = "1.13.2"
+//    def mc_version = "1.14.2"
     def jei_version = "5.0.0.28"
 
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}")
+//    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}")
 //    implementation  "mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}:source"
 
-    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+//    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 //    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
 }
 
@@ -168,7 +168,7 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.13.2'
+        addGameVersion '1.14.3'
         changelog = file("changes.md")
         releaseType = 'release'
         mainArtifact jar
@@ -187,7 +187,7 @@ curseforge {
 githubRelease {
     repo = 'FluidTank'
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish = '1.13.2'
+    targetCommitish = '1.14.3'
     body {
         file("changes.md").text
     }

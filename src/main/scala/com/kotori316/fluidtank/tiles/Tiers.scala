@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.tiles
 
 import java.util.Collections
 
-import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.CompoundNBT
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -13,8 +13,8 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
 
   override def hashCode(): Int = rank.hashCode ^ amount.hashCode ^ toString.hashCode
 
-  def toNBTTag: NBTTagCompound = {
-    val nbt = new NBTTagCompound
+  def toNBTTag: CompoundNBT = {
+    val nbt = new CompoundNBT
     nbt.putString("string", toString)
     nbt
   }
@@ -46,7 +46,7 @@ object Tiers {
 
   def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
 
-  def fromNBT(nbt: NBTTagCompound): Tiers = {
+  def fromNBT(nbt: CompoundNBT): Tiers = {
     val key = nbt.getString("string")
     nameToTierMap.getOrElse(key, {
       println("Invalid pattern returned.")

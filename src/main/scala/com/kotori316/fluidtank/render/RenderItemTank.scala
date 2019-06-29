@@ -1,20 +1,21 @@
 package com.kotori316.fluidtank.render
 
-import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.FluidTank
+import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
+import com.mojang.blaze3d.platform.GlStateManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
+import net.minecraft.client.renderer.texture.AtlasTexture
+import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.client.renderer.{GlStateManager, RenderHelper, Tessellator}
+import net.minecraft.client.renderer.{RenderHelper, Tessellator}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import org.lwjgl.opengl.GL11
 
 @OnlyIn(Dist.CLIENT)
-class RenderItemTank extends TileEntityItemStackRenderer {
+class RenderItemTank extends ItemStackTileEntityRenderer {
 
   lazy val tileTank = new TileTank()
 
@@ -30,7 +31,7 @@ class RenderItemTank extends TileEntityItemStackRenderer {
 
         val tessellator = Tessellator.getInstance
         val buffer = tessellator.getBuffer
-        ClientProxy.RENDER_TANK.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE)
+        ClientProxy.RENDER_TANK.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE)
 
         if (!inSlot) RenderHelper.disableStandardItemLighting()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)

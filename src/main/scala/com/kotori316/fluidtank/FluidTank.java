@@ -2,8 +2,9 @@ package com.kotori316.fluidtank;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.crafting.RecipeSerializers;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -41,7 +42,7 @@ public class FluidTank {
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(proxy));
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().register(proxy));
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
         FluidRegistry.enableUniversalBucket();
@@ -53,8 +54,6 @@ public class FluidTank {
         PacketHandler.init();
         Config.content().assertion();
         CraftingHelper.register(ConfigCondition.LOCATION, new ConfigCondition());
-        RecipeSerializers.register(ConvertInvisibleRecipe.SERIALIZER);
-        RecipeSerializers.register(TierRecipe.SERIALIZER);
         CapabilityFluidTank.register();
     }
 
@@ -82,6 +81,12 @@ public class FluidTank {
             event.getRegistry().register(ModObjects.TANK_TYPE());
             event.getRegistry().register(ModObjects.TANK_NO_DISPLAY_TYPE());
             event.getRegistry().register(ModObjects.TANK_CREATIVE_TYPE());
+        }
+
+        @SubscribeEvent
+        public static void registerSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
+            event.getRegistry().register(ConvertInvisibleRecipe.SERIALIZER.setRegistryName(new ResourceLocation(ConvertInvisibleRecipe.LOCATION)));
+            event.getRegistry().register(TierRecipe.SERIALIZER);
         }
     }
 }

@@ -7,20 +7,21 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import net.minecraft.block.Block;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeHidden;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.RecipeSerializers;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 
-public class ConvertInvisibleRecipe extends IRecipeHidden {
+public class ConvertInvisibleRecipe extends SpecialRecipe {
+    public static final String LOCATION = "fluidtank:crafting_convert_invisible";
     public static final IRecipeSerializer<ConvertInvisibleRecipe> SERIALIZER =
-        new RecipeSerializers.SimpleSerializer<>("fluidtank:crafting_convert_invisible", ConvertInvisibleRecipe::new);
+        new SpecialRecipeSerializer<>(ConvertInvisibleRecipe::new);
     public static final Predicate<ItemStack> NON_EMPTY = ((Predicate<ItemStack>) ItemStack::isEmpty).negate();
 
     public ConvertInvisibleRecipe(ResourceLocation idIn) {
@@ -28,7 +29,7 @@ public class ConvertInvisibleRecipe extends IRecipeHidden {
     }
 
     @Override
-    public boolean matches(IInventory inv, World worldIn) {
+    public boolean matches(CraftingInventory inv, World worldIn) {
         List<ItemStack> stacks = IntStream.range(0, inv.getSizeInventory())
             .mapToObj(inv::getStackInSlot)
             .filter(NON_EMPTY)
@@ -39,7 +40,7 @@ public class ConvertInvisibleRecipe extends IRecipeHidden {
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv) {
+    public ItemStack getCraftingResult(CraftingInventory inv) {
         Optional<ItemStack> stackOptional = IntStream.range(0, inv.getSizeInventory())
             .mapToObj(inv::getStackInSlot)
             .filter(NON_EMPTY)

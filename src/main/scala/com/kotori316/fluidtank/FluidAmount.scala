@@ -1,20 +1,19 @@
 package com.kotori316.fluidtank
 
 import cats.Show
-import net.minecraft.fluid.Fluid
-import net.minecraft.init.{Fluids, Items}
-import net.minecraft.item.{ItemBucket, ItemStack}
-import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.fluid.{Fluid, Fluids}
+import net.minecraft.item.{BucketItem, ItemStack, Items}
+import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.ResourceLocation
-import net.minecraft.util.registry.IRegistry
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
+import net.minecraftforge.registries.ForgeRegistries
 
 import scala.util.Try
 
 case class FluidAmount(fluid: Fluid, amount: Long) {
   def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount)
 
-  def write(tag: NBTTagCompound): NBTTagCompound = {
+  def write(tag: CompoundNBT): CompoundNBT = {
     tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
     tag.putLong(FluidAmount.NBT_amount, amount)
     tag
@@ -45,21 +44,21 @@ object FluidAmount {
   val EMPTY = FluidAmount(Fluids.EMPTY, 0)
   val BUCKET_LAVA = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET)
   val BUCKET_WATER = FluidAmount(Fluids.WATER, AMOUNT_BUCKET)
-  private[this] final val bucket_fluid_field: ItemBucket => Fluid =
-    item => ObfuscationReflectionHelper.getPrivateValue(classOf[ItemBucket], item, "field_77876_a"):Fluid
+  private[this] final val bucket_fluid_field: BucketItem => Fluid =
+    item => ObfuscationReflectionHelper.getPrivateValue(classOf[BucketItem], item, "field_77876_a"):Fluid
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
       case Items.LAVA_BUCKET => BUCKET_LAVA
       case Items.WATER_BUCKET => BUCKET_WATER
-      case bucket: ItemBucket =>
+      case bucket: BucketItem=>
         Try(bucket_fluid_field(bucket)).map(FluidAmount(_, AMOUNT_BUCKET)).getOrElse(EMPTY)
       case _ => EMPTY
     }
   }
 
-  def fromNBT(tag: NBTTagCompound): FluidAmount = {
-    val fluid = registry.get(new ResourceLocation(tag.getString(NBT_fluid)))
+  def fromNBT(tag: CompoundNBT): FluidAmount = {
+    val fluid = registry.getValue(new ResourceLocation(tag.getString(NBT_fluid)))
     if (fluid == EMPTY.fluid) {
       EMPTY
     } else {
@@ -68,7 +67,7 @@ object FluidAmount {
     }
   }
 
-  def registry = IRegistry.FLUID
+  def registry = ForgeRegistries.FLUIDS
 
   trait Tank {
     /**

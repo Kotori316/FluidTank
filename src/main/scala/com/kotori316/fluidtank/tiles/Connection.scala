@@ -4,7 +4,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
@@ -104,7 +104,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else seq.map(_.tier.amount).sum
 
-  def amount: Long = if (hasCreative && fluidType != null) Tiers.CREATIVE.amount else seq.map(_.tank.getFluidAmount.toLong).sum
+  def amount: Long = if (hasCreative && fluidType != null) Tiers.CREATIVE.amount else seq.map(_.tank.getFluidAmount).sum
 
   def tankSeq(fluid: FluidAmount): Seq[TileTankNoDisplay] = {
     if (fluid != null && fluid.isGaseous(fluid)) {
@@ -125,7 +125,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
     * @return new connection
     */
-  def add(tileTank: TileTankNoDisplay, facing: EnumFacing): Connection = {
+  def add(tileTank: TileTankNoDisplay, facing: Direction): Connection = {
     val newFluid = tileTank.tank.getFluid
     if (newFluid.isEmpty || fluidType.isEmpty || fluidType.fluidEqual(newFluid)) {
       // You can connect the tank to this connection.
@@ -133,7 +133,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         FluidTank.LOGGER.warn(s"${tileTank.getClass.getName} at ${tileTank.getPos} is already added to connection.")
         return this
       }
-      val newSeq = if (facing == EnumFacing.DOWN) {
+      val newSeq = if (facing == Direction.DOWN) {
         tileTank +: seq
       } else {
         seq :+ tileTank
@@ -154,14 +154,14 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     }
   }
 
-  def add(connection: Connection, facing: EnumFacing): Connection = {
+  def add(connection: Connection, facing: Direction): Connection = {
     val newFluid = connection.fluidType
     if (newFluid.isEmpty || fluidType.isEmpty || fluidType.fluidEqual(newFluid)) {
       if (seq.exists(connection.seq.contains)) {
         FluidTank.LOGGER.warn(s"Connection($seq) has same block with ${connection.seq}.")
         return connection
       }
-      val newSeq = if (facing == EnumFacing.DOWN) {
+      val newSeq = if (facing == Direction.DOWN) {
         connection.seq ++ this.seq
       } else {
         this.seq ++ connection.seq
@@ -182,8 +182,8 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   def remove(tileTank: TileTankNoDisplay): Unit = {
     val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
-    s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
-    s2.tail.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
+    s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
+    s2.tail.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
   }
 
   def getComparatorLevel: Int = {
@@ -196,9 +196,9 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     updateActions.foreach(_.apply())
   }
 
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing) = {
-        CapabilityFluidTank.cap.orEmpty(capability, LazyOptional.of(() => handler))
-          .or(capabilities.map(_.getCapability(capability, facing)).getOrElse(LazyOptional.empty()))
+  override def getCapability[T](capability: Capability[T], facing: Direction) = {
+    CapabilityFluidTank.cap.orEmpty(capability, LazyOptional.of(() => handler))
+      .or(capabilities.map(_.getCapability(capability, facing)).getOrElse(LazyOptional.empty()))
   }
 
   override def toString: String = {
@@ -241,6 +241,6 @@ object Connection {
     })
     val tanks = Iterator.iterate(lowest)(_.up()).map(world.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
       .toList.map(_.asInstanceOf[TileTankNoDisplay])
-    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
+    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
   }
 }

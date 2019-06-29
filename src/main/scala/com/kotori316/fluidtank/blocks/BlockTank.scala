@@ -2,21 +2,19 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
-import net.minecraft.block.Block
-import net.minecraft.block.state.IBlockState
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.{EntityLiving, EntityLivingBase, EntitySpawnPlacementRegistry, EntityType}
-import net.minecraft.init.{Enchantments, Items}
+import net.minecraft.block.{Block, BlockRenderType, BlockState}
+import net.minecraft.enchantment.{EnchantmentHelper, Enchantments}
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.stats.StatList
+import net.minecraft.stats.Stats
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util._
-import net.minecraft.util.math.{BlockPos, RayTraceResult}
-import net.minecraft.util.text.TextComponentString
-import net.minecraft.world.{IBlockReader, IWorldReaderBase, World}
+import net.minecraft.util.math.shapes.ISelectionContext
+import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
+import net.minecraft.util.text.StringTextComponent
+import net.minecraft.util.{BlockRenderLayer, Direction, Hand, NonNullList}
+import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.event.ForgeEventFactory
 
 class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f)) {
@@ -31,19 +29,18 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
 
   def namePrefix = "tank_"
 
-  override final def hasTileEntity(state: IBlockState) = true
+  override def hasTileEntity(state: BlockState) = true
 
-  override def createTileEntity(state: IBlockState, world: IBlockReader): TileTankNoDisplay = {
+  override def createTileEntity(state: BlockState, world: IBlockReader): TileTankNoDisplay = {
     new TileTank(tier)
   }
 
-  override def onBlockActivated(state: IBlockState, worldIn: World, pos: BlockPos, playerIn: EntityPlayer,
-                                hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult) = {
     // Bucket filling code is moved to BucketEventHandler and using event.
     if (playerIn.getHeldItemMainhand.isEmpty) {
       if (!worldIn.isRemote) {
         worldIn.getTileEntity(pos) match {
-          case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
+          case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new StringTextComponent(tileTank.connection.toString), true)
           case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
       }
@@ -55,22 +52,11 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
 
   override final def getRenderLayer: BlockRenderLayer = BlockRenderLayer.CUTOUT
 
-  override final def getRenderType(state: IBlockState): EnumBlockRenderType = EnumBlockRenderType.MODEL
+  override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
-  override final def isFullCube(state: IBlockState) = false
+  override final def isSideInvisible(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
 
-  override final def getCollisionShape(state: IBlockState, worldIn: IBlockReader, pos: BlockPos) = ModObjects.TANK_SHAPE
-
-  override final def getShape(state: IBlockState, worldIn: IBlockReader, pos: BlockPos) = ModObjects.TANK_SHAPE
-
-  override final def isSideInvisible(state: IBlockState, adjacentBlockState: IBlockState, side: EnumFacing) = true
-
-  override final def canCreatureSpawn(state: IBlockState, world: IWorldReaderBase, pos: BlockPos,
-                                      t: EntitySpawnPlacementRegistry.SpawnPlacementType, entityType: EntityType[_ <: EntityLiving]) = {
-    false
-  }
-
-  override final def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
+  override final def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack): Unit = {
     super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
     worldIn.getTileEntity(pos) match {
       case tank: TileTankNoDisplay => if (!worldIn.isRemote) tank.onBlockPlacedBy()
@@ -78,16 +64,16 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     }
   }
 
-  override final def hasComparatorInputOverride(state: IBlockState): Boolean = true
+  override final def hasComparatorInputOverride(state: BlockState): Boolean = true
 
-  override final def getComparatorInputOverride(blockState: IBlockState, worldIn: World, pos: BlockPos): Int = {
+  override final def getComparatorInputOverride(blockState: BlockState, worldIn: World, pos: BlockPos): Int = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
       case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
     }
   }
 
-  override final def onReplaced(state: IBlockState, worldIn: World, pos: BlockPos, newState: IBlockState, isMoving: Boolean): Unit = {
+  override final def onReplaced(state: BlockState, worldIn: World, pos: BlockPos, newState: BlockState, isMoving: Boolean): Unit = {
     worldIn.getTileEntity(pos) match {
       case tank: TileTankNoDisplay => tank.onDestroy()
       case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
@@ -102,25 +88,28 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
       .foreach(stack.setDisplayName)
   }
 
-  override final def getPickBlock(state: IBlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: EntityPlayer) = {
+  override final def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity) = {
     val stack = super.getPickBlock(state, target, world, pos, player)
     saveTankNBT(world.getTileEntity(pos), stack)
     stack
   }
 
-  override final def harvestBlock(worldIn: World, player: EntityPlayer, pos: BlockPos, state: IBlockState, te: TileEntity, stack: ItemStack): Unit = {
-    player.addStat(StatList.BLOCK_MINED.get(this))
+  override final def harvestBlock(worldIn: World, player: PlayerEntity, pos: BlockPos, state: BlockState, te: TileEntity, stack: ItemStack): Unit = {
+    player.addStat(Stats.BLOCK_MINED.get(this))
     player.addExhaustion(0.005F)
-    harvesters.set(player)
+
     if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockStates, prevents item dupe
       val blockStack = new ItemStack(this, 1)
       saveTankNBT(te, blockStack)
       val list = NonNullList.create[ItemStack]()
       list.add(blockStack)
       val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack)
-      val chance = ForgeEventFactory.fireBlockHarvesting(list, worldIn, pos, state, i, 1.0f, false, harvesters.get)
+      val chance = ForgeEventFactory.fireBlockHarvesting(list, worldIn, pos, state, i, 1.0f, false, player)
       list.forEach(drop => if (worldIn.rand.nextFloat <= chance) Block.spawnAsEntity(worldIn, pos, drop))
     }
-    harvesters.set(null)
   }
+
+  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+
+  override def getCollisionShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
 }

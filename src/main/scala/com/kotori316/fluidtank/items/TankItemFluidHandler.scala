@@ -4,8 +4,8 @@ import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import javax.annotation.Nullable
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.EnumFacing
+import net.minecraft.nbt.CompoundNBT
+import net.minecraft.util.Direction
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
@@ -14,10 +14,10 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, FluidTankPr
 class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
   val tiers = item.blockTank.tier
 
-  def nbt: NBTTagCompound = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+  def nbt: CompoundNBT = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
 
   @Nullable
-  def tankNbt: NBTTagCompound = if (nbt == null) null else nbt.getCompound(TileTankNoDisplay.NBT_Tank)
+  def tankNbt: CompoundNBT = if (nbt == null) null else nbt.getCompound(TileTankNoDisplay.NBT_Tank)
 
   var initialized = false
   var fluid: FluidStack = _
@@ -84,7 +84,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
     new FluidStack(copy, move)
   }
 
-  override def getCapability[T](capability: Capability[T], facing: EnumFacing): LazyOptional[T] = {
+  override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.orEmpty(capability, LazyOptional.of(() => this))
   }
 
@@ -111,10 +111,10 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
     }
   }
 
-  def createTag: NBTTagCompound = {
-    val tag = new NBTTagCompound
+  def createTag: CompoundNBT = {
+    val tag = new CompoundNBT
     tag.put(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
-    val tankTag = new NBTTagCompound
+    val tankTag = new CompoundNBT
     tankTag.putInt(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
     fluid.writeToNBT(tankTag)
     tag.put(TileTankNoDisplay.NBT_Tank, tankTag)

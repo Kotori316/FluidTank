@@ -3,9 +3,9 @@ package com.kotori316.fluidtank.tiles;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Nullable;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -24,17 +24,17 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
 
     @Nullable
     @Override
-    public INBTBase writeNBT(Capability<FluidAmount.Tank> capability, FluidAmount.Tank instance, EnumFacing side) {
-        NBTTagCompound tag = new NBTTagCompound();
+    public INBT writeNBT(Capability<FluidAmount.Tank> capability, FluidAmount.Tank instance, Direction side) {
+        CompoundNBT tag = new CompoundNBT();
         FluidAmount drained = instance.drain(FluidAmount.EMPTY().setAmount(Long.MAX_VALUE), false, 0);
         drained.write(tag);
         return tag;
     }
 
     @Override
-    public void readNBT(Capability<FluidAmount.Tank> capability, FluidAmount.Tank instance, EnumFacing side, INBTBase nbt) {
-        if (nbt instanceof NBTTagCompound) {
-            NBTTagCompound tag = (NBTTagCompound) nbt;
+    public void readNBT(Capability<FluidAmount.Tank> capability, FluidAmount.Tank instance, Direction side, INBT nbt) {
+        if (nbt instanceof CompoundNBT) {
+            CompoundNBT tag = (CompoundNBT) nbt;
             FluidAmount toFill = FluidAmount.fromNBT(tag);
             instance.fill(toFill, true, 0);
         }
@@ -75,11 +75,6 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
         }
 
         @Override
-        public int drain$default$3() {
-            return 0;
-        }
-
-        @Override
         public FluidAmount drain(FluidAmount fluidAmount, boolean doDrain, int min) {
             if (fluidAmount.amount() < min) return FluidAmount.EMPTY();
             if (fluidAmount.fluidEqual(FluidAmount.EMPTY())) {
@@ -97,9 +92,5 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
             }
         }
 
-        @Override
-        public int fill$default$3() {
-            return 0;
-        }
     }
 }

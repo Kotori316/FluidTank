@@ -3,10 +3,10 @@ package com.kotori316.fluidtank.render
 import java.util.{Collections, Random}
 
 import javax.vecmath.{Matrix4f, Vector3f}
-import net.minecraft.block.state.IBlockState
+import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType
 import net.minecraft.client.renderer.model.{IBakedModel, ItemOverrideList}
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.Direction
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.model.TRSRTransformation
 import org.apache.commons.lang3.tuple.Pair
@@ -35,7 +35,7 @@ class ItemModelTank extends IBakedModel {
 
   override def isAmbientOcclusion = false
 
-  override def getQuads(state: IBlockState, side: EnumFacing, rand: Random) = Collections.emptyList()
+  override def getQuads(state: BlockState, side: Direction, rand: Random) = Collections.emptyList()
 
   override def isBuiltInRenderer = true
 

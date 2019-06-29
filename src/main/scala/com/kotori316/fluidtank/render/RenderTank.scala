@@ -4,7 +4,7 @@ import com.kotori316.fluidtank.FluidAmount
 import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.init.Fluids
+import net.minecraft.fluid.Fluids
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.BiomeColors
@@ -16,7 +16,7 @@ class RenderTank extends TileEntityRendererFast[TileTank] {
 
   override def renderTileEntityFast(te: TileTank, x: Double, y: Double, z: Double, partialTicks: Float,
                                     destroyStage: Int, buffer: BufferBuilder): Unit = {
-    Minecraft.getInstance.profiler.startSection("RenderTank")
+    Minecraft.getInstance.getProfiler.startSection("RenderTank")
     if (te.hasContent) {
       val tank = te.tank
       if (tank.box != null) {
@@ -31,7 +31,7 @@ class RenderTank extends TileEntityRendererFast[TileTank] {
       }
     }
 
-    Minecraft.getInstance.profiler.endSection()
+    Minecraft.getInstance.getProfiler.endSection()
   }
 
   /**

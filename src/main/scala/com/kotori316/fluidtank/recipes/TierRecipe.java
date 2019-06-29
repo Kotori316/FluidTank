@@ -8,18 +8,18 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeHidden;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.JsonUtils;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.crafting.CompoundIngredient;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import scala.collection.JavaConverters;
 
 import com.kotori316.fluidtank.Config;
@@ -31,7 +31,7 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-public class TierRecipe extends IRecipeHidden {
+public class TierRecipe extends SpecialRecipe {
     public static final Serializer SERIALIZER = new Serializer();
     private final Tiers tier;
     private final Ingredient tankItems;
@@ -53,7 +53,7 @@ public class TierRecipe extends IRecipeHidden {
     }
 
     @Override
-    public boolean matches(IInventory inv, World worldIn) {
+    public boolean matches(CraftingInventory inv, World worldIn) {
         if (!IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
         if (!IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot).allMatch(tankItems))
             return false;
@@ -68,7 +68,7 @@ public class TierRecipe extends IRecipeHidden {
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv) {
+    public ItemStack getCraftingResult(CraftingInventory inv) {
         ItemStack result = getRecipeOutput();
         FluidAmount fluidAmount = IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
@@ -78,9 +78,9 @@ public class TierRecipe extends IRecipeHidden {
             .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
 
         if (fluidAmount.nonEmpty()) {
-            NBTTagCompound compound = new NBTTagCompound();
+            CompoundNBT compound = new CompoundNBT();
 
-            NBTTagCompound tankTag = new NBTTagCompound();
+            CompoundNBT tankTag = new CompoundNBT();
             tankTag.putInt(TileTankNoDisplay.NBT_Capacity(), Utils.toInt(tier.amount()));
             fluidAmount.write(tankTag);
 
@@ -116,12 +116,16 @@ public class TierRecipe extends IRecipeHidden {
         return subItems;
     }
 
-    public static class Serializer implements IRecipeSerializer<TierRecipe> {
+    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "crafting_grade_up");
+
+        public Serializer() {
+            setRegistryName(LOCATION);
+        }
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, JsonObject json) {
-            String t = JsonUtils.getString(json, "tier");
+            String t = JSONUtils.getString(json, "tier");
             Tiers tiers = Tiers.jList().stream()
                 .filter(tier -> tier.toString().equalsIgnoreCase(t))
                 .findFirst()
@@ -142,9 +146,5 @@ public class TierRecipe extends IRecipeHidden {
             buffer.writeCompoundTag(recipe.tier.toNBTTag());
         }
 
-        @Override
-        public ResourceLocation getName() {
-            return LOCATION;
-        }
     }
 }

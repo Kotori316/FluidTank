@@ -10,12 +10,12 @@ import mcp.mobius.waila.api.IComponentProvider;
 import mcp.mobius.waila.api.IDataAccessor;
 import mcp.mobius.waila.api.IPluginConfig;
 import mcp.mobius.waila.api.IServerDataProvider;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import com.kotori316.fluidtank.FluidAmount;
@@ -36,29 +36,29 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
         TileEntity t = accessor.getTileEntity();
         if (t instanceof TileTankNoDisplay && config.get(KEY_TANK_INFO)) {
             TileTankNoDisplay tank = ((TileTankNoDisplay) t);
-            NBTTagCompound nbtData = accessor.getServerData();
+            CompoundNBT nbtData = accessor.getServerData();
             List<? extends ITextComponent> list;
             if (!config.get(KEY_SHORT_INFO)) {
                 Tiers tier = tank.tier();
                 if (nbtData.getBoolean(NBT_NonCreative)) {
                     list = Arrays.asList(
-                        new TextComponentTranslation(WAILA_TIER, tier.toString()),
-                        new TextComponentTranslation(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
-                        new TextComponentTranslation(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
-                        new TextComponentTranslation(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
-                        new TextComponentTranslation(WAILA_COMPARATOR, nbtData.getInt(NBT_ConnectionComparator))
+                        new TranslationTextComponent(WAILA_TIER, tier.toString()),
+                        new TranslationTextComponent(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
+                        new TranslationTextComponent(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
+                        new TranslationTextComponent(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
+                        new TranslationTextComponent(WAILA_COMPARATOR, nbtData.getInt(NBT_ConnectionComparator))
                     );
                 } else {
                     String fluidName = getCreativeFluidName(tank);
                     list = Arrays.asList(
-                        new TextComponentTranslation(WAILA_TIER, tier.toString()),
-                        new TextComponentTranslation(WAILA_CONTENT, fluidName)
+                        new TranslationTextComponent(WAILA_TIER, tier.toString()),
+                        new TranslationTextComponent(WAILA_CONTENT, fluidName)
                     );
                 }
             } else {
                 if (nbtData.getBoolean(NBT_NonCreative)) {
                     list = Collections.singletonList(
-                        new TextComponentTranslation(WAILA_SHORT,
+                        new TranslationTextComponent(WAILA_SHORT,
                             nbtData.getString(NBT_ConnectionFluidName),
                             nbtData.getLong(NBT_ConnectionAmount),
                             nbtData.getLong(NBT_ConnectionCapacity))
@@ -67,7 +67,7 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
                     String fluidName = getCreativeFluidName(tank);
                     list = java.util.Optional.of(fluidName)
                         .filter(NOT_EMPTY)
-                        .map(TextComponentString::new)
+                        .map(StringTextComponent::new)
                         .map(Collections::singletonList)
                         .orElse(Collections.emptyList());
                 }
@@ -83,7 +83,7 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
     }
 
     @Override
-    public void appendServerData(NBTTagCompound tag, EntityPlayerMP player, World world, TileEntity te) {
+    public void appendServerData(CompoundNBT tag, ServerPlayerEntity player, World world, TileEntity te) {
         if (te instanceof TileTankNoDisplay) {
             TileTankNoDisplay tank = (TileTankNoDisplay) te;
 
