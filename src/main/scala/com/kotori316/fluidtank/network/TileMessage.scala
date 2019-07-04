@@ -26,8 +26,8 @@ class TileMessage {
     for (world <- FluidTank.proxy.getWorld(supplier.get()) if world.getDimension.getType.getId == dim;
          tile <- Option(world.getTileEntity(pos))) {
       supplier.get().enqueueWork(() => tile.read(nbt))
-      supplier.get().setPacketHandled(true)
     }
+    supplier.get().setPacketHandled(true)
   }
 }
 
