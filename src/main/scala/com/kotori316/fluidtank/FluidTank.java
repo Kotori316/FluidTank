@@ -48,7 +48,7 @@ public class FluidTank {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
         FluidRegistry.enableUniversalBucket();
         MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
-        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
+//        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
 
     @SuppressWarnings("unused")

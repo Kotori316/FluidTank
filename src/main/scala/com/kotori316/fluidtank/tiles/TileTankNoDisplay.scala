@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.{FluidAmount, ModObjects, Utils}
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SUpdateTileEntityPacket
-import net.minecraft.tileentity.{TileEntity, TileEntityType}
+import net.minecraft.tileentity.{ITickableTileEntity, TileEntity, TileEntityType}
 import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.util.{Direction, INameable}
 import net.minecraftforge.common.capabilities.Capability
@@ -18,6 +18,7 @@ import net.minecraftforge.common.util.LazyOptional
 class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDisplay])
   extends TileEntity(t)
     with INameable
+    with ITickableTileEntity
     /*with ICustomPipeConnection
     with IDebuggable*/ {
   self =>
@@ -247,6 +248,12 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     left.add("Tier : " + tier)
     left add tank.toString
   }*/
+  override def tick(): Unit = {
+    if (loading && SideProxy.isServer(this)) {
+      Connection.load(getWorld, getPos)
+      loading = false
+    }
+  }
 }
 
 object TileTankNoDisplay {
