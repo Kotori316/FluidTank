@@ -1,3 +1,3 @@
-## v4.2
-* Support Evil Craft Sanguinary Environmental Accumulator. [#14](https://github.com/Kotori316/FluidTank/issues/14)
-* Returning fluid handler on client side.
+## v4.3
+* Addition - config option to use very easy recipe to craft wood tank.  
+             Change easyRecipe in recipe category in config to true.
