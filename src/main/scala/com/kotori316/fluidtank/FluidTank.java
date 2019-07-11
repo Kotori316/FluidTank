@@ -30,9 +30,9 @@ import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
+import com.kotori316.fluidtank.recipes.EasyCondition;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -56,6 +56,7 @@ public class FluidTank {
         PacketHandler.init();
         Config.content().assertion();
         CraftingHelper.register(ConfigCondition.LOCATION, new ConfigCondition());
+        CraftingHelper.register(EasyCondition.LOCATION, new EasyCondition());
         CapabilityFluidTank.register();
     }
 

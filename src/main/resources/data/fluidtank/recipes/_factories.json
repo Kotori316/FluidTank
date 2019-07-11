@@ -1,5 +1,6 @@
 {
   "conditions": {
-    "config": "com.kotori316.fluidtank.recipes.ConfigCondition"
+    "config": "com.kotori316.fluidtank.recipes.ConfigCondition",
+    "easy": "com.kotori316.fluidtank.recipes.EasyCondition"
   }
 }
