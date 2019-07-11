@@ -13,7 +13,7 @@ object Config {
     val builder = new ForgeConfigSpec.Builder
     mContent = new Content(builder)
     val spec = builder.build()
-//    mContent.assertion()
+    //    mContent.assertion()
     spec
   }
 
@@ -37,6 +37,8 @@ object Config {
       (tier, builder.worldRestart().comment(s"Set OreDict name of items to craft $tier tank.")
         .define(tier + "OreName", tier.oreName))
     }.toMap
+
+    val easyRecipe = builder.comment("True to use easy recipe.").define("easyRecipe", false)
 
     builder.pop()
 
