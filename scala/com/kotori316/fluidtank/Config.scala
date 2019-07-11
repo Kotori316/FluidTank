@@ -73,6 +73,10 @@ object Config {
     showToolTipOnMods.setComment("True to enable waila and top to show tank info.")
     val enableWailaAndTOP = showToolTipOnMods.getBoolean
 
+    private val easyRecipeProperty = configuration.get(CATEGORY_RECIPE, "easyRecipe", false)
+    easyRecipeProperty.setComment("True to use easy recipe.")
+    val easyRecipe = easyRecipeProperty.getBoolean
+
     require(Tiers.list.forall(oreNameMap.contains))
 
     if (configuration.hasChanged)
