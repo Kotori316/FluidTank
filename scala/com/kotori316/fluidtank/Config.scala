@@ -74,7 +74,8 @@ object Config {
     val enableWailaAndTOP = showToolTipOnMods.getBoolean
 
     private val easyRecipeProperty = configuration.get(CATEGORY_RECIPE, "easyRecipe", false)
-    easyRecipeProperty.setComment("True to use easy recipe.")
+    easyRecipeProperty.setComment("True to use easy recipe. Requires minecraft restarted to allpy this change.")
+    easyRecipeProperty.setRequiresMcRestart(true)
     val easyRecipe = easyRecipeProperty.getBoolean
 
     require(Tiers.list.forall(oreNameMap.contains))
