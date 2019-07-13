@@ -38,7 +38,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
           } else {
             tanks match {
               case Nil =>
-                val message = if (filled.isEmpty) "Fill failed." else s"Filled, Amount: ${filled.show}"
+                val message = if (filled.isEmpty) s"Filling $toFill failed." else s"Filled, Amount: ${filled.show}"
                 Writer.tell(Vector(message)).map(_ => filled)
               case head :: tail =>
                 val fill = head.tank.fill(toFill, doFill)
@@ -49,7 +49,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
         internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
           case (messages, filled) =>
-            FluidTank.LOGGER.debug(messages.mkString(", ") + (if (doFill) " Real" else " Simulate"))
+            FluidTank.LOGGER.debug((() => messages.mkString(", ") + (if (doFill) " Real" else " Simulate")): org.apache.logging.log4j.util.Supplier[String])
             filled
         }
       }
