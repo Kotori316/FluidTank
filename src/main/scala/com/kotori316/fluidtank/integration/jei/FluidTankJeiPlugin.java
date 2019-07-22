@@ -11,10 +11,9 @@ import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategor
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.crafting.VanillaRecipeTypes;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.recipes.TierRecipe;
@@ -24,7 +23,7 @@ public class FluidTankJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager manager = Minecraft.getInstance().world.getRecipeManager();
-        List<?> recipeExtensions = manager.getRecipes(VanillaRecipeTypes.CRAFTING).stream()
+        List<?> recipeExtensions = manager.getRecipes().stream()
             .filter(TierRecipe.class::isInstance)
             .map(TierRecipe.class::cast)
             .collect(Collectors.toList());
@@ -35,7 +34,7 @@ public class FluidTankJeiPlugin implements IModPlugin {
 
     @Override
     public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
-        IExtendableRecipeCategory<IRecipe, ICraftingCategoryExtension> category = registration.getCraftingCategory();
+        IExtendableRecipeCategory<ICraftingRecipe, ICraftingCategoryExtension> category = registration.getCraftingCategory();
         category.addCategoryExtension(TierRecipe.class, TierRecipeExtension::new);
     }
 

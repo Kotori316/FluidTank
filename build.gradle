@@ -102,13 +102,13 @@ dependencies {
     implementation "org.scala-lang:scala-library:2.12.8"
     implementation group: 'org.typelevel', name: "cats-core_2.12", version: '1.6.0'
 
-//    def mc_version = "1.14.2"
-    def jei_version = "5.0.0.28"
+    def mc_version = "1.14.3"
+    def jei_version = "6.0.0.8"
 
 //    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}")
 //    implementation  "mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}:source"
 
-//    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 //    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
 }
 
