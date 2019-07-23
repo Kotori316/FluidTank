@@ -20,6 +20,7 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.apache.commons.lang3.tuple.Pair;
 import scala.collection.JavaConverters;
 
 import com.kotori316.fluidtank.Config;
@@ -33,6 +34,8 @@ import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 public class TierRecipe extends SpecialRecipe {
     public static final Serializer SERIALIZER = new Serializer();
+    private static final int[] TANK_SLOTS = {0, 2, 6, 8};
+    private static final int[] SUB_SLOTS = {1, 3, 5, 7};
     private final Tiers tier;
     private final Ingredient tankItems;
     private final Ingredient subItems;
@@ -54,10 +57,10 @@ public class TierRecipe extends SpecialRecipe {
 
     @Override
     public boolean matches(CraftingInventory inv, World worldIn) {
-        if (!IntStream.of(1, 3, 5, 7).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
-        if (!IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot).allMatch(tankItems))
+        if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
+        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot).allMatch(tankItems))
             return false;
-        return IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot)
+        return IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
@@ -70,7 +73,7 @@ public class TierRecipe extends SpecialRecipe {
     @Override
     public ItemStack getCraftingResult(CraftingInventory inv) {
         ItemStack result = getRecipeOutput();
-        FluidAmount fluidAmount = IntStream.of(0, 2, 6, 8).mapToObj(inv::getStackInSlot)
+        FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
@@ -114,6 +117,18 @@ public class TierRecipe extends SpecialRecipe {
 
     public Ingredient getSubItems() {
         return subItems;
+    }
+
+    public Stream<Pair<Integer, Ingredient>> tankItemWithSlot() {
+        return IntStream.of(TANK_SLOTS).mapToObj(value -> Pair.of(value, getTankItems()));
+    }
+
+    public Stream<Pair<Integer, Ingredient>> subItemWithSlot() {
+        return IntStream.of(TANK_SLOTS).mapToObj(value -> Pair.of(value, getSubItems()));
+    }
+
+    public Stream<Pair<Integer, Ingredient>> allSlot() {
+        return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
     }
 
     public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TierRecipe> {
