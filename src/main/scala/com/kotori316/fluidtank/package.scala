@@ -1,11 +1,12 @@
 package com.kotori316
 
-import cats.Show
+import cats._
+import cats.data._
+import cats.implicits._
 import net.minecraft.util.math.BlockPos
-import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.common.util.{LazyOptional, NonNullSupplier}
 import net.minecraftforge.fluids.FluidStack
 
-import scala.collection.AbstractIterator
 
 package object fluidtank {
 
@@ -28,44 +29,38 @@ package object fluidtank {
     }
   }
 
-  implicit class LazyOptional2Stream[T](val opt: LazyOptional[T]) extends AnyVal {
-    def asScalaIterator = {
-      if (opt.isPresent) {
-        new AbstractIterator[T] {
-          private var evaluated = false
+  type Cap[T] = OptionT[Eval, T]
 
-          override def hasNext = !evaluated
-
-          override def next() = {
-            if (hasNext) {
-              evaluated = true
-              opt.orElseThrow(() => new AssertionError("Lazy Optional doesn't provide value."))
-            } else {
-              Iterator.empty.next()
-            }
-          }
-        }
-      } else {
-        Iterator.empty
-      }
+  object Cap {
+    def make[T](obj: T): Cap[T] = {
+      OptionT.liftF(Eval.now(obj))
     }
 
-    def asScala = {
-      if (opt.isPresent) {
-        Some(opt.orElseThrow(() => new AssertionError("Lazy Optional doesn't provide value.")))
-      } else {
-        None
-      }
+    def asJava[A](cap: Cap[A]): LazyOptional[A] = {
+      cap.value.value.foldl(LazyOptional.empty[A]()) { case (_, a) => LazyOptional.of[A](() => a) }
     }
 
-    def or(x: => LazyOptional[T]) = {
-      if (opt.isPresent) {
-        opt
-      } else {
-        x
-      }
+    def empty[A]: Cap[A] = {
+      OptionT.none
     }
   }
 
-  implicit val showPos:Show[BlockPos] = pos => s"(${pos.getX}, ${pos.getY}, ${pos.getZ})"
+  def transform0[T](cap: LazyOptional[T]) = Eval.always {
+    if (cap.isPresent) {
+      cap.orElseThrow(thrower).some
+    } else {
+      None
+    }
+  }
+
+  implicit class AsScalaLO[T](val cap: LazyOptional[T]) extends AnyVal {
+    def asScala: Cap[T] = OptionT(transform0[T](cap))
+  }
+
+  private val thrower: NonNullSupplier[AssertionError] = () =>
+    new AssertionError(
+      "LazyOptional has no content " +
+        "though it returned true when isPresent is called.")
+
+  implicit val showPos: Show[BlockPos] = pos => s"(${pos.getX}, ${pos.getY}, ${pos.getZ})"
 }

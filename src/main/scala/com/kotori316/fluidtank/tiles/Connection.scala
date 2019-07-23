@@ -9,7 +9,6 @@ import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.world.IBlockReader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
-import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
 
 import scala.collection.mutable.ArrayBuffer
@@ -206,8 +205,10 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction) = {
-    CapabilityFluidTank.cap.orEmpty(capability, LazyOptional.of(() => handler))
-      .or(capabilities.map(_.getCapability(capability, facing)).getOrElse(LazyOptional.empty()))
+    Cap.asJava(
+      Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap)
+        .orElse(capabilities.map(_.getCapability(capability, facing).asScala).getOrElse(Cap.empty))
+    )
   }
 
   override def toString: String = {
