@@ -4,3 +4,6 @@ FluidTank for Minecraft 1.14.3
 
 ## v6.5
 * Addition - Support for JEI.
+* Addition - Support for Hywla.
+* Fixed - Can't fill creative tank.
+* Fixed - You can drain fluid from normal tanks in creative connection.

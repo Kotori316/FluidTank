@@ -24,3 +24,9 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.12.8
   * Licenced under the Apache License 2.0
+
+* [Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)
+  * Licensed under the MIT License
+
+* [Hwyla](https://github.com/TehNut/HWYLA)
+  * Licensed under CC BY-NC-SA 4.0
