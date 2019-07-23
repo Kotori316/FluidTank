@@ -75,10 +75,10 @@ minecraft {
 }
 
 repositories {
-    maven {
-        name "BuildCraft"
-        url = "https://mod-buildcraft.com/maven"
-    }
+//    maven {
+//        name "BuildCraft"
+//        url = "https://mod-buildcraft.com/maven"
+//    }
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
@@ -88,10 +88,10 @@ repositories {
         name = "Hwyla"
         url "http://tehnut.info/maven"
     }
-    maven { // TThe One Probe
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
+//    maven { // TThe One Probe
+//        name 'tterrag maven'
+//        url "https://maven.tterrag.com/"
+//    }
 }
 
 dependencies {
@@ -105,7 +105,7 @@ dependencies {
     def mc_version = "1.14.3"
     def jei_version = "6.0.0.8"
 
-//    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}")
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.4-B65_1.14.2")
 //    implementation  "mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}:source"
 
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
