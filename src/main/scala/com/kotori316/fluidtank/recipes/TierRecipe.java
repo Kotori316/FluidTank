@@ -124,7 +124,7 @@ public class TierRecipe extends SpecialRecipe {
     }
 
     public Stream<Pair<Integer, Ingredient>> subItemWithSlot() {
-        return IntStream.of(TANK_SLOTS).mapToObj(value -> Pair.of(value, getSubItems()));
+        return IntStream.of(SUB_SLOTS).mapToObj(value -> Pair.of(value, getSubItems()));
     }
 
     public Stream<Pair<Integer, Ingredient>> allSlot() {
