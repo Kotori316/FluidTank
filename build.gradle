@@ -88,10 +88,10 @@ repositories {
         name = "Hwyla"
         url "http://tehnut.info/maven"
     }
-//    maven { // TThe One Probe
-//        name 'tterrag maven'
-//        url "https://maven.tterrag.com/"
-//    }
+    maven { // The One Probe
+        name 'tterrag maven'
+        url "https://maven.tterrag.com/"
+    }
 }
 
 dependencies {
@@ -109,6 +109,8 @@ dependencies {
 
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 //    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
+
+    compileOnly ("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
