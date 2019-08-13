@@ -35,9 +35,9 @@ class RenderTank extends TileEntityRendererFast[TileTank] {
   }
 
   /**
-    * Need here to make public.<br>
-    * For [[com.kotori316.fluidtank.render.RenderItemTank]]
-    */
+   * Need here to make public.<br>
+   * For [[com.kotori316.fluidtank.render.RenderItemTank]]
+   */
   override def bindTexture(location: ResourceLocation): Unit = super.bindTexture(location)
 }
 

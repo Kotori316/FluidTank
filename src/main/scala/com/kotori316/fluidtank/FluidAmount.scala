@@ -71,17 +71,17 @@ object FluidAmount {
 
   trait Tank {
     /**
-      * @return Fluid that was accepted by the tank.
-      */
+     * @return Fluid that was accepted by the tank.
+     */
     def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int = 0): FluidAmount
 
     /**
-      * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-      *                    Empty Fluid means fluid type can be anything.
-      * @param doDrain     false means simulating.
-      * @param min         minimum amount to drain.
-      * @return the fluid and amount that is (or will be) drained.
-      */
+     * @param fluidAmount the fluid representing the kind and maximum amount to drain.
+     *                    Empty Fluid means fluid type can be anything.
+     * @param doDrain     false means simulating.
+     * @param min         minimum amount to drain.
+     * @return the fluid and amount that is (or will be) drained.
+     */
     def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int = 0): FluidAmount
   }
 

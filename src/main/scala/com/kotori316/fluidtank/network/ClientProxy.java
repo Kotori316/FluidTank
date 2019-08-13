@@ -3,7 +3,6 @@ package com.kotori316.fluidtank.network;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;

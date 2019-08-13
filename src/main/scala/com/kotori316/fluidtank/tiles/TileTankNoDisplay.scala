@@ -181,8 +181,8 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
     // Change content
     /**
-      * @return Fluid that was accepted by the tank.
-      */
+     * @return Fluid that was accepted by the tank.
+     */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int = 0): FluidAmount = {
       if (canFillFluidType(fluidAmount)) {
         val newAmount = fluid.amount + fluidAmount.amount
@@ -210,12 +210,12 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     }
 
     /**
-      * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-      *                    Empty Fluid means fluid type can be anything.
-      * @param doDrain     false means simulating.
-      * @param min         minimum amount to drain.
-      * @return the fluid and amount that is (or will be) drained.
-      */
+     * @param fluidAmount the fluid representing the kind and maximum amount to drain.
+     *                    Empty Fluid means fluid type can be anything.
+     * @param doDrain     false means simulating.
+     * @param min         minimum amount to drain.
+     * @return the fluid and amount that is (or will be) drained.
+     */
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int = 0): FluidAmount = {
       if (canFillFluidType(fluidAmount) || FluidAmount.EMPTY.fluidEqual(fluidAmount)) {
         val drain = math.min(fluid.amount, fluidAmount.amount)
@@ -265,7 +265,7 @@ object TileTankNoDisplay {
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
 
-  import net.minecraftforge.event.world.ChunkEvent
+  /*import net.minecraftforge.event.world.ChunkEvent
 
   def makeConnectionOnChunkLoad(event: ChunkEvent.Load): Unit = {
     val chunk = event.getChunk
@@ -278,5 +278,5 @@ object TileTankNoDisplay {
       // Loading finished. Don't turn off the flag with above call.
       tanks.foreach(_.loading = false)
     }
-  }
+  }*/
 }

@@ -23,8 +23,21 @@ import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-import static com.kotori316.fluidtank.integration.Localize.*;
-import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.*;
+import static com.kotori316.fluidtank.integration.Localize.FLUID_NULL;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_AMOUNT;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_CAPACITY;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_COMPARATOR;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_CONTENT;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_SHORT;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_TIER;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.KEY_SHORT_INFO;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.KEY_TANK_INFO;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionAmount;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionCapacity;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionComparator;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionFluidName;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_NonCreative;
+import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_Tier;
 
 //@Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = Waila_ModId)
 public class TankDataProvider implements IServerDataProvider<TileEntity>, IComponentProvider {

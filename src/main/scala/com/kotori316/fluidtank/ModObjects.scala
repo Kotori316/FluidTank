@@ -39,8 +39,8 @@ object ModObjects {
   final val TANK_NO_DISPLAY_TYPE = createTileType(() => new TileTankNoDisplay, blockTanksInvisible)
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
 
-  def createTileType[T <: TileTankNoDisplay](supplier: () => T, blocks:Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
-    val t = TileEntityType.Builder.create[T](() => supplier(), blocks : _*).build(null)
+  def createTileType[T <: TileTankNoDisplay](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
+    val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(null)
     t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
     t
   }

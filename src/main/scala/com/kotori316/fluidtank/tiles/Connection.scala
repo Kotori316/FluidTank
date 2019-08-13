@@ -22,8 +22,8 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   class TankHandler extends FluidAmount.Tank {
     /**
-      * @return Fluid that was accepted by the tank.
-      */
+     * @return Fluid that was accepted by the tank.
+     */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.isEmpty || fluidAmount.amount < min || (capacity - amount) < min) return FluidAmount.EMPTY
       if (hasCreative) {
@@ -55,12 +55,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     }
 
     /**
-      * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-      *                    Empty Fluid means fluid type can be anything.
-      * @param doDrain     false means simulating.
-      * @param min         minimum amount to drain.
-      * @return the fluid and amount that is (or will be) drained.
-      */
+     * @param fluidAmount the fluid representing the kind and maximum amount to drain.
+     *                    Empty Fluid means fluid type can be anything.
+     * @param doDrain     false means simulating.
+     * @param min         minimum amount to drain.
+     * @return the fluid and amount that is (or will be) drained.
+     */
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.amount < min) return FluidAmount.EMPTY
       if (hasCreative) {
@@ -127,12 +127,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   /**
-    * Make connection.
-    *
-    * @param tileTank The tank added to this connection.
-    * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
-    * @return new connection
-    */
+   * Make connection.
+   *
+   * @param tileTank The tank added to this connection.
+   * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
+   * @return new connection
+   */
   def add(tileTank: TileTankNoDisplay, facing: Direction): Connection = {
     val newFluid = tileTank.tank.getFluid
     if (newFluid.isEmpty || fluidType.isEmpty || fluidType.fluidEqual(newFluid)) {

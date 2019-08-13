@@ -10,8 +10,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fml.network.NetworkEvent
 
 /**
-  * To both client and server.
-  */
+ * To both client and server.
+ */
 class TileMessage {
   var pos = BlockPos.ZERO
   var dim = 0
