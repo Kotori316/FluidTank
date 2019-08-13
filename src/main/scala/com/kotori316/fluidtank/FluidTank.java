@@ -24,6 +24,7 @@ import scala.collection.JavaConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.BucketEventHandler;
+import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
@@ -58,6 +59,7 @@ public class FluidTank {
         CraftingHelper.register(ConfigCondition.LOCATION, new ConfigCondition());
         CraftingHelper.register(EasyCondition.LOCATION, new EasyCondition());
         CapabilityFluidTank.register();
+        FluidTankTOPPlugin.sendIMC().apply(modID);
     }
 
     @SuppressWarnings("unused")
