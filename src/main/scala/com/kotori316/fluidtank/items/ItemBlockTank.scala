@@ -70,7 +70,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
   }
 
   override def tryPlace(context: BlockItemUseContext) = {
-    if (Option(context.getPlayer).exists(_.abilities.isCreativeMode)) {
+    if (Option(context.getPlayer).exists(_.isCreative)) {
       val size = context.getItem.getCount
       val result = super.tryPlace(context)
       context.getItem.setCount(size)
