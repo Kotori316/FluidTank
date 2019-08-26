@@ -22,11 +22,18 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
   * For Minecraft 1.14.3 or 1.14.4
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-  * Version 2.12.8
+  * Version 2.12.9
   * Licenced under the Apache License 2.0
+
+* **REQUIRED** [Cats](https://github.com/typelevel/cats)
+  * Version 1.6.1
+  * Licensed under the MIT License
 
 * [Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)
   * Licensed under the MIT License
 
-* [Hwyla](https://github.com/TehNut/HWYLA)
+* [Hwyla](https://github.com/TehNut/HWYLA/tree/1.14_forge)
   * Licensed under CC BY-NC-SA 4.0
+
+* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.14)
+  * Licensed under the MIT License Copyright © 2016 McJty
