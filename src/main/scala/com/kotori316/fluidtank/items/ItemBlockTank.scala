@@ -30,7 +30,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
       val tankNBT = nbt.getCompound(TileTankNoDisplay.NBT_Tank)
       val fluid = Option(FluidAmount.fromNBT(tankNBT))
       val c = tankNBT.getInt(TileTankNoDisplay.NBT_Capacity)
-      tooltip.add(new StringTextComponent(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0l)(_.amount) + " mB / " + c + " mB"))
+      tooltip.add(new StringTextComponent(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0L)(_.amount) + " mB / " + c + " mB"))
     } else {
       tooltip.add(new StringTextComponent("Capacity : " + blockTank.tier.amount + "mB"))
     }

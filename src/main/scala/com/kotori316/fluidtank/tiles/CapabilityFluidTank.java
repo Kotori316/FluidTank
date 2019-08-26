@@ -93,4 +93,18 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
         }
 
     }
+
+    public static class EmptyTank implements FluidAmount.Tank {
+        public static final EmptyTank INSTANCE = new EmptyTank();
+
+        @Override
+        public FluidAmount fill(FluidAmount fluidAmount, boolean doFill, int min) {
+            return FluidAmount.EMPTY();
+        }
+
+        @Override
+        public FluidAmount drain(FluidAmount fluidAmount, boolean doDrain, int min) {
+            return FluidAmount.EMPTY();
+        }
+    }
 }

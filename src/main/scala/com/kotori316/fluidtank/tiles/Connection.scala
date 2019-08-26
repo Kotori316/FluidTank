@@ -4,6 +4,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.tiles.CapabilityFluidTank.EmptyTank
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.world.IBlockReader
@@ -229,11 +230,7 @@ object Connection {
 
     override def amount: Long = 0
 
-    override val handler: FluidAmount.Tank = new FluidAmount.Tank {
-      override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int) = FluidAmount.EMPTY
-
-      override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int) = FluidAmount.EMPTY
-    }
+    override val handler: FluidAmount.Tank = EmptyTank.INSTANCE
     override val toString: String = "Connection.Invalid"
 
     override def getComparatorLevel: Int = 0
