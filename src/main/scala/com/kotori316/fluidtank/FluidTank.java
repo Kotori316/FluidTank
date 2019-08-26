@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -24,6 +25,7 @@ import scala.collection.JavaConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.BucketEventHandler;
+import com.kotori316.fluidtank.blocks.ContentTankSerializer;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
@@ -60,6 +62,7 @@ public class FluidTank {
         CraftingHelper.register(EasyCondition.LOCATION, new EasyCondition());
         CapabilityFluidTank.register();
         FluidTankTOPPlugin.sendIMC().apply(modID);
+        LootFunctionManager.registerFunction(new ContentTankSerializer());
     }
 
     @SuppressWarnings("unused")

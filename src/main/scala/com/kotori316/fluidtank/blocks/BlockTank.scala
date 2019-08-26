@@ -4,18 +4,15 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
 import net.minecraft.block.{Block, BlockRenderType, BlockState}
-import net.minecraft.enchantment.{EnchantmentHelper, Enchantments}
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.stats.Stats
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.shapes.ISelectionContext
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.text.StringTextComponent
-import net.minecraft.util.{BlockRenderLayer, Direction, Hand, NonNullList}
+import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
-import net.minecraftforge.event.ForgeEventFactory
 
 class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f)) {
 
@@ -81,7 +78,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     worldIn.removeTileEntity(pos)
   }
 
-  protected def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
+  def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
     Option(tileEntity).collect { case tank: TileTankNoDisplay if tank.hasContent => tank.getBlockTag }
       .foreach(tag => stack.setTagInfo(TileTankNoDisplay.NBT_BlockTag, tag))
     Option(tileEntity).collect { case tank: TileTankNoDisplay => tank.getStackName }.flatten
@@ -92,21 +89,6 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     val stack = super.getPickBlock(state, target, world, pos, player)
     saveTankNBT(world.getTileEntity(pos), stack)
     stack
-  }
-
-  override final def harvestBlock(worldIn: World, player: PlayerEntity, pos: BlockPos, state: BlockState, te: TileEntity, stack: ItemStack): Unit = {
-    player.addStat(Stats.BLOCK_MINED.get(this))
-    player.addExhaustion(0.005F)
-
-    if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockStates, prevents item dupe
-      val blockStack = new ItemStack(this, 1)
-      saveTankNBT(te, blockStack)
-      val list = NonNullList.create[ItemStack]()
-      list.add(blockStack)
-      val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack)
-      val chance = ForgeEventFactory.fireBlockHarvesting(list, worldIn, pos, state, i, 1.0f, false, player)
-      list.forEach(drop => if (worldIn.rand.nextFloat <= chance) Block.spawnAsEntity(worldIn, pos, drop))
-    }
   }
 
   override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE

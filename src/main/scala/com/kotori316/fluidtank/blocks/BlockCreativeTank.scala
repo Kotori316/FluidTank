@@ -18,7 +18,7 @@ class BlockCreativeTank extends BlockTank(Tiers.CREATIVE) {
 
   override def createTileEntity(state: BlockState, world: IBlockReader) = new TileTankCreative
 
-  override protected def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
+  override def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
     // Just save custom name.
     Option(tileEntity).collect { case tank: TileTankCreative => tank.getStackName }.flatten
       .foreach(stack.setDisplayName)
