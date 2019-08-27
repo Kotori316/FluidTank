@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank;
 
+import java.lang.reflect.Method;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -10,6 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.DistExecutor;
@@ -18,7 +21,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.collection.JavaConverters;
@@ -46,9 +48,11 @@ public class FluidTank {
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().register(proxy));
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+        IEventBus modEventBus = modBus();
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> modEventBus.register(proxy));
+        modEventBus.addListener(this::clientInit);
+        modEventBus.addListener(this::init);
+        modEventBus.register(Register.class);
         FluidRegistry.enableUniversalBucket();
         MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
 //        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
@@ -70,7 +74,6 @@ public class FluidTank {
         proxy.registerTESR();
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class Register {
         @SubscribeEvent
         public static void registerBlocks(RegistryEvent.Register<Block> event) {
@@ -95,6 +98,16 @@ public class FluidTank {
         public static void registerSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
             event.getRegistry().register(ConvertInvisibleRecipe.SERIALIZER.setRegistryName(new ResourceLocation(ConvertInvisibleRecipe.LOCATION)));
             event.getRegistry().register(TierRecipe.SERIALIZER);
+        }
+    }
+
+    private static IEventBus modBus() {
+        Object o = ModLoadingContext.get().extension();
+        try {
+            Method busGetter = o.getClass().getMethod("getModEventBus");
+            return (IEventBus) busGetter.invoke(o);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Error in getting event bus.", e);
         }
     }
 }
