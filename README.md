@@ -19,7 +19,7 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ### APIs
 
 * **REQUIRED** [Forge](https://files.minecraftforge.net/)
-  * For Minecraft 1.14.3 or 1.14.4
+  * For Minecraft 1.14.4
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.12.9
