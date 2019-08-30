@@ -11,6 +11,7 @@ import net.minecraft.world.IBlockReader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -94,6 +95,10 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
           drained
       }
     }
+
+    override def getFluidInTank(tank: Int) = fluidType.setAmount(Utils.toInt(amount)).toStack
+
+    override def getTankCapacity(tank: Int) = Utils.toInt(amount)
   }
 
   val handler: FluidAmount.Tank = new TankHandler
@@ -207,7 +212,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   override def getCapability[T](capability: Capability[T], facing: Direction) = {
     Cap.asJava(
-      Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap)
+      Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap || capability ==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
         .orElse(capabilities.map(_.getCapability(capability, facing).asScala).getOrElse(Cap.empty))
     )
   }

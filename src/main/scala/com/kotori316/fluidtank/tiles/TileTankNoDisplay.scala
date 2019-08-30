@@ -233,6 +233,10 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
         FluidAmount.EMPTY
       }
     }
+
+    override def getFluidInTank(tank: Int) = fluid.toStack
+
+    override def getTankCapacity(tank: Int) = capacity
   }
 
   /*@Optional.Method(modid = TileTankNoDisplay.bcId)

@@ -27,11 +27,11 @@ object BucketEventHandler {
             val fillAmount = tileTank.connection.handler.fill(stackFluid, doFill = false, min = FluidAmount.AMOUNT_BUCKET)
             if (fillAmount.nonEmpty) {
               tileTank.connection.handler.fill(stackFluid, doFill = true, min = FluidAmount.AMOUNT_BUCKET)
-              event.setFilledBucket(getContainer(stack, event.getEntityPlayer))
+              event.setFilledBucket(getContainer(stack, event.getPlayer))
               event.setResult(Result.ALLOW)
             }
           } else {
-            event.setFilledBucket(getContainer(stack, event.getEntityPlayer))
+            event.setFilledBucket(getContainer(stack, event.getPlayer))
             event.setResult(Result.ALLOW)
           }
 

@@ -14,7 +14,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -53,7 +52,6 @@ public class FluidTank {
         modEventBus.addListener(this::clientInit);
         modEventBus.addListener(this::init);
         modEventBus.register(Register.class);
-        FluidRegistry.enableUniversalBucket();
         MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
 //        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
@@ -62,8 +60,8 @@ public class FluidTank {
     public void init(FMLCommonSetupEvent event) {
         PacketHandler.init();
         Config.content().assertion();
-        CraftingHelper.register(ConfigCondition.LOCATION, new ConfigCondition());
-        CraftingHelper.register(EasyCondition.LOCATION, new EasyCondition());
+        CraftingHelper.register(new ConfigCondition.Serializer());
+        CraftingHelper.register(new EasyCondition.Serializer());
         CapabilityFluidTank.register();
         FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());

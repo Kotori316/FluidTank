@@ -5,29 +5,9 @@ import cats.data._
 import cats.implicits._
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.util.{LazyOptional, NonNullSupplier}
-import net.minecraftforge.fluids.FluidStack
 
 
 package object fluidtank {
-
-  implicit class FluidStackHelper(val fluidStack: FluidStack) extends AnyVal {
-
-    def copyWithAmount(amount: Int): FluidStack = {
-      if (fluidStack == null)
-        null
-      else
-        new FluidStack(fluidStack, amount)
-    }
-
-    def setAmount(amount: Int): FluidStack = {
-      fluidStack.amount = amount
-      fluidStack
-    }
-
-    def isEmpty: Boolean = {
-      fluidStack == null || fluidStack.amount <= 0
-    }
-  }
 
   type Cap[T] = OptionT[Eval, T]
 

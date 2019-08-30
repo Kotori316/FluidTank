@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.tiles;
 
 import java.util.concurrent.Callable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -9,6 +10,7 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fluids.FluidStack;
 
 import com.kotori316.fluidtank.FluidAmount;
 
@@ -92,6 +94,16 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
             }
         }
 
+        @Nonnull
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            return content.toStack();
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            return capacity;
+        }
     }
 
     public static class EmptyTank implements FluidAmount.Tank {
@@ -105,6 +117,32 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
         @Override
         public FluidAmount drain(FluidAmount fluidAmount, boolean doDrain, int min) {
             return FluidAmount.EMPTY();
+        }
+
+        @Nonnull
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            return 0;
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            return 0;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            return FluidStack.EMPTY;
         }
     }
 }
