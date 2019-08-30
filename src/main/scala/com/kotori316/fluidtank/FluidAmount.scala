@@ -1,16 +1,14 @@
 package com.kotori316.fluidtank
 
-import cats.Show
+import cats._
+import cats.implicits._
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.capability.IFluidHandler
-import net.minecraftforge.fluids.{FluidAttributes, FluidStack}
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper
+import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
-
-import scala.util.Try
 
 case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundNBT]) {
   def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount, nbt)
@@ -50,16 +48,14 @@ object FluidAmount {
   val EMPTY = FluidAmount(Fluids.EMPTY, 0, None)
   val BUCKET_LAVA = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
   val BUCKET_WATER = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
-  private[this] final val bucket_fluid_field: BucketItem => Fluid =
-    item => ObfuscationReflectionHelper.getPrivateValue(classOf[BucketItem], item, "field_77876_a"): Fluid
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
       case Items.LAVA_BUCKET => BUCKET_LAVA
       case Items.WATER_BUCKET => BUCKET_WATER
       case bucket: BucketItem =>
-        Try(bucket_fluid_field(bucket)).map(FluidAmount(_, AMOUNT_BUCKET, None)).getOrElse(EMPTY)
-      case _ => EMPTY
+        bucket.pure[Id].map(_.getFluid).map(FluidAmount(_, AMOUNT_BUCKET, None))
+      case _ => FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY).pure[Id].map(fromStack)
     }
   }
 
