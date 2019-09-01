@@ -27,6 +27,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.isEmpty || fluidAmount.amount < min || (capacity - amount) < min) return FluidAmount.EMPTY
+      if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
       if (hasCreative) {
         val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
         val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
@@ -64,6 +65,15 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       */
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.amount < min) return FluidAmount.EMPTY
+      if (hasCreative) {
+        if (FluidAmount.EMPTY.fluidEqual(fluidAmount)) {
+          val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos.show} in creative connection." + (if (doDrain) " Real" else " Simulate")
+          FluidTank.LOGGER.debug(m)
+          return fluidType.setAmount(fluidAmount.amount)
+        } else {
+          return FluidAmount.EMPTY
+        }
+      }
 
       def internal(tanks: List[TileTankNoDisplay], toDrain: FluidAmount, drained: FluidAmount): Writer[Vector[String], FluidAmount] = {
         if (toDrain.amount <= 0) {
