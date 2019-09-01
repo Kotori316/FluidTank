@@ -28,6 +28,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
      */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.isEmpty || fluidAmount.amount < min || (capacity - amount) < min) return FluidAmount.EMPTY
+      if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
       if (hasCreative) {
         val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
         val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
@@ -121,7 +122,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   def amount: Long = if (hasCreative && fluidType.nonEmpty) Tiers.CREATIVE.amount else seq.map(_.tank.getFluidAmount).sum
 
   def tankSeq(fluid: FluidAmount): Seq[TileTankNoDisplay] = {
-    if (fluid != null && fluid.isGaseous(fluid)) {
+    if (fluid != null && fluid.isGaseous) {
       seq.reverse
     } else {
       seq
@@ -212,7 +213,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   override def getCapability[T](capability: Capability[T], facing: Direction) = {
     Cap.asJava(
-      Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap || capability ==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+      Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap || capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
         .orElse(capabilities.map(_.getCapability(capability, facing).asScala).getOrElse(Cap.empty))
     )
   }
