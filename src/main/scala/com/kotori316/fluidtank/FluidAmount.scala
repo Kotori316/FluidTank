@@ -6,6 +6,7 @@ import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.common.util.Constants.NBT
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
@@ -16,7 +17,7 @@ case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundNBT]) {
   def write(tag: CompoundNBT): CompoundNBT = {
     tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
     tag.putLong(FluidAmount.NBT_amount, amount)
-    tag.put(FluidAmount.NBT_tag, nbt.getOrElse(new CompoundNBT))
+    nbt.foreach(n => tag.put(FluidAmount.NBT_tag, n))
     tag
   }
 
@@ -24,9 +25,9 @@ case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundNBT]) {
 
   def isEmpty = !nonEmpty
 
-  def isGaseous(dummy: FluidAmount) = false
+  def isGaseous = fluid.getAttributes.isGaseous
 
-  def getLocalizedName: String = FluidAmount.registry.getKey(fluid).toString
+  def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
 
   def +(that: FluidAmount): FluidAmount = {
     if (fluid == Fluids.EMPTY) that
@@ -35,7 +36,7 @@ case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundNBT]) {
 
   def -(that: FluidAmount): FluidAmount = setAmount(this.amount - that.amount)
 
-  def fluidEqual(that: FluidAmount) = this.fluid == that.fluid
+  def fluidEqual(that: FluidAmount) = this.fluid === that.fluid && this.nbt === that.nbt
 
   def toStack: FluidStack = new FluidStack(fluid, Utils.toInt(amount))
 }
@@ -65,8 +66,8 @@ object FluidAmount {
       EMPTY
     } else {
       val amount = tag.getLong(NBT_amount)
-      val nbt = tag.getCompound(NBT_tag)
-      FluidAmount(fluid, amount, Some(nbt))
+      val nbt = if (tag.contains(NBT_tag, NBT.TAG_COMPOUND)) Option(tag.getCompound(NBT_tag)).filterNot(_.isEmpty) else None
+      FluidAmount(fluid, amount, nbt)
     }
   }
 

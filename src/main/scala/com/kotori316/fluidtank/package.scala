@@ -3,6 +3,8 @@ package com.kotori316
 import cats._
 import cats.data._
 import cats.implicits._
+import net.minecraft.fluid.Fluid
+import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.util.{LazyOptional, NonNullSupplier}
 
@@ -43,4 +45,6 @@ package object fluidtank {
         "though it returned true when isPresent is called.")
 
   implicit val showPos: Show[BlockPos] = pos => s"(${pos.getX}, ${pos.getY}, ${pos.getZ})"
+  implicit val hashFluid: Hash[Fluid] = Hash.fromUniversalHashCode
+  implicit val eqCompoundNbt: Eq[CompoundNBT] = Eq.fromUniversalEquals
 }

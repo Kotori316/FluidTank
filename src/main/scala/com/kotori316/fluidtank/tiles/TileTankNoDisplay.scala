@@ -130,7 +130,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
           val d = 1d / 16d
           var maxY = 0d
           var minY = 0d
-          if (tank.getFluid.isGaseous(tank.getFluid)) {
+          if (tank.getFluid.isGaseous) {
             maxY = 1d - a
             minY = 1d - percent + a
           } else {
