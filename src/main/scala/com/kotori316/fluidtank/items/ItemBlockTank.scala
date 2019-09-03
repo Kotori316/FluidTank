@@ -37,7 +37,6 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
   }
 
   override def initCapabilities(stack: ItemStack, nbt: CompoundNBT): ICapabilityProvider = {
-    if (true) return null // 1.13.2
     new TankItemFluidHandler(this, stack)
   }
 
