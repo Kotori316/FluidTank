@@ -13,6 +13,10 @@ import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
+import net.minecraftforge.fluids.capability.IFluidHandler
+import net.minecraftforge.fluids.{FluidStack, FluidUtil}
+import net.minecraftforge.items.CapabilityItemHandler
+import net.minecraftforge.items.wrapper.EmptyHandler
 
 class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f)) {
 
@@ -33,17 +37,39 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
   }
 
   override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult) = {
-    // Bucket filling code is moved to BucketEventHandler and using event.
-    if (playerIn.getHeldItemMainhand.isEmpty) {
-      if (!worldIn.isRemote) {
-        worldIn.getTileEntity(pos) match {
-          case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new StringTextComponent(tileTank.connection.toString), true)
-          case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+    worldIn.getTileEntity(pos) match {
+      case tileTank: TileTankNoDisplay =>
+        val stack = playerIn.getHeldItem(handIn)
+        if (playerIn.getHeldItemMainhand.isEmpty) {
+          if (!worldIn.isRemote) {
+            playerIn.sendStatusMessage(new StringTextComponent(tileTank.connection.toString), true)
+          }
+          true
+        } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
+          FluidUtil.getFluidHandler(stack).asScala.value.value match {
+            case Some(handlerItem) =>
+              if (!worldIn.isRemote) {
+                val tankHandler = tileTank.connection.handler
+                val drainAmount = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE).getAmount
+                val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
+                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
+                if (resultFill.isSuccess) {
+                  playerIn.setHeldItem(handIn, resultFill.getResult)
+                } else {
+                  val fillAmount = handlerItem.fill(tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), IFluidHandler.FluidAction.SIMULATE)
+                  val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
+                  if (resultDrain.isSuccess) {
+                    playerIn.setHeldItem(handIn, resultDrain.getResult)
+                  }
+                }
+              }
+              true
+            case None => false
+          }
+        } else {
+          false
         }
-      }
-      true
-    } else {
-      false
+      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); false
     }
   }
 

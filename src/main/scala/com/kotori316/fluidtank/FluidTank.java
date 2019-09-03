@@ -9,7 +9,6 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -25,7 +24,6 @@ import org.apache.logging.log4j.Logger;
 import scala.collection.JavaConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
-import com.kotori316.fluidtank.blocks.BucketEventHandler;
 import com.kotori316.fluidtank.blocks.ContentTankSerializer;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
@@ -52,7 +50,7 @@ public class FluidTank {
         modEventBus.addListener(this::clientInit);
         modEventBus.addListener(this::init);
         modEventBus.register(Register.class);
-        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
+//        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
 //        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
 

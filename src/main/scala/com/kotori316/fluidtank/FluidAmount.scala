@@ -38,7 +38,9 @@ case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundNBT]) {
 
   def fluidEqual(that: FluidAmount) = this.fluid === that.fluid && this.nbt === that.nbt
 
-  def toStack: FluidStack = new FluidStack(fluid, Utils.toInt(amount))
+  def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount))
+
+  override def toString = FluidAmount.registry.getKey(fluid).getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
 }
 
 object FluidAmount {
@@ -61,7 +63,7 @@ object FluidAmount {
   }
 
   def fromNBT(tag: CompoundNBT): FluidAmount = {
-    val fluid = registry.getValue(new ResourceLocation(tag.getString(NBT_fluid)))
+    val fluid = registry.getValue(new ResourceLocation(Option(tag).map(_.getString(NBT_fluid)).getOrElse(Fluids.EMPTY.getRegistryName.toString)))
     if (fluid == EMPTY.fluid) {
       EMPTY
     } else {
@@ -108,5 +110,5 @@ object FluidAmount {
     override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drain(fromStack(getFluidInTank(0)).setAmount(maxDrain), action.execute()).toStack
   }
 
-  implicit val showFA: Show[FluidAmount] = fa => registry.getKey(fa.fluid).getPath + "@" + fa.amount + "mB"
+  implicit val showFA: Show[FluidAmount] = Show.fromToString
 }
