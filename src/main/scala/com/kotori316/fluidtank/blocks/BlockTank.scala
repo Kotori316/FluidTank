@@ -47,7 +47,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
           true
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           FluidUtil.getFluidHandler(stack).asScala.value.value match {
-            case Some(handlerItem) =>
+            case Some(handlerItem) if !stack.isEmpty =>
               if (!worldIn.isRemote) {
                 val tankHandler = tileTank.connection.handler
                 val drainAmount = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE).getAmount
