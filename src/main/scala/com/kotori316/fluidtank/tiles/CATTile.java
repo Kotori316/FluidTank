@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.tiles;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -174,7 +175,7 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         public Stream<FluidAmount> getFluidAmountStream() {
             return IntStream.range(0, this.getTanks())
                 .mapToObj(this::getFluidInTank)
-                .collect(Collectors.groupingBy(FluidKey::new, Collectors.summingLong(FluidStack::getAmount)))
+                .collect(Collectors.groupingBy(FluidKey::new, LinkedHashMap::new, Collectors.summingLong(FluidStack::getAmount)))
                 .entrySet().stream()
                 .map(e -> e.getKey().toAmount(e.getValue()))
                 .filter(FluidAmount::nonEmpty);
