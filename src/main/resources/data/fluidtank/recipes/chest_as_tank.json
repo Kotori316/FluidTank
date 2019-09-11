@@ -9,9 +9,14 @@
     "x": {
       "item": "fluidtank:tank_wood"
     },
-    "p": {
-      "tag": "forge:chests"
-    }
+    "p": [
+      {
+        "tag": "forge:chests"
+      },
+      {
+        "item": "minecraft:barrel"
+      }
+    ]
   },
   "result": {
     "item": "fluidtank:chest_as_tank"
