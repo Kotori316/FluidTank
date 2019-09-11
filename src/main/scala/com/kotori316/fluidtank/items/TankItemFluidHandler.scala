@@ -50,6 +50,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
     }
   }
 
+  @Nonnull
   override def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = {
     init()
     if (fluid.isEmpty || resource.isEmpty || stack.getCount > 1) {
@@ -63,12 +64,13 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
       }
       new FluidStack(resource, move)
     } else
-      null
+      FluidStack.EMPTY
   }
 
+  @Nonnull
   override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = {
     init()
-    if (fluid.isEmpty || maxDrain <= 0) {
+    if (fluid.isEmpty || maxDrain <= 0 || stack.getCount > 1) {
       return FluidStack.EMPTY
     }
     val copy = fluid.copy()
@@ -116,9 +118,10 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
 
   override def getTanks = 1
 
-  override def getFluidInTank(tank: Int) = fluid
+  @Nonnull
+  override def getFluidInTank(tank: Int): FluidStack = if (stack.getCount == 1) fluid else FluidStack.EMPTY
 
-  override def getTankCapacity(tank: Int) = Utils.toInt(tiers.amount)
+  override def getTankCapacity(tank: Int): Int = if (stack.getCount == 1) Utils.toInt(tiers.amount) else 0
 
   override def isFluidValid(tank: Int, stack: FluidStack) = true
 }
