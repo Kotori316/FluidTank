@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.FluidAmount
+import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.entity.player.EntityPlayer
@@ -15,7 +16,7 @@ object BucketEventHandler {
 
   def onBucketUsed(event: FillBucketEvent): Unit = {
     val ray = event.getTarget
-    if (ray == null || ray.`type` != RayTraceResult.Type.BLOCK) return
+    if (ray == null || ray.`type` != RayTraceResult.Type.BLOCK || event.getEmptyBucket.getItem.isInstanceOf[ItemBlockTank]) return
 
     event.getWorld.getTileEntity(ray.getBlockPos) match {
       case tileTank: TileTankNoDisplay =>

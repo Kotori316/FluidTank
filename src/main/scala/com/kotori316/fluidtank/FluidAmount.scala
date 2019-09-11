@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank
 
 import cats.Show
+import com.kotori316.fluidtank.items.ItemBlockTank
 import net.minecraft.fluid.Fluid
 import net.minecraft.init.{Fluids, Items}
 import net.minecraft.item.{ItemBucket, ItemStack}
@@ -36,6 +37,8 @@ case class FluidAmount(fluid: Fluid, amount: Long) {
   def -(that: FluidAmount): FluidAmount = setAmount(this.amount - that.amount)
 
   def fluidEqual(that: FluidAmount) = this.fluid == that.fluid
+
+  override def toString = FluidAmount.registry.getKey(fluid).getPath + "@" + amount + "mB"
 }
 
 object FluidAmount {
@@ -46,7 +49,7 @@ object FluidAmount {
   val BUCKET_LAVA = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET)
   val BUCKET_WATER = FluidAmount(Fluids.WATER, AMOUNT_BUCKET)
   private[this] final val bucket_fluid_field: ItemBucket => Fluid =
-    item => ObfuscationReflectionHelper.getPrivateValue(classOf[ItemBucket], item, "field_77876_a"):Fluid
+    item => ObfuscationReflectionHelper.getPrivateValue(classOf[ItemBucket], item, "field_77876_a"): Fluid
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
@@ -54,13 +57,14 @@ object FluidAmount {
       case Items.WATER_BUCKET => BUCKET_WATER
       case bucket: ItemBucket =>
         Try(bucket_fluid_field(bucket)).map(FluidAmount(_, AMOUNT_BUCKET)).getOrElse(EMPTY)
+      case _: ItemBlockTank => ItemBlockTank.loadFluid(stack)
       case _ => EMPTY
     }
   }
 
   def fromNBT(tag: NBTTagCompound): FluidAmount = {
     val fluid = registry.get(new ResourceLocation(tag.getString(NBT_fluid)))
-    if (fluid == EMPTY.fluid) {
+    if (fluid == null || fluid == EMPTY.fluid) {
       EMPTY
     } else {
       val amount = tag.getLong(NBT_amount)

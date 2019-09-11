@@ -3,7 +3,6 @@ package com.kotori316.fluidtank.network;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
@@ -12,7 +11,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
@@ -24,6 +25,7 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderTank;
+import com.kotori316.fluidtank.tiles.CATScreen;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 @OnlyIn(Dist.CLIENT)
@@ -44,6 +46,7 @@ public class ClientProxy extends SideProxy {
     @Override
     public void registerTESR() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> CATScreen::create);
     }
 
     @Override

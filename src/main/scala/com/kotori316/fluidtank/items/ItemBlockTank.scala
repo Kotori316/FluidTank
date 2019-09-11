@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
-import com.kotori316.fluidtank.{FluidAmount, FluidTank}
+import com.kotori316.fluidtank.{FluidAmount, FluidTank, Utils}
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.EntityPlayer
@@ -30,7 +30,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends ItemBlock(blockTank, Fluid
       val tankNBT = nbt.getCompound(TileTankNoDisplay.NBT_Tank)
       val fluid = Option(FluidAmount.fromNBT(tankNBT))
       val c = tankNBT.getInt(TileTankNoDisplay.NBT_Capacity)
-      tooltip.add(new TextComponentString(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0l)(_.amount) + " mB / " + c + " mB"))
+      tooltip.add(new TextComponentString(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0L)(_.amount) + " mB / " + c + " mB"))
     } else {
       tooltip.add(new TextComponentString("Capacity : " + blockTank.tier.amount + "mB"))
     }
@@ -69,7 +69,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends ItemBlock(blockTank, Fluid
     false
   }
 
-  override def tryPlace(context : BlockItemUseContext) = {
+  override def tryPlace(context: BlockItemUseContext) = {
     if (Option(context.getPlayer).exists(_.abilities.isCreativeMode)) {
       val size = context.getItem.getCount
       val result = super.tryPlace(context)
@@ -77,6 +77,47 @@ class ItemBlockTank(val blockTank: BlockTank) extends ItemBlock(blockTank, Fluid
       result
     } else {
       super.tryPlace(context)
+    }
+  }
+}
+
+object ItemBlockTank {
+  def saveFluid(stack: ItemStack, amount: FluidAmount): Unit = {
+    stack.getItem match {
+      case t: ItemBlockTank =>
+        if (amount.nonEmpty) {
+          val tiers = t.blockTank.tier
+          val tag = new NBTTagCompound
+          tag.put(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
+          val tankTag = new NBTTagCompound
+          tankTag.putInt(TileTankNoDisplay.NBT_Capacity, Utils.toInt(tiers.amount))
+          amount.write(tankTag)
+          tag.put(TileTankNoDisplay.NBT_Tank, tankTag)
+
+          stack.getOrCreateTag().put(TileTankNoDisplay.NBT_BlockTag, tag)
+        } else {
+          stack.removeChildTag(TileTankNoDisplay.NBT_BlockTag)
+        }
+      case _ =>
+    }
+  }
+
+  def loadFluid(stack: ItemStack): FluidAmount = {
+    stack.getItem match {
+      case _: ItemBlockTank =>
+        Option(stack.getTag)
+          .map(_.getCompound(TileTankNoDisplay.NBT_BlockTag))
+          .map(_.getCompound(TileTankNoDisplay.NBT_Tank))
+          .map(FluidAmount.fromNBT)
+          .getOrElse(FluidAmount.EMPTY)
+      case _ => FluidAmount.EMPTY
+    }
+  }
+
+  def getCapacity(stack: ItemStack): Int = {
+    stack.getItem match {
+      case t: ItemBlockTank => Utils.toInt(t.blockTank.tier.amount)
+      case _ => 0
     }
   }
 }
