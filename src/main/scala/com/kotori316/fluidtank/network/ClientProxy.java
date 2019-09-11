@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.network;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
@@ -23,6 +24,7 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderTank;
+import com.kotori316.fluidtank.tiles.CATScreen;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 @OnlyIn(Dist.CLIENT)
@@ -43,6 +45,7 @@ public class ClientProxy extends SideProxy {
     @Override
     public void registerTESR() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
+        ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
     }
 
     @Override

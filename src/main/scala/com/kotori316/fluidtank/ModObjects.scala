@@ -1,11 +1,11 @@
 package com.kotori316.fluidtank
 
-import com.kotori316.fluidtank.blocks.{BlockCreativeTank, BlockInvisibleTank, BlockTank}
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankCreative, TileTankNoDisplay}
+import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank}
+import com.kotori316.fluidtank.tiles._
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
-import net.minecraft.tileentity.TileEntityType
+import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.shapes.VoxelShapes
 
@@ -32,16 +32,22 @@ object ModObjects {
   private[this] final val creativeTank = new BlockCreativeTank
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
   final val blockTanksInvisible = woodTankInvisible :: normalTanksInv.toList
+  final val blockCat = new BlockCAT
 
   //---------- TileEntities ----------
 
   final val TANK_TYPE = createTileType(() => new TileTank, blockTanks)
   final val TANK_NO_DISPLAY_TYPE = createTileType(() => new TileTankNoDisplay, blockTanksInvisible)
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
+  final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
 
-  def createTileType[T <: TileTankNoDisplay](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
+  def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
     val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(null)
     t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
     t
   }
+
+  //---------- Containers ----------
+
+  final val CAT_CONTAINER_TYPE = CATContainer.makeType()
 }

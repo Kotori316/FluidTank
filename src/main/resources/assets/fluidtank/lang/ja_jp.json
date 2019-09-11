@@ -12,6 +12,7 @@
   "block.fluidtank.tank_emerald": "エメラルドのタンク",
   "block.fluidtank.tank_star": "星のタンク",
   "block.fluidtank.creative": "無限のタンク",
+  "block.fluidtank.chest_as_tank": "チェストがタンクになる接続器",
   "block.fluidtank.invisible_tank_wood": "不可視の木のタンク",
   "block.fluidtank.invisible_tank_stone": "不可視の石のタンク",
   "block.fluidtank.invisible_tank_copper": "不可視の銅のタンク",
