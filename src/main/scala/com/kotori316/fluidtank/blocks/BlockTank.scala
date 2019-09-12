@@ -13,10 +13,8 @@ import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
-import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
-import net.minecraftforge.items.CapabilityItemHandler
-import net.minecraftforge.items.wrapper.EmptyHandler
+import net.minecraftforge.items.ItemHandlerHelper
 
 class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f)) {
 
@@ -46,7 +44,8 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
           }
           true
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
-          FluidUtil.getFluidHandler(stack).asScala.value.value match {
+          val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)
+          FluidUtil.getFluidHandler(copiedStack).asScala.value.value match {
             case Some(handlerItem) if !stack.isEmpty =>
               if (!worldIn.isRemote) {
                 val tankHandler = tileTank.connection.handler
@@ -64,7 +63,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
                 }
               }
               true
-            case None => false
+            case _ => false
           }
         } else {
           false
