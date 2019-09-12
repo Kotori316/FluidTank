@@ -7,7 +7,6 @@ I don't support any other environment.
 
 **This version requires forge newer than 28.0.74**
 
-## v14.7.4
-* Added new block - Chest as Tank Kotori316 2019/09/11 19:04
-* Fixed - empty item had fluid capability. Kotori316 2019/09/11 18:30
-* Fixed - returns EMPTY instance instead of null when item tank is drained. Kotori316 2019/09/11 18:29
+## v14.7.5
+* Improvement - fill and empty sound is played. Kotori316 2019/09/13 2:42
+* Improvement - stacked containers can be used to fill or drain. Kotori316 2019/09/13 2:42
