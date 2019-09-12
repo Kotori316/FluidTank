@@ -49,18 +49,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
             case Some(handlerItem) if !stack.isEmpty =>
               if (!worldIn.isRemote) {
                 val tankHandler = tileTank.connection.handler
-                val drainAmount = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE).getAmount
-                val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
-                val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
-                if (resultFill.isSuccess) {
-                  playerIn.setHeldItem(handIn, resultFill.getResult)
-                } else {
-                  val fillAmount = handlerItem.fill(tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), IFluidHandler.FluidAction.SIMULATE)
-                  val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
-                  if (resultDrain.isSuccess) {
-                    playerIn.setHeldItem(handIn, resultDrain.getResult)
-                  }
-                }
+                BucketEventHandler.transferFluid(worldIn, pos, playerIn, handIn, tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), stack, handlerItem, tankHandler)
               }
               true
             case _ => false

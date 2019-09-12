@@ -41,18 +41,8 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
           if (!worldIn.isRemote) {
             val direction = state.get(FACING)
             val cat = worldIn.getTileEntity(pos).asInstanceOf[CATTile].getFluidHandler(direction).orElseThrow(() => new AssertionError())
-            val drainAmount = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE).getAmount
-            val itemHandler = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
-            val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, cat, itemHandler, drainAmount, player, true)
-            if (resultFill.isSuccess) {
-              player.setHeldItem(handIn, resultFill.getResult)
-            } else {
-              val fillAmount = handlerItem.fill(cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack, IFluidHandler.FluidAction.SIMULATE)
-              val resultDrain = FluidUtil.tryFillContainerAndStow(stack, cat, itemHandler, fillAmount, player, true)
-              if (resultDrain.isSuccess) {
-                player.setHeldItem(handIn, resultDrain.getResult)
-              }
-            }
+            BucketEventHandler.transferFluid(worldIn, pos, player, handIn, cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack,
+              stack, handlerItem, cat)
           }
           true
         case _ =>

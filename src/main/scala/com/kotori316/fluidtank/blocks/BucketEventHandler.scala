@@ -5,10 +5,17 @@ import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.{BucketItem, ItemStack, Items}
-import net.minecraft.util.math.{BlockRayTraceResult, RayTraceResult}
+import net.minecraft.tags.FluidTags
+import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
+import net.minecraft.util.{Direction, Hand, SoundCategory, SoundEvents}
+import net.minecraft.world.World
 import net.minecraftforge.event.entity.player.FillBucketEvent
 import net.minecraftforge.eventbus.api.Event.Result
+import net.minecraftforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
+import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
+import net.minecraftforge.items.CapabilityItemHandler
+import net.minecraftforge.items.wrapper.EmptyHandler
 
 object BucketEventHandler {
 
@@ -64,4 +71,26 @@ object BucketEventHandler {
       }
     }
   }
+
+  def transferFluid(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
+    val drain = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE)
+    val drainAmount = drain.getAmount
+    val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
+    val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
+    if (resultFill.isSuccess) {
+      val soundEvent = Option(drain.getFluid.getAttributes.getFillSound(drain)).getOrElse(if (drain.getFluid.isIn(FluidTags.LAVA)) SoundEvents.ITEM_BUCKET_FILL_LAVA else SoundEvents.ITEM_BUCKET_FILL)
+      worldIn.playSound(null, pos, soundEvent, SoundCategory.BLOCKS, 1f, 1f)
+      playerIn.setHeldItem(handIn, resultFill.getResult)
+    } else {
+      val fill = toFill
+      val fillAmount = handlerItem.fill(fill, IFluidHandler.FluidAction.SIMULATE)
+      val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
+      if (resultDrain.isSuccess) {
+        val soundEvent = Option(fill.getFluid.getAttributes.getEmptySound(fill)).getOrElse(if (fill.getFluid isIn FluidTags.LAVA) SoundEvents.ITEM_BUCKET_EMPTY_LAVA else SoundEvents.ITEM_BUCKET_EMPTY)
+        worldIn.playSound(null, pos, soundEvent, SoundCategory.BLOCKS, 1f, 1f)
+        playerIn.setHeldItem(handIn, resultDrain.getResult)
+      }
+    }
+  }
+
 }
