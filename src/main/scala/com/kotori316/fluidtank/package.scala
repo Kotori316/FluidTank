@@ -7,6 +7,7 @@ import net.minecraft.fluid.Fluid
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.util.{LazyOptional, NonNullSupplier}
+import net.minecraftforge.fluids.FluidStack
 
 
 package object fluidtank {
@@ -47,4 +48,9 @@ package object fluidtank {
   implicit val showPos: Show[BlockPos] = pos => s"(${pos.getX}, ${pos.getY}, ${pos.getZ})"
   implicit val hashFluid: Hash[Fluid] = Hash.fromUniversalHashCode
   implicit val eqCompoundNbt: Eq[CompoundNBT] = Eq.fromUniversalEquals
+  implicit val hashFluidStack: Hash[FluidStack] = new Hash[FluidStack] {
+    override def hash(x: FluidStack): Int = x.##
+
+    override def eqv(x: FluidStack, y: FluidStack): Boolean = x isFluidStackIdentical y
+  }
 }

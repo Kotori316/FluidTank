@@ -75,7 +75,7 @@ object FluidAmount {
   }
 
   def fromStack(stack: FluidStack): FluidAmount = {
-    val fluid = stack.getFluid
+    val fluid = stack.getRawFluid
     if (fluid == null || fluid == Fluids.EMPTY) {
       FluidAmount.EMPTY
     } else {
