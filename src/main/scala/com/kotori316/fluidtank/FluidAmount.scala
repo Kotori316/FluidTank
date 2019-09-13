@@ -2,6 +2,7 @@ package com.kotori316.fluidtank
 
 import cats._
 import cats.implicits._
+import javax.annotation.Nonnull
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.nbt.CompoundNBT
@@ -11,7 +12,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
 
-case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundNBT]) {
+case class FluidAmount(@Nonnull fluid: Fluid, amount: Long,@Nonnull nbt: Option[CompoundNBT]) {
   def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount, nbt)
 
   def write(tag: CompoundNBT): CompoundNBT = {
@@ -64,7 +65,7 @@ object FluidAmount {
 
   def fromNBT(tag: CompoundNBT): FluidAmount = {
     val fluid = registry.getValue(new ResourceLocation(Option(tag).map(_.getString(NBT_fluid)).getOrElse(Fluids.EMPTY.getRegistryName.toString)))
-    if (fluid == EMPTY.fluid) {
+    if (fluid == null || fluid == EMPTY.fluid) {
       EMPTY
     } else {
       val amount = tag.getLong(NBT_amount)
@@ -75,7 +76,7 @@ object FluidAmount {
 
   def fromStack(stack: FluidStack): FluidAmount = {
     val fluid = stack.getFluid
-    if (fluid == Fluids.EMPTY) {
+    if (fluid == null || fluid == Fluids.EMPTY) {
       FluidAmount.EMPTY
     } else {
       FluidAmount(fluid, stack.getAmount, Option(stack.getTag))

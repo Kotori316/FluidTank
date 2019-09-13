@@ -74,12 +74,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
       return FluidStack.EMPTY
     }
     val copy = fluid.copy()
-    val move = math.min(maxDrain, fluid.getAmount)
-    if (action.execute()) {
-      fluid.setAmount(fluid.getAmount - move)
-      updateTag()
-    }
-    new FluidStack(copy, move)
+    drain(copy, action)
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
