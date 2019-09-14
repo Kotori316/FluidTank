@@ -1,6 +1,8 @@
 package com.kotori316.fluidtank;
 
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
+import java.util.Optional;
 
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
@@ -34,6 +36,7 @@ import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.EasyCondition;
+import com.kotori316.fluidtank.recipes.RecipeAdvancements;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
 
@@ -64,6 +67,9 @@ public class FluidTank {
         CapabilityFluidTank.register();
         FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());
+        if (Optional.ofNullable(System.getenv("target")).map(s -> s.contains("dev")).orElse(Boolean.FALSE)) {
+            RecipeAdvancements.output(Paths.get("generated"));
+        }
     }
 
     @SuppressWarnings("unused")

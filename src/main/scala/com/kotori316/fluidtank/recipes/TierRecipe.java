@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -10,13 +11,14 @@ import java.util.stream.Stream;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.JSONUtils;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -32,17 +34,18 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-public class TierRecipe extends SpecialRecipe {
+public class TierRecipe implements ICraftingRecipe {
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
+    private final ResourceLocation id;
     private final Tiers tier;
     private final Ingredient tankItems;
     private final Ingredient subItems;
     private final ItemStack result;
 
     public TierRecipe(ResourceLocation idIn, Tiers tier) {
-        super(idIn);
+        id = idIn;
         this.tier = tier;
 
         result = JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
@@ -109,6 +112,16 @@ public class TierRecipe extends SpecialRecipe {
     @Override
     public ItemStack getRecipeOutput() {
         return result.copy();
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    @Override
+    public NonNullList<Ingredient> getIngredients() {
+        return allSlot().sorted(Comparator.comparing(Pair::getLeft)).map(Pair::getRight).collect(Collectors.toCollection(NonNullList::create));
     }
 
     public Ingredient getTankItems() {
