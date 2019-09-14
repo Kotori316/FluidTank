@@ -21,4 +21,5 @@ build
 eclipse
 FILES
 Minecraft
+server
 build.bat
