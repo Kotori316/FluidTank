@@ -30,7 +30,7 @@ object Tiers {
   val GOLD = new Tiers(4, 1 << 12, "Gold", "forge:ingots/gold", hasOreRecipe = true)
   val DIAMOND = new Tiers(5, 1 << 14, "Diamond", "forge:gems/diamond", hasOreRecipe = true)
   val EMERALD = new Tiers(6, 1 << 16, "Emerald", "forge:gems/emerald", hasOreRecipe = true)
-  val STAR = new Tiers(7, 1 << 20, "Star", "forge:nether_star", hasOreRecipe = true)
+  val STAR = new Tiers(7, 1 << 20, "Star", "forge:nether_stars", hasOreRecipe = true)
   val CREATIVE = new Tiers(8, 0, "Creative", "Unknown", hasOreRecipe = false) {
     override val amount: Long = Long.MaxValue
   }
