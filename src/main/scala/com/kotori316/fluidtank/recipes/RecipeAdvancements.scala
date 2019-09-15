@@ -4,7 +4,7 @@ import java.io.IOException
 
 import com.google.gson.{GsonBuilder, JsonArray, JsonObject}
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
-import net.minecraft.advancements.criterion.{FilledBucketTrigger, InventoryChangeTrigger, ItemPredicate, RecipeUnlockedTrigger}
+import net.minecraft.advancements.criterion._
 import net.minecraft.advancements.{Advancement, AdvancementRewards, ICriterionInstance, IRequirementsStrategy}
 import net.minecraft.data.{DataGenerator, DirectoryCache, IDataProvider}
 import net.minecraft.item.{Item, Items}
@@ -14,6 +14,7 @@ import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
+import net.minecraftforge.registries.ForgeRegistries
 
 case class RecipeAdvancements(location: ResourceLocation,
                               criterionList: List[(String, ICriterionInstance)] = Nil,
@@ -66,8 +67,11 @@ object RecipeAdvancements {
         .addItemCriterion(Tags.Items.GLASS)
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasOreRecipe => b.tier }
         .map(tier => RecipeAdvancements(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(new Tag[Item](new ResourceLocation(tier.oreName))))
-
-      val recipeAdvancements = TANK_WOOD :: TANK_WOOD_EASY :: TANKS
+      val CAT = RecipeAdvancements(ID("chest_as_tank"))
+        .addItemCriterion(ForgeRegistries.ITEMS.getValue(new ResourceLocation("fluidtank:tank_wood")))
+        .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(MinMaxBounds.IntBound.atLeast(10),
+          MinMaxBounds.IntBound.UNBOUNDED, MinMaxBounds.IntBound.UNBOUNDED, Array(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build())))
+      val recipeAdvancements = CAT :: TANK_WOOD :: TANK_WOOD_EASY :: TANKS
 
       for (recipe <- recipeAdvancements) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/advancements/${recipe.location.getPath}.json")
