@@ -1,8 +1,6 @@
 package com.kotori316.fluidtank;
 
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
@@ -54,6 +52,7 @@ public class FluidTank {
         modEventBus.addListener(this::clientInit);
         modEventBus.addListener(this::init);
         modEventBus.register(Register.class);
+        modEventBus.addListener(RecipeAdvancements::gatherData);
 //        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
 //        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
@@ -67,9 +66,6 @@ public class FluidTank {
         CapabilityFluidTank.register();
         FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());
-        if (Optional.ofNullable(System.getenv("target")).map(s -> s.contains("dev")).orElse(Boolean.FALSE)) {
-            RecipeAdvancements.output(Paths.get("generated"));
-        }
     }
 
     @SuppressWarnings("unused")
