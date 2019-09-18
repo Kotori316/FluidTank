@@ -10,7 +10,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.shapes.ISelectionContext
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
-import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
@@ -40,7 +39,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
         val stack = playerIn.getHeldItem(handIn)
         if (playerIn.getHeldItemMainhand.isEmpty) {
           if (!worldIn.isRemote) {
-            playerIn.sendStatusMessage(new StringTextComponent(tileTank.connection.toString), true)
+            playerIn.sendStatusMessage(tileTank.connection.getTextComponent, true)
           }
           true
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {

@@ -25,6 +25,8 @@
   "block.fluidtank.invisible_tank_diamond": "隐形钻石储罐",
   "block.fluidtank.invisible_tank_emerald": "隐形绿宝石储罐",
   "block.fluidtank.invisible_tank_star": "隐形星级储罐",
+  "chat.fluidtank.connection": "Connection of %1$s : %2$s / %3$s mB, Comparator outputs %4$s.",
+  "chat.fluidtank.connection_creative": "Connection of %1$s in creative, Comparator outputs %2$s.",
   "itemGroup.FluidTank": "液体储罐",
   "fluidtank.recipe.tooltip": "储罐合成配方",
   "config.waila.plugin_fluidtank": "液体储罐",

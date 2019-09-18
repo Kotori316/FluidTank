@@ -25,6 +25,8 @@
   "block.fluidtank.invisible_tank_diamond": "不可視のダイアモンドのタンク",
   "block.fluidtank.invisible_tank_emerald": "不可視のエメラルドのタンク",
   "block.fluidtank.invisible_tank_star": "不可視の星のタンク",
+  "chat.fluidtank.connection": "%1$sのタンク : %2$s / %3$s mB コンパレータの出力 %4$s",
+  "chat.fluidtank.connection_creative": "%1$sの無限タンク コンパレータの出力 %2$s",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "タンクのレシピ",
   "config.waila.plugin_fluidtank": "Fluidtank",

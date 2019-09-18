@@ -25,6 +25,8 @@
   "block.fluidtank.invisible_tank_diamond": "Невидимый алмазный резервуар",
   "block.fluidtank.invisible_tank_emerald": "Невидимый изумрудный резервуар",
   "block.fluidtank.invisible_tank_star": "Невидимый звёздный резервуар",
+  "chat.fluidtank.connection": "Connection of %1$s : %2$s / %3$s mB, Comparator outputs %4$s.",
+  "chat.fluidtank.connection_creative": "Connection of %1$s in creative, Comparator outputs %2$s.",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Рецепт резервуаров",
   "config.waila.plugin_fluidtank": "Fluidtank",

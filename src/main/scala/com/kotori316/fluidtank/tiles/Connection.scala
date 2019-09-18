@@ -7,6 +7,7 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank.EmptyTank
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
+import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}
 import net.minecraft.world.IBlockReader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
@@ -225,6 +226,19 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     else
       s"Connection of $name in creative. Comparator outputs $getComparatorLevel."
   }
+
+  def getTextComponent: ITextComponent = {
+    if (hasCreative)
+      new TranslationTextComponent("chat.fluidtank.connection_creative",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new StringTextComponent("null")),
+        Int.box(getComparatorLevel))
+    else
+      new TranslationTextComponent("chat.fluidtank.connection",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new StringTextComponent("null")),
+        Long.box(amount),
+        Long.box(capacity),
+        Int.box(getComparatorLevel))
+  }
 }
 
 object Connection {
@@ -242,6 +256,8 @@ object Connection {
     override def getComparatorLevel: Int = 0
 
     override def remove(tileTank: TileTankNoDisplay): Unit = ()
+
+    override def getTextComponent = new StringTextComponent(toString)
   }
 
   val stackFromTile = (t: TileTankNoDisplay) => Option(t.tank.getFluid).filter(_.nonEmpty)

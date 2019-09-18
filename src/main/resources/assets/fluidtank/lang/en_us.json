@@ -25,6 +25,8 @@
   "block.fluidtank.invisible_tank_diamond": "Invisible Diamond Tank",
   "block.fluidtank.invisible_tank_emerald": "Invisible Emerald Tank",
   "block.fluidtank.invisible_tank_star": "Invisible Star Tank",
+  "chat.fluidtank.connection": "Connection of %1$s : %2$s / %3$s mB, Comparator outputs %4$s.",
+  "chat.fluidtank.connection_creative": "Connection of %1$s in creative, Comparator outputs %2$s.",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Recipe of tanks",
   "config.waila.plugin_fluidtank": "Fluidtank",
