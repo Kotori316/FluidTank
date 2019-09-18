@@ -1,0 +1,53 @@
+{
+  "multipart": [
+    {"apply": {"model": "fluidtank:block/pipe_center"}},
+    {
+      "when": {"north": "connected"},
+      "apply": {"model": "fluidtank:block/pipe_side", "uvlock": true}
+    },
+    {
+      "when": {"east": "connected"},
+      "apply": {"model": "fluidtank:block/pipe_side", "y": 90, "uvlock": true}
+    },
+    {
+      "when": {"south": "connected"},
+      "apply": {"model": "fluidtank:block/pipe_side", "y": 180, "uvlock": true}
+    },
+    {
+      "when": {"west": "connected"},
+      "apply": {"model": "fluidtank:block/pipe_side", "y": 270, "uvlock": true}
+    },
+    {
+      "when": {"up": "connected"},
+      "apply": {"model": "fluidtank:block/pipe_side", "x": 270, "uvlock": true}
+    },
+    {
+      "when": {"down": "connected"},
+      "apply": {"model": "fluidtank:block/pipe_side", "x": 90, "uvlock": true}
+    },
+    {
+      "when": {"north": "output"},
+      "apply": {"model": "fluidtank:block/pipe_side", "uvlock": true}
+    },
+    {
+      "when": {"east": "output"},
+      "apply": {"model": "fluidtank:block/pipe_side", "y": 90, "uvlock": true}
+    },
+    {
+      "when": {"south": "output"},
+      "apply": {"model": "fluidtank:block/pipe_side", "y": 180, "uvlock": true}
+    },
+    {
+      "when": {"west": "output"},
+      "apply": {"model": "fluidtank:block/pipe_side", "y": 270, "uvlock": true}
+    },
+    {
+      "when": {"up": "output"},
+      "apply": {"model": "fluidtank:block/pipe_side", "x": 270, "uvlock": true}
+    },
+    {
+      "when": {"down": "output"},
+      "apply": {"model": "fluidtank:block/pipe_side", "x": 90, "uvlock": true}
+    }
+  ]
+}

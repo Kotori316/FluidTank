@@ -79,6 +79,7 @@ public class FluidTank {
             JavaConverters.seqAsJavaList(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
             JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat());
+            event.getRegistry().register(ModObjects.blockPipe());
         }
 
         @SubscribeEvent
@@ -86,6 +87,7 @@ public class FluidTank {
             JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat().itemBlock());
+            event.getRegistry().register(ModObjects.blockPipe().itemBlock());
         }
 
         @SubscribeEvent

@@ -2,6 +2,7 @@ package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank}
 import com.kotori316.fluidtank.tiles._
+import com.kotori316.fluidtank.transport.BlockPipe
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
@@ -33,6 +34,7 @@ object ModObjects {
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
   final val blockTanksInvisible = woodTankInvisible :: normalTanksInv.toList
   final val blockCat = new BlockCAT
+  final val blockPipe = new BlockPipe
 
   //---------- TileEntities ----------
 
