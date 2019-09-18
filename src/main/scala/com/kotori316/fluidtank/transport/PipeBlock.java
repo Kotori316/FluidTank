@@ -131,7 +131,12 @@ public class PipeBlock extends Block {
     @SuppressWarnings("deprecation")
     public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState,
                                           IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-        return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), canConnectTo(worldIn, currentPos.offset(facing), facing));
+        Connection value = canConnectTo(worldIn, currentPos.offset(facing), facing);
+        Connection now = stateIn.get(FACING_TO_PROPERTY_MAP.get(facing));
+        if (value.hasConnection() ^ now.hasConnection())
+            return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+        else
+            return stateIn;
     }
 
     private Connection canConnectTo(IWorld worldIn, BlockPos pos, Direction direction) {
@@ -181,6 +186,24 @@ public class PipeBlock extends Block {
         }
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
+        BlockState fromState = worldIn.getBlockState(fromPos);
+        if (fromState.getBlock() == this) {
+            BlockPos vec = fromPos.subtract(pos);
+            Direction direction = Direction.func_218383_a(vec.getX(), vec.getY(), vec.getZ());
+            if (direction != null) {
+                if (fromState.get(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.NO_CONNECTION) {
+                    worldIn.setBlockState(pos, state.with(FACING_TO_PROPERTY_MAP.get(direction), Connection.NO_CONNECTION));
+                } else if (fromState.get(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.CONNECTED) {
+                    worldIn.setBlockState(pos, state.with(FACING_TO_PROPERTY_MAP.get(direction), Connection.CONNECTED));
+                }
+            }
+        }
+    }
+
     public enum Connection implements IStringSerializable {
         NO_CONNECTION,
         INPUT,
@@ -190,6 +213,10 @@ public class PipeBlock extends Block {
         @Override
         public String getName() {
             return name().toLowerCase();
+        }
+
+        public boolean hasConnection() {
+            return this == INPUT || this == OUTPUT || this == CONNECTED;
         }
     }
 }
