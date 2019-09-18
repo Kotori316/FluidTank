@@ -154,7 +154,7 @@ public class PipeBlock extends Block {
 
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new PipeTile();
+        return ModObjects.PIPE_TYPE().create();
     }
 
     @Override
