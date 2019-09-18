@@ -230,11 +230,11 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   def getTextComponent: ITextComponent = {
     if (hasCreative)
       new TranslationTextComponent("chat.fluidtank.connection_creative",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new StringTextComponent("null")),
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslationTextComponent("chat.fluidtank.empty")),
         Int.box(getComparatorLevel))
     else
       new TranslationTextComponent("chat.fluidtank.connection",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new StringTextComponent("null")),
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslationTextComponent("chat.fluidtank.empty")),
         Long.box(amount),
         Long.box(capacity),
         Int.box(getComparatorLevel))
@@ -265,7 +265,7 @@ object Connection {
   def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
     val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
       .toList.lastOption.getOrElse({
-      FluidTank.LOGGER.fatal("No lowest tank", new IllegalArgumentException("No lowest tank"))
+      FluidTank.LOGGER.fatal("No lowest tank", new IllegalStateException("No lowest tank"))
       pos
     })
     val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])

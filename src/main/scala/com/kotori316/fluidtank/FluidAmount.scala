@@ -12,7 +12,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
 
-case class FluidAmount(@Nonnull fluid: Fluid, amount: Long,@Nonnull nbt: Option[CompoundNBT]) {
+case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
   def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount, nbt)
 
   def write(tag: CompoundNBT): CompoundNBT = {
