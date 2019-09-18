@@ -36,3 +36,7 @@ fluidtank.waila.amount=  量: %s mB
 fluidtank.waila.capacity=  容量: %s mB
 fluidtank.waila.comparator=  コンパレータ: %s
 fluidtank.waila.short=%1$s: %2$s/%3$s mB
+
+chat.fluidtank.connection=%1$sのタンク : %2$s / %3$s mB コンパレータの出力 %4$s
+chat.fluidtank.connection_creative=%1$sの無限タンク コンパレータの出力 %2$s
+chat.fluidtank.empty=空

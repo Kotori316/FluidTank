@@ -36,3 +36,7 @@ fluidtank.waila.amount=  Количество: %s mB
 fluidtank.waila.capacity=  Вместимость: %s mB
 fluidtank.waila.comparator=  Компаратор: %s
 fluidtank.waila.short=%1$s: %2$s/%3$s мВ
+
+chat.fluidtank.connection=Connection of %1$s : %2$s / %3$s mB, Comparator outputs %4$s.
+chat.fluidtank.connection_creative=Connection of %1$s in creative, Comparator outputs %2$s.
+chat.fluidtank.empty=null

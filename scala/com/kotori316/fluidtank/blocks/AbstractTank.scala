@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.{EntityLiving, EntityLivingBase}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.TextComponentString
 import net.minecraft.util.{BlockRenderLayer, EnumBlockRenderType, EnumFacing, EnumHand}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -37,7 +36,7 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
     for (stackHandler <- stackHandlerOption;
          tileTank <- Option(worldIn.getTileEntity(pos).asInstanceOf[TileTankNoDisplay])
          if !stack.getItem.isInstanceOf[ItemBlockTank]
-    ) {
+         ) {
       if (SideProxy.isServer(tileTank)) {
         val tankHandler = tileTank.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)
         val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)
@@ -61,7 +60,7 @@ abstract class AbstractTank extends Block(Utils.MATERIAL) with ITileEntityProvid
     if (playerIn.getHeldItemMainhand.isEmpty) {
       if (!worldIn.isRemote) {
         worldIn.getTileEntity(pos) match {
-          case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(new TextComponentString(tileTank.connection.toString), true)
+          case tileTank: TileTankNoDisplay => playerIn.sendStatusMessage(tileTank.connection.getTextComponent, true)
           case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
         }
       }
