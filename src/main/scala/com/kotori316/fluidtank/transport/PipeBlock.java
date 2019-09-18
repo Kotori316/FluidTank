@@ -1,12 +1,15 @@
 package com.kotori316.fluidtank.transport;
 
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -15,8 +18,12 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -31,7 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 
-public class BlockPipe extends Block {
+public class PipeBlock extends Block {
     public static final VoxelShape BOX_AABB = VoxelShapes.create(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
     public static final VoxelShape North_AABB = VoxelShapes.create(0.25, 0.25, 0, 0.75, 0.75, 0.25);
     public static final VoxelShape South_AABB = VoxelShapes.create(0.25, 0.25, .75, 0.75, 0.75, 1);
@@ -46,23 +53,24 @@ public class BlockPipe extends Block {
     public static final EnumProperty<Connection> EAST = EnumProperty.create("east", Connection.class);
     public static final EnumProperty<Connection> UP = EnumProperty.create("up", Connection.class);
     public static final EnumProperty<Connection> DOWN = EnumProperty.create("down", Connection.class);
-    private static final Map<EnumProperty<Connection>, VoxelShape> SHAPE_MAP = Stream.of(
+    @SuppressWarnings("UnstableApiUsage")
+    private static final ImmutableBiMap<EnumProperty<Connection>, VoxelShape> SHAPE_MAP = Stream.of(
         Pair.of(NORTH, North_AABB),
         Pair.of(SOUTH, South_AABB),
         Pair.of(WEST, West_AABB),
         Pair.of(EAST, East_AABB),
         Pair.of(UP, UP_AABB),
         Pair.of(DOWN, Down_AABB)
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-    public static final Map<Direction, EnumProperty<Connection>> FACING_TO_PROPERTY_MAP = Stream.of(
+    ).collect(ImmutableBiMap.toImmutableBiMap(Pair::getKey, Pair::getValue));
+    @SuppressWarnings("UnstableApiUsage")
+    public static final ImmutableBiMap<Direction, EnumProperty<Connection>> FACING_TO_PROPERTY_MAP = Stream.of(
         Pair.of(Direction.NORTH, NORTH),
         Pair.of(Direction.SOUTH, SOUTH),
         Pair.of(Direction.WEST, WEST),
         Pair.of(Direction.EAST, EAST),
         Pair.of(Direction.UP, UP),
         Pair.of(Direction.DOWN, DOWN)
-    ).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-    ;
+    ).collect(ImmutableBiMap.toImmutableBiMap(Pair::getKey, Pair::getValue));
 
     public BlockItem itemBlock() {
         return blockItem;
@@ -70,7 +78,7 @@ public class BlockPipe extends Block {
 
     private final BlockItem blockItem;
 
-    public BlockPipe() {
+    public PipeBlock() {
         super(Block.Properties.create(Material.MISCELLANEOUS)
             .hardnessAndResistance(0.5f));
         setRegistryName(FluidTank.modID, "pipe");
@@ -136,6 +144,40 @@ public class BlockPipe extends Block {
             } else {
                 return Connection.NO_CONNECTION;
             }
+        }
+    }
+
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return new PipeTile();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (player.getHeldItem(handIn).getItem() == this.blockItem) return false;
+        Vec3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
+        Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
+            AxisAlignedBB box = e.getValue().getBoundingBox();
+            return box.minX <= d.x && box.maxX >= d.x && box.minY <= d.y && box.maxY >= d.y && box.minZ <= d.z && box.maxZ >= d.z;
+        };
+        Optional<BlockState> blockState = SHAPE_MAP.entrySet().stream()
+            .filter(predicate)
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .filter(p -> worldIn.getBlockState(pos.offset(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
+            .map(state::cycle);
+        if (blockState.isPresent()) {
+            if (!worldIn.isRemote)
+                worldIn.setBlockState(pos, blockState.get());
+            return true;
+        } else {
+            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
         }
     }
 

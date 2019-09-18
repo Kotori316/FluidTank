@@ -92,10 +92,7 @@ public class FluidTank {
 
         @SubscribeEvent
         public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
-            event.getRegistry().register(ModObjects.TANK_TYPE());
-            event.getRegistry().register(ModObjects.TANK_NO_DISPLAY_TYPE());
-            event.getRegistry().register(ModObjects.TANK_CREATIVE_TYPE());
-            event.getRegistry().register(ModObjects.CAT_TYPE());
+            JavaConverters.seqAsJavaList(ModObjects.getTileTypes()).forEach(event.getRegistry()::register);
         }
 
         @SubscribeEvent
