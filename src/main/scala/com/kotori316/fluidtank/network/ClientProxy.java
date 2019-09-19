@@ -16,7 +16,7 @@ import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
-import scala.collection.JavaConverters;
+import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
@@ -65,7 +65,7 @@ public class ClientProxy extends SideProxy {
     @SubscribeEvent
     public void onBake(ModelBakeEvent event) {
         event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
-        JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
+        CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
             ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
 //            IBakedModel model = event.getModelManager().getModel(modelLocation);
             event.getModelRegistry().put(modelLocation, MODEL_TANK);

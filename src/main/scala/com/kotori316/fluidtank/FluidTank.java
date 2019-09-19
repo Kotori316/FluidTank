@@ -22,7 +22,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import scala.collection.JavaConverters;
+import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.ContentTankSerializer;
@@ -76,23 +76,23 @@ public class FluidTank {
     public static class Register {
         @SubscribeEvent
         public static void registerBlocks(RegistryEvent.Register<Block> event) {
-            JavaConverters.seqAsJavaList(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
-            JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).forEach(event.getRegistry()::register);
+            CollectionConverters.asJava(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
+            CollectionConverters.asJava(ModObjects.blockTanksInvisible()).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat());
             event.getRegistry().register(ModObjects.blockPipe());
         }
 
         @SubscribeEvent
         public static void registerItems(RegistryEvent.Register<Item> event) {
-            JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
-            JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
+            CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
+            CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat().itemBlock());
             event.getRegistry().register(ModObjects.blockPipe().itemBlock());
         }
 
         @SubscribeEvent
         public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
-            JavaConverters.seqAsJavaList(ModObjects.getTileTypes()).forEach(event.getRegistry()::register);
+            CollectionConverters.asJava(ModObjects.getTileTypes()).forEach(event.getRegistry()::register);
         }
 
         @SubscribeEvent

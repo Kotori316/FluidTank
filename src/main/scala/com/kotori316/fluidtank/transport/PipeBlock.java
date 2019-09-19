@@ -118,6 +118,8 @@ public class PipeBlock extends Block {
     public BlockState getStateForPlacement(BlockItemUseContext context) {
         World worldIn = context.getWorld();
         BlockPos pos = context.getPos();
+//        return FACING_TO_PROPERTY_MAP.entrySet().stream()
+//        .reduce(this.getDefaultState(), (s, e) -> s.with(e.getValue(), canConnectTo(worldIn, pos.offset(e.getKey()), e.getKey())), (s1, s2) -> s1);
         return this.getDefaultState()
             .with(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
             .with(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))

@@ -274,7 +274,7 @@ object TileTankNoDisplay {
   def makeConnectionOnChunkLoad(event: ChunkEvent.Load): Unit = {
     val chunk = event.getChunk
     if (event.getWorld != null && !event.getWorld.isRemote && !chunk.getTileEntitiesPos.isEmpty) {
-      import scala.collection.JavaConverters
+      import scala.jdk.CollectionConverters
       val poses = JavaConverters.asScalaSet(chunk.getTileEntitiesPos)
       val tanks = poses.map(chunk.getTileEntity).collect { case tank: TileTankNoDisplay => tank }
       // Getting tiles via world IS NOT AVAILABLE.

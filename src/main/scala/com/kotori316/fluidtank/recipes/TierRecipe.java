@@ -23,7 +23,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
-import scala.collection.JavaConverters;
+import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidAmount;
@@ -48,10 +48,10 @@ public class TierRecipe implements ICraftingRecipe {
         id = idIn;
         this.tier = tier;
 
-        result = JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
+        result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
         Set<Tiers> tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
-        Set<BlockTank> tanks = JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
-        Set<BlockTank> invTanks = JavaConverters.seqAsJavaList(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
+        Set<BlockTank> tanks = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
+        Set<BlockTank> invTanks = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         tankItems = Ingredient.fromStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
         subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().oreNameMap().apply(tier))))
             .map(Ingredient::fromTag)
