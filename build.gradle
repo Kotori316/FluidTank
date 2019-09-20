@@ -92,6 +92,11 @@ repositories {
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
+    maven {
+        // Curse Forge
+        name 'Curse Forge'
+        url 'https://minecraft.curseforge.com/api/maven/'
+    }
 }
 
 dependencies {
@@ -109,6 +114,8 @@ dependencies {
 
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 //    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
+    implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
+    // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
 
     compileOnly ("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
 }
