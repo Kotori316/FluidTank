@@ -28,7 +28,7 @@ public class FluidTankJeiPlugin implements IModPlugin {
             .map(TierRecipe.class::cast)
             .collect(Collectors.toList());
 
-        registration.addRecipes(recipeExtensions, VanillaRecipeCategoryUid.CRAFTING);
+//        registration.addRecipes(recipeExtensions, VanillaRecipeCategoryUid.CRAFTING);
     }
 
 

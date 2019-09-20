@@ -41,7 +41,7 @@ object Tiers {
   val LEAD = new Tiers(3, 1 << 8, "Lead", "forge:ingots/lead", hasOreRecipe = true)
   val SILVER = new Tiers(3, 1 << 10, "Silver", "forge:ingots/silver", hasOreRecipe = true)
 
-  val rankList = list.groupBy(_.rank).map { case (r, ts) => (r, ts.size) }
+  val rankList = list.groupBy(_.rank).toList.map { case (r, ts) => (r, ts.size) }.toMap
   val nameToTierMap = list.map(t => (t.toString, t)).toMap
 
   def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
