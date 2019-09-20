@@ -118,6 +118,10 @@ dependencies {
     // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
 
     compileOnly ("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
+
+    // Test Dependencies.
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.4.2")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.2")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
