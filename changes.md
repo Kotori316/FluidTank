@@ -8,6 +8,7 @@ I don't support any other environment.
 **This version requires forge newer than 28.1.0 (Forge Recommend version)**
 
 ## v14.7.6
+* Update Chinese lang file.
 * Changed lang key and localized empty fluid name. Kotori316 2019/09/18 14:50
 * Localized message shown when tank is right clicked. Kotori316 2019/09/18 12:26
 * Added cat recipe hint Kotori316 2019/09/15 23:21
