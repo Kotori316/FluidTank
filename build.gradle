@@ -1,3 +1,5 @@
+import java.util.function.BiConsumer
+
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
@@ -117,7 +119,7 @@ dependencies {
     implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
     // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
 
-    compileOnly ("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
+    compileOnly("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
 
     // Test Dependencies.
     testCompile("org.junit.jupiter:junit-jupiter-api:5.4.2")
@@ -206,7 +208,7 @@ githubRelease {
     releaseAssets = files(jar.archivePath)
 }
 
-task signJar2(){
+task signJar2() {
     doLast {
         ant.signjar(
                 jar: jar.archivePath,
@@ -247,5 +249,12 @@ task checkMethod() {
         println("hasGitHubToken ${project.hasProperty("githubToken")}")
         println("hasSignToken ${project.hasProperty("keyStore")}")
         println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}")
+        println("*" * 20)
+        System.properties.forEach(new BiConsumer<Object, Object>() {
+            @Override
+            void accept(Object o, Object o2) {
+                println("$o=$o2")
+            }
+        })
     }
 }
