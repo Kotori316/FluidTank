@@ -71,7 +71,10 @@ object RecipeAdvancements {
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(new ResourceLocation("fluidtank:tank_wood")))
         .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(MinMaxBounds.IntBound.atLeast(10),
           MinMaxBounds.IntBound.UNBOUNDED, MinMaxBounds.IntBound.UNBOUNDED, Array(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build())))
-      val recipeAdvancements = CAT :: TANK_WOOD :: TANK_WOOD_EASY :: TANKS
+      val PIPE = RecipeAdvancements(ID("pipe"))
+        .addItemCriterion(Tags.Items.ENDER_PEARLS)
+        .addItemCriterion(ForgeRegistries.ITEMS.getValue(new ResourceLocation("fluidtank:tank_wood")))
+      val recipeAdvancements = PIPE :: CAT :: TANK_WOOD :: TANK_WOOD_EASY :: TANKS
 
       for (recipe <- recipeAdvancements) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/advancements/${recipe.location.getPath}.json")

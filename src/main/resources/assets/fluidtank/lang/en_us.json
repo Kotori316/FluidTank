@@ -25,6 +25,7 @@
   "block.fluidtank.invisible_tank_diamond": "Invisible Diamond Tank",
   "block.fluidtank.invisible_tank_emerald": "Invisible Emerald Tank",
   "block.fluidtank.invisible_tank_star": "Invisible Star Tank",
+  "block.fluidtank.pipe": "Fluid Pipe",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Recipe of tanks",
   "config.waila.plugin_fluidtank": "Fluidtank",

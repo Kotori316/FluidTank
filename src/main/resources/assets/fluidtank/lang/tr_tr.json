@@ -25,6 +25,7 @@
   "block.fluidtank.invisible_tank_diamond": "Görünmez Elmas Tank",
   "block.fluidtank.invisible_tank_emerald": "Görünmez Zümrüt Tank",
   "block.fluidtank.invisible_tank_star": "Görünmez Yıldız Tank",
+  "block.fluidtank.pipe": "Fluid Pipe",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Tankların Tarifleri",
   "config.waila.plugin_fluidtank": "Fluidtank",

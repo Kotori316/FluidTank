@@ -23,6 +23,7 @@ class PipeConnectionTest {
       t(1, 1) -> new Holder,
       t(0, 2) -> new Holder,
       t(1, 2) -> new Holder,
+      t(1, 3) -> new Holder,
     )
     val c1 = PipeConnection[(Int, Int)](Set(t(0, 1)), { case (p, c) => map.get(p).foreach(_.setConnection(c)) }, _ => false)
     assertTrue(c1.poses.contains(t(0, 1)))
@@ -35,6 +36,9 @@ class PipeConnectionTest {
     assertEquals(c2, map(t(0, 1)).connection)
     assertEquals(c2, map(t(1, 1)).connection)
 
+    val c3 = PipeConnection.empty[(Int, Int)]({ case (p, c) => map.get(p).foreach(_.setConnection(c)) }, p => p._2 == 3)
+    val c4 = map.keys.foldLeft(c3) { case (c, p) => c add p }
+    assertTrue(map.values.forall(_.connection == c4))
   }
 
   @inline

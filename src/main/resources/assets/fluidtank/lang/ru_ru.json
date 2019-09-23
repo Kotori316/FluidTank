@@ -25,6 +25,7 @@
   "block.fluidtank.invisible_tank_diamond": "Невидимый алмазный резервуар",
   "block.fluidtank.invisible_tank_emerald": "Невидимый изумрудный резервуар",
   "block.fluidtank.invisible_tank_star": "Невидимый звёздный резервуар",
+  "block.fluidtank.pipe": "Fluid Pipe",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Рецепт резервуаров",
   "config.waila.plugin_fluidtank": "Fluidtank",
