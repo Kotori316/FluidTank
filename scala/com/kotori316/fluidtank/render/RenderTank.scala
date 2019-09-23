@@ -22,6 +22,7 @@ class RenderTank extends FastTESR[TileTank] {
         else 0x00f000f0
         buffer.setTranslation(x, y, z)
         tank.box.render(buffer, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(new Box.LightValue(brightness))
+        buffer.setTranslation(0, 0, 0)
       }
     }
 
