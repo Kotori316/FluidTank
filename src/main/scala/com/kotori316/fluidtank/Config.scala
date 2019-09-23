@@ -35,7 +35,7 @@ object Config {
 
     private val oreNameMapValue = Tiers.list.filter(_.hasOreRecipe).map { tier =>
       (tier, builder.worldRestart().comment(s"Set OreDict name of items to craft $tier tank.")
-        .define(tier + "OreName", tier.oreName))
+        .define(tier.toString + "OreName", tier.oreName))
     }.toMap
 
     val easyRecipe = builder.comment("True to use easy recipe.").define("easyRecipe", false)
@@ -55,7 +55,7 @@ object Config {
       require(Tiers.list.forall(oreNameMap.contains))
     }
 
-    def oreNameMap = oreNameMapValue.mapValues(_.get()) ++ Tiers.list.filterNot(_.hasOreRecipe).map(t => (t, t.oreName)).toMap
+    def oreNameMap = oreNameMapValue.view.mapValues(_.get()).toMap ++ Tiers.list.filterNot(_.hasOreRecipe).map(t => (t, t.oreName)).toMap
   }
 
 }

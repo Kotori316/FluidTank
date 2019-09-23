@@ -4,8 +4,8 @@ import java.util.Collections
 
 import net.minecraft.nbt.CompoundNBT
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 class Tiers private(val rank: Int, buckets: Int, override val toString: String, val oreName: String, val hasOreRecipe: Boolean) {
   val amount: Long = buckets * 1000

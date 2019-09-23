@@ -2,6 +2,7 @@ package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank}
 import com.kotori316.fluidtank.tiles._
+import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
@@ -33,19 +34,25 @@ object ModObjects {
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
   final val blockTanksInvisible = woodTankInvisible :: normalTanksInv.toList
   final val blockCat = new BlockCAT
+  final val blockPipe = new PipeBlock
 
   //---------- TileEntities ----------
 
+  private[this] final var types: List[TileEntityType[_ <: TileEntity]] = Nil
   final val TANK_TYPE = createTileType(() => new TileTank, blockTanks)
   final val TANK_NO_DISPLAY_TYPE = createTileType(() => new TileTankNoDisplay, blockTanksInvisible)
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
   final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
+  final val PIPE_TYPE = createTileType(() => new PipeTile, List(blockPipe))
 
   def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
     val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(null)
     t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
+    types = t :: types
     t
   }
+
+  def getTileTypes = types
 
   //---------- Containers ----------
 

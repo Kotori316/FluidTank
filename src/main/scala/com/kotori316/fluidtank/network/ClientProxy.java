@@ -16,22 +16,25 @@ import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
-import scala.collection.JavaConverters;
+import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
+import com.kotori316.fluidtank.render.RenderPipe;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.CATScreen;
 import com.kotori316.fluidtank.tiles.TileTank;
+import com.kotori316.fluidtank.transport.PipeTile;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientProxy extends SideProxy {
 
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
     public static final RenderTank RENDER_TANK = new RenderTank();
+    public static final RenderPipe RENDER_PIPE = new RenderPipe();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
@@ -45,6 +48,7 @@ public class ClientProxy extends SideProxy {
     @Override
     public void registerTESR() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
+        ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
     }
 
@@ -65,7 +69,7 @@ public class ClientProxy extends SideProxy {
     @SubscribeEvent
     public void onBake(ModelBakeEvent event) {
         event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
-        JavaConverters.seqAsJavaList(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
+        CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
             ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
 //            IBakedModel model = event.getModelManager().getModel(modelLocation);
             event.getModelRegistry().put(modelLocation, MODEL_TANK);

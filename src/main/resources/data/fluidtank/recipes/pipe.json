@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gtg",
+    " e ",
+    "gtg"
+  ],
+  "key": {
+    "g": {
+      "tag": "forge:glass"
+    },
+    "e": {
+      "tag": "forge:ender_pearls"
+    },
+    "t": {
+      "item": "fluidtank:tank_wood"
+    }
+  },
+  "result": {
+    "item": "fluidtank:pipe"
+  }
+}
