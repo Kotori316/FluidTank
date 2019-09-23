@@ -233,7 +233,15 @@ public class PipeBlock extends Block {
         }
 
         public boolean hasConnection() {
-            return this == INPUT || this == OUTPUT || this == CONNECTED;
+            return this == CONNECTED || isInput() || isOutput();
+        }
+
+        public boolean isOutput() {
+            return this == OUTPUT;
+        }
+
+        public boolean isInput() {
+            return this == INPUT;
         }
     }
 }
