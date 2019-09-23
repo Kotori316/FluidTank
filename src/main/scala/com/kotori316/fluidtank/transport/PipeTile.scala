@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.transport
 import cats.Eval
 import cats.data.OptionT
 import cats.implicits._
+import com.kotori316.fluidtank.tiles.Tiers
 import com.kotori316.fluidtank.transport.PipeConnection._
 import com.kotori316.fluidtank.{FluidTank, ModObjects, _}
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
@@ -22,7 +23,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
   }, p =>
     getWorld.getBlockState(p) match {
       case s if s.getBlock == ModObjects.blockPipe =>
-        PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(pr => s.get(pr) == PipeBlock.Connection.OUTPUT)
+        PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(pr => s.get(pr).isOutput)
       case _ => false
     }
   )
@@ -33,19 +34,22 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
         makeConnection()
       import scala.jdk.CollectionConverters._
       PipeBlock.FACING_TO_PROPERTY_MAP.asScala.toSeq.flatMap { case (direction, value) =>
-        if (getBlockState.get(value) == PipeBlock.Connection.INPUT) {
+        if (getBlockState.get(value).isInput) {
+          val sourcePos = pos.offset(direction)
           val c = for {
-            t <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos.offset(direction))))
+            t <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(sourcePos)))
             cap <- t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
-          } yield cap
+          } yield cap -> sourcePos
           c.toList
         } else {
           List.empty
         }
-      }.foreach { f =>
+      }.foreach { case (f, sourcePos) =>
         for {
           p <- connection.outputs
           (direction, pos) <- Direction.values().map(f => f -> p.offset(f))
+          if pos != sourcePos
+          if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
           dest <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos)))
             .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
             .toList
@@ -85,5 +89,5 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
 }
 
 object PipeTile {
-  val amountPerTick = 200
+  final val amountPerTick = Utils.toInt(Tiers.WOOD.amount)
 }
