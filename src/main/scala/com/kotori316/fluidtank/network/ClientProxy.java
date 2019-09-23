@@ -23,15 +23,18 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
+import com.kotori316.fluidtank.render.RenderPipe;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.CATScreen;
 import com.kotori316.fluidtank.tiles.TileTank;
+import com.kotori316.fluidtank.transport.PipeTile;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientProxy extends SideProxy {
 
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
     public static final RenderTank RENDER_TANK = new RenderTank();
+    public static final RenderPipe RENDER_PIPE = new RenderPipe();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
@@ -45,6 +48,7 @@ public class ClientProxy extends SideProxy {
     @Override
     public void registerTESR() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
+        ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
     }
 

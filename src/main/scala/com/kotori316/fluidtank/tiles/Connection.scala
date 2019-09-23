@@ -34,24 +34,24 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
         fluidAmount.setAmount(total)
       } else {
-        def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[Vector[String], FluidAmount] = {
+        def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[Chain[String], FluidAmount] = {
           if (toFill.isEmpty) {
-            Writer.tell(Vector("Filled")).map(_ => filled)
+            Writer.tell("Filled".pure[Chain]).map(_ => filled)
           } else {
             tanks match {
               case Nil =>
                 val message = if (filled.isEmpty) s"Filling $toFill failed." else s"Filled, Amount: ${filled.show}"
-                Writer.tell(Vector(message)).map(_ => filled)
+                Writer.tell(message.pure[Chain]).map(_ => filled)
               case head :: tail =>
                 val fill = head.tank.fill(toFill, doFill)
-                Writer.tell(Vector(s"Filled ${fill.show} to ${head.getPos.show}")).flatMap(_ => internal(tail, toFill - fill, filled + fill))
+                Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[Chain]).flatMap(_ => internal(tail, toFill - fill, filled + fill))
             }
           }
         }
 
         internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
           case (messages, filled) =>
-            FluidTank.LOGGER.debug((() => messages.mkString(", ") + (if (doFill) " Real" else " Simulate")): org.apache.logging.log4j.util.Supplier[String])
+            FluidTank.LOGGER.debug((() => messages.mkString_(", ") + (if (doFill) " Real" else " Simulate")): org.apache.logging.log4j.util.Supplier[String])
             filled
         }
       }
@@ -65,7 +65,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
      * @return the fluid and amount that is (or will be) drained.
      */
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = {
-      if (fluidAmount.amount < min) return FluidAmount.EMPTY
+      if (fluidAmount.amount < min || fluidType.isEmpty) return FluidAmount.EMPTY
       if (hasCreative) {
         if (FluidAmount.EMPTY.fluidEqual(fluidAmount)) {
           val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos.show} in creative connection." + (if (doDrain) " Real" else " Simulate")

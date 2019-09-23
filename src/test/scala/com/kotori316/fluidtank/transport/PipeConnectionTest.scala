@@ -13,7 +13,7 @@ class PipeConnectionTest {
   @Test
   def dummy(): Unit = {
     assertEquals(Math.sqrt(3), new BlockPos(1, 1, 1).norm)
-    assertTrue(PipeConnection.empty[BlockPos]({ case (_, _) => () }).isEmpty)
+    assertTrue(PipeConnection.empty[BlockPos]({ case (_, _) => () }, _ => false).isEmpty)
   }
 
   @Test
@@ -24,7 +24,7 @@ class PipeConnectionTest {
       t(0, 2) -> new Holder,
       t(1, 2) -> new Holder,
     )
-    val c1 = PipeConnection[(Int, Int)](Set(t(0, 1)), { case (p, c) => map.get(p).foreach(_.setConnection(c)) })
+    val c1 = PipeConnection[(Int, Int)](Set(t(0, 1)), { case (p, c) => map.get(p).foreach(_.setConnection(c)) }, _ => false)
     assertTrue(c1.poses.contains(t(0, 1)))
     assertTrue(map(t(0, 1)).connection != null)
     assertEquals(c1, map(t(0, 1)).connection)

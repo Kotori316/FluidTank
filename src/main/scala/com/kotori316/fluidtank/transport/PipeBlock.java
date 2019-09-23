@@ -180,8 +180,10 @@ public class PipeBlock extends Block {
             .filter(p -> worldIn.getBlockState(pos.offset(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
             .map(state::cycle);
         if (blockState.isPresent()) {
-            if (!worldIn.isRemote)
+            if (!worldIn.isRemote) {
                 worldIn.setBlockState(pos, blockState.get());
+                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(PipeTile::connectorUpdate);
+            }
             return true;
         } else {
             return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
@@ -206,11 +208,24 @@ public class PipeBlock extends Block {
         }
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (state.getBlock() != newState.getBlock()) {
+            TileEntity entity = worldIn.getTileEntity(pos);
+            if (entity instanceof PipeTile) {
+                PipeTile tile = (PipeTile) entity;
+                tile.connection().remove(pos);
+            }
+            super.onReplaced(state, worldIn, pos, newState, isMoving);
+        }
+    }
+
     public enum Connection implements IStringSerializable {
         NO_CONNECTION,
+        CONNECTED,
         INPUT,
-        OUTPUT,
-        CONNECTED;
+        OUTPUT;
 
         @Override
         public String getName() {
