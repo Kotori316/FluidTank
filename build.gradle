@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit
+
 buildscript {
     repositories {
         jcenter()
@@ -152,11 +154,12 @@ curseforge {
         javaVersionAutoDetect = false
     }
 }
+final String branch = 'master'
 
 githubRelease {
     repo = 'FluidTank'
     token = project.hasProperty("githubToken") ? project.getProperty("githubToken") : ""
-    targetCommitish = 'master'
+    targetCommitish = branch
     body {
         file("changes.md").text
     }
@@ -170,4 +173,15 @@ task checkMethod() << {
     System.out.println("Name $project.name")
     System.out.println("BaseName $archivesBaseName")
     System.out.println("ModVersion ${getProperty("modversion")}")
+    System.out.println("Commit: ${getCommit(branch)}")
+}
+
+static String getCommit(String branch) {
+    ProcessBuilder builder = new ProcessBuilder("git", "rev-parse", branch)
+    def process = builder.start()
+    process.waitFor(1L, TimeUnit.SECONDS)
+    def reader = new BufferedReader(new InputStreamReader(process.getInputStream()))
+    def commit = reader.readLine()
+    reader.close()
+    return commit
 }
