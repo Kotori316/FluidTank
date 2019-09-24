@@ -24,6 +24,8 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   )
 
   class TankHandler extends FluidAmount.Tank {
+    type LogType[A] = Chain[A]
+
     /**
      * @return Fluid that was accepted by the tank.
      */
@@ -37,24 +39,24 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
         fluidAmount.setAmount(total)
       } else {
-        def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[Chain[String], FluidAmount] = {
+        def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[LogType[String], FluidAmount] = {
           if (toFill.isEmpty) {
-            Writer.tell("Filled".pure[Chain]).map(_ => filled)
+            Writer.tell("Filled".pure[LogType]).map(_ => filled)
           } else {
             tanks match {
               case Nil =>
                 val message = if (filled.isEmpty) s"Filling $toFill failed." else s"Filled, Amount: ${filled.show}"
-                Writer.tell(message.pure[Chain]).map(_ => filled)
+                Writer.apply(message.pure[LogType], filled)
               case head :: tail =>
                 val fill = head.tank.fill(toFill, doFill)
-                Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[Chain]).flatMap(_ => internal(tail, toFill - fill, filled + fill))
+                Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[LogType]).flatMap(_ => internal(tail, toFill - fill, filled + fill))
             }
           }
         }
 
         internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
           case (messages, filled) =>
-            FluidTank.LOGGER.debug((() => messages.mkString_(", ") + (if (doFill) " Real" else " Simulate")): org.apache.logging.log4j.util.Supplier[String])
+            log(doFill, messages)
             filled
         }
       }
@@ -71,32 +73,41 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       if (fluidAmount.amount < min || fluidType.isEmpty) return FluidAmount.EMPTY
       if (hasCreative) {
         if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidType.fluidEqual(fluidAmount)) {
-          val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos.show} in creative connection." + (if (doDrain) " Real" else " Simulate")
-          FluidTank.LOGGER.debug(m)
+          val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos.show} in creative connection."
+          log(doDrain, m.pure[LogType])
           return fluidType.setAmount(fluidAmount.amount)
         } else {
           return FluidAmount.EMPTY
         }
       }
 
-      def internal(tanks: List[TileTankNoDisplay], toDrain: FluidAmount, drained: FluidAmount): Writer[Vector[String], FluidAmount] = {
+      def internal(tanks: List[TileTankNoDisplay], toDrain: FluidAmount, drained: FluidAmount): Writer[LogType[String], FluidAmount] = {
         if (toDrain.amount <= 0) {
           val message = if (drained.isEmpty) "Drain failed." else "Drain Finished."
-          for (_ <- Writer.tell(Vector(message))) yield drained
+          Writer.apply(message.pure[LogType], drained)
         } else {
           tanks match {
-            case Nil => for (_ <- Writer.tell(Vector(s"Drain Finished. Total amount is ${drained.show}"))) yield drained
+            case Nil => for (_ <- Writer.tell(s"Drain Finished. Total amount is ${drained.show}".pure[LogType])) yield drained
             case ::(head, tl) =>
               val drain = head.tank.drain(toDrain, doDrain)
-              Writer.tell(Vector(s"Drained ${drain.show} from ${head.getPos.show}")) flatMap { _ => internal(tl, toDrain - drain, drained + drain) }
+              Writer.tell(s"Drained ${drain.show} from ${head.getPos.show}".pure[LogType]) flatMap { _ => internal(tl, toDrain - drain, drained + drain) }
           }
         }
       }
 
       internal(tankSeq(fluidType).reverse.toList, fluidAmount, FluidAmount.EMPTY).run match {
-        case (vec, drained) =>
-          FluidTank.LOGGER.debug(vec.mkString(", ") + (if (doDrain) " Real" else " Simulate"))
+        case (messages, drained) =>
+          log(doDrain, messages)
           drained
+      }
+    }
+
+    private def log(real: Boolean, messages: LogType[String]): Unit = {
+      import org.apache.logging.log4j.util.Supplier
+      if (real) {
+        FluidTank.LOGGER.debug((() => messages.mkString_(", ") + " Real"): Supplier[String])
+      } else {
+        FluidTank.LOGGER.trace((() => messages.mkString_(", ") + " Simulate"): Supplier[String])
       }
     }
 
@@ -266,10 +277,10 @@ object Connection {
 
   def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
     val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
-      .toList.lastOption.getOrElse({
+      .toList.lastOption.getOrElse {
       FluidTank.LOGGER.fatal("No lowest tank", new IllegalStateException("No lowest tank"))
       pos
-    })
+    }
     val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
       .toList.map(_.asInstanceOf[TileTankNoDisplay])
     tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
