@@ -71,7 +71,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
 
   override def drain(maxDrain: Int, doDrain: Boolean): FluidStack = {
     init()
-    if (fluid == null || maxDrain <= 0) {
+    if (fluid == null || maxDrain <= 0 || stack.getCount > 1) {
       return null
     }
     val copy = fluid.copy()
