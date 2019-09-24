@@ -32,6 +32,7 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     if (te.getBlockState.get(PipeBlock.DOWN).hasConnection)
       RenderPipe.Down_AABB.render(buffer, texture, 128, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)
 
+    buffer.setTranslation(0, 0, 0)
     Minecraft.getInstance.getProfiler.endSection()
   }
 }
