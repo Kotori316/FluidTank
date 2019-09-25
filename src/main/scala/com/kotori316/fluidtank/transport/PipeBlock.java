@@ -232,16 +232,20 @@ public class PipeBlock extends Block {
             return name().toLowerCase();
         }
 
+        public boolean is(Connection c1, Connection... cs) {
+            return this == c1 || Arrays.asList(cs).contains(this);
+        }
+
         public boolean hasConnection() {
-            return this == CONNECTED || isInput() || isOutput();
+            return is(CONNECTED, INPUT, OUTPUT);
         }
 
         public boolean isOutput() {
-            return this == OUTPUT;
+            return is(OUTPUT);
         }
 
         public boolean isInput() {
-            return this == INPUT;
+            return is(INPUT);
         }
     }
 }
