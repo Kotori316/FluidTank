@@ -17,7 +17,13 @@ case class PipeConnection[A](poses: Set[A], updateFunc: (A, PipeConnection[A]) =
 
   def add(a: A): PipeConnection[A] = this.copy(poses = poses + a)
 
-  def remove(a: A): Unit = {
+  def remove(a: A): PipeConnection[A] = {
+    val empty = PipeConnection.empty(updateFunc, isOutput)
+    poses.find(_ == a).foreach(p => updateFunc(p, empty))
+    this.copy(poses - a)
+  }
+
+  def reset(): Unit = {
     val empty = PipeConnection.empty(updateFunc, isOutput)
     poses.foreach(p => updateFunc.apply(p, empty))
   }

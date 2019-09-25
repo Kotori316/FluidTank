@@ -89,7 +89,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
   }
 
   def connectorUpdate(): Unit = {
-
+    connection.reset()
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {

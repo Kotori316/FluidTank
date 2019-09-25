@@ -138,18 +138,24 @@ public class PipeBlock extends Block {
     @SuppressWarnings("deprecation")
     public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState,
                                           IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-        Connection value = canConnectTo(worldIn, currentPos.offset(facing), facing);
+        Connection value;
         Connection now = stateIn.get(FACING_TO_PROPERTY_MAP.get(facing));
-        if (value.is(Connection.NO_CONNECTION)) {
-            if (facingState.getMaterial() == Material.AIR) {
-                return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
-            } else {
-                return stateIn;
-            }
-        } else if (value.hasConnection() ^ now.hasConnection())
+        if (facingState.getBlock() == this) {
+            value = facingState.get(FACING_TO_PROPERTY_MAP.get(facing.getOpposite()));
             return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
-        else
-            return stateIn;
+        } else {
+            value = canConnectTo(worldIn, currentPos.offset(facing), facing);
+            if (value.is(Connection.NO_CONNECTION)) {
+                if (facingState.getMaterial() == Material.AIR) {
+                    return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+                } else {
+                    return stateIn;
+                }
+            } else if (value.hasConnection() ^ now.hasConnection())
+                return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+            else
+                return stateIn;
+        }
     }
 
     private Connection canConnectTo(IWorld worldIn, BlockPos pos, Direction direction) {
@@ -191,16 +197,21 @@ public class PipeBlock extends Block {
             AxisAlignedBB box = e.getValue().getBoundingBox();
             return box.minX <= d.x && box.maxX >= d.x && box.minY <= d.y && box.maxY >= d.y && box.minZ <= d.z && box.maxZ >= d.z;
         };
-        Optional<BlockState> blockState = SHAPE_MAP.entrySet().stream()
+        Optional<Pair<BlockState, Boolean>> blockState = SHAPE_MAP.entrySet().stream()
             .filter(predicate)
             .map(Map.Entry::getKey)
             .findFirst()
-            .filter(p -> worldIn.getBlockState(pos.offset(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
-            .map(state::cycle);
+            .map(p -> {
+                if (worldIn.getBlockState(pos.offset(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
+                    return Pair.of(state.cycle(p), false);
+                else
+                    return Pair.of(state.with(p, Connection.onOffConnection(state.get(p))), true);
+            });
         if (blockState.isPresent()) {
             if (!worldIn.isRemote) {
-                worldIn.setBlockState(pos, blockState.get());
-                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(PipeTile::connectorUpdate);
+                worldIn.setBlockState(pos, blockState.get().getKey());
+                if (blockState.get().getValue())
+                    Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(PipeTile::connectorUpdate);
             }
             return true;
         } else {
@@ -233,7 +244,7 @@ public class PipeBlock extends Block {
             TileEntity entity = worldIn.getTileEntity(pos);
             if (entity instanceof PipeTile) {
                 PipeTile tile = (PipeTile) entity;
-                tile.connection().remove(pos);
+                tile.connection().reset();
             }
             super.onReplaced(state, worldIn, pos, newState, isMoving);
         }
@@ -264,6 +275,13 @@ public class PipeBlock extends Block {
 
         public boolean isInput() {
             return is(INPUT);
+        }
+
+        public static Connection onOffConnection(Connection now) {
+            if (now == NO_CONNECTION)
+                return CONNECTED;
+            else
+                return NO_CONNECTION;
         }
     }
 }
