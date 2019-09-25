@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.transport;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -10,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -32,7 +34,10 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidTank;
@@ -135,7 +140,13 @@ public class PipeBlock extends Block {
                                           IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
         Connection value = canConnectTo(worldIn, currentPos.offset(facing), facing);
         Connection now = stateIn.get(FACING_TO_PROPERTY_MAP.get(facing));
-        if (value.hasConnection() ^ now.hasConnection())
+        if (value.is(Connection.NO_CONNECTION)) {
+            if (facingState.getMaterial() == Material.AIR) {
+                return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+            } else {
+                return stateIn;
+            }
+        } else if (value.hasConnection() ^ now.hasConnection())
             return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
         else
             return stateIn;
@@ -146,8 +157,15 @@ public class PipeBlock extends Block {
             return Connection.CONNECTED;
         } else {
             TileEntity entity = worldIn.getTileEntity(pos);
-            if (entity != null && entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
-                return Connection.CONNECTED;
+            if (entity != null) {
+                LazyOptional<IFluidHandler> capability = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
+                if (capability.isPresent())
+                    if (capability.map(f -> f.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)).orElse(0) >= 4000)
+                        return Connection.OUTPUT;
+                    else
+                        return Connection.CONNECTED;
+                else
+                    return Connection.NO_CONNECTION;
             } else {
                 return Connection.NO_CONNECTION;
             }
@@ -167,7 +185,7 @@ public class PipeBlock extends Block {
     @Override
     @SuppressWarnings("deprecation")
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (player.getHeldItem(handIn).getItem() == this.blockItem) return false;
+        if (player.getHeldItem(handIn).getItem() instanceof BlockItem) return false;
         Vec3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
         Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
             AxisAlignedBB box = e.getValue().getBoundingBox();
