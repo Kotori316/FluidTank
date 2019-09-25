@@ -50,7 +50,7 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         Direction direction = getBlockState().get(BlockStateProperties.FACING);
-        if (side == null || side == direction) {
+        if (side != direction) {
             if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
                 return getFluidHandler(direction).cast();
             }
