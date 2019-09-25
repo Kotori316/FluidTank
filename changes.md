@@ -7,11 +7,11 @@ I don't support any other environment.
 
 **This version requires forge newer than 28.1.0 (Forge Recommend version)**
 
-## v14.8.1
-- Prevented recursive transfer by checking source and destination pos and equality of handler instance.
-- Fixed output side was ignored.
-- Changed amount to transfer in a tick.
-- Fixed creative tank didn't push to pipes.
-- Added helper method to check output and input.
-- Removed log when connection is full
-- Added code to reset buffer translation. This will prevent some render issue with other mods.
+## v14.8.2
+- Smarter connection.
+- Added fluid handler of pipe to fill tanks via pipe. Draining via pipes isn't available.
+- helper method to compare.
+- Added util method to convert boolean and FluidAction.
+- Require group instance to get the distance from a specific coord.
+- Changed the condition of facing to get fluid handler from CAT.
+- Fixed NPE when pipe connection is changed.
