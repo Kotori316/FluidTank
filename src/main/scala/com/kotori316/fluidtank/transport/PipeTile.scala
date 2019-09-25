@@ -37,7 +37,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
         if (getBlockState.get(value).isInput) {
           val sourcePos = pos.offset(direction)
           val c = for {
-            t <- getWorld.getTileEntity(sourcePos).pure(OptionT.catsDataMonadForOptionT[Eval])
+            t <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(sourcePos)))
             cap <- t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
           } yield cap -> sourcePos
           c.toList
@@ -50,7 +50,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
           (direction, pos) <- Direction.values().map(f => f -> p.offset(f))
           if pos != sourcePos
           if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-          dest <- OptionT.pure[Eval](getWorld.getTileEntity(pos))
+          dest <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos)))
             .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
             .toList
           if f != dest
