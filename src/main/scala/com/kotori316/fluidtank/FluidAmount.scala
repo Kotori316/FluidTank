@@ -111,5 +111,9 @@ object FluidAmount {
     override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drain(fromStack(getFluidInTank(0)).setAmount(maxDrain), action.execute()).toStack
   }
 
+  def b2a(doAction: Boolean): IFluidHandler.FluidAction =
+    if (doAction) IFluidHandler.FluidAction.EXECUTE
+    else IFluidHandler.FluidAction.SIMULATE
+
   implicit val showFA: Show[FluidAmount] = Show.fromToString
 }
