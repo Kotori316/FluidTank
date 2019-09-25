@@ -3,17 +3,20 @@ package com.kotori316.fluidtank.transport
 import cats.Eval
 import cats.data.OptionT
 import cats.implicits._
-import com.kotori316.fluidtank.tiles.Tiers
+import com.kotori316.fluidtank.tiles.{CapabilityFluidTank, Tiers}
 import com.kotori316.fluidtank.transport.PipeConnection._
 import com.kotori316.fluidtank.{FluidTank, ModObjects, _}
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity {
   var connection: PipeConnection[BlockPos] = getEmptyConnection
+  val handler = new PipeFluidHandler(this)
 
   private def getEmptyConnection: PipeConnection[BlockPos] = PipeConnection.empty({ case (p, c) =>
     getWorld.getTileEntity(p) match {
@@ -87,6 +90,15 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
 
   def connectorUpdate(): Unit = {
 
+  }
+
+  override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
+    Cap.asJava(
+      Cap.make(handler.asInstanceOf[T])
+        .filter(_ => cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || cap == CapabilityFluidTank.cap)
+        .filter(_ => side != null && getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))
+        .orElse(super.getCapability(cap, side).asScala)
+    )
   }
 }
 
