@@ -13,7 +13,7 @@ import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
 
 case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
-  def setAmount(newAmount: Long) = FluidAmount(fluid, newAmount, nbt)
+  def setAmount(newAmount: Long): FluidAmount = FluidAmount(fluid, newAmount, nbt)
 
   def write(tag: CompoundNBT): CompoundNBT = {
     tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
@@ -22,11 +22,11 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
     tag
   }
 
-  def nonEmpty = fluid != Fluids.EMPTY && amount > 0
+  def nonEmpty: Boolean = fluid != Fluids.EMPTY && amount > 0
 
-  def isEmpty = !nonEmpty
+  def isEmpty: Boolean = !nonEmpty
 
-  def isGaseous = fluid.getAttributes.isGaseous
+  def isGaseous: Boolean = fluid.getAttributes.isGaseous
 
   def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
 
@@ -37,7 +37,7 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
 
   def -(that: FluidAmount): FluidAmount = setAmount(this.amount - that.amount)
 
-  def fluidEqual(that: FluidAmount) = this.fluid === that.fluid && this.nbt === that.nbt
+  def fluidEqual(that: FluidAmount): Boolean = this.fluid === that.fluid && this.nbt === that.nbt
 
   def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount))
 

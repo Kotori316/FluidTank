@@ -55,7 +55,7 @@ object Config {
       require(Tiers.list.forall(oreNameMap.contains))
     }
 
-    def oreNameMap = oreNameMapValue.view.mapValues(_.get()).toMap ++ Tiers.list.filterNot(_.hasOreRecipe).map(t => (t, t.oreName)).toMap
+    def oreNameMap: Map[Tiers, String] = oreNameMapValue.view.mapValues(_.get()).toMap ++ Tiers.list.filterNot(_.hasOreRecipe).map(t => (t, t.oreName)).toMap
   }
 
 }

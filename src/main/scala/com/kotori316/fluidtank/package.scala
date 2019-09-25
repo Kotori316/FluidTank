@@ -16,7 +16,7 @@ package object fluidtank {
 
   object Cap {
     def make[T](obj: T): Cap[T] = {
-      OptionT.liftF(Eval.now(obj))
+      OptionT.fromOption[Eval](Option(obj))
     }
 
     def asJava[A](cap: Cap[A]): LazyOptional[A] = {

@@ -7,7 +7,7 @@ class TileTankCreative extends TileTank(Tiers.CREATIVE, ModObjects.TANK_CREATIVE
   override val tank = new CreativeTank
 
   class CreativeTank extends Tank {
-    override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int) = {
+    override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
       if (fluidAmount.nonEmpty) {
         if (doFill) {
           if (fluid.isEmpty) {
@@ -25,7 +25,7 @@ class TileTankCreative extends TileTank(Tiers.CREATIVE, ModObjects.TANK_CREATIVE
       }
     }
 
-    override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int) = {
+    override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = {
       if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidAmount.amount >= min) fluid.setAmount(fluidAmount.amount)
       else FluidAmount.EMPTY
     }

@@ -8,6 +8,7 @@ import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item._
 import net.minecraft.nbt.CompoundNBT
+import net.minecraft.util.ActionResultType
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.world.World
@@ -68,7 +69,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     false
   }
 
-  override def tryPlace(context: BlockItemUseContext) = {
+  override def tryPlace(context: BlockItemUseContext): ActionResultType = {
     if (Option(context.getPlayer).exists(_.isCreative)) {
       val size = context.getItem.getCount
       val result = super.tryPlace(context)

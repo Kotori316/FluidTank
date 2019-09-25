@@ -12,6 +12,7 @@ import net.minecraft.world.IBlockReader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 import scala.collection.mutable.ArrayBuffer
@@ -111,21 +112,20 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       }
     }
 
-    override def getFluidInTank(tank: Int) = fluidType.setAmount(Utils.toInt(amount)).toStack
+    override def getFluidInTank(tank: Int): FluidStack = fluidType.setAmount(Utils.toInt(amount)).toStack
 
-    override def getTankCapacity(tank: Int) = Utils.toInt(amount)
+    override def getTankCapacity(tank: Int): Int = Utils.toInt(amount)
   }
 
   val handler: FluidAmount.Tank = new TankHandler
 
-  val capabilities = if (s.nonEmpty) {
+  val capabilities: Option[CapabilityDispatcher] = if (s.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
     MinecraftForge.EVENT_BUS.post(event)
     Option(event.getCapabilities).filterNot(_.isEmpty).map(t => new CapabilityDispatcher(t, event.getListeners))
   } else {
     None
   }
-
 
   protected def fluidType: FluidAmount = {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)

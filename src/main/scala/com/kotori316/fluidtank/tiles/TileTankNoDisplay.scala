@@ -107,12 +107,12 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
   def getStackName: Option[ITextComponent] = Option(stackName)
 
-  override def getName = getStackName
+  override def getName: ITextComponent = getStackName
     .getOrElse(new StringTextComponent(tier.toString + " Tank"))
 
   override def hasCustomName = stackName != null
 
-  override def getCustomName = getStackName.orNull
+  override def getCustomName: ITextComponent = getStackName.orNull
 
   class Tank extends FluidAmount.Tank /*extends net.minecraftforge.fluids.FluidTank(Utils.toInt(tier.amount))*/ {
     var box: Box = _
@@ -170,9 +170,9 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     }
 
     // Util methods
-    def getFluidAmount = fluid.amount
+    def getFluidAmount: Long = fluid.amount
 
-    def getFluid = fluid
+    def getFluid: FluidAmount = fluid
 
     def setFluid(fluidAmount: FluidAmount): Unit = {
       if (fluidAmount == null) fluid = FluidAmount.EMPTY
