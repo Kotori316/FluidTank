@@ -4,7 +4,6 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
-import net.minecraft.util.Direction
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
@@ -36,7 +35,7 @@ class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
   override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
     val destinations = for {
       p <- pipeTile.connection.outputSorted(pipeTile.getPos)
-      (pos, direction) <- Direction.values().toList.map(dir => p.offset(dir) -> dir)
+      (pos, direction) <- PipeTile.facings.map(dir => p.offset(dir) -> dir)
       if pipeTile.getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
       dest <- OptionT.pure[Eval](pipeTile.getWorld.getTileEntity(pos))
         .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
