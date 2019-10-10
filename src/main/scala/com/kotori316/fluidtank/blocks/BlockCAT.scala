@@ -40,9 +40,9 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
         case Some(handlerItem) if !stack.isEmpty =>
           if (!worldIn.isRemote) {
             val direction = state.get(FACING)
-            val cat = worldIn.getTileEntity(pos).asInstanceOf[CATTile].getFluidHandler(direction).orElseThrow(() => new AssertionError())
-            BucketEventHandler.transferFluid(worldIn, pos, player, handIn, cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack,
-              stack, handlerItem, cat)
+            worldIn.getTileEntity(pos).asInstanceOf[CATTile].getFluidHandler(direction).ifPresent(cat =>
+              BucketEventHandler.transferFluid(worldIn, pos, player, handIn, cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack,
+                stack, handlerItem, cat))
           }
           true
         case _ =>
