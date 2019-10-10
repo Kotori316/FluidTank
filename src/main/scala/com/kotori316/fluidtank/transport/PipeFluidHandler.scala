@@ -37,7 +37,7 @@ class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
       p <- pipeTile.connection.outputSorted(pipeTile.getPos)
       (pos, direction) <- PipeTile.facings.map(dir => p.offset(dir) -> dir)
       if pipeTile.getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-      dest <- OptionT.pure[Eval](pipeTile.getWorld.getTileEntity(pos))
+      dest <- OptionT.fromOption[Eval](Option(pipeTile.getWorld.getTileEntity(pos)))
         .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
         .toList
     } yield dest
