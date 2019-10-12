@@ -32,6 +32,7 @@ public class CATScreen extends ContainerScreen<CATContainer> {
     }
 
     @Override
+    @SuppressWarnings("NoTranslation")
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         String s = this.getTitle().getFormattedText();
@@ -46,9 +47,9 @@ public class CATScreen extends ContainerScreen<CATContainer> {
     }
 
     @Override
-    public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         renderBackground();
-        super.render(p_render_1_, p_render_2_, p_render_3_);
-        this.renderHoveredToolTip(p_render_1_, p_render_2_);
+        super.render(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
     }
 }
