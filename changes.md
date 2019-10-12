@@ -7,11 +7,6 @@ I don't support any other environment.
 
 **This version requires forge newer than 28.1.0 (Forge Recommend version)**
 
-## v14.8.2
-- Smarter connection.
-- Added fluid handler of pipe to fill tanks via pipe. Draining via pipes isn't available.
-- helper method to compare.
-- Added util method to convert boolean and FluidAction.
-- Require group instance to get the distance from a specific coord.
-- Changed the condition of facing to get fluid handler from CAT.
-- Fixed NPE when pipe connection is changed.
+## v14.8.3
+- Fixed Assertion Error when "Chest as Tank" was right-clicked with fluid item if item container didn't exist.
+- Separating connection is enabled.
