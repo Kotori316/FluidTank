@@ -1,3 +1,4 @@
+import java.util.concurrent.TimeUnit
 import java.util.function.BiConsumer
 
 buildscript {
@@ -183,7 +184,7 @@ curseforge {
         id = '291006'
         changelogType = 'markdown'
         addGameVersion '1.14.4'
-        changelog = file("changes.md")
+        changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar
         addArtifact deobfJar
@@ -203,7 +204,7 @@ githubRelease {
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
     targetCommitish = '1.14.3'
     body {
-        file("changes.md").text
+        getLatestChangeLog()
     }
     releaseAssets = files(jar.archivePath)
 }
@@ -234,6 +235,49 @@ task signJar2() {
 // Runs this task automatically when build is ran.
 assemble.dependsOn(signJar2)
 
+void moveOldLog() {
+    def new_log_file = file("changes.md")
+    def old_log_file = file("old_logs.md")
+
+    if (new_log_file.exists()) {
+        if (!old_log_file.exists())
+            old_log_file.createNewFile()
+        def combined = new_log_file.text + System.lineSeparator() + old_log_file.text
+        old_log_file.setText(combined)
+    }
+}
+
+String getAllChangeLog() {
+    final old_log = file("old_logs.md")
+    final header_file = file("header.md")
+
+    def all_log = old_log.exists() ? old_log.text : "No change log provided."
+    def header = header_file.exists() ? header_file.text : "#Change Log"
+    return header + System.lineSeparator() + all_log
+}
+
+String getLatestChangeLog() {
+    final def log_file = file("changes.md")
+    final def header_file = file("header.md")
+    def log = log_file.exists() ? log_file.text : "No change log provided."
+    def header = header_file.exists() ? header_file.text : "#Change Log"
+    return header + System.lineSeparator() + log
+}
+
+task makeChangeLog() {
+    doLast {
+        moveOldLog()
+        // git commit and push to github
+
+        ProcessBuilder commiter = new ProcessBuilder("git", "commit", "-m", "v${project.version}")
+        def process1 = commiter.start()
+        process1.waitFor(1L, TimeUnit.SECONDS)
+        ProcessBuilder pusher = new ProcessBuilder("git", "push")
+        def process2 = pusher.start()
+        process2.waitFor(20L, TimeUnit.SECONDS)
+    }
+}
+
 task checkMethod() {
     doLast {
         System.out.println("FilePath $jar.archivePath")
@@ -244,7 +288,7 @@ task checkMethod() {
         System.out.println("ModVersion ${getProperty("modVersion")}")
         println("*" * 20)
         println("changes.md")
-        println(file("changes.md").text)
+        println(getLatestChangeLog())
         println("*" * 20)
         println("hasGitHubToken ${project.hasProperty("githubToken")}")
         println("hasSignToken ${project.hasProperty("keyStore")}")
@@ -253,8 +297,12 @@ task checkMethod() {
         System.properties.forEach(new BiConsumer<Object, Object>() {
             @Override
             void accept(Object o, Object o2) {
-                println("$o=$o2")
+//                println("$o=$o2")
             }
         })
+        println("*" * 20)
+        println("All Changes")
+        println(getAllChangeLog())
+        println("*" * 20)
     }
 }
