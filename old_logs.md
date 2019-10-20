@@ -1,3 +1,7 @@
+## v14.8.4
+- Added - tank recipes of non forge metal.
+- Improvement - added data provider for recipes to make json file. Renamed class name.
+
 ## v14.8.3
 - Fixed Assertion Error when "Chest as Tank" was right-clicked with fluid item if item container didn't exist.
 - Separating connection is enabled.

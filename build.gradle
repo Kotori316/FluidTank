@@ -269,12 +269,12 @@ task makeChangeLog() {
         moveOldLog()
         // git commit and push to github
 
-        ProcessBuilder commiter = new ProcessBuilder("git", "commit", "-m", "v${project.version}")
-        def process1 = commiter.start()
-        process1.waitFor(10L, TimeUnit.SECONDS)
-        ProcessBuilder pusher = new ProcessBuilder("git", "push")
-        def process2 = pusher.start()
-        process2.waitFor(20L, TimeUnit.SECONDS)
+//        ProcessBuilder committer = new ProcessBuilder("git", "commit", "-m", "v${project.version}")
+//        def process1 = committer.start()
+//        process1.waitFor(10L, TimeUnit.SECONDS)
+//        ProcessBuilder pusher = new ProcessBuilder("git", "push")
+//        def process2 = pusher.start()
+//        process2.waitFor(20L, TimeUnit.SECONDS)
     }
 }
 
