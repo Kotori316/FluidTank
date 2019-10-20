@@ -17,7 +17,7 @@ object ModObjects {
 
   final val CREATIVE_TABS = new ItemGroup(FluidTank.MOD_NAME) {
     override def createIcon = new ItemStack(woodTank)
-  }
+  }.setTabPath(FluidTank.modID)
   final val MATERIAL = new Material(MaterialColor.AIR, false, true, true, false,
     true, false, false, PushReaction.BLOCK)
   private[this] final val d = 1 / 16d

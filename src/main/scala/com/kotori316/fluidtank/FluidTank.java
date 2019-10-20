@@ -34,7 +34,7 @@ import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.EasyCondition;
-import com.kotori316.fluidtank.recipes.RecipeAdvancements;
+import com.kotori316.fluidtank.recipes.FluidTankDataProvider;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
 
@@ -52,7 +52,7 @@ public class FluidTank {
         modEventBus.addListener(this::clientInit);
         modEventBus.addListener(this::init);
         modEventBus.register(Register.class);
-        modEventBus.addListener(RecipeAdvancements::gatherData);
+        modEventBus.addListener(FluidTankDataProvider::gatherData);
 //        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
 //        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
@@ -61,8 +61,6 @@ public class FluidTank {
     public void init(FMLCommonSetupEvent event) {
         PacketHandler.init();
         Config.content().assertion();
-        CraftingHelper.register(new ConfigCondition.Serializer());
-        CraftingHelper.register(new EasyCondition.Serializer());
         CapabilityFluidTank.register();
         FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());
@@ -99,6 +97,8 @@ public class FluidTank {
         public static void registerSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
             event.getRegistry().register(ConvertInvisibleRecipe.SERIALIZER.setRegistryName(new ResourceLocation(ConvertInvisibleRecipe.LOCATION)));
             event.getRegistry().register(TierRecipe.SERIALIZER);
+            CraftingHelper.register(new ConfigCondition.Serializer());
+            CraftingHelper.register(new EasyCondition.Serializer());
         }
 
         @SubscribeEvent

@@ -9,6 +9,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
+import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
@@ -174,5 +176,41 @@ public class TierRecipe implements ICraftingRecipe {
             buffer.writeCompoundTag(recipe.tier.toNBTTag());
         }
 
+    }
+
+    public static class FinishedRecipe implements IFinishedRecipe {
+        private final ResourceLocation recipeId;
+        private final Tiers tiers;
+
+        public FinishedRecipe(ResourceLocation recipeId, Tiers tiers) {
+            this.recipeId = recipeId;
+            this.tiers = tiers;
+        }
+
+        @Override
+        public void serialize(JsonObject json) {
+            json.addProperty("tier", tiers.toString().toLowerCase());
+        }
+
+        @Override
+        public ResourceLocation getID() {
+            return recipeId;
+        }
+
+        @Override
+        public IRecipeSerializer<?> getSerializer() {
+            return SERIALIZER;
+        }
+
+        @Nullable
+        @Override
+        public JsonObject getAdvancementJson() {
+            return null;
+        }
+
+        @Override
+        public ResourceLocation getAdvancementID() {
+            return new ResourceLocation("");
+        }
     }
 }
