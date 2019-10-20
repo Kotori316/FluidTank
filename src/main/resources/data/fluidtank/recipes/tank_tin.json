@@ -1,13 +1,13 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "tier": "diamond",
+  "tier": "tin",
   "conditions": [
     {
       "type": "fluidtank:config"
     },
     {
       "value": {
-        "tag": "forge:gems/diamond",
+        "tag": "forge:ingots/tin",
         "type": "forge:tag_empty"
       },
       "type": "forge:not"

@@ -1,13 +1,13 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "tier": "diamond",
+  "tier": "copper",
   "conditions": [
     {
       "type": "fluidtank:config"
     },
     {
       "value": {
-        "tag": "forge:gems/diamond",
+        "tag": "forge:ingots/copper",
         "type": "forge:tag_empty"
       },
       "type": "forge:not"

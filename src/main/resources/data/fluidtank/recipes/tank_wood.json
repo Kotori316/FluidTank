@@ -1,9 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "conditions": [
-    {"type": "fluidtank:config"},
-    {"type": "forge:not", "value": {"type": "fluidtank:easy"}}
-  ],
   "pattern": [
     "x x",
     "xpx",
@@ -19,5 +15,16 @@
   },
   "result": {
     "item": "fluidtank:tank_wood"
-  }
+  },
+  "conditions": [
+    {
+      "value": {
+        "type": "fluidtank:easy"
+      },
+      "type": "forge:not"
+    },
+    {
+      "type": "fluidtank:config"
+    }
+  ]
 }
