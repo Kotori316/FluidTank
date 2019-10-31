@@ -11,7 +11,7 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
                                  conditions: List[ICondition] = Nil,
                                  saveName: ResourceLocation = null) {
   def this(c: ShapedRecipeBuilder, saveName: ResourceLocation) = {
-    this(getConsumeValue(c), saveName = saveName)
+    this(RecipeSerializeHelper.getConsumeValue(c), saveName = saveName)
   }
 
   def addCondition(condition: ICondition): RecipeSerializeHelper =
@@ -29,17 +29,15 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
 
   def location = if (saveName == null) recipe.getID else saveName
 
+}
+
+object RecipeSerializeHelper {
+  def by(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
+
   private def getConsumeValue(c: ShapedRecipeBuilder): IFinishedRecipe = {
     c.addCriterion("dummy", new RecipeUnlockedTrigger.Instance(new ResourceLocation("dummy:dummy")))
     var t: IFinishedRecipe = null
     c.build(p => t = p)
     t
   }
-}
-
-object RecipeSerializeHelper {
-  def apply(recipe: IFinishedRecipe, conditions: List[ICondition] = Nil, saveName: ResourceLocation= null): RecipeSerializeHelper =
-    new RecipeSerializeHelper(recipe, conditions, saveName)
-
-  def apply(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
 }

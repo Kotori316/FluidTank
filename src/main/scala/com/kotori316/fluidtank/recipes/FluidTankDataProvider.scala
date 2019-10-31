@@ -68,7 +68,7 @@ object FluidTankDataProvider {
       val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val woodLocation = ID("tank_wood")
-      val WOOD = RecipeSerializeHelper(
+      val WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(woodLocation))
           .key('x', Tags.Items.GLASS).key('p', ItemTags.LOGS)
           .patternLine("x x")
@@ -76,7 +76,7 @@ object FluidTankDataProvider {
           .patternLine("xxx"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(new NotCondition(EasyCondition.getInstance()))
-      val EASY_WOOD = RecipeSerializeHelper(
+      val EASY_WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(woodLocation))
           .key('x', Tags.Items.GLASS).key('p', ItemTags.PLANKS)
           .patternLine("p p")
@@ -84,14 +84,14 @@ object FluidTankDataProvider {
           .patternLine("xpx"), saveName = ID("tank_wood_easy"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(EasyCondition.getInstance())
-      val CAT = RecipeSerializeHelper(
+      val CAT = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockCat)
           .key('x', ForgeRegistries.ITEMS.getValue(woodLocation))
           .key('p', Ingredient.merge(java.util.Arrays.asList(Ingredient.fromTag(Tags.Items.CHESTS), Ingredient.fromItems(Blocks.BARREL))))
           .patternLine("x x")
           .patternLine("xpx")
           .patternLine("xxx"))
-      val PIPE = RecipeSerializeHelper(
+      val PIPE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockPipe)
           .key('t', ForgeRegistries.ITEMS.getValue(woodLocation))
           .key('g', Tags.Items.GLASS)
