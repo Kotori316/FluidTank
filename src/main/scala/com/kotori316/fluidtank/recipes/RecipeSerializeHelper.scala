@@ -1,15 +1,19 @@
 package com.kotori316.fluidtank.recipes
 
-import com.google.gson.{JsonArray, JsonObject}
-import net.minecraft.data.IFinishedRecipe
+import com.google.gson.JsonObject
+import net.minecraft.advancements.criterion.RecipeUnlockedTrigger
+import net.minecraft.data.{IFinishedRecipe, ShapedRecipeBuilder}
 import net.minecraft.tags.Tag
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
 
 case class RecipeSerializeHelper(recipe: IFinishedRecipe,
                                  conditions: List[ICondition] = Nil,
                                  saveName: ResourceLocation = null) {
+  def this(c: ShapedRecipeBuilder, saveName: ResourceLocation) = {
+    this(getConsumeValue(c), saveName = saveName)
+  }
+
   def addCondition(condition: ICondition): RecipeSerializeHelper =
     copy(conditions = condition :: this.conditions)
 
@@ -19,9 +23,23 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
   def build: JsonObject = {
     val o = recipe.getRecipeJson
     if (conditions.nonEmpty)
-      o.add("conditions", conditions.foldLeft(new JsonArray) { case (a, c) => a.add(CraftingHelper.serialize(c)); a })
+      o.add("conditions", FluidTankDataProvider.makeConditionArray(conditions))
     o
   }
 
   def location = if (saveName == null) recipe.getID else saveName
+
+  private def getConsumeValue(c: ShapedRecipeBuilder): IFinishedRecipe = {
+    c.addCriterion("dummy", new RecipeUnlockedTrigger.Instance(new ResourceLocation("dummy:dummy")))
+    var t: IFinishedRecipe = null
+    c.build(p => t = p)
+    t
+  }
+}
+
+object RecipeSerializeHelper {
+  def apply(recipe: IFinishedRecipe, conditions: List[ICondition] = Nil, saveName: ResourceLocation= null): RecipeSerializeHelper =
+    new RecipeSerializeHelper(recipe, conditions, saveName)
+
+  def apply(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
 }

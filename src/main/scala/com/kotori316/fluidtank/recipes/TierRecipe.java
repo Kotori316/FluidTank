@@ -63,8 +63,7 @@ public class TierRecipe implements ICraftingRecipe {
     @Override
     public boolean matches(CraftingInventory inv, World worldIn) {
         if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
-        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot).allMatch(tankItems))
-            return false;
+        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot).allMatch(tankItems)) return false;
         return IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
             .filter(Objects::nonNull)

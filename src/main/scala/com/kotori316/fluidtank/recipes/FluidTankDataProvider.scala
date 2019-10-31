@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.recipes
 
 import java.io.IOException
 
-import com.google.gson.GsonBuilder
+import com.google.gson.{GsonBuilder, JsonArray}
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.advancements.criterion._
 import net.minecraft.block.Blocks
@@ -12,7 +12,8 @@ import net.minecraft.item.{Item, Items}
 import net.minecraft.tags.{ItemTags, Tag}
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
-import net.minecraftforge.common.crafting.conditions.NotCondition
+import net.minecraftforge.common.crafting.CraftingHelper
+import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition}
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 
@@ -48,12 +49,12 @@ object FluidTankDataProvider {
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(new ResourceLocation("fluidtank:tank_wood")))
       val recipeAdvancements = PIPE :: CAT :: TANK_WOOD :: TANK_WOOD_EASY :: TANKS
 
-      for (recipe <- recipeAdvancements) {
-        val out = path.resolve(s"data/${recipe.location.getNamespace}/advancements/${recipe.location.getPath}.json")
+      for (advancement <- recipeAdvancements) {
+        val out = path.resolve(s"data/${advancement.location.getNamespace}/advancements/${advancement.location.getPath}.json")
         try {
-          IDataProvider.save(GSON, cache, recipe.build, out)
+          IDataProvider.save(GSON, cache, advancement.build, out)
         } catch {
-          case e: IOException => FluidTank.LOGGER.error(s"Failed to save recipe ${recipe.location}.", e)
+          case e: IOException => FluidTank.LOGGER.error(s"Failed to save advancement ${advancement.location}.", e)
         }
       }
     }
@@ -67,40 +68,37 @@ object FluidTankDataProvider {
       val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val woodLocation = ID("tank_wood")
-      val WOOD = RecipeSerializeHelper(getConsumeValue(
+      val WOOD = RecipeSerializeHelper(
         ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(woodLocation))
           .key('x', Tags.Items.GLASS).key('p', ItemTags.LOGS)
           .patternLine("x x")
           .patternLine("xpx")
-          .patternLine("xxx")))
+          .patternLine("xxx"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(new NotCondition(EasyCondition.getInstance()))
       val EASY_WOOD = RecipeSerializeHelper(
-        getConsumeValue(
-          ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(woodLocation))
-            .key('x', Tags.Items.GLASS).key('p', ItemTags.PLANKS)
-            .patternLine("p p")
-            .patternLine("p p")
-            .patternLine("xpx")), saveName = ID("tank_wood_easy"))
+        ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(woodLocation))
+          .key('x', Tags.Items.GLASS).key('p', ItemTags.PLANKS)
+          .patternLine("p p")
+          .patternLine("p p")
+          .patternLine("xpx"), saveName = ID("tank_wood_easy"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(EasyCondition.getInstance())
       val CAT = RecipeSerializeHelper(
-        getConsumeValue(
-          ShapedRecipeBuilder.shapedRecipe(ModObjects.blockCat)
-            .key('x', ForgeRegistries.ITEMS.getValue(woodLocation))
-            .key('p', Ingredient.merge(java.util.Arrays.asList(Ingredient.fromTag(Tags.Items.CHESTS), Ingredient.fromItems(Blocks.BARREL))))
-            .patternLine("x x")
-            .patternLine("xpx")
-            .patternLine("xxx")))
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockCat)
+          .key('x', ForgeRegistries.ITEMS.getValue(woodLocation))
+          .key('p', Ingredient.merge(java.util.Arrays.asList(Ingredient.fromTag(Tags.Items.CHESTS), Ingredient.fromItems(Blocks.BARREL))))
+          .patternLine("x x")
+          .patternLine("xpx")
+          .patternLine("xxx"))
       val PIPE = RecipeSerializeHelper(
-        getConsumeValue(
-          ShapedRecipeBuilder.shapedRecipe(ModObjects.blockPipe)
-            .key('t', ForgeRegistries.ITEMS.getValue(woodLocation))
-            .key('g', Tags.Items.GLASS)
-            .key('e', Tags.Items.ENDER_PEARLS)
-            .patternLine("gtg")
-            .patternLine(" e ")
-            .patternLine("gtg")))
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockPipe)
+          .key('t', ForgeRegistries.ITEMS.getValue(woodLocation))
+          .key('g', Tags.Items.GLASS)
+          .key('e', Tags.Items.ENDER_PEARLS)
+          .patternLine("gtg")
+          .patternLine(" e ")
+          .patternLine("gtg"))
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasOreRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
           .addTagCondition(new Tag[Item](new ResourceLocation(tier.oreName)))
@@ -120,12 +118,9 @@ object FluidTankDataProvider {
 
     override def getName = "Recipe of FluidTank"
 
-    private def getConsumeValue(c: ShapedRecipeBuilder): IFinishedRecipe = {
-      c.addCriterion("dummy", new RecipeUnlockedTrigger.Instance(ID("dummy")))
-      var t: IFinishedRecipe = null
-      c.build(p => t = p)
-      t
-    }
   }
 
+  def makeConditionArray(conditions: List[ICondition]): JsonArray = {
+    conditions.foldLeft(new JsonArray) { case (a, c) => a.add(CraftingHelper.serialize(c)); a }
+  }
 }

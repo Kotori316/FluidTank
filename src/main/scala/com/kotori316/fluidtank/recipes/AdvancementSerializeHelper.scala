@@ -1,12 +1,11 @@
 package com.kotori316.fluidtank.recipes
 
-import com.google.gson.{JsonArray, JsonObject}
+import com.google.gson.JsonObject
 import net.minecraft.advancements.criterion._
 import net.minecraft.advancements.{Advancement, AdvancementRewards, ICriterionInstance, IRequirementsStrategy}
 import net.minecraft.item.Item
 import net.minecraft.tags.Tag
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
 
 case class AdvancementSerializeHelper(location: ResourceLocation,
@@ -34,7 +33,7 @@ case class AdvancementSerializeHelper(location: ResourceLocation,
       .withRequirementsStrategy(IRequirementsStrategy.OR)
     val obj = criterionList.foldLeft(builder) { case (b, (s, c)) => b.withCriterion(s, c) }
       .serialize()
-    obj.add("conditions", conditions.foldLeft(new JsonArray) { case (a, c) => a.add(CraftingHelper.serialize(c)); a })
+    obj.add("conditions", FluidTankDataProvider.makeConditionArray(conditions))
     obj
   }
 }
