@@ -46,6 +46,7 @@ package object fluidtank {
         "though it returned true when isPresent is called.")
 
   implicit val showPos: Show[BlockPos] = pos => s"(${pos.getX}, ${pos.getY}, ${pos.getZ})"
+  implicit val eqPos: Eq[BlockPos] = Eq.fromUniversalEquals
   implicit val hashFluid: Hash[Fluid] = Hash.fromUniversalHashCode
   implicit val eqCompoundNbt: Eq[CompoundNBT] = Eq.fromUniversalEquals
   implicit val hashFluidStack: Hash[FluidStack] = new Hash[FluidStack] {
