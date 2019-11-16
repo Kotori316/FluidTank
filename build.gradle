@@ -338,16 +338,16 @@ publishing {
                 extension = 'jar'
             }
             artifact reobfArtifact
-            publishing.publications {
-                target(MavenPublication) {
-                    pom.withXml {
-                        Node pomNode = asNode()
-                        pomNode.dependencies.'*'.findAll() {
-                            it.parent().remove(it)
-                        }
-                    }
-                }
-            }
+//            publishing.publications {
+//                target(MavenPublication) {
+//                    pom.withXml {
+//                        Node pomNode = asNode()
+//                        pomNode.dependencies.'*'.findAll() {
+//                            it.parent().remove(it)
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 }
