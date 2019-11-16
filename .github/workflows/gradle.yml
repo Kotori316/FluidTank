@@ -15,8 +15,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Set up gradle
-      run: chmod +x ./gradlew && ./gradlew buildEnvironment
     - uses: actions/cache@v1
       with:
         path: ~/.gradle/caches
@@ -24,4 +22,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     - name: Build with Gradle
-      run: chmod +x ./gradlew && ./gradlew build
+      run: |
+        chmod +x ./gradlew
+        ./gradlew build
+        ./gradlew build
