@@ -2,6 +2,9 @@
 
 For Minecraft 1.14.4 (1.14.3 branch)
 
+![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)
+![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)
+
 LICENSE: MIT License  
 Copyright (c) 2019 Kotori316
 
