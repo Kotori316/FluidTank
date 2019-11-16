@@ -21,8 +21,9 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
+    - name: Precompile
+      run: chmod +x ./gradlew && ./gradlew build --continue
     - name: Build with Gradle
       run: |
         chmod +x ./gradlew
-        ./gradlew build
-        ./gradlew build
+        ./gradlew build --continue
