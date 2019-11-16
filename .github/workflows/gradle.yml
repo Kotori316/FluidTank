@@ -22,7 +22,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     - name: Precompile
-      run: chmod +x ./gradlew && ./gradlew build --continue
+      run: chmod +x ./gradlew && ./gradlew compileScala --continue
     - name: Build with Gradle and Publish
       run: |
         chmod +x ./gradlew
