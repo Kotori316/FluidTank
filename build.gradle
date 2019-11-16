@@ -19,6 +19,9 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: "com.matthewprenger.cursegradle"
 apply plugin: "com.github.breadmoirai.github-release"
+plugins {
+    id("maven-publish")
+}
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 version = getProperty("modVersion")
@@ -310,5 +313,23 @@ task checkMethod() {
         println("All Changes")
         println(getAllChangeLog())
         println("*" * 20)
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("REPO_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
     }
 }

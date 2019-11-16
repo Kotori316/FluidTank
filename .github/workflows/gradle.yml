@@ -23,7 +23,9 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Precompile
       run: chmod +x ./gradlew && ./gradlew build --continue
-    - name: Build with Gradle
+    - name: Build with Gradle and Publish
       run: |
         chmod +x ./gradlew
-        ./gradlew build --continue
+        ./gradlew publish --continue
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
