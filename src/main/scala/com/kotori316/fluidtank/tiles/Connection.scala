@@ -148,72 +148,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     Option(fluidType).filter(_.nonEmpty)
   }
 
-  /**
-   * Make connection.
-   *
-   * @param tileTank The tank added to this connection.
-   * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
-   * @return new connection
-   */
-  def add(tileTank: TileTankNoDisplay, facing: Direction): Connection = {
-    val newFluid = tileTank.tank.getFluid
-    if (newFluid.isEmpty || fluidType.isEmpty || fluidType.fluidEqual(newFluid)) {
-      // You can connect the tank to this connection.
-      if (seq.contains(tileTank) || seq.exists(_.getPos == tileTank.getPos)) {
-        FluidTank.LOGGER.warn(s"${tileTank.getClass.getName} at ${tileTank.getPos} is already added to connection.")
-        return this
-      }
-      val newSeq = if (facing == Direction.DOWN) {
-        tileTank +: seq
-      } else {
-        seq :+ tileTank
-      }
-      val connection = new Connection(newSeq)
-      val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, doDrain = true))) yield i
-      newSeq.foreach(t => {
-        t.connection = connection
-        t.tank.setFluid(null)
-      })
-      fluidStacks.foreach(connection.handler.fill(_, doFill = true))
-      connection
-    } else {
-      // You have to make new connection.
-      val connection = new Connection(Seq(tileTank))
-      tileTank.connection = connection
-      connection
-    }
-  }
-
-  def add(connection: Connection, facing: Direction): Connection = {
-    val newFluid = connection.fluidType
-    if (newFluid.isEmpty || fluidType.isEmpty || fluidType.fluidEqual(newFluid)) {
-      if (seq.exists(connection.seq.contains)) {
-        FluidTank.LOGGER.warn(s"Connection($seq) has same block with ${connection.seq}.")
-        return connection
-      }
-      val newSeq = if (facing == Direction.DOWN) {
-        connection.seq ++ this.seq
-      } else {
-        this.seq ++ connection.seq
-      }
-      val nConnection = new Connection(newSeq)
-      val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, doDrain = true))) yield i
-      newSeq.foreach { t =>
-        t.connection = nConnection
-        t.tank.setFluid(null)
-      }
-      fluidStacks.foreach(nConnection.handler.fill(_, doFill = true))
-      nConnection
-    } else {
-      // Nothing to change.
-      connection
-    }
-  }
-
   def remove(tileTank: TileTankNoDisplay): Unit = {
     val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
-    s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
-    s2.tail.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
+    val s1Connection = Connection.create(s1)
+    val s2Connection = Connection.create(s2.tail)
+    s1.foreach(_.connection = s1Connection)
+    s2.tail.foreach(_.connection = s2Connection)
   }
 
   def getComparatorLevel: Int = {
@@ -260,6 +200,26 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
 object Connection {
 
+  def create(s: Seq[TileTankNoDisplay]): Connection = {
+    if (s.isEmpty) invalid
+    else new Connection(s)
+  }
+
+  @scala.annotation.tailrec
+  def createAndInit(s: Seq[TileTankNoDisplay]): Unit = {
+    if (s.nonEmpty) {
+      val fluid = LazyList.from(s).map(_.tank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
+      val (s1, s2) = s.span(t => t.tank.getFluid.fluidEqual(fluid) || t.tank.getFluid.isEmpty)
+      // Assert tanks in s1 have the same fluid.
+      require(s1.map(_.tank.getFluid).forall(f => f.isEmpty || f.fluidEqual(fluid)))
+      val content: FluidAmount = (for (t <- s1) yield t.tank.drain(t.tank.getFluid, doDrain = true)).reduce(_ + _)
+      val connection = Connection.create(s1)
+      connection.handler.fill(content, doFill = true)
+      s1.foreach(_.connection = connection)
+      if (s2.nonEmpty) createAndInit(s2)
+    }
+  }
+
   val invalid: Connection = new Connection(Nil) {
     override def fluidType: FluidAmount = FluidAmount.EMPTY
 
@@ -287,6 +247,7 @@ object Connection {
     }
     val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
       .toList.map(_.asInstanceOf[TileTankNoDisplay])
-    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
+    //    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
+    createAndInit(tanks)
   }
 }

@@ -93,12 +93,13 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   def onBlockPlacedBy(): Unit = {
     val downTank = Option(getWorld.getTileEntity(getPos.down())).collect { case t: TileTankNoDisplay => t }
     val upTank = Option(getWorld.getTileEntity(getPos.up())).collect { case t: TileTankNoDisplay => t }
-    (downTank, upTank) match {
-      case (Some(dT), Some(uT)) => dT.connection.add(this, Direction.UP).add(uT.connection, Direction.UP)
-      case (None, Some(uT)) => uT.connection.add(this, Direction.UP.getOpposite)
-      case (Some(dT), None) => dT.connection.add(this, Direction.DOWN.getOpposite)
-      case (None, None) => this.connection = new Connection(Seq(this))
+    val newSeq = (downTank, upTank) match {
+      case (Some(dT), Some(uT)) => dT.connection.seq :+ this :++ uT.connection.seq
+      case (None, Some(uT)) => this +: uT.connection.seq
+      case (Some(dT), None) => dT.connection.seq :+ this
+      case (None, None) => Seq(this)
     }
+    Connection.createAndInit(newSeq)
   }
 
   def onDestroy(): Unit = {
@@ -254,8 +255,11 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   }*/
   override def tick(): Unit = {
     if (loading && SideProxy.isServer(this)) {
-      Connection.load(getWorld, getPos)
+      getWorld.getProfiler.startSection("Connection Loading")
+      if (this.connection == Connection.invalid)
+        Connection.load(getWorld, getPos)
       loading = false
+      getWorld.getProfiler.endSection()
     }
   }
 }
