@@ -11,6 +11,7 @@ import net.minecraft.util.text.{ITextComponent, StringTextComponent, Translation
 import net.minecraft.world.IBlockReader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
+import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -225,12 +226,15 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     updateActions.foreach(_.apply())
   }
 
-  override def getCapability[T](capability: Capability[T], facing: Direction) = {
+  override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     Cap.asJava(
       Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap || capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
         .orElse(capabilities.map(_.getCapability(capability, facing).asScala).getOrElse(Cap.empty))
     )
   }
+
+  @inline // This is just a bridge method to suppress inspection.
+  def getCapabilityDummy[T](capability: Capability[T], facing: Direction): LazyOptional[T] = this.getCapability(capability, facing)
 
   override def toString: String = {
     val name = getFluidStack.fold("null")(_.getLocalizedName)

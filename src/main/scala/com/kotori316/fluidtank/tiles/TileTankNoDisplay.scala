@@ -76,7 +76,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = handleUpdateTag(pkt.getNbtCompound)
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    val c = connection.getCapability(capability, facing)
+    val c = connection.getCapabilityDummy(capability, facing)
     if (c.isPresent) c else super.getCapability(capability, facing)
   }
 
