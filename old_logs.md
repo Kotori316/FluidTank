@@ -1,3 +1,6 @@
+## v14.8.6
+- Fixed - Very big tower of tanks (>= 100) causes lag and takes too longer time to load. [#27](https://github.com/Kotori316/FluidTank/issues/27)
+
 ## v14.8.5
 - Refactored data generation code.
 - Update forge to 1.14.4-28.1.87
