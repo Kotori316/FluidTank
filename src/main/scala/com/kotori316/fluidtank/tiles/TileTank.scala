@@ -11,6 +11,4 @@ class TileTank(t: Tiers, ty: TileEntityType[_ <: TileTank]) extends TileTankNoDi
   def this(t: Tiers) {
     this(t, ModObjects.TANK_TYPE)
   }
-
-  override def hasFastRenderer = true
 }
