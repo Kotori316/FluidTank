@@ -21,7 +21,9 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     () => seq.foreach(_.markDirty())
   )
 
-  val handler: IFluidHandler = new IFluidHandler {
+  val handler = new Handler
+
+  class Handler extends IFluidHandler {
     override def fill(kind: FluidStack, doFill: Boolean): Int = {
       if (kind == null || kind.amount <= 0) {
         return 0
@@ -95,6 +97,30 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     override def getTankProperties: Array[IFluidTankProperties] = {
       Array(new FluidTankProperties(getFluidStack.orNull, Utils.toInt(capacity)))
     }
+
+    def fill(kind: FluidStack, amount: Long, doFill: Boolean): Long = {
+      if (kind == null || amount <= 0) {
+        return 0
+      }
+      val resource = kind.copy()
+      if (hasCreative) {
+        // Just use default creative operation
+        resource.amount = 1000
+        fill(resource, doFill = true)
+      } else {
+        var total = 0L
+        var amount_ = amount
+        for (tileTank <- tankSeq(kind)) {
+          if (amount_ > 0) {
+            resource.amount = Utils.toInt(amount_)
+            val filled = tileTank.tank.fill(resource, doFill)
+            total += filled
+            amount_ -= filled
+          }
+        }
+        amount_
+      }
+    }
   }
 
   val capabilities = if (s.nonEmpty) {
@@ -104,7 +130,6 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   } else {
     None
   }
-
 
   protected def fluidType: FluidStack = {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).orNull
@@ -126,72 +151,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     Option(fluidType).map(f => new FluidStack(f, Utils.toInt(amount)))
   }
 
-  /**
-    * Make connection.
-    *
-    * @param tileTank The tank added to this connection.
-    * @param facing   The facing that the tank should be connected to. UP and DOWN are valid.
-    * @return new connection
-    */
-  def add(tileTank: TileTankNoDisplay, facing: EnumFacing): Connection = {
-    val newFluid = tileTank.tank.getFluid
-    if (newFluid == null || fluidType == null || fluidType == newFluid) {
-      // You can connect the tank to this connection.
-      if (seq.contains(tileTank) || seq.exists(_.getPos == tileTank.getPos)) {
-        FluidTank.LOGGER.warn(s"TileTank at ${tileTank.getPos} is already added to connection.")
-        return this
-      }
-      val newSeq = if (facing == EnumFacing.DOWN) {
-        tileTank +: seq
-      } else {
-        seq :+ tileTank
-      }
-      val connection = new Connection(newSeq)
-      val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, true))) yield i
-      newSeq.foreach(t => {
-        t.connection = connection
-        t.tank.setFluid(null)
-      })
-      fluidStacks.foreach(connection.handler.fill(_, true))
-      connection
-    } else {
-      // You have to make new connection.
-      val connection = new Connection(Seq(tileTank))
-      tileTank.connection = connection
-      connection
-    }
-  }
-
-  def add(connection: Connection, facing: EnumFacing): Connection = {
-    val newFluid = connection.fluidType
-    if (newFluid == null || fluidType == null || newFluid == fluidType) {
-      if (seq.exists(connection.seq.contains)) {
-        FluidTank.LOGGER.warn(s"Connection($seq) has same block with ${connection.seq}.")
-        return connection
-      }
-      val newSeq = if (facing == EnumFacing.DOWN) {
-        connection.seq ++ this.seq
-      } else {
-        this.seq ++ connection.seq
-      }
-      val nConnection = new Connection(newSeq)
-      val fluidStacks = for (t <- newSeq; i <- Option(t.tank.drain(t.tank.getFluid, true))) yield i
-      newSeq.foreach(t => {
-        t.connection = nConnection
-        t.tank.setFluid(null)
-      })
-      fluidStacks.foreach(nConnection.handler.fill(_, true))
-      nConnection
-    } else {
-      // Nothing to change.
-      connection
-    }
-  }
-
   def remove(tileTank: TileTankNoDisplay): Unit = {
     val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
-    s1.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
-    s2.tail.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
+    val s1Connection = Connection.create(s1)
+    val s2Connection = Connection.create(s2.tail)
+    s1.foreach(_.connection = s1Connection)
+    s2.tail.foreach(_.connection = s2Connection)
   }
 
   def getComparatorLevel: Int = {
@@ -240,6 +205,26 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
 object Connection {
 
+  def create(s: Seq[TileTankNoDisplay]): Connection = {
+    if (s.isEmpty) invalid
+    else new Connection(s)
+  }
+
+  @scala.annotation.tailrec
+  def createAndInit(s: Seq[TileTankNoDisplay]): Unit = {
+    if (s.nonEmpty) {
+      val fluid = s.toStream.map(_.tank.getFluid).find(_ != null).orNull
+      val (s1, s2) = s.span(t => t.tank.getFluid == null || t.tank.getFluid.isFluidEqual(fluid))
+      // Assert tanks in s1 have the same fluid.
+      require(s1.map(_.tank.getFluid).forall(f => f == null || f.isFluidEqual(fluid)))
+      val contentAmount = (for (t <- s1; f <- Option(t.tank.drain(t.tank.getFluid, true))) yield f.amount.toLong).sum
+      val connection = Connection.create(s1)
+      connection.handler.fill(fluid, contentAmount, doFill = true)
+      s1.foreach(_.connection = connection)
+      if (s2.nonEmpty) createAndInit(s2)
+    }
+  }
+
   val invalid: Connection = new Connection(Nil) {
     override def fluidType: FluidStack = null
 
@@ -247,7 +232,17 @@ object Connection {
 
     override def amount: Long = 0
 
-    override val handler: IFluidHandler = EmptyFluidHandler.INSTANCE
+    override val handler: Handler = new Handler {
+      override def fill(kind: FluidStack, doFill: Boolean) = 0
+
+      override def drain(kind: FluidStack, doDrain: Boolean) = null
+
+      override def drain(maxDrain: Int, doDrain: Boolean) = null
+
+      override def getTankProperties: Array[IFluidTankProperties] = EmptyFluidHandler.EMPTY_TANK_PROPERTIES_ARRAY
+
+      override def fill(kind: FluidStack, amount: Long, doFill: Boolean) = 0
+    }
 
     override val toString: String = "Connection.Invalid"
 
@@ -268,6 +263,6 @@ object Connection {
     })
     val tanks = Iterator.iterate(lowest)(_.up()).map(world.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
       .toList.map(_.asInstanceOf[TileTankNoDisplay])
-    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, EnumFacing.UP) }
+    createAndInit(tanks)
   }
 }
