@@ -185,12 +185,7 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
     public List<FluidAmount> fluidAmountList() {
         Direction direction = getBlockState().get(BlockStateProperties.FACING);
         LazyOptional<FluidHandlerWrapper> opt = getFluidHandler(direction);
-        if (opt.isPresent()) {
-            FluidHandlerWrapper wrapper = opt.orElseThrow(() -> new AssertionError("LazyOptional has nothing."));
-            return wrapper.fluidList();
-        } else {
-            return Collections.emptyList();
-        }
+        return opt.map(FluidHandlerWrapper::fluidList).orElse(Collections.emptyList());
     }
 
     private static class FluidKey {
