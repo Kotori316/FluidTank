@@ -6,15 +6,25 @@
     "gtg"
   ],
   "key": {
-    "t": {
-      "item": "fluidtank:tank_wood"
-    },
+    "t": [
+      {
+        "item": "fluidtank:tank_wood"
+      },
+      {
+        "item": "fluidtank:invisible_tank_wood"
+      }
+    ],
     "g": {
       "tag": "forge:glass"
     },
-    "e": {
-      "tag": "forge:ender_pearls"
-    }
+    "e": [
+      {
+        "tag": "forge:ender_pearls"
+      },
+      {
+        "item": "minecraft:ender_eye"
+      }
+    ]
   },
   "result": {
     "item": "fluidtank:pipe"

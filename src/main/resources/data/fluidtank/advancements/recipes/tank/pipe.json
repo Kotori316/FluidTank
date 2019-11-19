@@ -22,10 +22,13 @@
         ]
       }
     },
-    "has_ender_pearls": {
+    "has_pearl": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
+          {
+            "item": "minecraft:ender_eye"
+          },
           {
             "tag": "forge:ender_pearls"
           }
@@ -37,7 +40,7 @@
     [
       "has_the_recipe",
       "has_tank_wood",
-      "has_ender_pearls"
+      "has_pearl"
     ]
   ],
   "conditions": [
