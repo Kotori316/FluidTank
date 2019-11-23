@@ -114,7 +114,10 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   override def getTanks = 1
 
   @Nonnull
-  override def getFluidInTank(tank: Int): FluidStack = if (stack.getCount == 1) fluid else FluidStack.EMPTY
+  override def getFluidInTank(tank: Int): FluidStack = {
+    init()
+    if (stack.getCount == 1) fluid else FluidStack.EMPTY
+  }
 
   override def getTankCapacity(tank: Int): Int = if (stack.getCount == 1) Utils.toInt(tiers.amount) else 0
 
