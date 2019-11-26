@@ -124,14 +124,20 @@ dependencies {
 
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 //    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
+    // https://dvs1.progwml6.com/files/maven/mezz/jei/jei-1.14.4/6.0.0.25/jei-1.14.4-6.0.0.25.jar
     implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
     // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
 
     compileOnly("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
 
+    // Runtime mod dependencies.
+//    runtimeOnly fg.deobf("silent-lib:SilentLib:1.14.4:4.4.0+44")
+//    runtimeOnly fg.deobf("silents-mechanisms:SilentMechanisms:1.14.4:0.6.9+42")
+    // https://minecraft.curseforge.com/api/maven/silents-mechanisms/SilentMechanisms/1.14.4/SilentMechanisms-1.14.4-0.6.9+42.jar
+
     // Test Dependencies.
-    testCompile("org.junit.jupiter:junit-jupiter-api:5.4.2")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.2")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
