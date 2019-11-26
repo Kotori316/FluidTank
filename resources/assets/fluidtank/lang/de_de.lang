@@ -1,0 +1,42 @@
+tile.fluidtank.blocktank1.wood.name=Holztank
+tile.fluidtank.blocktank2.stone.name=Steintank
+tile.fluidtank.blocktank2.copper.name=Kupfertank
+tile.fluidtank.blocktank2.tin.name=Zinntank
+tile.fluidtank.blocktank3.iron.name=Eisentank
+tile.fluidtank.blocktank3.bronze.name=Bronzetank
+tile.fluidtank.blocktank3.lead.name=Bleitank
+tile.fluidtank.blocktank3.silver.name=Silbertank
+tile.fluidtank.blocktank4.gold.name=Goldtank
+tile.fluidtank.blocktank5.diamond.name=Diamandtank
+tile.fluidtank.blocktank6.emerald.name=Smaragdtank
+tile.fluidtank.blocktank7.star.name=Startank
+tile.fluidtank.blocktankcreative.name=Creativetank
+
+tile.fluidtank.blocktank1.wood.invisible.name=Transparenter Holztank
+tile.fluidtank.blocktank2.stone.invisible.name=Transparenter Steintank
+tile.fluidtank.blocktank2.copper.invisible.name=Transparenter Kupfertank
+tile.fluidtank.blocktank2.tin.invisible.name=Transparenter Zinntank
+tile.fluidtank.blocktank3.iron.invisible.name=Transparenter Eisentank
+tile.fluidtank.blocktank3.bronze.invisible.name=Transparenter Bronzetank
+tile.fluidtank.blocktank3.lead.invisible.name=Transparenter Bleitank
+tile.fluidtank.blocktank3.silver.invisible.name=Transparenter Silbertank
+tile.fluidtank.blocktank4.gold.invisible.name=Transparenter Goldtank
+tile.fluidtank.blocktank5.diamond.invisible.name=Transparenter Diamandtank
+tile.fluidtank.blocktank6.emerald.invisible.name=Transparenter Smaragdtank
+tile.fluidtank.blocktank7.star.invisible.name=Transparenter Startank
+
+itemGroup.FluidTank=FluidTanks
+fluidtank.recipe.tooltip=Recipe of tanks
+
+option.fluidtank.waila.tankinfo=Showtank Info
+option.fluidtank.waila.shortinfo=Short
+fluidtank.waila.tier=Tier: %s
+fluidtank.waila.content=Inhalt: %s
+fluidtank.waila.amount=  Menge: %s mB
+fluidtank.waila.capacity=  Volumen: %s mB
+fluidtank.waila.comparator=  Komperator: %s
+fluidtank.waila.short=%1$s: %2$s/%3$s mB
+
+chat.fluidtank.connection=Verbindung von %1$s : %2$s / %3$s mB, Komperator Ausgabe %4$s.
+chat.fluidtank.connection_creative=Verbindung von %1$s in creative, Komperator Ausgabe %2$s.
+chat.fluidtank.empty=null
