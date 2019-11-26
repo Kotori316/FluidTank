@@ -41,8 +41,8 @@ object FluidTankDataProvider {
       val TANK_WOOD_EASY = AdvancementSerializeHelper(ID("tank_wood_easy"))
         .addCriterion("has_bucket", FilledBucketTrigger.Instance.forItem(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build()))
         .addItemCriterion(Tags.Items.GLASS)
-      val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasOreRecipe => b.tier }
-        .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(new Tag[Item](new ResourceLocation(tier.oreName))))
+      val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
+        .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(new Tag[Item](new ResourceLocation(tier.tagName))))
       val CAT = AdvancementSerializeHelper(ID("chest_as_tank"))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
         .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(MinMaxBounds.IntBound.atLeast(10),
@@ -106,9 +106,9 @@ object FluidTankDataProvider {
           .patternLine("gtg")
           .patternLine(" e ")
           .patternLine("gtg"))
-      val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasOreRecipe => b.tier }
+      val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
-          .addTagCondition(new Tag[Item](new ResourceLocation(tier.oreName)))
+          .addTagCondition(new Tag[Item](new ResourceLocation(tier.tagName)))
           .addCondition(ConfigCondition.getInstance()))
 
       val recipes = PIPE :: CAT :: WOOD :: EASY_WOOD :: TANKS

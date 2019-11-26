@@ -55,7 +55,7 @@ public class TierRecipe implements ICraftingRecipe {
         Set<BlockTank> tanks = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         Set<BlockTank> invTanks = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         tankItems = Ingredient.fromStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
-        subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().oreNameMap().apply(tier))))
+        subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().tagMap().apply(tier))))
             .map(Ingredient::fromTag)
             .orElse(Ingredient.EMPTY);
     }

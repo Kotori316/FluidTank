@@ -33,9 +33,9 @@ object Config {
 
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
-    private val oreNameMapValue = Tiers.list.filter(_.hasOreRecipe).map { tier =>
-      (tier, builder.worldRestart().comment(s"Set OreDict name of items to craft $tier tank.")
-        .define(tier.toString + "OreName", tier.oreName))
+    private val tagMapValue = Tiers.list.filter(_.hasTagRecipe).map { tier =>
+      (tier, builder.worldRestart().comment(s"Set tag name of items to craft $tier tank.")
+        .define(tier.toString + "OreName", tier.tagName))
     }.toMap
 
     val easyRecipe = builder.comment("True to use easy recipe.").define("easyRecipe", false)
@@ -52,10 +52,10 @@ object Config {
     builder.pop()
 
     def assertion(): Unit = {
-      require(Tiers.list.forall(oreNameMap.contains))
+      require(Tiers.list.forall(tagMap.contains))
     }
 
-    def oreNameMap: Map[Tiers, String] = oreNameMapValue.view.mapValues(_.get()).toMap ++ Tiers.list.filterNot(_.hasOreRecipe).map(t => (t, t.oreName)).toMap
+    def tagMap: Map[Tiers, String] = tagMapValue.view.mapValues(_.get()).toMap ++ Tiers.list.filterNot(_.hasTagRecipe).map(t => (t, t.tagName)).toMap
   }
 
 }

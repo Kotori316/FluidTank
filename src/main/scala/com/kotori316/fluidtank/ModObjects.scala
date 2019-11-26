@@ -28,8 +28,8 @@ object ModObjects {
 
   private[this] final val woodTank = new BlockTank(Tiers.WOOD)
   private[this] final val woodTankInvisible = new BlockInvisibleTank(Tiers.WOOD)
-  private[this] final val normalTanks = Tiers.list.filter(_.hasOreRecipe).map(new BlockTank(_))
-  private[this] final val normalTanksInv = Tiers.list.filter(_.hasOreRecipe).map(new BlockInvisibleTank(_))
+  private[this] final val normalTanks = Tiers.list.filter(_.hasTagRecipe).map(new BlockTank(_))
+  private[this] final val normalTanksInv = Tiers.list.filter(_.hasTagRecipe).map(new BlockInvisibleTank(_))
   private[this] final val creativeTank = new BlockCreativeTank
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
   final val blockTanksInvisible = woodTankInvisible :: normalTanksInv.toList
