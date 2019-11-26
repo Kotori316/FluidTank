@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.tiles
 
 import java.util.Collections
 
+import cats.kernel.Eq
 import net.minecraft.nbt.CompoundNBT
 
 import scala.collection.mutable
@@ -49,9 +50,10 @@ object Tiers {
   def fromNBT(nbt: CompoundNBT): Tiers = {
     val key = nbt.getString("string")
     nameToTierMap.getOrElse(key, {
-      println("Invalid pattern returned.")
-      (new Exception).printStackTrace()
+      new IllegalArgumentException("Invalid pattern returned.").printStackTrace()
       WOOD
     })
   }
+
+  implicit val EqTiers: Eq[Tiers] = Eq.fromUniversalEquals
 }

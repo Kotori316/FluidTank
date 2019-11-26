@@ -2,7 +2,9 @@ package com.kotori316.fluidtank.recipes
 
 import java.io.IOException
 
+import cats.syntax.eq._
 import com.google.gson.{GsonBuilder, JsonArray}
+import com.kotori316.fluidtank.tiles.Tiers
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.advancements.criterion._
 import net.minecraft.block.Blocks
@@ -72,6 +74,7 @@ object FluidTankDataProvider {
       val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
+      val woodTanks = Ingredient.fromItems(ModObjects.blockTanks.filter(_.tier === Tiers.WOOD) ::: ModObjects.blockTanksInvisible.filter(_.tier === Tiers.WOOD): _*)
       val WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(tankWoodItem)
           .key('x', Tags.Items.GLASS).key('p', ItemTags.LOGS)
@@ -90,14 +93,14 @@ object FluidTankDataProvider {
         .addCondition(EasyCondition.getInstance())
       val CAT = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockCat)
-          .key('x', tankWoodItem)
+          .key('x', woodTanks)
           .key('p', ingredientArray(Ingredient.fromTag(Tags.Items.CHESTS), Ingredient.fromItems(Blocks.BARREL)))
           .patternLine("x x")
           .patternLine("xpx")
           .patternLine("xxx"))
       val PIPE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockPipe)
-          .key('t', ingredientArray(Ingredient.fromItems(tankWoodItem), Ingredient.fromItems(ForgeRegistries.ITEMS.getValue(ID("invisible_tank_wood")))))
+          .key('t', woodTanks)
           .key('g', Tags.Items.GLASS)
           .key('e', ingredientArray(Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromItems(Items.ENDER_EYE)))
           .patternLine("gtg")

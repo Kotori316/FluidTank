@@ -6,9 +6,14 @@
     "xxx"
   ],
   "key": {
-    "x": {
-      "item": "fluidtank:tank_wood"
-    },
+    "x": [
+      {
+        "item": "fluidtank:tank_wood"
+      },
+      {
+        "item": "fluidtank:invisible_tank_wood"
+      }
+    ],
     "p": [
       {
         "tag": "forge:chests"
