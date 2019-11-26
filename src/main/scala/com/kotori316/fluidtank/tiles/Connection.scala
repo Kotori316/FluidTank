@@ -32,36 +32,37 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
      * @return Fluid that was accepted by the tank.
      */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
+      if (hasCreative) {
+        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
+        val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
+        return fluidAmount.setAmount(total)
+      }
       val rest = capacity - amount
       if (rest == 0) return FluidAmount.EMPTY
       if (fluidAmount.isEmpty || fluidAmount.amount < min || rest < min) return FluidAmount.EMPTY
       if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
-      if (hasCreative) {
-        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
-        val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
-        fluidAmount.setAmount(total)
-      } else {
-        def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[LogType[String], FluidAmount] = {
-          if (toFill.isEmpty) {
-            Writer.tell("Filled".pure[LogType]).map(_ => filled)
-          } else {
-            tanks match {
-              case Nil =>
-                val message = if (filled.isEmpty) s"Filling $toFill failed." else s"Filled, Amount: ${filled.show}"
-                Writer.apply(message.pure[LogType], filled)
-              case head :: tail =>
-                val fill = head.tank.fill(toFill, doFill)
-                Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[LogType]).flatMap(_ => internal(tail, toFill - fill, filled + fill))
-            }
+
+      def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[LogType[String], FluidAmount] = {
+        if (toFill.isEmpty) {
+          Writer.tell("Filled".pure[LogType]).map(_ => filled)
+        } else {
+          tanks match {
+            case Nil =>
+              val message = if (filled.isEmpty) s"Filling $toFill failed." else s"Filled, Amount: ${filled.show}"
+              Writer.apply(message.pure[LogType], filled)
+            case head :: tail =>
+              val fill = head.tank.fill(toFill, doFill)
+              Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[LogType]).flatMap(_ => internal(tail, toFill - fill, filled + fill))
           }
         }
-
-        internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
-          case (messages, filled) =>
-            log(doFill, messages)
-            filled
-        }
       }
+
+      internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
+        case (messages, filled) =>
+          log(doFill, messages)
+          filled
+      }
+
     }
 
     /**
