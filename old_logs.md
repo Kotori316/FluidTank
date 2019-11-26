@@ -1,3 +1,10 @@
+## v14.8.7
+- Added de_de.json, German language file.
+- Recipe changed - Fluid Pipe. Ender pearl and Ender eye can be used as the center item.
+- Recipe changed - Pipe and Chest as Tank can accept invisible wood tank.
+- Fixed - ItemFluidHandler of tanks had invalid fluid.
+- Fixed - tank on creative tank wasn't filled when placed.
+
 ## v14.8.6
 - Fixed - Very big tower of tanks (>= 100) causes lag and takes too longer time to load. [#27](https://github.com/Kotori316/FluidTank/issues/27)
 
