@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.2.0'
-        classpath group: "gradle.plugin.com.github.breadmoirai", name: "github-release", version: "2.2.8"
+        classpath group: "gradle.plugin.com.github.breadmoirai", name: "github-release", version: "2.2.9"
     }
 }
 
@@ -148,7 +148,7 @@ jar {
                 "Specification-Vendor"    : "Kotori316",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${version}",
+                "Implementation-Version"  : "${project.version}",
                 "Implementation-Vendor"   : "Kotori316",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -219,13 +219,17 @@ githubRelease {
     body {
         getLatestChangeLog()
     }
-    releaseAssets = files(jar.archivePath)
+    releaseAssets = files(
+            jar.getArchiveFile().get(),
+            deobfJar.getArchiveFile().get(),
+            srcJar.getArchiveFile().get()
+    )
 }
 
 task signJar2() {
     doLast {
         ant.signjar(
-                jar: jar.archivePath,
+                jar: jar.getArchiveFile().get(),
                 alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
                 keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
                 storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
@@ -234,7 +238,7 @@ task signJar2() {
                 tsaurl: "http://timestamp.digicert.com"
         )
         ant.signjar(
-                jar: deobfJar.archivePath,
+                jar: deobfJar.getArchiveFile().get(),
                 alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
                 keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
                 storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
@@ -295,12 +299,13 @@ task makeChangeLog() {
 
 task checkMethod() {
     doLast {
-        System.out.println("FilePath $jar.archivePath")
-        System.out.println("FilePath $srcJar.archivePath")
-        System.out.println("FilePath $deobfJar.archivePath")
+        System.out.println("FilePath ${jar.getArchiveFile().get()}")
+        System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
+        System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
         System.out.println("Name $project.name")
         System.out.println("BaseName $archivesBaseName")
         System.out.println("ModVersion ${getProperty("modVersion")}")
+        System.out.println("ModVersion ${project.version}")
         println("*" * 20)
         println("changes.md")
         println(getLatestChangeLog())
