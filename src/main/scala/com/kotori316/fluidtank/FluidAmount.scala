@@ -52,11 +52,13 @@ object FluidAmount {
   val EMPTY = FluidAmount(Fluids.EMPTY, 0, None)
   val BUCKET_LAVA = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
   val BUCKET_WATER = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
+  val BUCKET_MILK = FluidAmount(ModObjects.MILK_FLUID, AMOUNT_BUCKET, None)
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
       case Items.LAVA_BUCKET => BUCKET_LAVA
       case Items.WATER_BUCKET => BUCKET_WATER
+      case Items.MILK_BUCKET => BUCKET_MILK
       case bucket: BucketItem =>
         bucket.pure[Id].map(_.getFluid).map(FluidAmount(_, AMOUNT_BUCKET, None))
       case _ => FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY).pure[Id].map(fromStack)

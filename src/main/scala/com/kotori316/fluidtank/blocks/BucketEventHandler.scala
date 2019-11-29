@@ -7,15 +7,15 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
-import net.minecraft.util.{Direction, Hand, SoundCategory, SoundEvents}
+import net.minecraft.util.{Direction, Hand, SoundCategory, SoundEvent, SoundEvents}
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.player.FillBucketEvent
 import net.minecraftforge.eventbus.api.Event.Result
 import net.minecraftforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
-import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.wrapper.EmptyHandler
+import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
 
 object BucketEventHandler {
 
@@ -73,12 +73,38 @@ object BucketEventHandler {
   }
 
   def transferFluid(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
+    if (stack.getItem != Items.MILK_BUCKET) {
+      transferFluid_internal(worldIn, pos, playerIn, handIn, toFill, stack, handlerItem, tankHandler)
+    } else {
+      // Transfer milk
+      val drained = FluidAmount.BUCKET_MILK.toStack
+      val filledSimulation = tankHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE)
+      if (filledSimulation >= drained.getAmount) {
+        // Tank can be filled with 1000 mB of milk.
+        tankHandler.fill(drained, IFluidHandler.FluidAction.EXECUTE)
+        val soundEvent = getFillSound(drained)
+        worldIn.playSound(null, pos, soundEvent, SoundCategory.BLOCKS, 1f, 1f)
+        if (!playerIn.abilities.isCreativeMode) {
+          if (stack.getCount > 1) {
+            ItemHandlerHelper.giveItemToPlayer(playerIn, new ItemStack(Items.BUCKET))
+            stack.shrink(1)
+            playerIn.setHeldItem(handIn, stack)
+          } else {
+            // Just replace to empty bucket.
+            playerIn.setHeldItem(handIn, new ItemStack(Items.BUCKET))
+          }
+        }
+      }
+    }
+  }
+
+  private def transferFluid_internal(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
     val drain = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE)
     val drainAmount = drain.getAmount
     val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
     val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
     if (resultFill.isSuccess) {
-      val soundEvent = Option(drain.getFluid.getAttributes.getFillSound(drain)).getOrElse(if (drain.getFluid.isIn(FluidTags.LAVA)) SoundEvents.ITEM_BUCKET_FILL_LAVA else SoundEvents.ITEM_BUCKET_FILL)
+      val soundEvent = getFillSound(drain)
       worldIn.playSound(null, pos, soundEvent, SoundCategory.BLOCKS, 1f, 1f)
       playerIn.setHeldItem(handIn, resultFill.getResult)
     } else {
@@ -86,11 +112,18 @@ object BucketEventHandler {
       val fillAmount = handlerItem.fill(fill, IFluidHandler.FluidAction.SIMULATE)
       val resultDrain = FluidUtil.tryFillContainerAndStow(stack, tankHandler, itemHandler, fillAmount, playerIn, true)
       if (resultDrain.isSuccess) {
-        val soundEvent = Option(fill.getFluid.getAttributes.getEmptySound(fill)).getOrElse(if (fill.getFluid isIn FluidTags.LAVA) SoundEvents.ITEM_BUCKET_EMPTY_LAVA else SoundEvents.ITEM_BUCKET_EMPTY)
+        val soundEvent = getEmptySound(fill)
         worldIn.playSound(null, pos, soundEvent, SoundCategory.BLOCKS, 1f, 1f)
         playerIn.setHeldItem(handIn, resultDrain.getResult)
       }
     }
   }
 
+  private def getEmptySound(fluidStack: FluidStack): SoundEvent = {
+    Option(fluidStack.getFluid.getAttributes.getEmptySound(fluidStack)).getOrElse(if (fluidStack.getFluid isIn FluidTags.LAVA) SoundEvents.ITEM_BUCKET_EMPTY_LAVA else SoundEvents.ITEM_BUCKET_EMPTY)
+  }
+
+  private def getFillSound(fluidStack: FluidStack): SoundEvent = {
+    Option(fluidStack.getFluid.getAttributes.getFillSound(fluidStack)).getOrElse(if (fluidStack.getFluid.isIn(FluidTags.LAVA)) SoundEvents.ITEM_BUCKET_FILL_LAVA else SoundEvents.ITEM_BUCKET_FILL)
+  }
 }

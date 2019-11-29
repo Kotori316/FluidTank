@@ -1,12 +1,14 @@
 package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank}
+import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.shapes.VoxelShapes
 
@@ -57,4 +59,8 @@ object ModObjects {
   //---------- Containers ----------
 
   final val CAT_CONTAINER_TYPE = CATContainer.makeType()
+
+  //---------- Fluids ----------
+  final val MILK_FLUID = new MilkFluid
+  final val MILK_TAG = new net.minecraft.tags.FluidTags.Wrapper(new ResourceLocation("minecraft:milk"))
 }

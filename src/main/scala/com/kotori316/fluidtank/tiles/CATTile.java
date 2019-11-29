@@ -16,6 +16,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -25,7 +27,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -37,6 +38,7 @@ import scala.Option;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.milk.MilkBucketHandler;
 
 public class CATTile extends TileEntity implements INamedContainerProvider {
     // The direction of FACING is facing to you, people expect to use itemBlock targeting an inventory so the chest exists on the opposite side of FACING.
@@ -92,7 +94,11 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         }
 
         public LazyOptional<IFluidHandlerItem> getFluidHandler(int tank) {
-            return FluidUtil.getFluidHandler(inventory.getStackInSlot(tank));
+            ItemStack stackInSlot = inventory.getStackInSlot(tank);
+            if (stackInSlot.getItem() == Items.MILK_BUCKET)
+                return LazyOptional.of(() -> new MilkBucketHandler(stackInSlot));
+            else
+                return net.minecraftforge.fluids.FluidUtil.getFluidHandler(stackInSlot);
         }
 
         @Override
@@ -103,7 +109,7 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         @Nonnull
         @Override
         public FluidStack getFluidInTank(int tank) {
-            return FluidUtil.getFluidContained(inventory.getStackInSlot(tank)).orElse(FluidStack.EMPTY);
+            return getFluidHandler(tank).map(h -> h.drain(Integer.MAX_VALUE, FluidAction.SIMULATE)).orElse(FluidStack.EMPTY);
         }
 
         @Override
