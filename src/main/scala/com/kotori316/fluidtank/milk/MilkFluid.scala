@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.fluids.FluidAttributes
 
 class MilkFluid extends Fluid {
-  setRegistryName(FluidTank.modID, "vanilla_milk")
+  setRegistryName(FluidTank.modID, MilkFluid.NAME)
 
   @OnlyIn(Dist.CLIENT)
   override def getRenderLayer = BlockRenderLayer.SOLID
@@ -48,4 +48,8 @@ class MilkFluid extends Fluid {
       .sound(SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY)
       .build(this)
   }
+}
+
+object MilkFluid {
+  final val NAME = "vanilla_milk"
 }
