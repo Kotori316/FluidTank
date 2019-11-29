@@ -3,6 +3,7 @@ package com.kotori316.fluidtank;
 import java.lang.reflect.Method;
 
 import net.minecraft.block.Block;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -86,6 +87,11 @@ public class FluidTank {
             CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat().itemBlock());
             event.getRegistry().register(ModObjects.blockPipe().itemBlock());
+        }
+
+        @SubscribeEvent
+        public static void registerFluids(RegistryEvent.Register<Fluid> event) {
+            event.getRegistry().register(ModObjects.MILK_FLUID());
         }
 
         @SubscribeEvent

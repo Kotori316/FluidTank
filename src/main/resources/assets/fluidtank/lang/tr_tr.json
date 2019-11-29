@@ -26,6 +26,7 @@
   "block.fluidtank.invisible_tank_emerald": "Görünmez Zümrüt Tank",
   "block.fluidtank.invisible_tank_star": "Görünmez Yıldız Tank",
   "block.fluidtank.pipe": "Fluid Pipe",
+  "block.fluidtank.milk": "Milk",
   "chat.fluidtank.connection": "Connection of %1$s : %2$s / %3$s mB, Comparator outputs %4$s.",
   "chat.fluidtank.connection_creative": "Connection of %1$s in creative, Comparator outputs %2$s.",
   "chat.fluidtank.empty": "null",

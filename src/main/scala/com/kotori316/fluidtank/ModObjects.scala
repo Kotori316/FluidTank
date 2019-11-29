@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank}
+import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
 import net.minecraft.block.Block
@@ -57,4 +58,7 @@ object ModObjects {
   //---------- Containers ----------
 
   final val CAT_CONTAINER_TYPE = CATContainer.makeType()
+
+  //---------- Fluids ----------
+  final val MILK_FLUID = new MilkFluid
 }
