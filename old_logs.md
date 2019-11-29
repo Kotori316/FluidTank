@@ -1,3 +1,6 @@
+## v14.8.8
+- Enabled storing milk in a tank. [#31](https://github.com/Kotori316/FluidTank/pull/31)
+
 ## v14.8.7
 - Added de_de.json, German language file.
 - Recipe changed - Fluid Pipe. Ender pearl and Ender eye can be used as the center item.
