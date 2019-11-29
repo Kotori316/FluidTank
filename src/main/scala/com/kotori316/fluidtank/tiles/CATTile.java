@@ -16,6 +16,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -103,7 +105,10 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         @Nonnull
         @Override
         public FluidStack getFluidInTank(int tank) {
-            return FluidUtil.getFluidContained(inventory.getStackInSlot(tank)).orElse(FluidStack.EMPTY);
+            ItemStack stackInSlot = inventory.getStackInSlot(tank);
+            if (stackInSlot.getItem() == Items.MILK_BUCKET)
+                return FluidAmount.BUCKET_MILK().toStack();
+            return FluidUtil.getFluidContained(stackInSlot).orElse(FluidStack.EMPTY);
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.FluidAmount
+import com.kotori316.fluidtank.milk.MilkBucketHandler
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.entity.player.PlayerEntity
@@ -73,6 +74,11 @@ object BucketEventHandler {
   }
 
   def transferFluid(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
+    val hander = if (stack.getItem == Items.MILK_BUCKET) new MilkBucketHandler(stack) else handlerItem
+    transferFluid_internal(worldIn, pos, playerIn, handIn, toFill, stack, hander, tankHandler)
+  }
+
+  private def transferFluid_internal(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
     val drain = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE)
     val drainAmount = drain.getAmount
     val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
