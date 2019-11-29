@@ -24,6 +24,7 @@ object FluidTankDataProvider {
     if (event.includeServer()) {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
+      event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator))
     }
   }
 
@@ -125,6 +126,12 @@ object FluidTankDataProvider {
 
     override def getName = "Recipe of FluidTank"
 
+  }
+
+  class FluidTagsProvider(g: DataGenerator) extends net.minecraft.data.FluidTagsProvider(g) {
+    override def registerTags(): Unit = {
+      getBuilder(ModObjects.MILK_TAG).add(ModObjects.MILK_FLUID)
+    }
   }
 
   def makeConditionArray(conditions: List[ICondition]): JsonArray = {
