@@ -6,7 +6,7 @@ import net.minecraft.fluid.{Fluid, IFluidState}
 import net.minecraft.item.{Item, Items}
 import net.minecraft.util.math.shapes.{VoxelShape, VoxelShapes}
 import net.minecraft.util.math.{BlockPos, Vec3d}
-import net.minecraft.util.{BlockRenderLayer, Direction, ResourceLocation}
+import net.minecraft.util.{BlockRenderLayer, Direction, ResourceLocation, SoundEvents}
 import net.minecraft.world.{IBlockReader, IWorldReader}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.fluids.FluidAttributes
@@ -45,6 +45,7 @@ class MilkFluid extends Fluid {
       new ResourceLocation(FluidTank.modID, "blocks/milk_flow")
     )
       .translationKey(s"block.${FluidTank.modID}.milk")
+      .sound(SoundEvents.ITEM_BUCKET_FILL, SoundEvents.ITEM_BUCKET_EMPTY)
       .build(this)
   }
 }
