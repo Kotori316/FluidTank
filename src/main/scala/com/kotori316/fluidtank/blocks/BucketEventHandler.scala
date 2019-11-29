@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.FluidAmount
-import com.kotori316.fluidtank.milk.MilkBucketHandler
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.entity.player.PlayerEntity
@@ -15,8 +14,8 @@ import net.minecraftforge.eventbus.api.Event.Result
 import net.minecraftforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
-import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.wrapper.EmptyHandler
+import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
 
 object BucketEventHandler {
 
@@ -74,8 +73,27 @@ object BucketEventHandler {
   }
 
   def transferFluid(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
-    val hander = if (stack.getItem == Items.MILK_BUCKET) new MilkBucketHandler(stack) else handlerItem
-    transferFluid_internal(worldIn, pos, playerIn, handIn, toFill, stack, hander, tankHandler)
+    if (stack.getItem != Items.MILK_BUCKET) {
+      transferFluid_internal(worldIn, pos, playerIn, handIn, toFill, stack, handlerItem, tankHandler)
+    } else {
+      // Transfer milk
+      val drained = FluidAmount.BUCKET_MILK.toStack
+      val filledSimulation = tankHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE)
+      if (filledSimulation >= drained.getAmount) {
+        // Tank can be filled with 1000 mB of milk.
+        tankHandler.fill(drained, IFluidHandler.FluidAction.EXECUTE)
+        if (!playerIn.abilities.isCreativeMode) {
+          if (stack.getCount > 1) {
+            ItemHandlerHelper.giveItemToPlayer(playerIn, new ItemStack(Items.BUCKET))
+            stack.shrink(1)
+            playerIn.setHeldItem(handIn, stack)
+          } else {
+            // Just replace to empty bucket.
+            playerIn.setHeldItem(handIn, new ItemStack(Items.BUCKET))
+          }
+        }
+      }
+    }
   }
 
   private def transferFluid_internal(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
