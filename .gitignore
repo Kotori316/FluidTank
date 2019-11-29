@@ -20,5 +20,5 @@ build
 # other
 eclipse
 FILES
-Minecraft
+/Minecraft
 run-server
