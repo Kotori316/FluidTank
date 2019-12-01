@@ -169,7 +169,9 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     Cap.asJava(
-      Cap.make[T](handler.asInstanceOf[T]).filter(_ => capability == CapabilityFluidTank.cap || capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+      Cap.empty[T]
+        .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
+        .orElse(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.make[T](capability, handler))
         .orElse(capabilities.map(_.getCapability(capability, facing).asScala).getOrElse(Cap.empty))
     )
   }
