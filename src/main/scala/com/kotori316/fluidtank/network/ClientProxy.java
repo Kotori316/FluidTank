@@ -5,12 +5,15 @@ import java.util.Optional;
 
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -38,6 +41,7 @@ public class ClientProxy extends SideProxy {
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
+    public static TextureAtlasSprite whiteTexture;
 
     @Override
     public Option<World> getWorld(NetworkEvent.Context context) {
@@ -74,5 +78,19 @@ public class ClientProxy extends SideProxy {
 //            IBakedModel model = event.getModelManager().getModel(modelLocation);
             event.getModelRegistry().put(modelLocation, MODEL_TANK);
         });
+    }
+
+    @SubscribeEvent
+    public void registerTexture(TextureStitchEvent.Pre event) {
+        if (event.getMap().getBasePath().equals("textures")) {
+            event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+        }
+    }
+
+    @SubscribeEvent
+    public void putTexture(TextureStitchEvent.Post event) {
+        if (event.getMap().getBasePath().equals("textures")) {
+            whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+        }
     }
 }

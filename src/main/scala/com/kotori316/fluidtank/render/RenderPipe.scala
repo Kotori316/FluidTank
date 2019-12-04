@@ -2,10 +2,10 @@ package com.kotori316.fluidtank.render
 
 import java.awt.Color
 
+import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.fluid.Fluids
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.client.model.animation.TileEntityRendererFast
 
@@ -17,7 +17,7 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     val minD = 4 * d + 0.01
     Minecraft.getInstance.getProfiler.startSection("RenderPipe")
 
-    val texture = Minecraft.getInstance.getTextureMap.getSprite(Fluids.WATER.getAttributes.getStillTexture)
+    val texture = ClientProxy.whiteTexture
     val minU = texture.getMinU
     val minV = texture.getMinV
     val maxU = texture.getMaxU
@@ -29,7 +29,7 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF
     val blue = color >> 0 & 0xFF
-    val alpha = 128
+    val alpha = 240
     //    RenderPipe.BOX_AABB.render(buffer, texture, 128, red, green, blue)
     if (te.getBlockState.get(PipeBlock.NORTH).hasConnection) {
       RenderPipe.North_AABB.render(buffer, texture, alpha, red, green, blue)
