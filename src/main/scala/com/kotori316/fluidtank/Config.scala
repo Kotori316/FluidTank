@@ -28,9 +28,6 @@ object Config {
     val removeRecipe = builder.worldRestart().comment("Remove all recipe to make tanks.")
       .define("RemoveRecipe", false)
 
-    val enableOldRender = builder.worldRestart().comment("True to use other render system for item. It doesn't show the content of tanks.")
-      .define("enableOldRender", false)
-
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
     private val tagMapValue = Tiers.list.filter(_.hasTagRecipe).map { tier =>
