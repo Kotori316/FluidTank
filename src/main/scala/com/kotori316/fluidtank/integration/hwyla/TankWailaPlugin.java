@@ -5,6 +5,7 @@ import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.WailaPlugin;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.ModList;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -29,7 +30,7 @@ public class TankWailaPlugin implements IWailaPlugin {
 
     @Override
     public void register(IRegistrar registrar) {
-        if (Config.content().enableWailaAndTOP().get()) {
+        if (ModList.get().isLoaded(Waila_ModId) && Config.content().enableWailaAndTOP().get()) {
             TankDataProvider provider = new TankDataProvider();
             registrar.registerBlockDataProvider(provider, TileTankNoDisplay.class);
             registrar.registerComponentProvider(provider, TooltipPosition.BODY, TileTankNoDisplay.class);
