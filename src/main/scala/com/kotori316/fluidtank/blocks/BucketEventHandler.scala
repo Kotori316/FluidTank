@@ -101,7 +101,7 @@ object BucketEventHandler {
   private def transferFluid_internal(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
     val drain = handlerItem.drain(Int.MaxValue, IFluidHandler.FluidAction.SIMULATE)
     val drainAmount = drain.getAmount
-    val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElseGet(() => EmptyHandler.INSTANCE)
+    val itemHandler = playerIn.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, Direction.UP).orElse(EmptyHandler.INSTANCE)
     val resultFill = FluidUtil.tryEmptyContainerAndStow(stack, tankHandler, itemHandler, drainAmount, playerIn, true)
     if (resultFill.isSuccess) {
       val soundEvent = getFillSound(drain)
