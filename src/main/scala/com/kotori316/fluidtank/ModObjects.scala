@@ -22,6 +22,8 @@ object ModObjects {
   }.setTabPath(FluidTank.modID)
   final val MATERIAL = new Material(MaterialColor.AIR, false, true, true, false,
     true, false, false, PushReaction.BLOCK)
+  final val MATERIAL_PIPE = new Material(MaterialColor.AIR, false, false, true, false,
+    true, false, false, PushReaction.BLOCK)
   private[this] final val d = 1 / 16d
   final val BOUNDING_BOX = new AxisAlignedBB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d)
   final val TANK_SHAPE = VoxelShapes.create(BOUNDING_BOX)

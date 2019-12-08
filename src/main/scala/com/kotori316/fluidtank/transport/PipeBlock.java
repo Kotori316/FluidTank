@@ -84,7 +84,7 @@ public class PipeBlock extends Block {
     private final BlockItem blockItem;
 
     public PipeBlock() {
-        super(Block.Properties.create(Material.MISCELLANEOUS)
+        super(Block.Properties.create(ModObjects.MATERIAL_PIPE())
             .hardnessAndResistance(0.5f));
         setRegistryName(FluidTank.modID, "pipe");
         setDefaultState(getStateContainer().getBaseState()
