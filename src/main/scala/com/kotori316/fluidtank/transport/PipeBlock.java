@@ -44,7 +44,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
-import com.kotori316.fluidtank.milk.MilkBucketHandler;
 
 import static net.minecraft.state.properties.BlockStateProperties.WATERLOGGED;
 
