@@ -9,9 +9,11 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -42,8 +44,11 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.milk.MilkBucketHandler;
 
-public class PipeBlock extends Block {
+import static net.minecraft.state.properties.BlockStateProperties.WATERLOGGED;
+
+public class PipeBlock extends Block implements IWaterLoggable {
     public static final VoxelShape BOX_AABB = VoxelShapes.create(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
     public static final VoxelShape North_AABB = VoxelShapes.create(0.25, 0.25, 0, 0.75, 0.75, 0.25);
     public static final VoxelShape South_AABB = VoxelShapes.create(0.25, 0.25, .75, 0.75, 0.75, 1);
@@ -94,6 +99,7 @@ public class PipeBlock extends Block {
             .with(EAST, Connection.NO_CONNECTION)
             .with(UP, Connection.NO_CONNECTION)
             .with(DOWN, Connection.NO_CONNECTION)
+            .with(WATERLOGGED, false)
         );
         blockItem = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS()));
         blockItem.setRegistryName(FluidTank.modID, "pipe");
@@ -101,7 +107,7 @@ public class PipeBlock extends Block {
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN);
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, WATERLOGGED);
     }
 
     @Override
@@ -125,13 +131,15 @@ public class PipeBlock extends Block {
         BlockPos pos = context.getPos();
 //        return FACING_TO_PROPERTY_MAP.entrySet().stream()
 //        .reduce(this.getDefaultState(), (s, e) -> s.with(e.getValue(), canConnectTo(worldIn, pos.offset(e.getKey()), e.getKey())), (s1, s2) -> s1);
+        IFluidState fluidState = worldIn.getFluidState(pos);
         return this.getDefaultState()
             .with(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
             .with(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))
             .with(SOUTH, canConnectTo(worldIn, pos.south(), Direction.SOUTH))
             .with(WEST, canConnectTo(worldIn, pos.west(), Direction.WEST))
             .with(DOWN, canConnectTo(worldIn, pos.down(), Direction.DOWN))
-            .with(UP, canConnectTo(worldIn, pos.up(), Direction.UP));
+            .with(UP, canConnectTo(worldIn, pos.up(), Direction.UP))
+            .with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
     }
 
     @Override
@@ -159,7 +167,8 @@ public class PipeBlock extends Block {
     }
 
     private Connection canConnectTo(IWorld worldIn, BlockPos pos, Direction direction) {
-        if (worldIn.getBlockState(pos).getBlock() == this) {
+        BlockState blockState = worldIn.getBlockState(pos);
+        if (blockState.getBlock() == this) {
             return Connection.CONNECTED;
         } else {
             TileEntity entity = worldIn.getTileEntity(pos);
@@ -248,6 +257,12 @@ public class PipeBlock extends Block {
             }
             super.onReplaced(state, worldIn, pos, newState, isMoving);
         }
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public IFluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
     }
 
     public enum Connection implements IStringSerializable {
