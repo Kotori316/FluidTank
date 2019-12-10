@@ -5,6 +5,9 @@ For Minecraft 1.14.4 (1.14.3 branch)
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
 [![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
 
+[![](https://github.com/Kotori316/FluidTank/workflows/Java%20CI/badge.svg)](https://github.com/Kotori316/FluidTank/actions)
+
+
 LICENSE: MIT License  
 Copyright (c) 2019 Kotori316
 
@@ -17,11 +20,13 @@ The capacity of wood tank is 4000 mB but star one can have 1048576000 mB.
 
 All tanks have Fluid Capability to transfer fluid and their items also have Fluid Capability for items.
 
+See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more information.
+
 Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidtank
 
 ### APIs
 
-* **REQUIRED** [Forge](https://files.minecraftforge.net/)
+* **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
   * For Minecraft 1.14.4, newer than 1.14.4-28.1.0
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
