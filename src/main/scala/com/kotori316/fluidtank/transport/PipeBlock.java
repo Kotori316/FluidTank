@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
@@ -45,9 +44,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 
-import static net.minecraft.state.properties.BlockStateProperties.WATERLOGGED;
-
-public class PipeBlock extends Block implements IWaterLoggable {
+public class PipeBlock extends Block {
     public static final VoxelShape BOX_AABB = VoxelShapes.create(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
     public static final VoxelShape North_AABB = VoxelShapes.create(0.25, 0.25, 0, 0.75, 0.75, 0.25);
     public static final VoxelShape South_AABB = VoxelShapes.create(0.25, 0.25, .75, 0.75, 0.75, 1);
@@ -98,7 +95,7 @@ public class PipeBlock extends Block implements IWaterLoggable {
             .with(EAST, Connection.NO_CONNECTION)
             .with(UP, Connection.NO_CONNECTION)
             .with(DOWN, Connection.NO_CONNECTION)
-            .with(WATERLOGGED, false)
+//            .with(WATERLOGGED, false)
         );
         blockItem = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS()));
         blockItem.setRegistryName(FluidTank.modID, "pipe");
@@ -106,7 +103,7 @@ public class PipeBlock extends Block implements IWaterLoggable {
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, WATERLOGGED);
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN/*, WATERLOGGED*/);
     }
 
     @Override
@@ -130,21 +127,24 @@ public class PipeBlock extends Block implements IWaterLoggable {
         BlockPos pos = context.getPos();
 //        return FACING_TO_PROPERTY_MAP.entrySet().stream()
 //        .reduce(this.getDefaultState(), (s, e) -> s.with(e.getValue(), canConnectTo(worldIn, pos.offset(e.getKey()), e.getKey())), (s1, s2) -> s1);
-        IFluidState fluidState = worldIn.getFluidState(pos);
+//        IFluidState fluidState = worldIn.getFluidState(pos);
         return this.getDefaultState()
             .with(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
             .with(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))
             .with(SOUTH, canConnectTo(worldIn, pos.south(), Direction.SOUTH))
             .with(WEST, canConnectTo(worldIn, pos.west(), Direction.WEST))
             .with(DOWN, canConnectTo(worldIn, pos.down(), Direction.DOWN))
-            .with(UP, canConnectTo(worldIn, pos.up(), Direction.UP))
-            .with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+            .with(UP, canConnectTo(worldIn, pos.up(), Direction.UP));
+//            .with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState,
                                           IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+        /*if (stateIn.get(WATERLOGGED)) {
+            worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+        }*/
         Connection value;
         Connection now = stateIn.get(FACING_TO_PROPERTY_MAP.get(facing));
         if (facingState.getBlock() == this) {
@@ -153,7 +153,7 @@ public class PipeBlock extends Block implements IWaterLoggable {
         } else {
             value = canConnectTo(worldIn, currentPos.offset(facing), facing);
             if (value.is(Connection.NO_CONNECTION)) {
-                if (facingState.getMaterial() == Material.AIR) {
+                if (facingState.getMaterial() == Material.AIR || facingState.getMaterial().isLiquid()) {
                     return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
                 } else {
                     return stateIn;
@@ -261,7 +261,7 @@ public class PipeBlock extends Block implements IWaterLoggable {
     @Override
     @SuppressWarnings("deprecation")
     public IFluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+        return /*state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) :*/ super.getFluidState(state);
     }
 
     public enum Connection implements IStringSerializable {
