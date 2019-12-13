@@ -1,12 +1,12 @@
 {
   "parent": "block/cube",
   "textures": {
-    "particle": "fluidtank:blocks/cat_side",
-    "down": "fluidtank:blocks/cat_side",
-    "up": "fluidtank:blocks/cat_side",
-    "north": "fluidtank:blocks/cat_side",
-    "east": "fluidtank:blocks/cat_side",
-    "south": "fluidtank:blocks/cat_side",
-    "west": "fluidtank:blocks/cat_side"
+    "particle": "fluidtank:blocks/fluid_source",
+    "down": "fluidtank:blocks/white",
+    "up": "fluidtank:blocks/white",
+    "north": "fluidtank:blocks/fluid_source",
+    "east": "fluidtank:blocks/fluid_source",
+    "south": "fluidtank:blocks/fluid_source",
+    "west": "fluidtank:blocks/fluid_source"
   }
 }

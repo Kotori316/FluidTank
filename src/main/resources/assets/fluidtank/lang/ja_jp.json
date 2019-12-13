@@ -27,6 +27,7 @@
   "block.fluidtank.invisible_tank_star": "不可視の星のタンク",
   "block.fluidtank.pipe": "液体パイプ",
   "block.fluidtank.milk": "牛乳",
+  "block.fluidtank.fluid_source": "Infinite Fluid Supplier",
   "chat.fluidtank.connection": "%1$sのタンク : %2$s / %3$s mB コンパレータの出力 %4$s",
   "chat.fluidtank.connection_creative": "%1$sの無限タンク コンパレータの出力 %2$s",
   "chat.fluidtank.empty": "空",
