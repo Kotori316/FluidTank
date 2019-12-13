@@ -9,6 +9,7 @@ import net.minecraft.item.{BlockItem, Item, Items}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.Hand
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult}
+import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.{IBlockReader, World}
 
 class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON)) {
@@ -28,12 +29,16 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
       if (stack.getItem == Items.BUCKET) {
         // Reset to empty.
         changeContent(worldIn, pos, FluidAmount.EMPTY)
+        if (!worldIn.isRemote)
+          player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_source", FluidAmount.EMPTY.getLocalizedName), false)
         true
       } else {
         false
       }
     } else {
       changeContent(worldIn, pos, fluid)
+      if (!worldIn.isRemote)
+        player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_source", fluid.getLocalizedName), false)
       true
     }
   }
