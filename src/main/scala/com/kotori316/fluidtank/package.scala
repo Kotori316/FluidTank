@@ -70,4 +70,7 @@ package object fluidtank {
   }
 
   val directions = Direction.values().toList
+  val evalExtractor: Eval ~> Id = new (Eval ~> Id) {
+    override def apply[A](fa: Eval[A]): A = fa.value
+  }
 }

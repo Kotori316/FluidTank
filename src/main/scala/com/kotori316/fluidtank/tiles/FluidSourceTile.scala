@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.tiles
 
-import cats.Eval
+import cats.Id
 import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.nbt.CompoundNBT
@@ -16,8 +16,8 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
     // In server world only.
     for (direction <- directions) {
       for {
-        tile <- Option(getWorld.getTileEntity(getPos.offset(direction))).toOptionT[Eval]
-        cap <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
+        tile <- Option(getWorld.getTileEntity(getPos.offset(direction))).toOptionT[Id]
+        cap <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala.mapK(evalExtractor)
       } yield {
         val accepted = cap.fill(fluid.toStack, FluidAmount.b2a(false))
         if (accepted > 0) {
