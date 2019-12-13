@@ -32,6 +32,7 @@
   "chat.fluidtank.connection_creative": "Verbindung von %1$s in creative, Komperator Ausgabe %2$s.",
   "chat.fluidtank.empty": "null",
   "chat.fluidtank.change_source": "Fluid was changed to %s.",
+  "chat.fluidtank.change_interval": "Interval was changed to %s.",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Recipe of tanks",
   "config.waila.plugin_fluidtank": "Fluidtank",

@@ -26,26 +26,41 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
     val stack = player.getHeldItem(handIn)
     val fluid = FluidAmount.fromItem(stack)
     if (fluid.isEmpty) {
-      if (stack.getItem == Items.BUCKET) {
-        // Reset to empty.
-        changeContent(worldIn, pos, FluidAmount.EMPTY)
-        if (!worldIn.isRemote)
-          player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_source", FluidAmount.EMPTY.getLocalizedName), false)
-        true
-      } else {
-        false
+      stack.getItem match {
+        case Items.BUCKET =>
+          // Reset to empty.
+          changeContent(worldIn, pos, FluidAmount.EMPTY, player)
+          true
+        case Items.CLOCK =>
+          val i = if (handIn == Hand.MAIN_HAND) 1 else -1
+          changeInterval(worldIn, pos, stack.getCount * i, player)
+          true
+        case _ => false
       }
     } else {
-      changeContent(worldIn, pos, fluid)
-      if (!worldIn.isRemote)
-        player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_source", fluid.getLocalizedName), false)
+      changeContent(worldIn, pos, fluid, player)
       true
     }
   }
 
-  def changeContent(world: World, pos: BlockPos, fluid: FluidAmount): Unit = if (!world.isRemote) {
+  def changeContent(world: World, pos: BlockPos, fluid: FluidAmount, player: PlayerEntity): Unit = if (!world.isRemote) {
     world.getTileEntity(pos) match {
-      case s: FluidSourceTile => s.fluid = fluid
+      case s: FluidSourceTile =>
+        if (s.fluid fluidEqual fluid) {
+          s.fluid += fluid
+        } else {
+          s.fluid = fluid
+        }
+        player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_source", s.fluid.getLocalizedName), false)
+      case _ =>
+    }
+  }
+
+  def changeInterval(world: World, pos: BlockPos, dt: Int, player: PlayerEntity): Unit = if (!world.isRemote) {
+    world.getTileEntity(pos) match {
+      case s: FluidSourceTile =>
+        s.interval = Math.max(1, s.interval + dt)
+        player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_interval", s.interval), false)
       case _ =>
     }
   }

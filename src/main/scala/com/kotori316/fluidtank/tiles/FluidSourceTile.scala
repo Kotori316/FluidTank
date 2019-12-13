@@ -11,8 +11,9 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
   with ITickableTileEntity {
 
   var fluid = FluidAmount.EMPTY
+  var interval = 1
 
-  override def tick(): Unit = if (!world.isRemote) {
+  override def tick(): Unit = if (!world.isRemote && world.getGameTime % interval == 0) {
     // In server world only.
     for (direction <- directions) {
       for {
@@ -32,12 +33,14 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
   override def read(compound: CompoundNBT): Unit = {
     super.read(compound)
     fluid = FluidAmount.fromNBT(compound.getCompound("fluid"))
+    interval = Math.max(1, compound.getInt("interval"))
   }
 
   override def write(compound: CompoundNBT): CompoundNBT = {
     val fluidNBT = new CompoundNBT
     this.fluid.write(fluidNBT)
     compound.put("fluid", fluidNBT)
+    compound.putInt("interval", interval)
     super.write(compound)
   }
 }
