@@ -10,8 +10,9 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
   with ITickableTileEntity {
 
-  var fluid = FluidAmount.EMPTY
+  private[this] var mFluid = FluidAmount.EMPTY
   var interval = 1
+  var locked = true
 
   override def tick(): Unit = if (!world.isRemote && world.getGameTime % interval == 0) {
     // In server world only.
@@ -30,15 +31,36 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
     }
   }
 
+  def fluid: FluidAmount = {
+    if (this.locked) {
+      FluidAmount.BUCKET_WATER.setAmount(mFluid.amount)
+    } else {
+      mFluid
+    }
+  }
+
+  def fluid_=(fluidAmount: FluidAmount): Unit = {
+    if (this.locked) {
+      if (fluidAmount fluidEqual FluidAmount.BUCKET_WATER)
+        mFluid = fluidAmount
+      else if (fluidAmount.isEmpty)
+        mFluid = FluidAmount.EMPTY
+    } else {
+      mFluid = fluidAmount
+    }
+  }
+
   override def read(compound: CompoundNBT): Unit = {
     super.read(compound)
-    fluid = FluidAmount.fromNBT(compound.getCompound("fluid"))
+    locked = compound.getBoolean("locked")
+    mFluid = FluidAmount.fromNBT(compound.getCompound("fluid"))
     interval = Math.max(1, compound.getInt("interval"))
   }
 
   override def write(compound: CompoundNBT): CompoundNBT = {
     val fluidNBT = new CompoundNBT
-    this.fluid.write(fluidNBT)
+    compound.putBoolean("locked", locked)
+    this.mFluid.write(fluidNBT)
     compound.put("fluid", fluidNBT)
     compound.putInt("interval", interval)
     super.write(compound)
