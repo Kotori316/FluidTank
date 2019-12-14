@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": {"model": "fluidtank:block/fluid_source"}
+  }
+}

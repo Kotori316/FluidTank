@@ -121,12 +121,16 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
   val handler: FluidAmount.Tank = new TankHandler
 
-  val capabilities: Option[CapabilityDispatcher] = if (s.nonEmpty) {
+  val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
     MinecraftForge.EVENT_BUS.post(event)
-    Option(event.getCapabilities).filterNot(_.isEmpty).map(t => new CapabilityDispatcher(t, event.getListeners))
+    if (event.getCapabilities.isEmpty) {
+      Cap.empty
+    } else {
+      new CapabilityDispatcher(event.getCapabilities, event.getListeners).pure[Cap]
+    }
   } else {
-    None
+    Cap.empty
   }
 
   protected def fluidType: FluidAmount = {
@@ -172,7 +176,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       Cap.empty[T]
         .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
         .orElse(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.make[T](capability, handler))
-        .orElse(capabilities.map(_.getCapability(capability, facing).asScala).getOrElse(Cap.empty))
+        .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
     )
   }
 

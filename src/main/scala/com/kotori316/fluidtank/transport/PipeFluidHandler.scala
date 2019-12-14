@@ -36,7 +36,7 @@ class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
     var rest = fluidAmount
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
-      val handlerIterator = PipeTile.facings.map(dir => pipePos.offset(dir) -> dir).iterator
+      val handlerIterator = directions.map(dir => pipePos.offset(dir) -> dir).iterator
         .filter { case (_, direction) => pipeTile.getWorld.getBlockState(pipePos).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput }
         .flatMap { case (pos, direction) => OptionT.fromOption[Eval](Option(pipeTile.getWorld.getTileEntity(pos)))
           .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala).value.value
@@ -57,7 +57,7 @@ class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
           dest <- OptionT.fromOption[Eval](Option(pipeTile.getWorld.getTileEntity(pos)))
             .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala).value.value
         } yield dest
-        val notFilled = destinations.foldl(fluidAmount) { case (rest, handler) =>
+        val notFilled = destinations.foldLeft(fluidAmount) { case (rest, handler) =>
           if (rest.isEmpty) rest
           else rest - rest.setAmount(handler.fill(rest.toStack, FluidAmount.b2a(doFill)))
         }

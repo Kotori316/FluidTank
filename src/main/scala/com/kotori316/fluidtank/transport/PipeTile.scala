@@ -50,7 +50,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
       }.foreach { case (f, sourcePos) =>
         for {
           p <- connection.outputs
-          (direction, pos) <- PipeTile.facings.map(f => f -> p.offset(f))
+          (direction, pos) <- directions.map(f => f -> p.offset(f))
           if pos != sourcePos
           if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
           dest <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos)))
@@ -72,7 +72,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
 
     def makePosList(start: BlockPos): List[BlockPos] = {
       for {
-        d <- PipeTile.facings
+        d <- directions
         pos <- start.offset(d).pure[List]
         if checked.add(pos) // True means it's first time to check the pos. False means the pos already checked.
         state <- getWorld.getBlockState(pos).pure[List]
@@ -103,5 +103,4 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
 
 object PipeTile {
   final val amountPerTick = Utils.toInt(Tiers.WOOD.amount)
-  final val facings = Direction.values().toList
 }
