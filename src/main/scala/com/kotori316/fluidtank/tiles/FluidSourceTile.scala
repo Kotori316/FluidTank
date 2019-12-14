@@ -21,11 +21,21 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
         tile <- Option(getWorld.getTileEntity(getPos.offset(direction))).toOptionT[Id]
         cap <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala.mapK(evalExtractor)
       } yield {
-        val accepted = cap.fill(fluid.toStack, FluidAmount.b2a(false))
-        if (accepted > 0) {
-          cap.fill(fluid.setAmount(accepted).toStack, FluidAmount.b2a(true))
-        } else {
-          0
+        cap match {
+          case tank: FluidAmount.Tank =>
+            val accepted = tank.fill(fluid, doFill = false)
+            if (accepted.nonEmpty) {
+              tank.fill(accepted, doFill = true).amount
+            } else {
+              0L
+            }
+          case _ =>
+            val accepted = cap.fill(fluid.toStack, FluidAmount.b2a(false))
+            if (accepted > 0) {
+              cap.fill(fluid.setAmount(accepted).toStack, FluidAmount.b2a(true))
+            } else {
+              0
+            }
         }
       }
     }
