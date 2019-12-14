@@ -31,6 +31,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
         } else {
           s.fluid = FluidAmount.BUCKET_WATER
         }
+      case _ =>
     }
   }
 

@@ -14,7 +14,7 @@ import net.minecraftforge.registries.ForgeRegistries
 
 case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
   def setAmount(newAmount: Long): FluidAmount = {
-    if (newAmount == this.amount) this // No need to create new instance.
+    if (newAmount === this.amount) this // No need to create new instance.
     else FluidAmount(fluid, newAmount, nbt)
   }
 
