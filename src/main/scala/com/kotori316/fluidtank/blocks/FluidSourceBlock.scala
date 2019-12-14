@@ -34,7 +34,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
     }
   }
 
-  override def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity) = {
+  override def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity): ItemStack = {
     val stack = super.getPickBlock(state, target, world, pos, player)
     if (Option(world.getTileEntity(pos)).collect { case s: FluidSourceTile => !s.locked }.getOrElse(false)) {
       stack.getOrCreateTag().putBoolean("unlocked", true)
@@ -74,15 +74,17 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
   def changeContent(world: World, pos: BlockPos, fluid: FluidAmount, player: PlayerEntity, isMainHand: Boolean): Unit = if (!world.isRemote) {
     world.getTileEntity(pos) match {
       case s: FluidSourceTile =>
-        if (s.fluid fluidEqual fluid) {
-          val replace = if (isMainHand) s.fluid + fluid else s.fluid - fluid
-          s.fluid = if (replace.nonEmpty) replace else FluidAmount.EMPTY
-        } else if (fluid.isEmpty) {
-          s.fluid = FluidAmount.EMPTY
-        } else {
-          s.fluid = fluid
-        }
-        if (!s.locked || fluid.fluidEqual(FluidAmount.BUCKET_WATER))
+        val replace =
+          if (s.fluid fluidEqual fluid) {
+            val r1 = if (isMainHand) s.fluid + fluid else s.fluid - fluid
+            if (r1.nonEmpty) r1 else FluidAmount.EMPTY
+          } else if (fluid.isEmpty) {
+            FluidAmount.EMPTY
+          } else {
+            fluid
+          }
+        s.fluid = replace
+        if (!s.locked || fluid.fluidEqual(FluidAmount.BUCKET_WATER) || fluid.isEmpty)
           player.sendStatusMessage(new TranslationTextComponent(FluidSourceBlock.CHANGE_SOURCE, s.fluid), false)
       case _ =>
     }
