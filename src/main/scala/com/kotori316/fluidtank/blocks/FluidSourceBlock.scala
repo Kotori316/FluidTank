@@ -12,10 +12,10 @@ import net.minecraft.util.math.{BlockPos, BlockRayTraceResult}
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.{IBlockReader, World}
 
-class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON)) {
-  setRegistryName(FluidTank.modID, "fluid_source")
+class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
+  setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   val itemBlock = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
-  itemBlock.setRegistryName(FluidTank.modID, "fluid_source")
+  itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
 
   override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
@@ -32,6 +32,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
           changeContent(worldIn, pos, FluidAmount.EMPTY, player)
           true
         case Items.CLOCK =>
+          // Change interval time to push fluid.
           val i = if (handIn == Hand.MAIN_HAND) 1 else -1
           changeInterval(worldIn, pos, stack.getCount * i, player)
           true
@@ -51,7 +52,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
         } else {
           s.fluid = fluid
         }
-        player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_source", s.fluid.getLocalizedName), false)
+        player.sendStatusMessage(new TranslationTextComponent(FluidSourceBlock.CHANGE_SOURCE, s.fluid.getLocalizedName), false)
       case _ =>
     }
   }
@@ -60,8 +61,14 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
     world.getTileEntity(pos) match {
       case s: FluidSourceTile =>
         s.interval = Math.max(1, s.interval + dt)
-        player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_interval", s.interval), false)
+        player.sendStatusMessage(new TranslationTextComponent(FluidSourceBlock.CHANGE_INTERVAL, s.interval), false)
       case _ =>
     }
   }
+}
+
+object FluidSourceBlock {
+  final val NAME = "fluid_source"
+  final val CHANGE_SOURCE = "chat.fluidtank.change_source"
+  final val CHANGE_INTERVAL = "chat.fluidtank.change_interval"
 }
