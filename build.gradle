@@ -322,8 +322,12 @@ task checkMethod() {
         })
         println("*" * 20)
         println("All Changes")
-        println(getAllChangeLog())
+//        println(getAllChangeLog())
         println("*" * 20)
+        println("FindProperty of githubToken: project.findProperty(\"githubToken\") != null ${project.findProperty("githubToken") != null}")
+        println("FindProperty of gpr.user ${project.findProperty("gpr.user")}")
+        println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}")
+//        println("Property of gpr.user ${project.property("gpr.user")}") // FAILED
     }
 }
 
