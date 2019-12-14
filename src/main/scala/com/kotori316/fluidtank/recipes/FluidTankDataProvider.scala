@@ -54,7 +54,9 @@ object FluidTankDataProvider {
           ItemPredicate.Builder.create().tag(Tags.Items.ENDER_PEARLS).build()))
         .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.getId)))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
-      val recipeAdvancements = PIPE :: CAT :: TANK_WOOD :: TANK_WOOD_EASY :: TANKS
+      val FLUID_SOURCE = AdvancementSerializeHelper(ID("fluid_source"))
+        .addItemCriterion(Items.WATER_BUCKET)
+      val recipeAdvancements = FLUID_SOURCE :: PIPE :: CAT :: TANK_WOOD :: TANK_WOOD_EASY :: TANKS
 
       for (advancement <- recipeAdvancements) {
         val out = path.resolve(s"data/${advancement.location.getNamespace}/advancements/${advancement.location.getPath}.json")
@@ -111,8 +113,18 @@ object FluidTankDataProvider {
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
           .addTagCondition(new Tag[Item](new ResourceLocation(tier.tagName)))
           .addCondition(ConfigCondition.getInstance()))
+      val FLUID_SOURCE = RecipeSerializeHelper.by(
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockSource)
+          .patternLine("wiw")
+          .patternLine("gIg")
+          .patternLine("wdw")
+          .key('w', Items.WATER_BUCKET)
+          .key('i', Tags.Items.INGOTS_IRON)
+          .key('g', Tags.Items.INGOTS_GOLD)
+          .key('I', Tags.Items.STORAGE_BLOCKS_IRON)
+          .key('d', Blocks.DIRT))
 
-      val recipes = PIPE :: CAT :: WOOD :: EASY_WOOD :: TANKS
+      val recipes = FLUID_SOURCE :: PIPE :: CAT :: WOOD :: EASY_WOOD :: TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
