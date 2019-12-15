@@ -6,7 +6,7 @@ on:
       - 1.14.3
 
 jobs:
-  build:
+  build-publish:
     runs-on: ubuntu-latest
 
     steps:

@@ -6,7 +6,7 @@ on:
       - 1.14.3
 
 jobs:
-  build:
+  compile-check:
     runs-on: ubuntu-latest
 
     steps:
