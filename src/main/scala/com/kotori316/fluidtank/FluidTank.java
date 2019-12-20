@@ -27,7 +27,7 @@ import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.ContentTankSerializer;
-import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
+//import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
@@ -63,7 +63,7 @@ public class FluidTank {
         PacketHandler.init();
         Config.content().assertion();
         CapabilityFluidTank.register();
-        FluidTankTOPPlugin.sendIMC().apply(modID);
+//        FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());
     }
 

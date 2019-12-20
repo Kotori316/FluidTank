@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.render
 
+import com.kotori316.fluidtank.render.Box.Wrapper
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.math.{AxisAlignedBB, MathHelper}
@@ -30,10 +31,11 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
       alpha, red, green, blue)
   }
 
-  protected final def renderInternal(buffer: BufferBuilder, sprite: TextureAtlasSprite,
+  protected final def renderInternal(r: BufferBuilder, sprite: TextureAtlasSprite,
                                      n1X: Double, n1Y: Double, n1Z: Double,
                                      n2X: Double, n2Z: Double, lv: Box.LightValue,
                                      alpha: Int, red: Int, green: Int, blue: Int): Unit = {
+    val buffer: Wrapper = new Wrapper(r)
     val eX = dx / length * sizeX
     val eY = dy / length * sizeY
     val eZ = dz / length * sizeZ
@@ -115,7 +117,8 @@ private class BoxX(startX: Double,
   extends Box(startX, y, z, endX, y, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length: Double = dx
 
-  override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+    val buffer: Wrapper = new Wrapper(r)
     val count = MathHelper.floor(length / sizeX)
     val minU = sprite.getMinU
     val minV = sprite.getMinV
@@ -172,7 +175,8 @@ private class BoxY(startY: Double,
   extends Box(x, startY, z, x, endY, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = dy
 
-  override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+    val buffer: Wrapper = new Wrapper(r)
     val count = MathHelper.floor(length / sizeY)
     val minU = sprite.getMinU
     val minV = sprite.getMinV
@@ -230,7 +234,8 @@ private class BoxZ(startZ: Double,
   extends Box(x, y, startZ, x, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = dz
 
-  override def render(buffer: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: BufferBuilder, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+    val buffer: Wrapper = new Wrapper(r)
     val count = MathHelper.floor(length / sizeZ)
     val minU = sprite.getMinU
     val minV = sprite.getMinV
@@ -326,4 +331,32 @@ object Box {
   }
 
   implicit val lightValue: LightValue = new LightValue(0x00f000f0)
+
+  class Wrapper(val buffer: BufferBuilder) extends AnyVal {
+    def pos(x: Double, y: Double, z: Double): Wrapper = {
+      buffer.func_225582_a_(x, y, z)
+      this
+    }
+
+    def color(red: Int, green: Int, blue: Int, alpha: Int): Wrapper = {
+      buffer.func_225586_a_(red, green, blue, alpha)
+      this
+    }
+
+    def tex(u: Float, v: Float): Wrapper = {
+      buffer.func_225583_a_(u, v)
+      this
+    }
+
+    //noinspection SpellCheckingInspection
+    def lightmap(l1: Int, l2: Int): Wrapper = {
+      buffer.func_225587_b_(l1, l2)
+      this
+    }
+
+    def endVertex(): Unit = {
+      buffer.endVertex()
+    }
+  }
+
 }

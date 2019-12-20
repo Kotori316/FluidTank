@@ -19,7 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IStringSerializable;
@@ -33,8 +33,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -89,12 +87,12 @@ public class PipeBlock extends Block {
             .hardnessAndResistance(0.5f));
         setRegistryName(FluidTank.modID, "pipe");
         setDefaultState(getStateContainer().getBaseState()
-            .with(NORTH, Connection.NO_CONNECTION)
-            .with(SOUTH, Connection.NO_CONNECTION)
-            .with(WEST, Connection.NO_CONNECTION)
-            .with(EAST, Connection.NO_CONNECTION)
-            .with(UP, Connection.NO_CONNECTION)
-            .with(DOWN, Connection.NO_CONNECTION)
+                .with(NORTH, Connection.NO_CONNECTION)
+                .with(SOUTH, Connection.NO_CONNECTION)
+                .with(WEST, Connection.NO_CONNECTION)
+                .with(EAST, Connection.NO_CONNECTION)
+                .with(UP, Connection.NO_CONNECTION)
+                .with(DOWN, Connection.NO_CONNECTION)
 //            .with(WATERLOGGED, false)
         );
         blockItem = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS()));
@@ -104,12 +102,6 @@ public class PipeBlock extends Block {
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN/*, WATERLOGGED*/);
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
     }
 
     @Override
@@ -198,8 +190,8 @@ public class PipeBlock extends Block {
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (player.getHeldItem(handIn).getItem() instanceof BlockItem) return false;
+    public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (player.getHeldItem(handIn).getItem() instanceof BlockItem) return ActionResultType.PASS;
         Vec3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
         Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
             AxisAlignedBB box = e.getValue().getBoundingBox();
@@ -221,9 +213,9 @@ public class PipeBlock extends Block {
                 if (blockState.get().getValue())
                     Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(PipeTile::connectorUpdate);
             }
-            return true;
+            return ActionResultType.SUCCESS;
         } else {
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            return super.func_225533_a_(state, worldIn, pos, player, handIn, hit);
         }
     }
 

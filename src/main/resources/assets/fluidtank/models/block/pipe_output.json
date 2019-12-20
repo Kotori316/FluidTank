@@ -1,6 +1,5 @@
 {
   "textures": {
-    "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
     "particle": "fluidtank:blocks/frame",
     "texture": "fluidtank:blocks/frame",
     "output": "fluidtank:blocks/frame_output"

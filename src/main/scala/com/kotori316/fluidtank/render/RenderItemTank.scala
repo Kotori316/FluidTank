@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.{RenderHelper, Tessellator}
 import net.minecraft.item.ItemStack
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import org.lwjgl.opengl.GL11
-
+/*
 @OnlyIn(Dist.CLIENT)
 class RenderItemTank extends ItemStackTileEntityRenderer {
 
@@ -60,3 +60,4 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
     }
   }
 }
+*/

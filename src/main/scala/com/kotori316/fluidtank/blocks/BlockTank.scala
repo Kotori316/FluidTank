@@ -3,19 +3,20 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
-import net.minecraft.block.{Block, BlockRenderType, BlockState}
+import net.minecraft.block.{Block, BlockState}
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.shapes.ISelectionContext
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
-import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
+import net.minecraft.util.{ActionResultType, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
+import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f)) {
+class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).func_226896_b_()) {
 
   /*
   RegistryName will be "fluidtank:tank_wood".
@@ -29,11 +30,11 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
 
   override def hasTileEntity(state: BlockState) = true
 
-  override def createTileEntity(state: BlockState, world: IBlockReader): TileTankNoDisplay = {
+  override def createTileEntity(state: BlockState, world: IBlockReader): TileEntity = {
     new TileTank(tier)
   }
 
-  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult) = {
+  override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay =>
         val stack = playerIn.getHeldItem(handIn)
@@ -41,7 +42,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
           if (!worldIn.isRemote) {
             playerIn.sendStatusMessage(tileTank.connection.getTextComponent, true)
           }
-          true
+          ActionResultType.SUCCESS
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)
           FluidUtil.getFluidHandler(copiedStack).asScala.value.value match {
@@ -50,19 +51,17 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
                 val tankHandler = tileTank.connection.handler
                 BucketEventHandler.transferFluid(worldIn, pos, playerIn, handIn, tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), stack, handlerItem, tankHandler)
               }
-              true
-            case _ => false
+              ActionResultType.SUCCESS
+            case _ => ActionResultType.PASS
           }
         } else {
-          false
+          ActionResultType.PASS
         }
-      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); false
+      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); ActionResultType.PASS
     }
   }
 
-  override final def getRenderLayer: BlockRenderLayer = BlockRenderLayer.CUTOUT
-
-  override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
+  //  override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
   override final def isSideInvisible(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
 
@@ -98,13 +97,21 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
       .foreach(stack.setDisplayName)
   }
 
-  override final def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity) = {
+  override final def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity): ItemStack = {
     val stack = super.getPickBlock(state, target, world, pos, player)
     saveTankNBT(world.getTileEntity(pos), stack)
     stack
   }
 
-  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+    override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
 
-  override def getCollisionShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+  override def isNormalCube(state: BlockState, worldIn: IBlockReader, pos: BlockPos) = false
+
+  @OnlyIn(Dist.CLIENT) override def func_220080_a(state: BlockState, worldIn: IBlockReader, pos: BlockPos) = 1.0F
+
+  override def propagatesSkylightDown(state: BlockState, reader: IBlockReader, pos: BlockPos) = true
+
+  override def func_229869_c_(p_229869_1_ : BlockState, p_229869_2_ : IBlockReader, p_229869_3_ : BlockPos): Boolean = {
+    false
+  }
 }

@@ -9,7 +9,7 @@ import net.minecraft.state.StateContainer
 import net.minecraft.state.properties.BlockStateProperties.FACING
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult}
-import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
+import net.minecraft.util.{ActionResultType, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fml.network.NetworkHooks
@@ -28,13 +28,11 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
 
   override def createNewTileEntity(worldIn: IBlockReader): TileEntity = new CATTile
 
-  override final def getRenderLayer: BlockRenderLayer = BlockRenderLayer.CUTOUT
-
   override def getStateForPlacement(context: BlockItemUseContext): BlockState = this.getDefaultState.`with`(FACING, context.getNearestLookingDirection)
 
-  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): Boolean = {
+  override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos, player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     val stack = player.getHeldItem(handIn)
-    if (!player.isSneaking) {
+    if (/*!player.isSneaking*/ true) {
       val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)
       FluidUtil.getFluidHandler(copiedStack).asScala.value.value match {
         case Some(handlerItem) if !stack.isEmpty =>
@@ -44,14 +42,14 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
               BucketEventHandler.transferFluid(worldIn, pos, player, handIn, cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack,
                 stack, handlerItem, cat))
           }
-          true
+          ActionResultType.SUCCESS
         case _ =>
           if (!worldIn.isRemote)
             NetworkHooks.openGui(player.asInstanceOf[ServerPlayerEntity], worldIn.getTileEntity(pos).asInstanceOf[CATTile], pos)
-          true
+          ActionResultType.SUCCESS
       }
     } else {
-      false
+      ActionResultType.PASS
     }
   }
 }

@@ -1,14 +1,15 @@
 package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.tiles.TileTank
+import com.mojang.blaze3d.matrix.MatrixStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.BufferBuilder
+import net.minecraft.client.renderer.{BufferBuilder, IRenderTypeBuffer}
+import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.BiomeColors
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.model.animation.TileEntityRendererFast
-
+/*
 @OnlyIn(Dist.CLIENT)
 class RenderTank extends TileEntityRendererFast[TileTank] {
 
@@ -58,3 +59,4 @@ object RenderTank {
     }
   }
 }
+*/

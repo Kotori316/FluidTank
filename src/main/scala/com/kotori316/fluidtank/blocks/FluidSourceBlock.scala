@@ -10,7 +10,7 @@ import net.minecraft.item._
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.text.TranslationTextComponent
-import net.minecraft.util.{Hand, NonNullList}
+import net.minecraft.util.{ActionResultType, Hand, NonNullList}
 import net.minecraft.world.{IBlockReader, World}
 
 class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
@@ -49,8 +49,8 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
     items.add(stack)
   }
 
-  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos,
-                                player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): Boolean = {
+  override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos,
+                                player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     val stack = player.getHeldItem(handIn)
     val fluid = FluidAmount.fromItem(stack)
     if (fluid.isEmpty) {
@@ -58,17 +58,17 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
         case Items.BUCKET =>
           // Reset to empty.
           changeContent(worldIn, pos, FluidAmount.EMPTY, player, handIn == Hand.MAIN_HAND)
-          true
+          ActionResultType.SUCCESS
         case Items.CLOCK =>
           // Change interval time to push fluid.
           val i = if (handIn == Hand.MAIN_HAND) 1 else -1
           changeInterval(worldIn, pos, stack.getCount * i, player)
-          true
-        case _ => false
+          ActionResultType.SUCCESS
+        case _ => ActionResultType.PASS
       }
     } else {
       changeContent(worldIn, pos, fluid, player, handIn == Hand.MAIN_HAND)
-      true
+      ActionResultType.SUCCESS
     }
   }
 

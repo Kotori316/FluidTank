@@ -6,16 +6,12 @@ import net.minecraft.fluid.{Fluid, IFluidState}
 import net.minecraft.item.{Item, Items}
 import net.minecraft.util.math.shapes.{VoxelShape, VoxelShapes}
 import net.minecraft.util.math.{BlockPos, Vec3d}
-import net.minecraft.util.{BlockRenderLayer, Direction, ResourceLocation, SoundEvents}
+import net.minecraft.util.{Direction, ResourceLocation, SoundEvents}
 import net.minecraft.world.{IBlockReader, IWorldReader}
-import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.fluids.FluidAttributes
 
 class MilkFluid extends Fluid {
   setRegistryName(FluidTank.modID, MilkFluid.NAME)
-
-  @OnlyIn(Dist.CLIENT)
-  override def getRenderLayer = BlockRenderLayer.SOLID
 
   override def getFilledBucket: Item = Items.MILK_BUCKET
 

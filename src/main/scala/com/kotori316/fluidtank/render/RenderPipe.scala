@@ -7,8 +7,7 @@ import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.model.animation.TileEntityRendererFast
-
+/*
 @OnlyIn(Dist.CLIENT)
 class RenderPipe extends TileEntityRendererFast[PipeTile] {
   override def renderTileEntityFast(te: PipeTile, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, buffer: BufferBuilder): Unit = {
@@ -84,7 +83,7 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     Minecraft.getInstance.getProfiler.endSection()
   }
 }
-
+*/
 object RenderPipe {
   private final val d = 1d / 16d
   final val duration = 200
