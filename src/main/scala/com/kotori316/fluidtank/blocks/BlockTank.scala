@@ -12,7 +12,6 @@ import net.minecraft.util.math.shapes.ISelectionContext
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.{ActionResultType, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
-import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
 
@@ -103,15 +102,6 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     stack
   }
 
-    override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
 
-  override def isNormalCube(state: BlockState, worldIn: IBlockReader, pos: BlockPos) = false
-
-  @OnlyIn(Dist.CLIENT) override def func_220080_a(state: BlockState, worldIn: IBlockReader, pos: BlockPos) = 1.0F
-
-  override def propagatesSkylightDown(state: BlockState, reader: IBlockReader, pos: BlockPos) = true
-
-  override def func_229869_c_(p_229869_1_ : BlockState, p_229869_2_ : IBlockReader, p_229869_3_ : BlockPos): Boolean = {
-    false
-  }
 }

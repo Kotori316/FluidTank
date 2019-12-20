@@ -1,9 +1,10 @@
 package com.kotori316.fluidtank.network;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.Item;
@@ -21,9 +22,7 @@ import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
-import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
-import com.kotori316.fluidtank.render.RenderPipe;
 import com.kotori316.fluidtank.tiles.CATScreen;
 
 @OnlyIn(Dist.CLIENT)
@@ -48,6 +47,13 @@ public class ClientProxy extends SideProxy {
 //        ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
 //        ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
+
+        RenderType rendertype = RenderType.func_228641_d_();
+        CollectionConverters.asJava(ModObjects.blockTanks())
+            .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
+        CollectionConverters.asJava(ModObjects.blockTanksInvisible())
+            .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
+        RenderTypeLookup.setRenderLayer(ModObjects.blockPipe(), rendertype);
     }
 
     @Override
