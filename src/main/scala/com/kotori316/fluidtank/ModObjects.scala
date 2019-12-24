@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank
 
-import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank}
+import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank, FluidSourceBlock}
 import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
@@ -39,6 +39,7 @@ object ModObjects {
   final val blockTanksInvisible = woodTankInvisible :: normalTanksInv.toList
   final val blockCat = new BlockCAT
   final val blockPipe = new PipeBlock
+  final val blockSource = new FluidSourceBlock
 
   //---------- TileEntities ----------
 
@@ -48,6 +49,7 @@ object ModObjects {
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
   final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
   final val PIPE_TYPE = createTileType(() => new PipeTile, List(blockPipe))
+  final val SOURCE_TYPE = createTileType(() => new FluidSourceTile, List(blockSource))
 
   def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
     val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(null)

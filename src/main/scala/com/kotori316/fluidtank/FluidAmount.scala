@@ -13,7 +13,10 @@ import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
 
 case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
-  def setAmount(newAmount: Long): FluidAmount = FluidAmount(fluid, newAmount, nbt)
+  def setAmount(newAmount: Long): FluidAmount = {
+    if (newAmount === this.amount) this // No need to create new instance.
+    else FluidAmount(fluid, newAmount, nbt)
+  }
 
   def write(tag: CompoundNBT): CompoundNBT = {
     tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)

@@ -3,10 +3,10 @@ name: PullRequest Test
 on:
   pull_request:
     branches:
-      - master
+      - 1.14.3
 
 jobs:
-  build:
+  compile-check:
     runs-on: ubuntu-latest
 
     steps:
