@@ -211,7 +211,7 @@ curseforge {
         changelogType = 'markdown'
         addGameVersion '1.15.1'
         changelog = getAllChangeLog()
-        releaseType = 'release'
+        releaseType = 'alpha'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
