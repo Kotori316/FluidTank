@@ -126,7 +126,8 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.15.1-30.0.18'
+    def forge_prop = loadProperties("forge_version.properties")
+    minecraft(forge_prop.getProperty("forge_version"))
     implementation "org.scala-lang:scala-library:2.13.1"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.0.0'
 
@@ -176,6 +177,14 @@ def reobfFile = file("$buildDir/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
     builtBy 'reobfJar'
+}
+
+def loadProperties(String filename) {
+    def props = new Properties()
+    file(filename).withInputStream {
+        props.load(it)
+    }
+    return props
 }
 
 task srcJar(type: Jar) {
