@@ -3,41 +3,39 @@ package com.kotori316.fluidtank.render
 import com.kotori316.fluidtank.tiles.TileTank
 import com.mojang.blaze3d.matrix.MatrixStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.{BufferBuilder, IRenderTypeBuffer}
 import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
+import net.minecraft.client.renderer.{IRenderTypeBuffer, RenderType}
+import net.minecraft.inventory.container.PlayerContainer
 import net.minecraft.tags.FluidTags
-import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.BiomeColors
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-/*
-@OnlyIn(Dist.CLIENT)
-class RenderTank extends TileEntityRendererFast[TileTank] {
 
-  override def renderTileEntityFast(te: TileTank, x: Double, y: Double, z: Double, partialTicks: Float,
-                                    destroyStage: Int, buffer: BufferBuilder): Unit = {
+@OnlyIn(Dist.CLIENT)
+class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[TileTank](d) {
+
+  import RenderTank._
+
+  override def func_225616_a_(te: TileTank, partialTicks: Float, matrix: MatrixStack, buffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
     Minecraft.getInstance.getProfiler.startSection("RenderTank")
     if (te.hasContent) {
+      matrix.push()
+      val b = buffer.getBuffer(RenderType.func_228643_e_())
       val tank = te.tank
       if (tank.box != null) {
         val resource = RenderTank.textureName(te)
-        val texture = Minecraft.getInstance.getTextureMap.getSprite(resource)
+        val texture = Minecraft.getInstance.func_228015_a_(PlayerContainer.field_226615_c_).apply(resource)
         val color = RenderTank.color(te)
-        val brightness = if (te.hasWorld) te.getWorld.getCombinedLight(te.getPos, if (tank.fluid.fluid.isIn(FluidTags.LAVA)) 15 else 0)
+        val brightness = if (te.hasWorld) te.getWorld.getLightValue(te.getPos)
         else 0x00f000f0
-        buffer.setTranslation(x, y, z)
-        tank.box.render(buffer, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(new Box.LightValue(brightness))
-        buffer.setTranslation(0, 0, 0)
-      }
-    }
+        //        buffer.setTranslation(x, y, z)
 
+//        matrix.offset(0, 0, 0)
+        tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(Box.lightValue)
+      }
+      matrix.pop()
+    }
     Minecraft.getInstance.getProfiler.endSection()
   }
-
-  /**
-   * Need here to make public.<br>
-   * For [[com.kotori316.fluidtank.render.RenderItemTank]]
-   */
-  override def bindTexture(location: ResourceLocation): Unit = super.bindTexture(location)
 }
 
 object RenderTank {
@@ -45,7 +43,7 @@ object RenderTank {
     val tank: TileTank#Tank = tile.tank
     val world = if (tile.hasWorld) tile.getWorld else Minecraft.getInstance().world
     val pos = if (tile.hasWorld) tile.getPos else Minecraft.getInstance().player.getPosition
-    tank.fluid.fluid.getAttributes.getStill(world, pos)
+    tank.fluid.fluid.getAttributes.getStillTexture(world, pos)
   }
 
   private def color(tile: TileTank) = {
@@ -53,10 +51,28 @@ object RenderTank {
     val world = if (tile.hasWorld) tile.getWorld else Minecraft.getInstance().world
     val pos = if (tile.hasWorld) tile.getPos else Minecraft.getInstance().player.getPosition
     if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
-      BiomeColors.getWaterColor(world, pos) | 0xFF000000
+      BiomeColors.func_228363_c_(world, pos) | 0xFF000000
     } else {
       fluidAmount.fluid.getAttributes.getColor(world, pos)
     }
   }
+
+  implicit class MatrixHelper(private val mat: MatrixStack) extends AnyVal {
+    def push(): Unit = {
+      mat.func_227860_a_()
+    }
+
+    def offset(x: Double, y: Double, z: Double): Unit = {
+      mat.func_227861_a_(x, y, z)
+    }
+
+    def scale(x: Float, y: Float, z: Float): Unit = {
+      mat.func_227862_a_(x, y, z)
+    }
+
+    def pop(): Unit = {
+      mat.func_227865_b_()
+    }
+  }
+
 }
-*/

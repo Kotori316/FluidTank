@@ -16,6 +16,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.CollectionConverters;
@@ -23,6 +24,7 @@ import scala.jdk.javaapi.CollectionConverters;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.render.ItemModelTank;
+import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.CATScreen;
 
 @OnlyIn(Dist.CLIENT)
@@ -30,7 +32,7 @@ public class ClientProxy extends SideProxy {
 
     //    private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
 //    public static final RenderTank RENDER_TANK = new RenderTank();
-//    public static final RenderPipe RENDER_PIPE = new RenderPipe();
+    //    public static final RenderPipe RENDER_PIPE = new RenderPipe();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
@@ -44,7 +46,7 @@ public class ClientProxy extends SideProxy {
 
     @Override
     public void registerTESR() {
-//        ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
+        ClientRegistry.bindTileEntityRenderer(ModObjects.TANK_TYPE(), RenderTank::new);
 //        ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
