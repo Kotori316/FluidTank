@@ -26,7 +26,7 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
         val texture = Minecraft.getInstance.func_228015_a_(PlayerContainer.field_226615_c_).apply(resource)
         val color = RenderTank.color(te)
 
-        tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(Box.lightValue)
+        tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(new Box.LightValue(light))
       }
       matrix.pop()
     }
