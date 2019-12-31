@@ -25,19 +25,20 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
+import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.CATScreen;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientProxy extends SideProxy {
 
-    //    private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
-//    public static final RenderTank RENDER_TANK = new RenderTank();
+    private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
+    //    public static final RenderTank RENDER_TANK = new RenderTank();
     //    public static final RenderPipe RENDER_PIPE = new RenderPipe();
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
-    public static TextureAtlasSprite whiteTexture;
+//    public static TextureAtlasSprite whiteTexture;
 
     @Override
     public Option<World> getWorld(NetworkEvent.Context context) {
@@ -62,7 +63,7 @@ public class ClientProxy extends SideProxy {
 
     @Override
     public Item.Properties getTankProperties() {
-        return new Item.Properties().group(ModObjects.CREATIVE_TABS())/*.setTEISR(() -> () -> RENDER_ITEM_TANK)*/;
+        return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setTEISR(() -> () -> RENDER_ITEM_TANK);
     }
 
     @SubscribeEvent
@@ -77,11 +78,11 @@ public class ClientProxy extends SideProxy {
     @SubscribeEvent
     public void onBake(ModelBakeEvent event) {
         event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
-        /*CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
+        CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
             ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
 //            IBakedModel model = event.getModelManager().getModel(modelLocation);
             event.getModelRegistry().put(modelLocation, MODEL_TANK);
-        });*/
+        });
     }
 
     @SubscribeEvent
