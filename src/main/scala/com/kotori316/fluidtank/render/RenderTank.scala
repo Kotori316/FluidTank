@@ -25,11 +25,7 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
         val resource = RenderTank.textureName(te)
         val texture = Minecraft.getInstance.func_228015_a_(PlayerContainer.field_226615_c_).apply(resource)
         val color = RenderTank.color(te)
-        val brightness = if (te.hasWorld) te.getWorld.getLightValue(te.getPos)
-        else 0x00f000f0
-        //        buffer.setTranslation(x, y, z)
 
-//        matrix.offset(0, 0, 0)
         tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(Box.lightValue)
       }
       matrix.pop()
@@ -68,6 +64,10 @@ object RenderTank {
 
     def scale(x: Float, y: Float, z: Float): Unit = {
       mat.func_227862_a_(x, y, z)
+    }
+
+    def scale(f: Float): Unit = {
+      mat.func_227862_a_(f, f, f)
     }
 
     def pop(): Unit = {
