@@ -27,7 +27,7 @@ apply plugin: "com.github.breadmoirai.github-release"
 version = getProperty("modVersion")
 if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
     // In remote CI/CD environment
-    version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA"))
+    version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA").substring(0, 6))
 }
 
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -220,7 +220,7 @@ curseforge {
         changelogType = 'markdown'
         addGameVersion '1.15.1'
         changelog = getAllChangeLog()
-        releaseType = 'alpha'
+        releaseType = 'release'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
