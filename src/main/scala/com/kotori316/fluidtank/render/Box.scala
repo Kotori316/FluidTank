@@ -328,7 +328,7 @@ object Box {
     -(x * x + z * z) / y
   }
 
-  class LightValue(brightness: Int) {
+  class LightValue(val brightness: Int) {
     final val l1 = brightness >> 16 & 0xFFFF
     final val l2 = brightness >> 0 & 0xFFFF
   }
