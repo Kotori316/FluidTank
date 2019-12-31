@@ -328,12 +328,23 @@ object Box {
     -(x * x + z * z) / y
   }
 
-  class LightValue(val brightness: Int) {
-    final val l1 = brightness >> 16 & 0xFFFF
-    final val l2 = brightness >> 0 & 0xFFFF
+  case class LightValue(brightness: Int) {
+    final val sky = brightness >> 16 & 0xFFFF
+    final val block = brightness >> 0 & 0xFFFF
+
+    def l1: Int = sky
+
+    def l2: Int = block
+
+    def overrideBlock(light: Int): LightValue = {
+      if (light * 16 > block)
+        copy((sky << 16) | light * 16)
+      else
+        this
+    }
   }
 
-  implicit val lightValue: LightValue = new LightValue(0x00f000f0)
+  implicit val lightValue: LightValue = LightValue(0x00f000f0)
 
   class Wrapper(val buffer: IVertexBuilder) extends AnyVal {
     def pos(x: Double, y: Double, z: Double, matrix: MatrixStack): Wrapper = {
