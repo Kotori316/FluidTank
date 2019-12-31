@@ -32,7 +32,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         //          TransformType.FIXED, false)
         val renderType = RenderTypeLookup.func_228389_a_(stack)
         val b = ItemRenderer.func_229113_a_(renderTypeBuffer, renderType, true, stack.hasEffect)
-        renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, Box.lightValue.brightness, otherLight, matrixStack, b)
+        renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
 
         tileTank.tier = tankItem.blockTank.tier
         tileTank.tank.setFluid(null)
