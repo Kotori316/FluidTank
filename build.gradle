@@ -27,7 +27,7 @@ apply plugin: "com.github.breadmoirai.github-release"
 version = getProperty("modVersion")
 if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
     // In remote CI/CD environment
-    version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA").substring(0, 6))
+    version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA").substring(0, 7))
 }
 
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
