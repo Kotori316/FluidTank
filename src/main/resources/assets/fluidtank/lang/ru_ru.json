@@ -43,5 +43,6 @@
   "fluidtank.waila.amount": "Количество: %s mB",
   "fluidtank.waila.capacity": "Вместимость: %s mB",
   "fluidtank.waila.comparator": "Компаратор: %s",
-  "fluidtank.waila.short": "%1$s: %2$s/%3$s мВ"
+  "fluidtank.waila.short": "%1$s: %2$s/%3$s мВ",
+  "tooltip.fluidtank.source": "Infinite"
 }

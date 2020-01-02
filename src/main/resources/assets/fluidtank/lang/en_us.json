@@ -43,5 +43,6 @@
   "fluidtank.waila.amount": "Amount: %s mB",
   "fluidtank.waila.capacity": "Capacity: %s mB",
   "fluidtank.waila.comparator": "Comparator: %s",
-  "fluidtank.waila.short": "%1$s: %2$s/%3$s mB"
+  "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
+  "tooltip.fluidtank.source": "Infinite"
 }
