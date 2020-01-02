@@ -43,5 +43,7 @@
   "fluidtank.waila.amount": "  量: %s mB",
   "fluidtank.waila.capacity": "  容量: %s mB",
   "fluidtank.waila.comparator": "  コンパレータ: %s",
-  "fluidtank.waila.short": "%1$s: %2$s/%3$s mB"
+  "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
+  "tooltip.fluidtank.source": "水のソース",
+  "tooltip.fluidtank.source_inf": "無限のソース"
 }

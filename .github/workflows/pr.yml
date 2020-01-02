@@ -7,7 +7,7 @@ on:
       - 1.15.1
 
 jobs:
-  build:
+  compile-check:
     runs-on: ubuntu-latest
 
     steps:

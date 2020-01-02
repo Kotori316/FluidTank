@@ -1,3 +1,16 @@
 {
-  "parent": "fluidtank:block/fluid_source"
+  "overrides": [
+    {
+      "predicate": {
+        "fluidtank:source_cheat": 0
+      },
+      "model": "fluidtank:block/fluid_source"
+    },
+    {
+      "predicate": {
+        "fluidtank:source_cheat": 1
+      },
+      "model": "fluidtank:block/fluid_source_inf"
+    }
+  ]
 }

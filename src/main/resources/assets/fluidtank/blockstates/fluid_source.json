@@ -1,5 +1,6 @@
 {
   "variants": {
-    "": {"model": "fluidtank:block/fluid_source"}
+    "cheat_mode=true": {"model": "fluidtank:block/fluid_source_inf"},
+    "cheat_mode=false": {"model": "fluidtank:block/fluid_source"}
   }
 }

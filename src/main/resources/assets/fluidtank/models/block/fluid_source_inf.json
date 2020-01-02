@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "fluidtank:blocks/fluid_source_inf",
+    "down": "fluidtank:blocks/pink",
+    "up": "fluidtank:blocks/pink",
+    "north": "fluidtank:blocks/fluid_source_inf",
+    "east": "fluidtank:blocks/fluid_source_inf",
+    "south": "fluidtank:blocks/fluid_source_inf",
+    "west": "fluidtank:blocks/fluid_source_inf"
+  }
+}
