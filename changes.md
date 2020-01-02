@@ -1,5 +1,3 @@
-## v15.0.2
-- Implemented item renderer.
-- Fixed - creative tank had no renderer.
-- Improvement - render lighting (the brightness of content.)
-- Remove SNAPSHOT
+## v15.0.3
+- Changed texture of "Infinite Fluid Supplier".
+- Changed item name from "Infinite Fluid Supplier" tp "Infinite Water Supplier".
