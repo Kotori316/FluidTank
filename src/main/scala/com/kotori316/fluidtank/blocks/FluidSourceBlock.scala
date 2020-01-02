@@ -111,9 +111,13 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
   }
 
   override def addInformation(stack: ItemStack, worldIn: IBlockReader, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
-    if (FluidSourceBlock.isCheatStack(stack)) {
-      tooltip.add(new TranslationTextComponent(FluidSourceBlock.TOOLTIP))
-    }
+    tooltip.add(
+      if (FluidSourceBlock.isCheatStack(stack)) {
+        new TranslationTextComponent(FluidSourceBlock.TOOLTIP_INF)
+      } else {
+        new TranslationTextComponent(FluidSourceBlock.TOOLTIP)
+      }
+    )
   }
 }
 
@@ -122,6 +126,7 @@ object FluidSourceBlock {
   final val CHANGE_SOURCE = "chat.fluidtank.change_source"
   final val CHANGE_INTERVAL = "chat.fluidtank.change_interval"
   final val TOOLTIP = "tooltip.fluidtank.source"
+  final val TOOLTIP_INF = "tooltip.fluidtank.source_inf"
   final val CHEAT_MODE = BooleanProperty.create("cheat_mode")
   val KEY_CHEAT = "unlocked"
 
