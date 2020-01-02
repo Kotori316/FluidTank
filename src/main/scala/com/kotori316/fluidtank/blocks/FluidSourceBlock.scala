@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
 import net.minecraft.block.material.Material
 import net.minecraft.block.{Block, BlockRenderType, BlockState, ContainerBlock}
@@ -17,7 +18,7 @@ import net.minecraft.world.{IBlockReader, World}
 
 class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
   setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
-  val itemBlock = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
+  val itemBlock = new FluidSourceItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
   itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   setDefaultState(getStateContainer.getBaseState.`with`(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
 
@@ -49,6 +50,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
   }
 
   override def fillItemGroup(group: ItemGroup, items: NonNullList[ItemStack]): Unit = {
+    items.add(new ItemStack(this))
     val stack = new ItemStack(this)
     stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
     items.add(stack)
