@@ -7,7 +7,10 @@ import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -39,7 +42,7 @@ public class ClientProxy extends SideProxy {
     private static final ItemModelTank MODEL_TANK = new ItemModelTank();
     private static final ModelResourceLocation MESH_MODEL =
         new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
-//    public static TextureAtlasSprite whiteTexture;
+    public static TextureAtlasSprite whiteTexture;
 
     @Override
     public Option<World> getWorld(NetworkEvent.Context context) {
@@ -88,15 +91,15 @@ public class ClientProxy extends SideProxy {
 
     @SubscribeEvent
     public void registerTexture(TextureStitchEvent.Pre event) {
-        /*if (event.getMap().getBasePath().equals("textures")) {
+        if (event.getMap().func_229223_g_().equals(PlayerContainer.field_226615_c_)) {
             event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
-        }*/
+        }
     }
 
     @SubscribeEvent
     public void putTexture(TextureStitchEvent.Post event) {
-        /*if (event.getMap().getBasePath().equals("textures")) {
+        if (event.getMap().func_229223_g_().equals(PlayerContainer.field_226615_c_)) {
             whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
-        }*/
+        }
     }
 }

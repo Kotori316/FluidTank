@@ -41,6 +41,7 @@ public class ItemModelTank implements IDynamicBakedModel {
     }
 
     @Override
+    @Deprecated
     public TextureAtlasSprite getParticleTexture() {
         return null;
     }

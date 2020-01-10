@@ -13,8 +13,6 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 @OnlyIn(Dist.CLIENT)
 class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[TileTank](d) {
 
-  import RenderTank._
-
   override def func_225616_a_(te: TileTank, partialTicks: Float, matrix: MatrixStack, buffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
     Minecraft.getInstance.getProfiler.startSection("RenderTank")
     if (te.hasContent) {
@@ -51,28 +49,6 @@ object RenderTank {
       BiomeColors.func_228363_c_(world, pos) | 0xFF000000
     } else {
       fluidAmount.fluid.getAttributes.getColor(world, pos)
-    }
-  }
-
-  implicit class MatrixHelper(private val mat: MatrixStack) extends AnyVal {
-    def push(): Unit = {
-      mat.func_227860_a_()
-    }
-
-    def offset(x: Double, y: Double, z: Double): Unit = {
-      mat.func_227861_a_(x, y, z)
-    }
-
-    def scale(x: Float, y: Float, z: Float): Unit = {
-      mat.func_227862_a_(x, y, z)
-    }
-
-    def scale(f: Float): Unit = {
-      mat.func_227862_a_(f, f, f)
-    }
-
-    def pop(): Unit = {
-      mat.func_227865_b_()
     }
   }
 
