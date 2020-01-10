@@ -26,6 +26,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
+import com.kotori316.fluidtank.render.RenderPipe;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.CATScreen;
 
@@ -50,7 +51,7 @@ public class ClientProxy extends SideProxy {
     public void registerTESR() {
         ClientRegistry.bindTileEntityRenderer(ModObjects.TANK_TYPE(), RenderTank::new);
         ClientRegistry.bindTileEntityRenderer(ModObjects.TANK_CREATIVE_TYPE(), RenderTank::new);
-//        ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
+        ClientRegistry.bindTileEntityRenderer(ModObjects.PIPE_TYPE(), RenderPipe::new);
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
         RenderType rendertype = RenderType.func_228641_d_();
