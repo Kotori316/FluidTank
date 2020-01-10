@@ -1,3 +1,5 @@
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.function.BiConsumer
 
 buildscript {
@@ -386,5 +388,15 @@ publishing {
 //                }
 //            }
         }
+    }
+}
+
+task copyToDrive(type: Copy, dependsOn: "build") {
+    def PATH_NAME = "drive_path"
+    from(jar.getArchiveFile(), deobfJar.getArchiveFile(), srcJar.getArchiveFile())
+    into(file(java.util.Optional.ofNullable(System.getenv(PATH_NAME)).orElse(".")))
+    onlyIf {
+        System.getenv(PATH_NAME) != null &&
+                Files.exists(Paths.get(System.getenv(PATH_NAME)))
     }
 }
