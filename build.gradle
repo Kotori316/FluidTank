@@ -127,6 +127,20 @@ repositories {
         name 'Curse Forge'
         url 'https://minecraft.curseforge.com/api/maven/'
     }
+    if (hasGitHubToken()) {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
+                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
+            }
+        }
+    }
+}
+
+private boolean hasGitHubToken() {
+    return project.hasProperty("githubToken") || System.getenv("REPO_TOKEN") != null
 }
 
 dependencies {
@@ -146,7 +160,11 @@ dependencies {
 //    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 //    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
     // https://dvs1.progwml6.com/files/maven/mezz/jei/jei-1.14.4/6.0.0.25/jei-1.14.4-6.0.0.25.jar
-    implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
+    if (hasGitHubToken()) {
+        implementation("com.kotori316:ScalableCatsForce:2.13.1-build-6:dev")
+    } else {
+        implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
+    }
     // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
 
 //    compileOnly("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
