@@ -214,12 +214,12 @@ def loadProperties(String filename) {
 
 task srcJar(type: Jar) {
     from sourceSets.main.allSource
-    classifier = 'sources'
+    archiveClassifier.set('sources')
 }
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output
-    classifier = 'deobf'
+    archiveClassifier.set('deobf')
     manifest {
         attributes([
                 "Specification-Title"     : project.name,
@@ -357,16 +357,9 @@ task checkMethod() {
         println("changes.md")
         println(getLatestChangeLog())
         println("*" * 20)
-        println("hasGitHubToken ${project.hasProperty("githubToken")}")
+        println("hasGitHubToken ${hasGitHubToken()}")
         println("hasSignToken ${project.hasProperty("keyStore")}")
         println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}")
-        println("*" * 20)
-        System.properties.forEach(new BiConsumer<Object, Object>() {
-            @Override
-            void accept(Object o, Object o2) {
-//                println("$o=$o2")
-            }
-        })
         println("*" * 20)
         println("All Changes")
 //        println(getAllChangeLog())
@@ -392,11 +385,11 @@ publishing {
     publications {
         gpr(MavenPublication) {
             artifact srcJar {
-                classifier = 'sources'
+                archiveClassifier.set('sources')
                 extension = 'jar'
             }
             artifact deobfJar {
-                classifier = 'deobf'
+                archiveClassifier.set('deobf')
                 extension = 'jar'
             }
             artifact reobfArtifact
