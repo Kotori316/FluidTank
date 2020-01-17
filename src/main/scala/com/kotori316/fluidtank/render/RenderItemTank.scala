@@ -39,17 +39,16 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         val compound = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
-        val inSlot = Minecraft.getInstance.getItemRenderer.zLevel > 0
-        if (!inSlot) RenderHelper.disableStandardItemLighting()
+        RenderHelper.disableStandardItemLighting()
         TileEntityRendererDispatcher.instance.func_228852_a_(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
-        if (!inSlot) RenderHelper.func_227780_a_()
 
       case _ => FluidTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)
     }
   }
 
+  // copy of ItemRenderer#func_229114_a_()
   def renderItemModel(renderer: ItemRenderer, model: IBakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, builder: IVertexBuilder): Unit = {
     val random = new Random
     val seed = 42L
