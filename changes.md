@@ -1,3 +1,4 @@
-## v15.0.3
-- Changed texture of "Infinite Fluid Supplier".
-- Changed item name from "Infinite Fluid Supplier" tp "Infinite Water Supplier".
+## v15.0.4
+- Add support of Hwyla.
+- Add rainbow renderer for pipe.
+- Some changes in item renderer. (Call `RenderHelper#disableStandardItemLighting()` every time.)
