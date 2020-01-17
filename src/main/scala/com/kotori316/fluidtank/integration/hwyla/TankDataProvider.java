@@ -39,7 +39,6 @@ import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_Conn
 import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_NonCreative;
 import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_Tier;
 
-//@Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = Waila_ModId)
 public class TankDataProvider implements IServerDataProvider<TileEntity>, IComponentProvider {
 
     private static final Predicate<Object> NOT_EMPTY = Predicate.isEqual(FLUID_NULL).negate();
