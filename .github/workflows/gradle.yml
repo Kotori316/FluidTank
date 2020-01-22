@@ -3,11 +3,10 @@ name: Java CI
 on:
   push:
     branches: 
-      - 1.14.3
-      - 1.15.1
+      - 1.15.1-fabric
 
 jobs:
-  build-publish:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +24,6 @@ jobs:
     - name: Build with Gradle and Publish
       run: |
         chmod +x ./gradlew
-        ./gradlew test publish --continue
+        ./gradlew build --continue --info
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
