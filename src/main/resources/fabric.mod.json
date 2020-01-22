@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "fluidtank",
+  "version": "${version}",
+  "name": "Fluid Tank",
+  "description": "FluidTank",
+  "authors": [
+    "Me!", "Kotori316"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Kotori316",
+    "sources": "https://github.com/Kotori316/FluidTank"
+  },
+  "license": "All rights reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "value": "com.kotori316.fluidtank.ModTank"
+      }
+    ],
+    "client": [
+      "com.kotori316.fluidtank.ModTank$ClientInit"
+    ]
+  },
+  "requires": {
+    "fabric-language-scala": ">=0.2.0"
+  },
+  "depends": {
+    "fabricloader": ">=0.7.2",
+    "fabric": "*",
+    "minecraft": "1.15.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

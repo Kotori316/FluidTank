@@ -22,3 +22,7 @@ eclipse
 FILES
 /Minecraft
 run-server
+
+# fabric
+
+run/

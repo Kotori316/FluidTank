@@ -9,9 +9,6 @@
     "t": [
       {
         "item": "fluidtank:tank_wood"
-      },
-      {
-        "item": "fluidtank:invisible_tank_wood"
       }
     ],
     "g": {

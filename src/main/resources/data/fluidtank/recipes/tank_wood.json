@@ -7,7 +7,7 @@
   ],
   "key": {
     "x": {
-      "tag": "forge:glass"
+      "item": "minecraft:glass"
     },
     "p": {
       "tag": "minecraft:logs"
@@ -15,16 +15,5 @@
   },
   "result": {
     "item": "fluidtank:tank_wood"
-  },
-  "conditions": [
-    {
-      "value": {
-        "type": "fluidtank:easy"
-      },
-      "type": "forge:not"
-    },
-    {
-      "type": "fluidtank:config"
-    }
-  ]
+  }
 }

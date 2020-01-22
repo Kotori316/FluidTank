@@ -1,12 +1,8 @@
 # FluidTank
 
-For Minecraft 1.15.1 (1.15.1 branch)
+For Minecraft 1.15.1 (1.15.1-fabric branch)
 
-[![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
-[![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
-
-[![](https://github.com/Kotori316/FluidTank/workflows/Java%20CI/badge.svg)](https://github.com/Kotori316/FluidTank/actions)
-
+**Work in progress.**
 
 LICENSE: MIT License  
 Copyright (c) 2019-2020 Kotori316
@@ -24,23 +20,10 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 
 ### APIs
 
-* **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.15.1, newer than 1.15.1-30.0.18
+* **REQUIRED** [Fabric](https://github.com/FabricMC/fabric)
+  * For Minecraft 1.15.1
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-  * Version 2.13.1
+  * Version 2.12.8
   * Licenced under the Apache License 2.0
-
-* **REQUIRED** [Cats](https://github.com/typelevel/cats)
-  * Version 2.0.0
-  * Licensed under the MIT License
-
-* ~[Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)~
-  * Licensed under the MIT License
-  * Not needed since 1.14.4
-
-* [Hwyla](https://github.com/TehNut/HWYLA/tree/1.15_forge)
-  * Licensed under CC BY-NC-SA 4.0
-
-* ~[The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.14)~
-  * Licensed under the MIT License Copyright © 2016 McJty
+  * FOR USER install https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala

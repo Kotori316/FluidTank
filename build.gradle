@@ -1,415 +1,85 @@
-import java.nio.file.Files
-import java.nio.file.Paths
-
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = "https://plugins.gradle.org/m2/" }
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.2.0'
-        classpath group: "gradle.plugin.com.github.breadmoirai", name: "github-release", version: "2.2.9"
-    }
-}
-
 plugins {
-    id("maven-publish")
-}
-apply plugin: 'scala'
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: "com.matthewprenger.cursegradle"
-apply plugin: "com.github.breadmoirai.github-release"
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
-version = getProperty("modVersion")
-if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
-    // In remote CI/CD environment
-    version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA").substring(0, 7))
+	id 'fabric-loom' version '0.2.6-SNAPSHOT'
+	id 'maven-publish'
+	id "scala"
 }
 
-group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "LargeFluidTank"
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
 
 minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20190719-1.14.3'
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
-    // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        client {
-            workingDirectory project.file('Minecraft')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                fluidtank {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run-server')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                fluidtank {
-                    source sourceSets.main
-                }
-            }
-        }
-        data {
-            workingDirectory project.file('run-server')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'info'
-
-            args '--mod', "fluidtank", '--all'
-
-            mods {
-                fluidtank {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-repositories {
-//    maven {
-//        name "BuildCraft"
-//        url = "https://mod-buildcraft.com/maven"
-//    }
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
-    }
-    maven {
-        name = "Hwyla"
-        url "http://tehnut.info/maven"
-    }
-    maven { // The One Probe
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
-    maven {
-        // Curse Forge
-        name 'Curse Forge'
-        url 'https://minecraft.curseforge.com/api/maven/'
-    }
-    if (hasGitHubToken()) {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
-            }
-        }
-    }
-}
-
-private boolean hasGitHubToken() {
-    return project.hasProperty("githubToken") || System.getenv("REPO_TOKEN") != null
 }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
-    def forge_prop = loadProperties("forge_version.properties")
-    minecraft(forge_prop.getProperty("forge_version"))
-    implementation "org.scala-lang:scala-library:2.13.1"
-    implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
+	//to change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    def mc_version = "1.15.1"
-    def jei_version = "6.0.0.1"
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_${mc_version}")
-    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc:fabric-language-scala:0.2.0.+"
 
-//    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
-//    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
-    // https://dvs1.progwml6.com/files/maven/mezz/jei/jei-1.14.4/6.0.0.25/jei-1.14.4-6.0.0.25.jar
-    if (hasGitHubToken()) {
-        implementation("com.kotori316:ScalableCatsForce:2.13.1-build-6:dev")
-    } else {
-        implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
-    }
-    // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
+	// library
+	implementation "org.scala-lang:scala-library:2.12.8"
 
-//    compileOnly("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
-
-    // Runtime mod dependencies.
-//    runtimeOnly
-
-    // Test Dependencies.
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.2")
+	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
+	// You may need to force-disable transitiveness on them.
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
+processResources {
+	inputs.property "version", project.version
+
+	from(sourceSets.main.resources.srcDirs) {
+		include "fabric.mod.json"
+		expand "version": project.version
+	}
+
+	from(sourceSets.main.resources.srcDirs) {
+		exclude "fabric.mod.json"
+	}
+}
+
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = "sources"
+	from sourceSets.main.allSource
+}
+
 jar {
-    manifest {
-        attributes([
-                "Specification-Title"     : project.name,
-                "Specification-Vendor"    : "Kotori316",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${project.version}",
-                "Implementation-Vendor"   : "Kotori316",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
+	from "LICENSE"
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
-
-def loadProperties(String filename) {
-    def props = new Properties()
-    file(filename).withInputStream {
-        props.load(it)
-    }
-    return props
-}
-
-task srcJar(type: Jar) {
-    from sourceSets.main.allSource
-    archiveClassifier.set('sources')
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    archiveClassifier.set('deobf')
-    manifest {
-        attributes([
-                "Specification-Title"     : project.name,
-                "Specification-Vendor"    : "Kotori316",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : project.version,
-                "Implementation-Vendor"   : "Kotori316",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-}
-
-// Tell the artifact system about our extra jars
-artifacts {
-    archives srcJar, deobfJar
-}
-
-curseforge {
-    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
-    project {
-        id = '291006'
-        changelogType = 'markdown'
-        addGameVersion '1.15.1'
-        changelog = getAllChangeLog()
-        releaseType = 'release'
-        mainArtifact jar
-        addArtifact deobfJar
-        addArtifact srcJar
-        relations {
-            requiredDependency 'scalable-cats-force'
-        }
-    }
-    options {
-        debug = false // defaults to false
-        javaVersionAutoDetect = false
-    }
-}
-
-githubRelease {
-    repo = 'FluidTank'
-    token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish = '1.15.1'
-    body {
-        getLatestChangeLog()
-    }
-    releaseAssets = files(
-            jar.getArchiveFile().get(),
-            deobfJar.getArchiveFile().get(),
-            srcJar.getArchiveFile().get()
-    )
-}
-
-task signJar2() {
-    doLast {
-        ant.signjar(
-                jar: jar.getArchiveFile().get(),
-                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
-                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
-                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
-                sigalg: "SHA1withRSA",
-                digestalg: "SHA-256",
-                tsaurl: "http://timestamp.digicert.com"
-        )
-        ant.signjar(
-                jar: deobfJar.getArchiveFile().get(),
-                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
-                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
-                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
-                sigalg: "SHA1withRSA",
-                digestalg: "SHA-256",
-                tsaurl: "http://timestamp.digicert.com"
-        )
-    }
-}
-
-if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
-    // Runs this task automatically when build is ran.
-    assemble.dependsOn(signJar2)
-}
-
-void moveOldLog() {
-    def new_log_file = file("changes.md")
-    def old_log_file = file("old_logs.md")
-
-    if (new_log_file.exists()) {
-        if (!old_log_file.exists())
-            old_log_file.createNewFile()
-        def combined = new_log_file.text + System.lineSeparator() + old_log_file.text
-        old_log_file.setText(combined)
-    }
-}
-
-String getAllChangeLog() {
-    final old_log = file("old_logs.md")
-    final header_file = file("header.md")
-
-    def all_log = old_log.exists() ? old_log.text : "No change log provided."
-    def header = header_file.exists() ? header_file.text : "#Change Log"
-    return header + System.lineSeparator() + all_log
-}
-
-String getLatestChangeLog() {
-    final def log_file = file("changes.md")
-    final def header_file = file("header.md")
-    def log = log_file.exists() ? log_file.text : "No change log provided."
-    def header = header_file.exists() ? header_file.text : "#Change Log"
-    return header + System.lineSeparator() + log
-}
-
-task makeChangeLog() {
-    doLast {
-        moveOldLog()
-        // git commit and push to github
-
-//        ProcessBuilder committer = new ProcessBuilder("git", "commit", "-m", "v${project.version}")
-//        def process1 = committer.start()
-//        process1.waitFor(10L, TimeUnit.SECONDS)
-//        ProcessBuilder pusher = new ProcessBuilder("git", "push")
-//        def process2 = pusher.start()
-//        process2.waitFor(20L, TimeUnit.SECONDS)
-    }
-}
-
-task checkMethod() {
-    doLast {
-        System.out.println("FilePath ${jar.getArchiveFile().get()}")
-        System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
-        System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
-        System.out.println("Name $project.name")
-        System.out.println("BaseName $archivesBaseName")
-        System.out.println("ModVersion ${getProperty("modVersion")}")
-        System.out.println("ModVersion ${project.version}")
-        println("*" * 20)
-        println("changes.md")
-        println(getLatestChangeLog())
-        println("*" * 20)
-        println("hasGitHubToken ${hasGitHubToken()}")
-        println("hasSignToken ${project.hasProperty("keyStore")}")
-        println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}")
-        println("*" * 20)
-        println("All Changes")
-//        println(getAllChangeLog())
-        println("*" * 20)
-        println("FindProperty of githubToken: project.findProperty(\"githubToken\") != null ${project.findProperty("githubToken") != null}")
-        println("FindProperty of gpr.user ${project.findProperty("gpr.user")}")
-        println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}")
-//        println("Property of gpr.user ${project.property("gpr.user")}") // FAILED
-    }
-}
-
+// configure the maven publication
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
-            }
-        }
-    }
-    publications {
-        gpr(MavenPublication) {
-            artifact srcJar {
-                archiveClassifier.set('sources')
-                extension = 'jar'
-            }
-            artifact deobfJar {
-                archiveClassifier.set('deobf')
-                extension = 'jar'
-            }
-            artifact reobfArtifact
-//            publishing.publications {
-//                target(MavenPublication) {
-//                    pom.withXml {
-//                        Node pomNode = asNode()
-//                        pomNode.dependencies.'*'.findAll() {
-//                            it.parent().remove(it)
-//                        }
-//                    }
-//                }
-//            }
-        }
-    }
-}
+	publications {
+		mavenJava(MavenPublication) {
+			// add all the jars that should be included when publishing to maven
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
+			}
+		}
+	}
 
-task copyToDrive(type: Copy, dependsOn: "build") {
-    def PATH_NAME = "drive_path"
-    from(jar.getArchiveFile(), deobfJar.getArchiveFile(), srcJar.getArchiveFile())
-    into(file(java.util.Optional.ofNullable(System.getenv(PATH_NAME)).orElse(".")))
-    onlyIf {
-        System.getenv(PATH_NAME) != null &&
-                Files.exists(Paths.get(System.getenv(PATH_NAME)))
-    }
+	// select the repositories you want to publish to
+	repositories {
+		// uncomment to publish to the local maven
+		// mavenLocal()
+	}
 }
