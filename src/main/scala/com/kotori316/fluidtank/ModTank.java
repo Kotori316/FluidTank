@@ -116,15 +116,4 @@ public class ModTank implements ModInitializer {
         }
     }
 
-    public static class ClientInit implements ClientModInitializer {
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onInitializeClient() {
-            System.out.println(modID + " is called client init.");
-            Entries.ALL_TANK_BLOCKS.forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, RenderLayer.getCutoutMipped()));
-            BlockEntityRendererRegistry.INSTANCE.register(Entries.TANK_BLOCK_ENTITY_TYPE, RenderTank::new);
-            BlockEntityRendererRegistry.INSTANCE.register(Entries.CREATIVE_BLOCK_ENTITY_TYPE, d -> (BlockEntityRenderer<TileTankCreative>) ((BlockEntityRenderer<?>) new RenderTank(d)));
-        }
-    }
 }

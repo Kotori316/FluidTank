@@ -20,7 +20,7 @@
       }
     ],
     "client": [
-      "com.kotori316.fluidtank.ModTank$ClientInit"
+      "com.kotori316.fluidtank.ModTankClientInit"
     ]
   },
   "requires": {

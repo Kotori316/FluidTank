@@ -26,6 +26,7 @@ dependencies {
 
 	// library
 	implementation "org.scala-lang:scala-library:2.12.8"
+	implementation "com.google.code.findbugs:jsr305:3.0.1"
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
