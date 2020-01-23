@@ -55,6 +55,7 @@ public class TierRecipe implements CraftingRecipe {
 
     @Override
     public boolean matches(CraftingInventory inv, World worldIn) {
+        if (isEmptyRecipe) return false;
         if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getInvStack).allMatch(subItems)) return false;
         if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getInvStack).allMatch(tankItems)) return false;
         return IntStream.of(TANK_SLOTS).mapToObj(inv::getInvStack)
