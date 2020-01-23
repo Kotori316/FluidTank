@@ -1,67 +1,63 @@
 package com.kotori316.fluidtank.render
 
 import java.util.Random
-/*
-import cats.syntax.eq._
-import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
-import com.kotori316.fluidtank.{FluidTank, ModObjects}
-import com.mojang.blaze3d.matrix.MatrixStack
-import com.mojang.blaze3d.vertex.IVertexBuilder
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.model.IBakedModel
-import net.minecraft.client.renderer.tileentity.{ItemStackTileEntityRenderer, TileEntityRendererDispatcher}
-import net.minecraft.client.renderer.{IRenderTypeBuffer, ItemRenderer, RenderHelper, RenderTypeLookup}
-import net.minecraft.item.ItemStack
-import net.minecraft.util.Direction
-import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.model.data.EmptyModelData
 
-@OnlyIn(Dist.CLIENT)
-class RenderItemTank extends ItemStackTileEntityRenderer {
+import com.kotori316.fluidtank.ModTank
+import com.kotori316.fluidtank.tank.{TankBlock, TankBlockItem, TileTank}
+import net.fabricmc.api.{EnvType, Environment}
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
+import net.minecraft.client.render.item.{BuiltinModelItemRenderer, ItemRenderer}
+import net.minecraft.client.render.model.BakedModel
+import net.minecraft.client.render.{DiffuseLighting, RenderLayers, VertexConsumer, VertexConsumerProvider}
+import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.item.ItemStack
+import net.minecraft.util.math.Direction
+
+@Environment(EnvType.CLIENT)
+class RenderItemTank extends BuiltinModelItemRenderer {
 
   lazy val tileTank = new TileTank()
 
-  override def func_228364_a_(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
-      case tankItem: ItemBlockTank =>
+      case tankItem: TankBlockItem =>
 
-        val state = ModObjects.blockTanksInvisible.find(_.tier === tankItem.blockTank.tier).map(_.getDefaultState).getOrElse(tankItem.blockTank.getDefaultState)
-        val model = Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state)
+        val state = tankItem.blockTank.getDefaultState
+        val model = MinecraftClient.getInstance.getBlockRenderManager.getModel(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
-        val renderType = RenderTypeLookup.func_228389_a_(stack)
-        val b = ItemRenderer.func_229113_a_(renderTypeBuffer, renderType, true, stack.hasEffect)
-        renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
+        val renderType = RenderLayers.getItemLayer(stack)
+        val b = renderTypeBuffer.getBuffer(renderType)
+        renderItemModel(MinecraftClient.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
 
-        tileTank.tier = tankItem.blockTank.tier
+        tileTank.tier = tankItem.blockTank.tiers
         tileTank.tank.setFluid(null)
-        val compound = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+        val compound = stack.getSubTag(TankBlock.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
-        RenderHelper.disableStandardItemLighting()
-        TileEntityRendererDispatcher.instance.func_228852_a_(
+        DiffuseLighting.disable()
+        BlockEntityRenderDispatcher.INSTANCE.renderEntity(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
 
-      case _ => FluidTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)
+      case _ => ModTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)
     }
   }
 
   // copy of ItemRenderer#func_229114_a_()
-  def renderItemModel(renderer: ItemRenderer, model: IBakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, builder: IVertexBuilder): Unit = {
+  def renderItemModel(renderer: ItemRenderer, model: BakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, builder: VertexConsumer): Unit = {
     val random = new Random
     val seed = 42L
 
     for (direction <- Direction.values) {
       random.setSeed(seed)
-      renderer.func_229112_a_(matrixStack, builder, model.getQuads(null, direction, random, EmptyModelData.INSTANCE), stack, light, otherLight)
+//      renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, direction, random), stack, light, otherLight)
     }
 
     random.setSeed(seed)
-    renderer.func_229112_a_(matrixStack, builder, model.getQuads(null, null, random, EmptyModelData.INSTANCE), stack, light, otherLight)
+//    renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, null, random), stack, light, otherLight)
 
   }
 
 }
-*/

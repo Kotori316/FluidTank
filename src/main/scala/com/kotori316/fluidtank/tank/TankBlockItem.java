@@ -19,7 +19,7 @@ import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
 
 public class TankBlockItem extends BlockItem {
-    private final TankBlock blockTank;
+    public final TankBlock blockTank;
 
     public TankBlockItem(TankBlock block) {
         super(block, new Item.Settings().group(ModTank.CREATIVE_TAB));
