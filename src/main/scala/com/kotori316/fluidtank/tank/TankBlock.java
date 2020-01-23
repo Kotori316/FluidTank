@@ -10,7 +10,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.EntityContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -76,7 +75,7 @@ public class TankBlock extends Block implements BlockEntityProvider {
             } else if (!(stack.getItem() instanceof TankBlockItem)) {
                 ItemStack copiedStack = stack.getCount() == 1 ? stack : stack.copy();
                 copiedStack.setCount(1);
-                if (!stack.isEmpty() && stack.getItem() instanceof BucketItem) {
+                if (!stack.isEmpty() && FluidAmount.isFluidContainer(stack)) {
                     if (!world.isClient) {
                         FluidAmount.Tank handler = tileTank.connection().handler();
                         BucketEventHandler.transferFluid(world, pos, playerIn, handIn,

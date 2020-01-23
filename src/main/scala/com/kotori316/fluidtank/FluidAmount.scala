@@ -64,6 +64,10 @@ object FluidAmount {
     }
   }
 
+  def isFluidContainer(stack: ItemStack): Boolean = {
+    stack.getItem.isInstanceOf[BucketItem] || fromItem(stack).nonEmpty
+  }
+
   def fromNBT(tag: CompoundTag): FluidAmount = {
     val fluid = registry.get(new Identifier(Option(tag).map(_.getString(NBT_fluid)).getOrElse(registry.getId(Fluids.EMPTY).toString)))
     if (fluid == null || fluid == EMPTY.fluid) {

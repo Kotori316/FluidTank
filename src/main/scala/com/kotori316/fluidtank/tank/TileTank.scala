@@ -168,7 +168,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
      * @return Fluid that was accepted by the tank.
      */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Long = 0): FluidAmount = {
-      if (canFillFluidType(fluidAmount)) {
+      if (canFillFluidType(fluidAmount) && fluidAmount.nonEmpty) {
         val newAmount = fluid.amount + fluidAmount.amount
         if (capacity >= newAmount) {
           if (doFill) {
