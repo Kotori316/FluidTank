@@ -31,53 +31,67 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     val blue = color >> 0 & 0xFF
     val alpha = 240
     //    RenderPipe.BOX_AABB.render(buffer, texture, 128, red, green, blue)
+
+    def drawWhite(p: ((Double, Double, Double), (Double, Double, Double), (Double, Double, Double), (Double, Double, Double))): Unit = {
+      buffer.pos(p._1._1, p._1._2, p._1._3).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
+      buffer.pos(p._2._1, p._2._2, p._2._3).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
+      buffer.pos(p._3._1, p._3._2, p._3._3).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
+      buffer.pos(p._4._1, p._4._2, p._4._3).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+    }
+
     if (te.getBlockState.get(PipeBlock.NORTH).hasConnection) {
       RenderPipe.North_AABB.render(buffer, texture, alpha, red, green, blue)
     } else {
-      buffer.pos(maxD, maxD, minD).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, minD, minD).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, minD, minD).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, maxD, minD).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+      drawWhite(
+        (maxD, maxD, minD),
+        (maxD, minD, minD),
+        (minD, minD, minD),
+        (minD, maxD, minD))
     }
     if (te.getBlockState.get(PipeBlock.SOUTH).hasConnection) {
       RenderPipe.South_AABB.render(buffer, texture, alpha, red, green, blue)
     } else {
-      buffer.pos(minD, maxD, maxD).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, minD, maxD).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, minD, maxD).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, maxD, maxD).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+      drawWhite(
+        (minD, maxD, maxD),
+        (minD, minD, maxD),
+        (maxD, minD, maxD),
+        (maxD, maxD, maxD))
     }
     if (te.getBlockState.get(PipeBlock.WEST).hasConnection) {
       RenderPipe.West_AABB.render(buffer, texture, alpha, red, green, blue)
     } else {
-      buffer.pos(minD, maxD, minD).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, minD, minD).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, minD, maxD).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, maxD, maxD).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+      drawWhite(
+        (minD, maxD, minD),
+        (minD, minD, minD),
+        (minD, minD, maxD),
+        (minD, maxD, maxD))
     }
     if (te.getBlockState.get(PipeBlock.EAST).hasConnection) {
       RenderPipe.East_AABB.render(buffer, texture, alpha, red, green, blue)
     } else {
-      buffer.pos(maxD, maxD, maxD).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, minD, maxD).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, minD, minD).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, maxD, minD).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+      drawWhite(
+        (maxD, maxD, maxD),
+        (maxD, minD, maxD),
+        (maxD, minD, minD),
+        (maxD, maxD, minD))
     }
     if (te.getBlockState.get(PipeBlock.UP).hasConnection) {
       RenderPipe.UP_AABB.render(buffer, texture, alpha, red, green, blue)
     } else {
-      buffer.pos(minD, maxD, minD).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, maxD, maxD).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, maxD, maxD).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, maxD, minD).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+      drawWhite(
+        (minD, maxD, minD),
+        (minD, maxD, maxD),
+        (maxD, maxD, maxD),
+        (maxD, maxD, minD))
     }
     if (te.getBlockState.get(PipeBlock.DOWN).hasConnection) {
       RenderPipe.Down_AABB.render(buffer, texture, alpha, red, green, blue)
     } else {
-      buffer.pos(maxD, minD, minD).color(red, green, blue, alpha).tex(minU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(maxD, minD, maxD).color(red, green, blue, alpha).tex(maxU, minV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, minD, maxD).color(red, green, blue, alpha).tex(maxU, maxV).lightmap(light.l1, light.l2).endVertex()
-      buffer.pos(minD, minD, minD).color(red, green, blue, alpha).tex(minU, maxV).lightmap(light.l1, light.l2).endVertex()
+      drawWhite(
+        (maxD, minD, minD),
+        (maxD, minD, maxD),
+        (minD, minD, maxD),
+        (minD, minD, minD))
     }
 
     buffer.setTranslation(0, 0, 0)
