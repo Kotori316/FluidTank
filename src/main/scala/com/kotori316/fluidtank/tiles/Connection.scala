@@ -52,7 +52,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
               Writer.apply(message.pure[LogType], filled)
             case head :: tail =>
               val fill = head.tank.fill(toFill, doFill)
-              Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[LogType]).flatMap(_ => internal(tail, toFill - fill, filled + fill))
+              Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[LogType]) >>= { _ => internal(tail, toFill - fill, filled + fill) }
           }
         }
       }
@@ -91,9 +91,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         } else {
           tanks match {
             case Nil => for (_ <- Writer.tell(s"Drain Finished. Total amount is ${drained.show}".pure[LogType])) yield drained
-            case ::(head, tl) =>
+            case head :: tl =>
               val drain = head.tank.drain(toDrain, doDrain)
-              Writer.tell(s"Drained ${drain.show} from ${head.getPos.show}".pure[LogType]) flatMap { _ => internal(tl, toDrain - drain, drained + drain) }
+              for {
+                _ <- Writer.tell(s"Drained ${drain.show} from ${head.getPos.show}".pure[LogType])
+                fluid <- internal(tl, toDrain - drain, drained + drain)
+              } yield fluid
           }
         }
       }
