@@ -84,7 +84,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     if (SideProxy.isServer(this)) PacketHandler.sendToClient(TileMessage(this), getWorld)
   }
 
-  def hasContent: Boolean = tank.getFluidAmount > 0
+  def hasContent: Boolean = tank.getFluid.nonEmpty
 
   override def hasFastRenderer = true
 
