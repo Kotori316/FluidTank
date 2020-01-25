@@ -31,37 +31,35 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
     }
   )
 
-  override def tick(): Unit = {
-    if (!world.isRemote) {
-      if (connection.isEmpty)
-        makeConnection()
-      import scala.jdk.CollectionConverters._
-      PipeBlock.FACING_TO_PROPERTY_MAP.asScala.toSeq.flatMap { case (direction, value) =>
-        if (getBlockState.get(value).isInput) {
-          val sourcePos = pos.offset(direction)
-          val c = for {
-            t <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(sourcePos)))
-            cap <- t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
-          } yield cap -> sourcePos
-          c.toList
-        } else {
-          List.empty
-        }
-      }.foreach { case (f, sourcePos) =>
-        for {
-          p <- connection.outputs
-          (direction, pos) <- directions.map(f => f -> p.offset(f))
-          if pos != sourcePos
-          if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-          dest <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos)))
-            .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
-            .toList
-          if f != dest
-        } {
-          val transferSimulate = FluidUtil.tryFluidTransfer(dest, f, PipeTile.amountPerTick, false)
-          if (!transferSimulate.isEmpty) {
-            FluidUtil.tryFluidTransfer(dest, f, transferSimulate, true)
-          }
+  override def tick(): Unit = if (!world.isRemote) {
+    if (connection.isEmpty)
+      makeConnection()
+    import scala.jdk.CollectionConverters._
+    PipeBlock.FACING_TO_PROPERTY_MAP.asScala.toSeq.flatMap { case (direction, value) =>
+      if (getBlockState.get(value).isInput) {
+        val sourcePos = pos.offset(direction)
+        val c = for {
+          t <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(sourcePos)))
+          cap <- t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
+        } yield cap -> sourcePos
+        c.toList
+      } else {
+        List.empty
+      }
+    }.foreach { case (f, sourcePos) =>
+      for {
+        p <- connection.outputs
+        (direction, pos) <- directions.map(f => f -> p.offset(f))
+        if pos != sourcePos
+        if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
+        dest <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos)))
+          .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
+          .toList
+        if f != dest
+      } {
+        val transferSimulate = FluidUtil.tryFluidTransfer(dest, f, PipeTile.amountPerTick, false)
+        if (!transferSimulate.isEmpty) {
+          FluidUtil.tryFluidTransfer(dest, f, transferSimulate, true)
         }
       }
     }
