@@ -1,3 +1,5 @@
+## v15.0.5
+- Fixed tanks with EMPTY fluid was trying to render their content.
 ## v15.0.4
 - Add support of Hwyla.
 - Add rainbow renderer for pipe.
