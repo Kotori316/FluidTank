@@ -45,6 +45,7 @@ public class TierRecipe implements ICraftingRecipe {
     private final Ingredient tankItems;
     private final Ingredient subItems;
     private final ItemStack result;
+    private final boolean disable;
 
     public TierRecipe(ResourceLocation idIn, Tiers tier) {
         id = idIn;
@@ -58,12 +59,24 @@ public class TierRecipe implements ICraftingRecipe {
         subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().tagMap().apply(tier))))
             .map(Ingredient::fromTag)
             .orElse(Ingredient.EMPTY);
+        if (subItems.hasNoMatchingItems()) {
+            disable = true;
+            FluidTank.LOGGER.error("Recipe {} for Tier {} has no corner items. tag: {}", idIn, tier, Config.content().tagMap().apply(tier));
+        } else {
+            disable = false;
+        }
     }
 
     @Override
     public boolean matches(CraftingInventory inv, World worldIn) {
+        return checkInv(inv);
+    }
+
+    private boolean checkInv(CraftingInventory inv) {
+        if (disable) return false;
         if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
         if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot).allMatch(tankItems)) return false;
+        if (!inv.getStackInSlot(4).isEmpty()) return false;
         return IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
             .filter(Objects::nonNull)
@@ -76,6 +89,12 @@ public class TierRecipe implements ICraftingRecipe {
 
     @Override
     public ItemStack getCraftingResult(CraftingInventory inv) {
+        if (disable) return ItemStack.EMPTY;
+        if (!this.checkInv(inv)) {
+            FluidTank.LOGGER.error("Requested to return crafting result for invalid inventory. {}",
+                IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot).collect(Collectors.toList()));
+            return ItemStack.EMPTY;
+        }
         ItemStack result = getRecipeOutput();
         FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
@@ -145,6 +164,11 @@ public class TierRecipe implements ICraftingRecipe {
         return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
     }
 
+    @Override
+    public boolean isDynamic() {
+        return disable;
+    }
+
     public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "crafting_grade_up");
 
@@ -164,14 +188,12 @@ public class TierRecipe implements ICraftingRecipe {
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            ResourceLocation id = buffer.readResourceLocation();
             Tiers tier = Tiers.fromNBT(buffer.readCompoundTag());
-            return new TierRecipe(id, tier);
+            return new TierRecipe(recipeId, tier);
         }
 
         @Override
         public void write(PacketBuffer buffer, TierRecipe recipe) {
-            buffer.writeResourceLocation(recipe.getId());
             buffer.writeCompoundTag(recipe.tier.toNBTTag());
         }
 
