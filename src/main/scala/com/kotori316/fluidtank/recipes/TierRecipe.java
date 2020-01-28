@@ -75,7 +75,7 @@ public class TierRecipe implements ICraftingRecipe {
             LOGGER.error("Recipe {} for Tier {} has no corner items. tag: {}", idIn, tier, Config.content().tagMap().apply(tier));
         } else {
             disable = false;
-            LOGGER.debug("Recipe instance created for Tier {}. Tag: {}", tier,
+            LOGGER.debug("Recipe instance({}) created for Tier {}. Tag: {}", idIn, tier,
                 maybeTag.map(Tag::getAllElements).map(Object::toString).orElse("NO ITEMS"));
         }
         recipeItems = getIngredients();
