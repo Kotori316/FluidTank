@@ -14,11 +14,14 @@ import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 
 public class ConvertInvisibleRecipe extends SpecialRecipe {
+    private static final Logger LOGGER = LogManager.getLogger(ConvertInvisibleRecipe.class);
     public static final String LOCATION = "fluidtank:crafting_convert_invisible";
     public static final IRecipeSerializer<ConvertInvisibleRecipe> SERIALIZER =
         new SpecialRecipeSerializer<>(ConvertInvisibleRecipe::new);
@@ -26,6 +29,7 @@ public class ConvertInvisibleRecipe extends SpecialRecipe {
 
     public ConvertInvisibleRecipe(ResourceLocation idIn) {
         super(idIn);
+        LOGGER.debug("Recipe instance of ConvertInvisibleRecipe({}) was created.", idIn);
     }
 
     @Override
@@ -60,6 +64,8 @@ public class ConvertInvisibleRecipe extends SpecialRecipe {
             stack.setTag(stackOptional.get().getTag());
             return stack;
         }
+        LOGGER.debug("No result item for inventory: {}",
+            IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot).collect(Collectors.toList()));
         return ItemStack.EMPTY;
     }
 
