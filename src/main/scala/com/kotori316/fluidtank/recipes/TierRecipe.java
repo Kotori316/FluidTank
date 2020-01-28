@@ -38,6 +38,7 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
@@ -144,7 +145,8 @@ public class TierRecipe implements ICraftingRecipe {
             return ItemStack.EMPTY;
         }
         ItemStack result = getRecipeOutput();
-        FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
+        FluidAmount fluidAmount = IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot)
+            .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
