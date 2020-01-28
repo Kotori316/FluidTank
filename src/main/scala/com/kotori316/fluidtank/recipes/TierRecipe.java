@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.recipes;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -12,6 +13,7 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -19,12 +21,15 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.Config;
@@ -37,6 +42,7 @@ import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 public class TierRecipe implements ICraftingRecipe {
+    private static final Logger LOGGER = LogManager.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
@@ -46,6 +52,9 @@ public class TierRecipe implements ICraftingRecipe {
     private final Ingredient subItems;
     private final ItemStack result;
     private final boolean disable;
+    private static final int recipeWidth = 3;
+    private static final int recipeHeight = 3;
+    private final List<Ingredient> recipeItems;
 
     public TierRecipe(ResourceLocation idIn, Tiers tier) {
         id = idIn;
@@ -56,15 +65,19 @@ public class TierRecipe implements ICraftingRecipe {
         Set<BlockTank> tanks = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         Set<BlockTank> invTanks = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         tankItems = Ingredient.fromStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
-        subItems = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().tagMap().apply(tier))))
+        Optional<Tag<Item>> maybeTag = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().tagMap().apply(tier))));
+        subItems = maybeTag
             .map(Ingredient::fromTag)
             .orElse(Ingredient.EMPTY);
         if (subItems.hasNoMatchingItems()) {
             disable = true;
-            FluidTank.LOGGER.error("Recipe {} for Tier {} has no corner items. tag: {}", idIn, tier, Config.content().tagMap().apply(tier));
+            LOGGER.error("Recipe {} for Tier {} has no corner items. tag: {}", idIn, tier, Config.content().tagMap().apply(tier));
         } else {
             disable = false;
+            LOGGER.debug("Recipe instance created for Tier {}. Tag: {}", tier,
+                maybeTag.map(Tag::getAllElements).map(Object::toString).orElse("NO ITEMS"));
         }
+        recipeItems = getIngredients();
     }
 
     @Override
@@ -74,24 +87,59 @@ public class TierRecipe implements ICraftingRecipe {
 
     private boolean checkInv(CraftingInventory inv) {
         if (disable) return false;
-        if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStackInSlot).allMatch(subItems)) return false;
-        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot).allMatch(tankItems)) return false;
-        if (!inv.getStackInSlot(4).isEmpty()) return false;
-        return IntStream.of(TANK_SLOTS).mapToObj(inv::getStackInSlot)
-            .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
-            .filter(Objects::nonNull)
-            .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
-            .filter(FluidAmount::nonEmpty)
-            .map(FluidAmount::fluid)
-            .distinct()
-            .count() <= 1;
+        for (int i = 0; i <= inv.getWidth() - recipeWidth; ++i) {
+            for (int j = 0; j <= inv.getHeight() - recipeHeight; ++j) {
+                if (this.checkMatch(inv, i, j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
+    /**
+     * Checks if the region of a crafting inventory is match for the recipe.
+     * <p>Copied from {@link net.minecraft.item.crafting.ShapedRecipe}</p>
+     */
+    public boolean checkMatch(CraftingInventory craftingInventory, int w, int h) {
+        for (int i = 0; i < craftingInventory.getWidth(); ++i) {
+            for (int j = 0; j < craftingInventory.getHeight(); ++j) {
+                int k = i - w;
+                int l = j - h;
+                Ingredient ingredient;
+                if (k >= 0 && l >= 0 && k < recipeWidth && l < recipeHeight) {
+                    ingredient = this.recipeItems.get(recipeWidth - k - 1 + l * recipeWidth);
+                } else {
+                    ingredient = Ingredient.EMPTY;
+                }
+
+                if (!ingredient.test(craftingInventory.getStackInSlot(i + j * craftingInventory.getWidth()))) {
+                    return false;
+                }
+            }
+        }
+
+        // Items are placed correctly.
+        List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.getSizeInventory())
+            .mapToObj(craftingInventory::getStackInSlot)
+            .filter(this.tankItems)
+            .collect(Collectors.toList());
+        return tankStacks.size() == 4 &&
+            tankStacks.stream().map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
+                .filter(Objects::nonNull)
+                .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
+                .filter(FluidAmount::nonEmpty)
+                .map(FluidAmount::fluid)
+                .distinct()
+                .count() <= 1;
+    }
+
 
     @Override
     public ItemStack getCraftingResult(CraftingInventory inv) {
         if (disable) return ItemStack.EMPTY;
         if (!this.checkInv(inv)) {
-            FluidTank.LOGGER.error("Requested to return crafting result for invalid inventory. {}",
+            LOGGER.error("Requested to return crafting result for invalid inventory. {}",
                 IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot).collect(Collectors.toList()));
             return ItemStack.EMPTY;
         }
@@ -183,12 +231,14 @@ public class TierRecipe implements ICraftingRecipe {
                 .filter(tier -> tier.toString().equalsIgnoreCase(t))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Invalid tier: %s", t)));
+            LOGGER.debug("Serializer loaded {} from json for tier {}.", recipeId, tiers);
             return new TierRecipe(recipeId, tiers);
         }
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
             Tiers tier = Tiers.fromNBT(buffer.readCompoundTag());
+            LOGGER.debug("Serializer loaded {} from packet for tier {}.", recipeId, tier);
             return new TierRecipe(recipeId, tier);
         }
 
