@@ -151,9 +151,9 @@ dependencies {
     implementation "org.scala-lang:scala-library:2.13.1"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    def mc_version = "1.15.1"
-    def jei_version = "6.0.0.1"
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_${mc_version}")
+    def mc_version = "1.15.2"
+    def jei_version = "6.0.0.2"
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_1.15.1")
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 
 //    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
@@ -240,7 +240,7 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.15.1'
+        addGameVersion '1.15.2'
         changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar

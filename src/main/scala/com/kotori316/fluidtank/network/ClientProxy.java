@@ -67,7 +67,7 @@ public class ClientProxy extends SideProxy {
 
     @Override
     public Item.Properties getTankProperties() {
-        return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setTEISR(() -> () -> RENDER_ITEM_TANK);
+        return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setISTER(() -> () -> RENDER_ITEM_TANK);
     }
 
     @SubscribeEvent

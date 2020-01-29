@@ -36,6 +36,11 @@ public class ItemModelTank implements IDynamicBakedModel {
     }
 
     @Override
+    public boolean func_230044_c_() {
+        return true;
+    }
+
+    @Override
     public boolean isBuiltInRenderer() {
         return true;
     }
