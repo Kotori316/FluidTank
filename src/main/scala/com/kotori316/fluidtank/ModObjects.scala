@@ -1,9 +1,10 @@
 package com.kotori316.fluidtank
 
-import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank, FluidSourceBlock}
+import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
+import com.mojang.datafixers.DSL
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
@@ -52,7 +53,7 @@ object ModObjects {
   final val SOURCE_TYPE = createTileType(() => new FluidSourceTile, List(blockSource))
 
   def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
-    val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(null)
+    val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(DSL.nilType())
     t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
     types = t :: types
     t

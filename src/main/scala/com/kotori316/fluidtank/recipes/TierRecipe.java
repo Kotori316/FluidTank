@@ -66,16 +66,17 @@ public class TierRecipe implements ICraftingRecipe {
         Set<BlockTank> tanks = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         Set<BlockTank> invTanks = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         tankItems = Ingredient.fromStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
-        Optional<Tag<Item>> maybeTag = Optional.ofNullable(ItemTags.getCollection().get(new ResourceLocation(Config.content().tagMap().apply(tier))));
+        ResourceLocation tagLocation = new ResourceLocation(Config.content().tagMap().apply(tier));
+        Optional<Tag<Item>> maybeTag = Optional.ofNullable(ItemTags.getCollection().get(tagLocation));
         subItems = maybeTag
             .map(Ingredient::fromTag)
             .orElse(Ingredient.EMPTY);
         if (subItems.hasNoMatchingItems()) {
             disable = true;
-            LOGGER.error("Recipe {} for Tier {} has no corner items. tag: {}", idIn, tier, Config.content().tagMap().apply(tier));
+            LOGGER.error("Recipe {} for Tier {} has no corner items. Tag: {}", idIn, tier, tagLocation);
         } else {
             disable = false;
-            LOGGER.debug("Recipe instance({}) created for Tier {}. Tag: {}", idIn, tier,
+            LOGGER.debug("Recipe instance({}) created for Tier {}. Tag: {} ({})", idIn, tier, tagLocation,
                 maybeTag.map(Tag::getAllElements).map(Object::toString).orElse("NO ITEMS"));
         }
         recipeItems = getIngredients();
