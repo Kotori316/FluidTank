@@ -3,23 +3,6 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
 import com.kotori316.fluidtank.{Config, FluidTank}
-import net.minecraft.block.Block
-import net.minecraft.block.properties.PropertyBool
-import net.minecraft.block.state.{BlockStateContainer, IBlockState}
-import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.init.Enchantments
-import net.minecraft.item.ItemStack
-import net.minecraft.stats.StatList
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.NonNullList
-import net.minecraft.util.math.{BlockPos, RayTraceResult}
-import net.minecraft.world.World
-import net.minecraftforge.event.ForgeEventFactory
-
-import scala.collection.JavaConverters._
-import scala.collection.mutable.ArrayBuffer
 
 class BlockTank(val rank: Int, defaultTier: Tiers) extends AbstractTank {
 
@@ -56,9 +39,10 @@ class BlockTank(val rank: Int, defaultTier: Tiers) extends AbstractTank {
     if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) { // do not drop items while restoring blockStates, prevents item dupe
       val blockStack = new ItemStack(this, 1, damageDropped(state))
       saveTankNBT(te, blockStack)
-      val list = ArrayBuffer(blockStack)
+      val list = new java.util.ArrayList[ItemStack]()
+      list.add(blockStack)
       val i = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack)
-      val chance = ForgeEventFactory.fireBlockHarvesting(list.asJava, worldIn, pos, state, i, 1.0f, false, harvesters.get)
+      val chance = ForgeEventFactory.fireBlockHarvesting(list, worldIn, pos, state, i, 1.0f, false, harvesters.get)
       for (drop <- list) {
         if (worldIn.rand.nextFloat <= chance) Block.spawnAsEntity(worldIn, pos, drop)
       }
