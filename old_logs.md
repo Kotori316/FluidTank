@@ -1,3 +1,6 @@
+## v14.9.4
+- Added logger
+
 ## v14.9.3
 - Fixed tank recipe was wrong.
 
