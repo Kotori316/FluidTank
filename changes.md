@@ -1,4 +1,4 @@
 FluidTank for Minecraft 1.12.2
 
-## v12.4.9
-- Added - German language file.
+## v12.5.0
+- Fixed a crash of `UnsupportedOperationException` when harvesting tank.
