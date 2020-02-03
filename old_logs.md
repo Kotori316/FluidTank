@@ -1,3 +1,5 @@
+## v15.2.1
+* Working on recipe issue
 ## v15.2.0
 * Update to Minecraft 1.15.2
   * **REQUIRES NEW LIBRARY. Install from [here](https://www.curseforge.com/minecraft/mc-mods/scalable-cats-force/files/2871351).**
