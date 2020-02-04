@@ -61,7 +61,6 @@ public class FluidTank {
     @SuppressWarnings("unused")
     public void init(FMLCommonSetupEvent event) {
         PacketHandler.init();
-        Config.content().assertion();
         CapabilityFluidTank.register();
         FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());
