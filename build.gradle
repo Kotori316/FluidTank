@@ -81,6 +81,19 @@ minecraft {
                 }
             }
         }
+        data {
+            workingDirectory project.file('Minecraft')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'info'
+
+            args('--mod', "fluidtank", '--all', '--output', "generated")
+
+            mods {
+                fluidtank {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }
 

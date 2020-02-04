@@ -30,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
-import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
@@ -54,18 +53,17 @@ public class TierRecipe implements ICraftingRecipe {
     private static final int recipeHeight = 3;
     private final List<Ingredient> recipeItems;
 
-    public TierRecipe(ResourceLocation idIn, Tiers tier) {
+    public TierRecipe(ResourceLocation idIn, Tiers tier, Ingredient subItems) {
         id = idIn;
         this.tier = tier;
+        this.subItems = subItems;
 
         result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
         Set<Tiers> tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
         Set<BlockTank> tanks = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         Set<BlockTank> invTanks = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
         tankItems = Ingredient.fromStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
-        ResourceLocation tagLocation = new ResourceLocation(Config.content().tagMap().apply(tier));
-        subItems = Optional.ofNullable(ItemTags.getCollection().get(tagLocation)).map(Ingredient::fromTag).orElse(Ingredient.EMPTY);
-        LOGGER.debug("Recipe instance({}) created for Tier {}. Tag: {}", idIn, tier, tagLocation);
+        LOGGER.debug("Recipe instance({}) created for Tier {}.", idIn, tier);
         recipeItems = getIngredients();
     }
 
@@ -213,20 +211,25 @@ public class TierRecipe implements ICraftingRecipe {
                 .filter(tier -> tier.toString().equalsIgnoreCase(t))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Invalid tier: %s", t)));
+            Ingredient subItem = Optional.ofNullable(json.get("sub_item"))
+                .map(Ingredient::deserialize)
+                .orElse(Ingredient.EMPTY);
             LOGGER.debug("Serializer loaded {} from json for tier {}.", recipeId, tiers);
-            return new TierRecipe(recipeId, tiers);
+            return new TierRecipe(recipeId, tiers, subItem);
         }
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
             Tiers tier = Tiers.fromNBT(buffer.readCompoundTag());
+            Ingredient subItem = Ingredient.read(buffer);
             LOGGER.debug("Serializer loaded {} from packet for tier {}.", recipeId, tier);
-            return new TierRecipe(recipeId, tier);
+            return new TierRecipe(recipeId, tier, subItem);
         }
 
         @Override
         public void write(PacketBuffer buffer, TierRecipe recipe) {
             buffer.writeCompoundTag(recipe.tier.toNBTTag());
+            recipe.getSubItems().write(buffer);
             LOGGER.debug("Serialized {} to packet for tier {}.", recipe.id, recipe.tier);
         }
 
@@ -244,6 +247,10 @@ public class TierRecipe implements ICraftingRecipe {
         @Override
         public void serialize(JsonObject json) {
             json.addProperty("tier", tiers.toString().toLowerCase());
+            if (tiers.hasTagRecipe()) {
+                Ingredient ingredient = Ingredient.fromTag(ItemTags.getCollection().getOrCreate(new ResourceLocation(tiers.tagName())));
+                json.add("sub_item", ingredient.serialize());
+            }
         }
 
         @Override

@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "silver",
+  "sub_item": {
+    "tag": "forge:ingots/silver"
+  },
   "conditions": [
     {
       "type": "fluidtank:config"

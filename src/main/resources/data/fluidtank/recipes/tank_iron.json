@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "iron",
+  "sub_item": {
+    "tag": "forge:ingots/iron"
+  },
   "conditions": [
     {
       "type": "fluidtank:config"
