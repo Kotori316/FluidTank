@@ -214,6 +214,8 @@ public class TierRecipe implements ICraftingRecipe {
             Ingredient subItem = Optional.ofNullable(json.get("sub_item"))
                 .map(Ingredient::deserialize)
                 .orElse(Ingredient.EMPTY);
+            if (subItem == Ingredient.EMPTY)
+                LOGGER.warn("Empty ingredient was loaded for {}, json: {}", recipeId, json);
             LOGGER.debug("Serializer loaded {} from json for tier {}.", recipeId, tiers);
             return new TierRecipe(recipeId, tiers, subItem);
         }
@@ -222,6 +224,8 @@ public class TierRecipe implements ICraftingRecipe {
         public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
             Tiers tier = Tiers.fromNBT(buffer.readCompoundTag());
             Ingredient subItem = Ingredient.read(buffer);
+            if (subItem == Ingredient.EMPTY)
+                LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
             LOGGER.debug("Serializer loaded {} from packet for tier {}.", recipeId, tier);
             return new TierRecipe(recipeId, tier, subItem);
         }
