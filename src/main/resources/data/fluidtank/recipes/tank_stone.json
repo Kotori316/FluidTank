@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "stone",
+  "sub_item": {
+    "tag": "forge:stone"
+  },
   "conditions": [
     {
       "type": "fluidtank:config"
