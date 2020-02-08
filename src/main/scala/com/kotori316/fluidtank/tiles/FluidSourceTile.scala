@@ -76,4 +76,7 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
     compound.putInt("interval", interval)
     super.write(compound)
   }
+
+  override def getUpdateTag = this.write(new CompoundNBT)
+
 }
