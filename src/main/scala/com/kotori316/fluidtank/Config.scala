@@ -39,6 +39,7 @@ object Config {
 
     val enableWailaAndTOP = builder.comment("True to enable waila and top to show tank info.").define("showToolTipOnMods", true)
 
+    val enableFluidSupplier = builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", true)
     builder.pop()
 
   }
