@@ -21,6 +21,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.CollectionConverters;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
@@ -51,6 +52,8 @@ public class ClientProxy extends SideProxy {
 
     @Override
     public void registerTESR() {
+        RENDER_PIPE.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
+        RENDER_PIPE.definedColor_$eq(Config.content().pipeColor().get());
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
         ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
