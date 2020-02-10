@@ -12,6 +12,8 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 @OnlyIn(Dist.CLIENT)
 class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[PipeTile](d) {
+  var useColor: Boolean = false
+  var definedColor: Int = 0xFFFFFFFF
 
   override def func_225616_a_(te: PipeTile, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
 
@@ -28,7 +30,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
     val light = implicitly[Box.LightValue]
     val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.func_228643_e_()))
     val time = te.getWorld.getGameTime
-    val color = Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
+    val color = if (useColor) definedColor else Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF
     val blue = color >> 0 & 0xFF

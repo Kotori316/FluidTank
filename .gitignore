@@ -21,4 +21,5 @@ build
 eclipse
 FILES
 /Minecraft
+/data
 run-server

@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "star",
+  "sub_item": {
+    "tag": "forge:nether_stars"
+  },
   "conditions": [
     {
       "type": "fluidtank:config"

@@ -3,8 +3,6 @@ package com.kotori316.fluidtank;
 import java.lang.reflect.Method;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
@@ -29,7 +27,6 @@ import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.ContentTankSerializer;
-//import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
@@ -40,6 +37,8 @@ import com.kotori316.fluidtank.recipes.EasyCondition;
 import com.kotori316.fluidtank.recipes.FluidTankDataProvider;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
+
+//import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -63,7 +62,6 @@ public class FluidTank {
     @SuppressWarnings("unused")
     public void init(FMLCommonSetupEvent event) {
         PacketHandler.init();
-        Config.content().assertion();
         CapabilityFluidTank.register();
 //        FluidTankTOPPlugin.sendIMC().apply(modID);
         LootFunctionManager.registerFunction(new ContentTankSerializer());
