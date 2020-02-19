@@ -11,12 +11,13 @@ import net.minecraft.world.World
 class TankDataProvider extends IProbeInfoProvider {
   override def getID = FluidTank.modID + ":toptank"
 
-  //noinspection ScalaDeprecation
+  private lazy val showTOP = Config.content.showTOP.get().booleanValue()
+
   override def addProbeInfo(probeMode: ProbeMode, probeInfo: IProbeInfo, playerEntity: PlayerEntity,
                             world: World, blockState: BlockState, data: IProbeHitData): Unit = {
     val entity = world.getTileEntity(data.getPos)
     entity match {
-      case tank: TileTankNoDisplay if Config.content.showTOP.get() =>
+      case tank: TileTankNoDisplay if showTOP =>
         val tier = s"Tier: ${tank.tier.toString}" //I18n.translateToLocalFormatted(WAILA_TIER, tank.tier.toString)
         val fluid = s"Content: ${tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL)}" //I18n.translateToLocalFormatted(WAILA_CONTENT, tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL))
         val list = if (tank.connection.hasCreative) Seq(tier, fluid)
