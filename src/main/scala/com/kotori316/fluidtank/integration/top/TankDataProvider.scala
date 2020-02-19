@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.integration.top
 
 import com.kotori316.fluidtank.integration.Localize._
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay
+import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTankNoDisplay}
 import com.kotori316.fluidtank.{Config, FluidTank}
 import mcjty.theoneprobe.api.{IProbeHitData, IProbeInfo, IProbeInfoProvider, ProbeMode}
 import net.minecraft.block.BlockState
@@ -28,6 +28,8 @@ class TankDataProvider extends IProbeInfoProvider {
           Seq(tier, fluid, amount, capacity, comparator)
         }
         list.foreach(probeInfo.text)
+      case source: FluidSourceTile =>
+        probeInfo.text(source.fluid.toString)
       case _ =>
     }
   }
