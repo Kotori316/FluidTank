@@ -32,7 +32,7 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
 
   override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos, player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     val stack = player.getHeldItem(handIn)
-    if (/*!player.isSneaking*/ true) {
+    if (!player.isCrouching) {
       val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)
       FluidUtil.getFluidHandler(copiedStack).asScala.value.value match {
         case Some(handlerItem) if !stack.isEmpty =>

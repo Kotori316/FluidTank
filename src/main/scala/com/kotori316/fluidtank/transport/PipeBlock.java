@@ -191,7 +191,8 @@ public class PipeBlock extends Block {
     @Override
     @SuppressWarnings("deprecation")
     public ActionResultType func_225533_a_(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (player.getHeldItem(handIn).getItem() instanceof BlockItem) return ActionResultType.PASS;
+        if (player.getHeldItem(handIn).getItem() instanceof BlockItem || player.isCrouching())
+            return ActionResultType.PASS;
         Vec3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
         Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
             AxisAlignedBB box = e.getValue().getBoundingBox();

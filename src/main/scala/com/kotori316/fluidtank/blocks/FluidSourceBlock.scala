@@ -79,7 +79,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
         ActionResultType.SUCCESS
       }
     } else {
-      player.sendStatusMessage(new StringTextComponent("Fluid Supplier is disabled."), true)
+      if (!player.isCrouching) player.sendStatusMessage(new StringTextComponent("Fluid Supplier is disabled."), true)
       ActionResultType.PASS
     }
   }
