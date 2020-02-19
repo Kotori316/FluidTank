@@ -152,21 +152,16 @@ dependencies {
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
     def mc_version = "1.15.2"
-    def jei_version = "6.0.0.2"
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.7-B71_1.15.1")
-    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:" + forge_prop.getProperty("hwyla_version"))
+    implementation fg.deobf("mezz.jei:jei-${mc_version}:${forge_prop.getProperty("jei_version")}")
+    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:${forge_prop.getProperty("top_version")}")
 
-//    implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
-//    implementation "mezz.jei:jei-${mc_version}:${jei_version}:sources"
-    // https://dvs1.progwml6.com/files/maven/mezz/jei/jei-1.14.4/6.0.0.25/jei-1.14.4-6.0.0.25.jar
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.1-build-6:dev")
     } else {
         implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
     }
     // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
-
-//    compileOnly("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
 
     // Runtime mod dependencies.
 //    runtimeOnly

@@ -10,5 +10,6 @@ public class Localize {
     public static final String WAILA_TANK_INFO = "fluidtank.waila.tank_info";
     public static final String WAILA_SHORT_INFO = "fluidtank.waila.short_info";
     public static final String WAILA_SHORT = "fluidtank.waila.short";
+    public static final String WAILA_SUPPLIER = "fluidtank.waila.supplier";
     public static final String FLUID_NULL = "None";
 }

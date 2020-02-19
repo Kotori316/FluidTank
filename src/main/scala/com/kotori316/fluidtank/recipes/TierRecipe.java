@@ -24,6 +24,7 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +40,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-public class TierRecipe implements ICraftingRecipe {
+public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInventory> {
     private static final Logger LOGGER = LogManager.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
@@ -195,6 +196,16 @@ public class TierRecipe implements ICraftingRecipe {
 
     public Stream<Pair<Integer, Ingredient>> allSlot() {
         return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
+    }
+
+    @Override
+    public int getRecipeWidth() {
+        return 3;
+    }
+
+    @Override
+    public int getRecipeHeight() {
+        return 3;
     }
 
     public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TierRecipe> {

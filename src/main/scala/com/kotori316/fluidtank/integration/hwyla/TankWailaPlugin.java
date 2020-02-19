@@ -10,6 +10,7 @@ import net.minecraftforge.fml.ModList;
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.integration.Localize;
+import com.kotori316.fluidtank.tiles.FluidSourceTile;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 /*
@@ -31,9 +32,12 @@ public class TankWailaPlugin implements IWailaPlugin {
     @Override
     public void register(IRegistrar registrar) {
         if (ModList.get().isLoaded(Waila_ModId) && Config.content().enableWailaAndTOP().get()) {
-            TankDataProvider provider = new TankDataProvider();
-            registrar.registerBlockDataProvider(provider, TileTankNoDisplay.class);
-            registrar.registerComponentProvider(provider, TooltipPosition.BODY, TileTankNoDisplay.class);
+            TankDataProvider tankDataProvider = new TankDataProvider();
+            registrar.registerBlockDataProvider(tankDataProvider, TileTankNoDisplay.class);
+            registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, TileTankNoDisplay.class);
+            SupplierDataProvider supplierDataProvider = new SupplierDataProvider();
+            registrar.registerBlockDataProvider(supplierDataProvider, FluidSourceTile.class);
+            registrar.registerComponentProvider(supplierDataProvider, TooltipPosition.BODY, FluidSourceTile.class);
 
             registrar.addConfig(KEY_TANK_INFO, true);
             registrar.addConfig(KEY_SHORT_INFO, true);
