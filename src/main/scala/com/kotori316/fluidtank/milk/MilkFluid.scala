@@ -15,17 +15,17 @@ class MilkFluid extends Fluid {
 
   override def getFilledBucket: Item = Items.MILK_BUCKET
 
-  override def func_215665_a(s: IFluidState, w: IBlockReader, p: BlockPos, f: Fluid, d: Direction): Boolean = true
+  override def canDisplace(s: IFluidState, w: IBlockReader, p: BlockPos, f: Fluid, d: Direction): Boolean = true
 
-  override def func_215663_a(w: IBlockReader, p: BlockPos, s: IFluidState): Vec3d = Vec3d.ZERO
+  override def getFlow(w: IBlockReader, p: BlockPos, s: IFluidState): Vec3d = Vec3d.ZERO
 
   override def getTickRate(w: IWorldReader): Int = 0
 
   override def getExplosionResistance: Float = 0F
 
-  override def func_215662_a(s: IFluidState, w: IBlockReader, p: BlockPos): Float = 0F
+  override def getActualHeight(s: IFluidState, w: IBlockReader, p: BlockPos): Float = 0F
 
-  override def func_223407_a(s: IFluidState): Float = 0F
+  override def getHeight(s: IFluidState): Float = 0F
 
   override def getBlockState(state: IFluidState): BlockState = Blocks.AIR.getDefaultState
 

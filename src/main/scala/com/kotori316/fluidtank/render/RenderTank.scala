@@ -13,15 +13,15 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 @OnlyIn(Dist.CLIENT)
 class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[TileTank](d) {
 
-  override def func_225616_a_(te: TileTank, partialTicks: Float, matrix: MatrixStack, buffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def render(te: TileTank, partialTicks: Float, matrix: MatrixStack, buffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
     Minecraft.getInstance.getProfiler.startSection("RenderTank")
     if (te.hasContent) {
       matrix.push()
-      val b = buffer.getBuffer(RenderType.func_228643_e_())
+      val b = buffer.getBuffer(RenderType.getCutout)
       val tank = te.tank
       if (tank.box != null) {
         val resource = RenderTank.textureName(te)
-        val texture = Minecraft.getInstance.func_228015_a_(PlayerContainer.field_226615_c_).apply(resource)
+        val texture = Minecraft.getInstance.getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(resource)
         val color = RenderTank.color(te)
 
         val value = Box.LightValue(light).overrideBlock(te.tank.fluid.fluid.getAttributes.getLuminosity(te.tank.fluid.toStack))
@@ -46,7 +46,7 @@ object RenderTank {
     val world = if (tile.hasWorld) tile.getWorld else Minecraft.getInstance().world
     val pos = if (tile.hasWorld) tile.getPos else Minecraft.getInstance().player.getPosition
     if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
-      BiomeColors.func_228363_c_(world, pos) | 0xFF000000
+      BiomeColors.getWaterColor(world, pos) | 0xFF000000
     } else {
       fluidAmount.fluid.getAttributes.getColor(world, pos)
     }

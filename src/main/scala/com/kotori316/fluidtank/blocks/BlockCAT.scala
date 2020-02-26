@@ -30,7 +30,7 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
 
   override def getStateForPlacement(context: BlockItemUseContext): BlockState = this.getDefaultState.`with`(FACING, context.getNearestLookingDirection)
 
-  override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos, player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
+  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     val stack = player.getHeldItem(handIn)
     if (!player.isCrouching) {
       val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)

@@ -15,7 +15,7 @@ import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).func_226896_b_()) {
+class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).notSolid()) {
 
   /*
   RegistryName will be "fluidtank:tank_wood".
@@ -33,7 +33,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     new TileTank(tier)
   }
 
-  override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
+  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay =>
         val stack = playerIn.getHeldItem(handIn)

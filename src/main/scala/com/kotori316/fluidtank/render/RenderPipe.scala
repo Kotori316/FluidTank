@@ -15,7 +15,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
   var useColor: Boolean = false
   var definedColor: Int = 0xFFFFFFFF
 
-  override def func_225616_a_(te: PipeTile, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def render(te: PipeTile, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
 
     val maxD = 12 * RenderPipe.d - 0.01
     val minD = 4 * RenderPipe.d + 0.01
@@ -28,7 +28,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
     val maxU = texture.getMaxU
     val maxV = texture.getMaxV
     val light = implicitly[Box.LightValue]
-    val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.func_228643_e_()))
+    val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.getCutout))
     val time = te.getWorld.getGameTime
     val color = if (useColor) definedColor else Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
     val red = color >> 16 & 0xFF

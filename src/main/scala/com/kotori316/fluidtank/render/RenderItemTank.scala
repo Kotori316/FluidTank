@@ -22,7 +22,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
 
   lazy val tileTank = new TileTank()
 
-  override def func_228364_a_(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: ItemBlockTank =>
 
@@ -30,8 +30,8 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         val model = Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
-        val renderType = RenderTypeLookup.func_228389_a_(stack)
-        val b = ItemRenderer.func_229113_a_(renderTypeBuffer, renderType, true, stack.hasEffect)
+        val renderType = RenderTypeLookup.getRenderType(stack)
+        val b = ItemRenderer.getBuffer(renderTypeBuffer, renderType, true, stack.hasEffect)
         renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
 
         tileTank.tier = tankItem.blockTank.tier
@@ -40,7 +40,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         if (compound != null)
           tileTank.readNBTClient(compound)
         RenderHelper.disableStandardItemLighting()
-        TileEntityRendererDispatcher.instance.func_228852_a_(
+        TileEntityRendererDispatcher.instance.renderItem(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
 
@@ -55,11 +55,11 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
 
     for (direction <- Direction.values) {
       random.setSeed(seed)
-      renderer.func_229112_a_(matrixStack, builder, model.getQuads(null, direction, random, EmptyModelData.INSTANCE), stack, light, otherLight)
+      renderer.renderQuads(matrixStack, builder, model.getQuads(null, direction, random, EmptyModelData.INSTANCE), stack, light, otherLight)
     }
 
     random.setSeed(seed)
-    renderer.func_229112_a_(matrixStack, builder, model.getQuads(null, null, random, EmptyModelData.INSTANCE), stack, light, otherLight)
+    renderer.renderQuads(matrixStack, builder, model.getQuads(null, null, random, EmptyModelData.INSTANCE), stack, light, otherLight)
 
   }
 

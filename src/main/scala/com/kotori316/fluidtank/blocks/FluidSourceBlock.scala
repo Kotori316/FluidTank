@@ -56,8 +56,8 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
     items.add(stack)
   }
 
-  override def func_225533_a_(state: BlockState, worldIn: World, pos: BlockPos,
-                              player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
+  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos,
+                                player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     if (Config.content.enableFluidSupplier.get()) {
       val stack = player.getHeldItem(handIn)
       val fluid = FluidAmount.fromItem(stack)
