@@ -227,7 +227,7 @@ public class PipeBlock extends Block {
         BlockState fromState = worldIn.getBlockState(fromPos);
         if (fromState.getBlock() == this) {
             BlockPos vec = fromPos.subtract(pos);
-            Direction direction = Direction.func_218383_a(vec.getX(), vec.getY(), vec.getZ());
+            Direction direction = Direction.byLong(vec.getX(), vec.getY(), vec.getZ());
             if (direction != null) {
                 if (fromState.get(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.NO_CONNECTION) {
                     worldIn.setBlockState(pos, state.with(FACING_TO_PROPERTY_MAP.get(direction), Connection.NO_CONNECTION));

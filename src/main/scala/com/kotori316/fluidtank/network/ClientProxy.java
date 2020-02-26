@@ -63,7 +63,7 @@ public class ClientProxy extends SideProxy {
         });
         ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
-        RenderType rendertype = RenderType.func_228641_d_();
+        RenderType rendertype = RenderType.getCutoutMipped();
         CollectionConverters.asJava(ModObjects.blockTanks())
             .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
         CollectionConverters.asJava(ModObjects.blockTanksInvisible())
@@ -97,14 +97,14 @@ public class ClientProxy extends SideProxy {
 
     @SubscribeEvent
     public void registerTexture(TextureStitchEvent.Pre event) {
-        if (event.getMap().func_229223_g_().equals(PlayerContainer.field_226615_c_)) {
+        if (event.getMap().getTextureLocation().equals(PlayerContainer.LOCATION_BLOCKS_TEXTURE)) {
             event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
     }
 
     @SubscribeEvent
     public void putTexture(TextureStitchEvent.Post event) {
-        if (event.getMap().func_229223_g_().equals(PlayerContainer.field_226615_c_)) {
+        if (event.getMap().getTextureLocation().equals(PlayerContainer.LOCATION_BLOCKS_TEXTURE)) {
             whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
     }
