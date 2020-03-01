@@ -3,8 +3,11 @@ package com.kotori316
 import cats._
 import cats.data._
 import cats.implicits._
+import com.google.gson.JsonElement
+import com.mojang.datafixers.Dynamic
+import com.mojang.datafixers.types.{DynamicOps, JsonOps}
 import net.minecraft.fluid.Fluid
-import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.{CompoundNBT, INBT, NBTDynamicOps}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
@@ -73,4 +76,37 @@ package object fluidtank {
   val evalExtractor: Eval ~> Id = new (Eval ~> Id) {
     override def apply[A](fa: Eval[A]): A = fa.value
   }
+
+  implicit class SOM[T](private val o: java.util.Optional[T]) extends AnyVal {
+    def scalaMap[B](f: T => B): Option[B] = toScalaOption(o).map(f)
+
+    def scalaFilter(p: T => Boolean): Option[T] = toScalaOption(o).filter(p)
+
+    def asScala: Option[T] = toScalaOption(o)
+
+    def toList: List[T] = if (o.isPresent) List(o.get()) else Nil
+  }
+
+  def toScalaOption[T](o: java.util.Optional[T]): Option[T] = if (o.isPresent) Some(o.get()) else None
+
+  trait DynamicSerializable[T] {
+    def serialize[DataType](t: T)(ops: DynamicOps[DataType]): Dynamic[DataType]
+
+    def deserialize[DataType](d: Dynamic[DataType]): T
+
+    def deserializeFromNBT(nbt: INBT): T = deserialize(new Dynamic(NBTDynamicOps.INSTANCE, nbt))
+  }
+
+  object DynamicSerializable {
+    def apply[T](implicit ev: DynamicSerializable[T]): DynamicSerializable[T] = ev
+  }
+
+  implicit class DynamicSerializeOps[T](private val t: T) extends AnyVal {
+    def serialize[DataType](ops: DynamicOps[DataType])(implicit d: DynamicSerializable[T]): Dynamic[DataType] = DynamicSerializable[T].serialize(t)(ops)
+
+    def toNBT(implicit d: DynamicSerializable[T]): INBT = serialize(NBTDynamicOps.INSTANCE).getValue
+
+    def toJson(implicit d: DynamicSerializable[T]): JsonElement = serialize(JsonOps.INSTANCE).getValue
+  }
+
 }

@@ -2,15 +2,18 @@ package com.kotori316.fluidtank
 
 import cats._
 import cats.implicits._
+import com.mojang.datafixers
+import com.mojang.datafixers.types.DynamicOps
 import javax.annotation.Nonnull
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
-import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.{CompoundNBT, NBTDynamicOps}
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.util.Constants.NBT
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.ForgeRegistries
+
+import scala.jdk.javaapi.CollectionConverters
 
 case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
   def setAmount(newAmount: Long): FluidAmount = {
@@ -19,10 +22,7 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
   }
 
   def write(tag: CompoundNBT): CompoundNBT = {
-    tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
-    tag.putLong(FluidAmount.NBT_amount, amount)
-    nbt.foreach(n => tag.put(FluidAmount.NBT_tag, n))
-    tag
+    tag merge this.asInstanceOf[FluidAmount].toNBT.asInstanceOf[CompoundNBT]
   }
 
   def nonEmpty: Boolean = fluid != Fluids.EMPTY && amount > 0
@@ -68,16 +68,7 @@ object FluidAmount {
     }
   }
 
-  def fromNBT(tag: CompoundNBT): FluidAmount = {
-    val fluid = registry.getValue(new ResourceLocation(Option(tag).map(_.getString(NBT_fluid)).getOrElse(Fluids.EMPTY.getRegistryName.toString)))
-    if (fluid == null || fluid == EMPTY.fluid) {
-      EMPTY
-    } else {
-      val amount = tag.getLong(NBT_amount)
-      val nbt = if (tag.contains(NBT_tag, NBT.TAG_COMPOUND)) Option(tag.getCompound(NBT_tag)).filterNot(_.isEmpty) else None
-      FluidAmount(fluid, amount, nbt)
-    }
-  }
+  def fromNBT(tag: CompoundNBT): FluidAmount = dynamicSerializableFA.deserializeFromNBT(tag)
 
   def fromStack(stack: FluidStack): FluidAmount = {
     val fluid = stack.getRawFluid
@@ -121,4 +112,33 @@ object FluidAmount {
     else IFluidHandler.FluidAction.SIMULATE
 
   implicit val showFA: Show[FluidAmount] = Show.fromToString
+
+  implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
+    override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
+      val map = Map[String, DataType](
+        NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
+        NBT_amount -> ops.createLong(t.amount)
+      ) ++ t.nbt.map(c => NBT_tag -> datafixers.Dynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
+
+      val data = map.map { case (key, data) => ops.createString(key) -> data }
+      new datafixers.Dynamic[DataType](ops, ops.createMap(CollectionConverters.asJava(data)))
+    }
+
+    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): FluidAmount = {
+      val ops = d.getOps
+      val fluidName = d.getElement(NBT_fluid).asScala
+        .flatMap(s => ops.getStringValue(s).asScala)
+        .map(s => new ResourceLocation(s))
+        .getOrElse(Fluids.EMPTY.getRegistryName)
+      val fluid = registry.getValue(fluidName)
+      if (fluid == null || fluid == EMPTY.fluid) {
+        EMPTY
+      } else {
+        val amount = d.getElement(NBT_amount).scalaMap(l => ops.getNumberValue(l, 0)).fold(0L)(_.longValue())
+        val nbt = d.getElement(NBT_tag).scalaMap(c => datafixers.Dynamic.convert(ops, NBTDynamicOps.INSTANCE, c))
+          .collect { case t: CompoundNBT if !t.isEmpty => t }
+        FluidAmount(fluid, amount, nbt)
+      }
+    }
+  }
 }
