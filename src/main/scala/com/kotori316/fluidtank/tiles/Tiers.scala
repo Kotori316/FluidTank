@@ -3,6 +3,8 @@ package com.kotori316.fluidtank.tiles
 import java.util.Collections
 
 import cats.kernel.Eq
+import com.mojang.datafixers
+import com.mojang.datafixers.types.DynamicOps
 import net.minecraft.nbt.CompoundNBT
 
 import scala.collection.mutable
@@ -14,11 +16,7 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
 
   override def hashCode(): Int = rank.hashCode ^ amount.hashCode ^ toString.hashCode
 
-  def toNBTTag: CompoundNBT = {
-    val nbt = new CompoundNBT
-    nbt.putString("string", toString)
-    nbt
-  }
+  def toNBTTag: CompoundNBT = this.asInstanceOf[Tiers].toNBT.asInstanceOf[CompoundNBT]
 }
 
 object Tiers {
@@ -42,18 +40,29 @@ object Tiers {
   val LEAD = new Tiers(3, 1 << 8, "Lead", "forge:ingots/lead", hasTagRecipe = true)
   val SILVER = new Tiers(3, 1 << 10, "Silver", "forge:ingots/silver", hasTagRecipe = true)
 
-  val rankList = list.groupBy(_.rank).toList.map { case (r, ts) => (r, ts.size) }.toMap
   val nameToTierMap = list.map(t => (t.toString, t)).toMap
 
   def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
 
-  def fromNBT(nbt: CompoundNBT): Tiers = {
-    val key = nbt.getString("string")
-    nameToTierMap.getOrElse(key, {
-      new IllegalArgumentException("Invalid pattern returned.").printStackTrace()
-      WOOD
-    })
-  }
+  def fromNBT(nbt: CompoundNBT): Tiers = TierDynamicSerialize.deserializeFromNBT(nbt)
 
   implicit val EqTiers: Eq[Tiers] = Eq.fromUniversalEquals
+
+  import com.kotori316.fluidtank._
+
+  implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable[Tiers] {
+    override def serialize[DataType](t: Tiers)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
+      val map = ops.set(ops.emptyMap(), "string", ops.createString(t.toString))
+      new datafixers.Dynamic[DataType](ops, map)
+    }
+
+    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Tiers = {
+      (d.get("string").asString().asScala orElse d.asString().asScala)
+        .flatMap(s => list.find(_.toString.equalsIgnoreCase(s)))
+        .getOrElse {
+          FluidTank.LOGGER.error(s"The tag '${d.getValue}' isn't have tier data.", new IllegalArgumentException("Invalid tier name."))
+          WOOD
+        }
+    }
+  }
 }
