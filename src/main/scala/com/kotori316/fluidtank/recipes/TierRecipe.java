@@ -3,13 +3,14 @@ package com.kotori316.fluidtank.recipes;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.types.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
@@ -20,7 +21,6 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -186,6 +186,10 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         return subItems;
     }
 
+    public Tiers getTier() {
+        return tier;
+    }
+
     public Stream<Pair<Integer, Ingredient>> tankItemWithSlot() {
         return IntStream.of(TANK_SLOTS).mapToObj(value -> Pair.of(value, getTankItems()));
     }
@@ -217,18 +221,9 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, JsonObject json) {
-            String t = JSONUtils.getString(json, "tier");
-            Tiers tiers = Tiers.jList().stream()
-                .filter(tier -> tier.toString().equalsIgnoreCase(t))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Invalid tier: %s", t)));
-            Ingredient subItem = Optional.ofNullable(json.get("sub_item"))
-                .map(Ingredient::deserialize)
-                .orElse(Ingredient.EMPTY);
-            if (subItem == Ingredient.EMPTY)
-                LOGGER.warn("Empty ingredient was loaded for {}, json: {}", recipeId, json);
-            LOGGER.debug("Serializer loaded {} from json for tier {}.", recipeId, tiers);
-            return new TierRecipe(recipeId, tiers, subItem);
+            json.addProperty("recipeId", recipeId.toString());
+            return RecipeSerializeHelper.TierRecipeSerializer()
+                .deserialize(new Dynamic<>(JsonOps.INSTANCE, json));
         }
 
         @Override
@@ -261,11 +256,10 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public void serialize(JsonObject json) {
-            json.addProperty("tier", tiers.toString().toLowerCase());
-            if (tiers.hasTagRecipe()) {
-                Ingredient ingredient = Ingredient.fromTag(ItemTags.getCollection().getOrCreate(new ResourceLocation(tiers.tagName())));
-                json.add("sub_item", ingredient.serialize());
-            }
+            Ingredient ingredient = Ingredient.fromTag(ItemTags.getCollection().getOrCreate(new ResourceLocation(tiers.tagName())));
+            JsonObject object = RecipeSerializeHelper.TierRecipeSerializer().serialize(new TierRecipe(this.recipeId, this.tiers, ingredient), JsonOps.INSTANCE)
+                .getValue().getAsJsonObject();
+            object.entrySet().forEach(e -> json.add(e.getKey(), e.getValue()));
         }
 
         @Override
