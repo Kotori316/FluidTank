@@ -125,17 +125,15 @@ object FluidAmount {
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): FluidAmount = {
-      val ops = d.getOps
-      val fluidName = d.getElement(NBT_fluid).asScala
-        .flatMap(s => ops.getStringValue(s).asScala)
+      val fluidName = d.get(NBT_fluid).asString().asScala
         .map(s => new ResourceLocation(s))
         .getOrElse(Fluids.EMPTY.getRegistryName)
       val fluid = registry.getValue(fluidName)
       if (fluid == null || fluid == EMPTY.fluid) {
         EMPTY
       } else {
-        val amount = d.getElement(NBT_amount).scalaMap(l => ops.getNumberValue(l, 0)).fold(0L)(_.longValue())
-        val nbt = d.getElement(NBT_tag).scalaMap(c => datafixers.Dynamic.convert(ops, NBTDynamicOps.INSTANCE, c))
+        val amount = d.get(NBT_amount).asLong(0L)
+        val nbt = d.getElement(NBT_tag).scalaMap(c => datafixers.Dynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
           .collect { case t: CompoundNBT if !t.isEmpty => t }
         FluidAmount(fluid, amount, nbt)
       }
