@@ -3,20 +3,23 @@ package com.kotori316.fluidtank.tiles
 import java.util.Collections
 
 import cats.kernel.Eq
+import com.kotori316.fluidtank.DynamicSerializable._
+import com.kotori316.fluidtank._
 import com.mojang.datafixers
 import com.mojang.datafixers.types.DynamicOps
-import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.INBT
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 class Tiers private(val rank: Int, buckets: Int, override val toString: String, val tagName: String, val hasTagRecipe: Boolean) {
+  val lowerName = toString.toLowerCase
   val amount: Long = buckets * 1000
   Tiers.list.append(this)
 
   override def hashCode(): Int = rank.hashCode ^ amount.hashCode ^ toString.hashCode
 
-  def toNBTTag: CompoundNBT = this.asInstanceOf[Tiers].toNBT.asInstanceOf[CompoundNBT]
+  def toNBTTag: INBT = this.asInstanceOf[Tiers].toNBT
 }
 
 object Tiers {
@@ -40,25 +43,22 @@ object Tiers {
   val LEAD = new Tiers(3, 1 << 8, "Lead", "forge:ingots/lead", hasTagRecipe = true)
   val SILVER = new Tiers(3, 1 << 10, "Silver", "forge:ingots/silver", hasTagRecipe = true)
 
-  val nameToTierMap = list.map(t => (t.toString, t)).toMap
-
   def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
 
-  def fromNBT(nbt: CompoundNBT): Tiers = TierDynamicSerialize.deserializeFromNBT(nbt)
+  def fromNBT(nbt: INBT): Tiers = TierDynamicSerialize.deserializeFromNBT(nbt)
+
+  def byName(s: String): Option[Tiers] = list.find(_.toString.equalsIgnoreCase(s))
 
   implicit val EqTiers: Eq[Tiers] = Eq.fromUniversalEquals
 
-  import com.kotori316.fluidtank._
-
   implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable[Tiers] {
     override def serialize[DataType](t: Tiers)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
-      val map = ops.set(ops.emptyMap(), "string", ops.createString(t.toString))
-      new datafixers.Dynamic[DataType](ops, map)
+      new datafixers.Dynamic[DataType](ops, ops.createString(t.lowerName))
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Tiers = {
       (d.get("string").asString().asScala orElse d.asString().asScala)
-        .flatMap(s => list.find(_.toString.equalsIgnoreCase(s)))
+        .flatMap(byName)
         .getOrElse {
           FluidTank.LOGGER.error(s"The tag '${d.getValue}' isn't have tier data.", new IllegalArgumentException("Invalid tier name."))
           WOOD
