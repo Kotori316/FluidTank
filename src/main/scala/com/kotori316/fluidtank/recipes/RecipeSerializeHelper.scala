@@ -1,6 +1,8 @@
 package com.kotori316.fluidtank.recipes
 
 import com.google.gson.JsonObject
+import com.kotori316.fluidtank.DynamicSerializable._
+import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.Tiers
 import com.mojang.datafixers
 import com.mojang.datafixers.types.{DynamicOps, JsonOps}
@@ -45,8 +47,6 @@ object RecipeSerializeHelper {
     t
   }
 
-  import com.kotori316.fluidtank._
-
   val TierRecipeSerializer: DynamicSerializable[TierRecipe] = new DynamicSerializable[TierRecipe] {
     private[this] final val LOGGER = org.apache.logging.log4j.LogManager.getLogger(classOf[TierRecipe])
 
@@ -55,23 +55,23 @@ object RecipeSerializeHelper {
 
     override def serialize[DataType](t: TierRecipe)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
       val map = ops.emptyMap().pure[Id]
-        .map(d => ops.set(d, "tier", t.getTier.serialize(ops).getValue))
-        .map(d => if (t.getTier.hasTagRecipe) ops.set(d, "sub_item", t.getSubItems.serialize(ops).getValue) else d)
+        .map(d => ops.set(d, TierRecipe.KEY_TIER, t.getTier.serialize(ops).getValue))
+        .map(d => if (t.getTier.hasTagRecipe) ops.set(d, TierRecipe.KEY_SUB_ITEM, t.getSubItems.serialize(ops).getValue) else d)
 
       new datafixers.Dynamic[DataType](ops, map)
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): TierRecipe = {
-      val recipeId = d.get("recipeId").asString().asScala.map(new ResourceLocation(_)).get
-      val tiers = d.get("tier").get().asScala
+      val recipeId = d.get(TierRecipe.KEY_ID).asString().asScala.map(new ResourceLocation(_)).get
+      val tiers = d.get(TierRecipe.KEY_TIER).get().asScala
         .map(DynamicSerializable[Tiers].deserialize)
         .getOrElse(Tiers.Invalid)
-      val subItem = d.get("sub_item").get().asScala
+      val subItem = d.get(TierRecipe.KEY_SUB_ITEM).get().asScala
         .map(DynamicSerializable[Ingredient].deserialize)
         .getOrElse(Ingredient.EMPTY)
       if (subItem == Ingredient.EMPTY)
-        LOGGER.warn("Empty ingredient was loaded for {}, json: {}", recipeId, d.getValue)
-      LOGGER.debug("Serializer loaded {} from json for tier {}.", recipeId, tiers)
+        LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, d.getValue)
+      LOGGER.debug("Serializer loaded {} from data for tier {}.", recipeId, tiers)
       new TierRecipe(recipeId, tiers, subItem)
     }
   }

@@ -56,7 +56,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   override def read(compound: CompoundNBT): Unit = {
     super.read(compound)
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
-    tier = Tiers.fromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tier))
+    tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
       stackName = ITextComponent.Serializer.fromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
     }
@@ -65,7 +65,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
   def readNBTClient(compound: CompoundNBT): Unit = {
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
-    tier = Tiers.fromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tier))
+    tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
       stackName = ITextComponent.Serializer.fromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
     } else {

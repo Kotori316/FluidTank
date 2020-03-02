@@ -212,6 +212,10 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         return 3;
     }
 
+    public static final String KEY_ID = "recipeId";
+    public static final String KEY_TIER = "tier";
+    public static final String KEY_SUB_ITEM = "sub_item";
+
     public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "crafting_grade_up");
 
@@ -221,14 +225,15 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, JsonObject json) {
-            json.addProperty("recipeId", recipeId.toString());
+            json.addProperty(KEY_ID, recipeId.toString());
             return RecipeSerializeHelper.TierRecipeSerializer()
                 .deserialize(new Dynamic<>(JsonOps.INSTANCE, json));
         }
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            Tiers tier = Tiers.fromNBT(buffer.readCompoundTag());
+            String tierName = buffer.readString();
+            Tiers tier = Tiers.byName(tierName).get();
             Ingredient subItem = Ingredient.read(buffer);
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
@@ -238,7 +243,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public void write(PacketBuffer buffer, TierRecipe recipe) {
-            buffer.writeCompoundTag(recipe.tier.toNBTTag());
+            buffer.writeString(recipe.getTier().toString());
             recipe.getSubItems().write(buffer);
             LOGGER.debug("Serialized {} to packet for tier {}.", recipe.id, recipe.tier);
         }

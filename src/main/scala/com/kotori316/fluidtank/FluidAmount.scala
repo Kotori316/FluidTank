@@ -2,6 +2,7 @@ package com.kotori316.fluidtank
 
 import cats._
 import cats.implicits._
+import com.kotori316.fluidtank.DynamicSerializable._
 import com.mojang.datafixers
 import com.mojang.datafixers.types.DynamicOps
 import javax.annotation.Nonnull
