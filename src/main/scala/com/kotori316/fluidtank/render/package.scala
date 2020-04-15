@@ -61,8 +61,8 @@ package object render {
     }
 
     //noinspection SpellCheckingInspection
-    def lightmap(l1: Int, l2: Int): Wrapper = {
-      buffer.overlay(10, 10).lightmap(l1, l2)
+    def lightmap(sky: Int, block: Int): Wrapper = {
+      buffer.overlay(10, 10).lightmap(block, sky)
       this
     }
 

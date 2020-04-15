@@ -329,8 +329,18 @@ object Box {
     final val sky = brightness >> 16 & 0xFFFF
     final val block = brightness >> 0 & 0xFFFF
 
+    /**
+     * Sky light
+     *
+     * @return the amount of light block is getting from sky.
+     */
     def l1: Int = sky
 
+    /**
+     * Block light
+     *
+     * @return the light amount block is getting or emitting.
+     */
     def l2: Int = block
 
     def overrideBlock(light: Int): LightValue = {
