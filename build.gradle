@@ -157,7 +157,7 @@ dependencies {
     implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:${forge_prop.getProperty("top_version")}")
 
     if (hasGitHubToken()) {
-        implementation("com.kotori316:ScalableCatsForce:2.13.1-build-6:dev")
+        implementation("com.kotori316:ScalableCatsForce:2.13.1-build-7:dev")
     } else {
         implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
     }
