@@ -3,12 +3,16 @@ package com.kotori316.fluidtank.transport
 import cats.Eval
 import cats.data.OptionT
 import cats.implicits._
+import com.kotori316.fluidtank.network.{PacketHandler, TileMessage}
 import com.kotori316.fluidtank.tiles.{CapabilityFluidTank, Tiers}
 import com.kotori316.fluidtank.transport.PipeConnection._
 import com.kotori316.fluidtank.{FluidTank, ModObjects, _}
+import net.minecraft.item.DyeColor
+import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
+import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
@@ -17,6 +21,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity {
   var connection: PipeConnection[BlockPos] = getEmptyConnection
   val handler = new PipeFluidHandler(this)
+  private[this] final var color = Int.unbox(Config.content.pipeColor.get())
 
   private def getEmptyConnection: PipeConnection[BlockPos] = PipeConnection.empty({ case (p, c) =>
     getWorld.getTileEntity(p) match {
@@ -97,8 +102,38 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
         .orElse(super.getCapability(cap, side).asScala)
     )
   }
+
+  override def read(compound: CompoundNBT): Unit = {
+    super.read(compound)
+    this.color = compound.getInt("color")
+  }
+
+  override def write(compound: CompoundNBT): CompoundNBT = {
+    compound.putInt("color", this.color)
+    super.write(compound)
+  }
+
+  override def getUpdateTag: CompoundNBT = super.serializeNBT()
+
+  def changeColor(color: DyeColor): Unit = {
+    this.connection.poses.map(world.getTileEntity).collect {
+      case tile: PipeTile => tile
+    }.foreach { t =>
+      t.setColor(color.getColorValue)
+    }
+  }
+
+  def setColor(c: Int): Unit = {
+    this.color = c
+    if (world != null && !world.isRemote) {
+      PacketHandler.sendToClient(TileMessage(this), world)
+    }
+  }
+
+  @OnlyIn(Dist.CLIENT)
+  def getColor: Int = this.color
 }
 
 object PipeTile {
-  final val amountPerTick = Utils.toInt(Tiers.WOOD.amount)
+  final val amountPerTick = Utils.toInt(Tiers.STAR.amount / 20)
 }

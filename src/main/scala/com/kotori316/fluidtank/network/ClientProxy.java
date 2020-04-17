@@ -57,7 +57,6 @@ public class ClientProxy extends SideProxy {
         ClientRegistry.bindTileEntityRenderer(ModObjects.TANK_CREATIVE_TYPE(), RenderTank::new);
         ClientRegistry.bindTileEntityRenderer(ModObjects.PIPE_TYPE(), d -> {
             RenderPipe renderPipe = new RenderPipe(d);
-            renderPipe.definedColor_$eq(Config.content().pipeColor().get());
             renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
             return renderPipe;
         });

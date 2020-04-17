@@ -11,7 +11,6 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.{LazyOptional, NonNullSupplier}
 import net.minecraftforge.fluids.FluidStack
 
-
 package object fluidtank {
 
   type Cap[T] = OptionT[Eval, T]
@@ -32,7 +31,7 @@ package object fluidtank {
 
   implicit class CapHelper[T](val capability: Capability[T]) extends AnyVal {
     /**
-     * @tparam F dummy parameter to satisfy compiler. It should be type parameter of {{{ICapabilityProvider#getCapability}}}.
+     * @tparam F dummy parameter to satisfy compiler. It should be type parameter of [[net.minecraftforge.common.capabilities.ICapabilityProvider#getCapability]].
      */
     def make[F](toCheckCapability: Capability[_], instance: T): Cap[F] = {
       if (this.capability == toCheckCapability)

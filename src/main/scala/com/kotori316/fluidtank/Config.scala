@@ -41,8 +41,8 @@ object Config {
 
     val enableFluidSupplier = builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", true)
 
-    val enablePipeRainbowRenderer = builder.worldRestart().comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", true)
-    val pipeColor = builder.worldRestart().comment("Color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.").define("pipeColor", Int.box(0xFFFFFFFF))
+    val enablePipeRainbowRenderer = builder.worldRestart().comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false)
+    val pipeColor = builder.worldRestart().comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.").define("pipeColor", Int.box(0xFFFFFFFF))
     builder.pop()
 
   }
