@@ -208,7 +208,9 @@ public class PipeBlock extends Block {
         if (color != null && !Config.content().enablePipeRainbowRenderer().get()) {
             if (!worldIn.isRemote) {
                 Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(p -> p.changeColor(color));
-                player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_color", color), false);
+                player.sendStatusMessage(
+                    new TranslationTextComponent("chat.fluidtank.change_color", new TranslationTextComponent("color.minecraft." + color)),
+                    false);
             }
             return true;
         }
