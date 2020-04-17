@@ -15,6 +15,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -30,6 +31,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -41,6 +43,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 
@@ -200,6 +203,17 @@ public class PipeBlock extends Block {
     @SuppressWarnings("deprecation")
     public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if (player.getHeldItem(handIn).getItem() instanceof BlockItem) return false;
+        // Dying pipe.
+        DyeColor color = DyeColor.getColor(player.getHeldItem(handIn));
+        if (color != null && !Config.content().enablePipeRainbowRenderer().get()) {
+            if (!worldIn.isRemote) {
+                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(p -> p.changeColor(color));
+                player.sendStatusMessage(new TranslationTextComponent("chat.fluidtank.change_color", color), false);
+            }
+            return true;
+        }
+
+        // Modifying pipe connection.
         Vec3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
         Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
             AxisAlignedBB box = e.getValue().getBoundingBox();

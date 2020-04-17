@@ -12,7 +12,6 @@ import net.minecraftforge.client.model.animation.TileEntityRendererFast
 @OnlyIn(Dist.CLIENT)
 class RenderPipe extends TileEntityRendererFast[PipeTile] {
   var useColor: Boolean = false
-  var definedColor: Int = 0xFFFFFFFF
 
   override def renderTileEntityFast(te: PipeTile, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, buffer: BufferBuilder): Unit = {
     import RenderPipe.d
@@ -28,7 +27,7 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     val light = implicitly[Box.LightValue]
     buffer.setTranslation(x, y, z)
     val time = te.getWorld.getGameTime
-    val color = if (useColor) definedColor else Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
+    val color = if (useColor) te.getColor else Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF
     val blue = color >> 0 & 0xFF
