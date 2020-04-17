@@ -37,10 +37,10 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 
 * ~[Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)~
   * Licensed under the MIT License
-  * Not needed since 1.14.4
+  * Not used since 1.14.4
 
 * [Hwyla](https://github.com/TehNut/HWYLA/tree/1.15_forge)
   * Licensed under CC BY-NC-SA 4.0
 
-* ~[The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.14)~
+* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.15)
   * Licensed under the MIT License Copyright © 2016 McJty
