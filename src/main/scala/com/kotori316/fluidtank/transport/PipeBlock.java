@@ -268,7 +268,7 @@ public class PipeBlock extends Block {
             TileEntity entity = worldIn.getTileEntity(pos);
             if (entity instanceof PipeTile) {
                 PipeTile tile = (PipeTile) entity;
-                tile.connection().reset();
+                tile.connectorUpdate();
             }
             super.onReplaced(state, worldIn, pos, newState, isMoving);
         }

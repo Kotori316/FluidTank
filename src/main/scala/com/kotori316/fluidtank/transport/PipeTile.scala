@@ -21,7 +21,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity {
   var connection: PipeConnection[BlockPos] = getEmptyConnection
   val handler = new PipeFluidHandler(this)
-  private[this] var color = Int.unbox(Config.content.pipeColor.get())
+  private[this] final var color = Int.unbox(Config.content.pipeColor.get())
 
   private def getEmptyConnection: PipeConnection[BlockPos] = PipeConnection.empty({ case (p, c) =>
     getWorld.getTileEntity(p) match {
