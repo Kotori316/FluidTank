@@ -16,11 +16,11 @@ case class PipeConnection[A: Norm : Group](poses: Set[A], updateFunc: (A, PipeCo
 
   def add(a: A): PipeConnection[A] = this.copy(poses = poses + a)
 
-  def remove(a: A): PipeConnection[A] = {
-    val empty = PipeConnection.empty(updateFunc, isOutput)
-    poses.find(_ == a).foreach(p => updateFunc(p, empty))
-    this.copy(poses - a)
-  }
+  //  def remove(a: A): PipeConnection[A] = {
+  //    val empty = PipeConnection.empty(updateFunc, isOutput)
+  //    poses.find(_ == a).foreach(p => updateFunc(p, empty))
+  //    this.copy(poses - a)
+  //  }
 
   def reset(): Unit = {
     val empty = PipeConnection.empty(updateFunc, isOutput)
@@ -33,7 +33,12 @@ case class PipeConnection[A: Norm : Group](poses: Set[A], updateFunc: (A, PipeCo
 }
 
 object PipeConnection {
-  def empty[A: Norm : Group](updateFunc: (A, PipeConnection[A]) => Unit, isOutput: A => Boolean): PipeConnection[A] = PipeConnection(Set.empty, updateFunc, isOutput)
+  def empty[A: Norm : Group](updateFunc: (A, PipeConnection[A]) => Unit, isOutput: A => Boolean): PipeConnection[A] = new EmptyConnection(updateFunc, isOutput)
+
+  class EmptyConnection[A: Norm : Group](updateFunc: (A, PipeConnection[A]) => Unit, isOutput: A => Boolean)
+    extends PipeConnection[A](Set.empty, updateFunc, isOutput) {
+    override def toString = "EmptyConnection"
+  }
 
   implicit val vec3iL2Norm: Norm[Vec3i] = v => Math.sqrt(v.getX * v.getX + v.getY * v.getY + v.getZ * v.getZ)
   val vec3iL1Norm: Norm[Vec3i] = v => v.getX + v.getY + v.getZ

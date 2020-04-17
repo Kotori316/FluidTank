@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.transport.PipeConnectionTest.Holder
 import com.kotori316.scala_lib.util.Norm._
 import com.kotori316.scala_lib.util.NormInstanceL2._
 import net.minecraft.util.math.BlockPos
-import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
+import org.junit.jupiter.api.Assertions.{assertEquals, assertNotEquals, assertTrue}
 import org.junit.jupiter.api.Test
 
 class PipeConnectionTest {
@@ -48,6 +48,16 @@ class PipeConnectionTest {
 
   @inline
   def t(i1: Int, i2: Int) = (i1, i2)
+
+  @Test
+  def checkClass(): Unit = {
+    val a = PipeConnection.empty[(Int, Int)]({ case (_, _) => () }, _ => false)
+    assertEquals(classOf[PipeConnection.EmptyConnection[(Int, Int)]], a.getClass)
+    val b = a.add(t(1, 2))
+    assertEquals(classOf[PipeConnection.EmptyConnection[(Int, Int)]], a.getClass)
+    assertNotEquals(classOf[PipeConnection.EmptyConnection[(Int, Int)]], b.getClass)
+    assertEquals(classOf[PipeConnection[(Int, Int)]], b.getClass)
+  }
 }
 
 object PipeConnectionTest {
