@@ -21,6 +21,7 @@ import scala.collection.mutable.ArrayBuffer
 sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   val seq: Seq[TileTankNoDisplay] = s.sortBy(_.getPos.getY)
   val hasCreative = seq.exists(_.isInstanceOf[TileTankCreative])
+  val hasVoid = seq.exists(_.isInstanceOf[TileTankVoid])
   val updateActions: ArrayBuffer[() => Unit] = ArrayBuffer(
     () => seq.foreach(_.markDirty())
   )
@@ -38,7 +39,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
         return fluidAmount.setAmount(total)
       }
       val rest = capacity - amount
-      if (rest == 0) return FluidAmount.EMPTY
+      if (rest == 0 && !hasVoid) return FluidAmount.EMPTY
       if (fluidAmount.isEmpty || fluidAmount.amount < min || rest < min) return FluidAmount.EMPTY
       if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
 
