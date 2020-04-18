@@ -1,7 +1,8 @@
-## v15.2.5
-* Fixed rendering issue. [#45](https://github.com/Kotori316/FluidTank/issues/45)
-
-## v15.2.4
-* Internal changes.
-* Changed nbt serialization of Tier.
-  * This change will cause error of tanks. Replace tanks to fix problem.
+## v15.2.6
+* Changed pipe transfer rate to 16,000 mB/t.
+* Pipes can be colored by dye.
+* Translucent pipe color.
+* Not to connect to dyed pipe when white player placed pipe.
+* Added "Void Tank".
+* Changed pipe shape when pipe is facing fluid handler tile.
+* Simplified model json files.
