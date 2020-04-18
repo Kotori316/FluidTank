@@ -39,6 +39,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
@@ -119,7 +120,7 @@ public class PipeBlock extends Block {
     @SuppressWarnings("deprecation")
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
         return SHAPE_MAP.entrySet().stream()
-            .filter(s -> state.get(s.getKey()) != Connection.NO_CONNECTION)
+            .filter(s -> state.get(s.getKey()) != Connection.NO_CONNECTION || isFluidHandler(worldIn, pos, s.getKey()))
             .map(Map.Entry::getValue)
             .reduce(BOX_AABB, VoxelShapes::or);
     }
@@ -313,5 +314,17 @@ public class PipeBlock extends Block {
             else
                 return NO_CONNECTION;
         }
+    }
+
+    private static boolean isFluidHandler(IBlockReader w, BlockPos pipePos, EnumProperty<Connection> p) {
+        Direction d = FACING_TO_PROPERTY_MAP.inverse().get(p);
+        return isFluidHandler(w, pipePos.offset(d), d);
+    }
+
+    public static boolean isFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
+        TileEntity t = world.getTileEntity(pos);
+        if (t != null && t.getWorld() != null)
+            return FluidUtil.getFluidHandler(t.getWorld(), pos, direction).isPresent();
+        else return false;
     }
 }
