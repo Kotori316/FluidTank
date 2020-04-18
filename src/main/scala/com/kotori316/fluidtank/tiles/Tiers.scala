@@ -58,7 +58,7 @@ object Tiers {
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Tiers = {
-      (d.get("string").asString().asScala orElse d.asString().asScala)
+      (d.asString().asScala orElse d.get("string").asString().asScala)
         .flatMap(byName)
         .getOrElse {
           FluidTank.LOGGER.error(s"The tag '${d.getValue}' isn't have tier data.", new IllegalArgumentException("Invalid tier name."))
