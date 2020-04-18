@@ -117,7 +117,7 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
 
   def changeColor(color: DyeColor): Unit = {
     this.connection.poses.map(world.getTileEntity).foreach {
-      case tile: PipeTile => tile.setColor(color.getColorValue)
+      case tile: PipeTile => tile.setColor(color.getColorValue | 0xF0000000)
       case _ =>
     }
   }

@@ -27,13 +27,13 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
     val maxU = texture.getMaxU
     val maxV = texture.getMaxV
     val light = implicitly[Box.LightValue]
-    val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.getCutout))
+    val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.getTranslucent))
     val time = te.getWorld.getGameTime
     val color = if (useColor) te.getColor else Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF
     val blue = color >> 0 & 0xFF
-    val alpha = 240
+    val alpha = Math.max(color >> 24 & 0xFF, 128) // Dummy code.
     //    RenderPipe.BOX_AABB.render(buffer, texture, 128, red, green, blue)
 
     def drawWhite(p: ((Double, Double, Double), (Double, Double, Double), (Double, Double, Double), (Double, Double, Double))): Unit = {
