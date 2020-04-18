@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.integration.top
 
 import com.kotori316.fluidtank.integration.Localize._
-import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTankNoDisplay, TileTankVoid}
 import com.kotori316.fluidtank.{Config, FluidTank}
 import mcjty.theoneprobe.api.{IProbeHitData, IProbeInfo, IProbeInfoProvider, ProbeMode}
 import net.minecraft.block.BlockState
@@ -15,9 +15,12 @@ class TankDataProvider extends IProbeInfoProvider {
 
   override def addProbeInfo(probeMode: ProbeMode, probeInfo: IProbeInfo, playerEntity: PlayerEntity,
                             world: World, blockState: BlockState, data: IProbeHitData): Unit = {
+    if (!showTOP) return
     val entity = world.getTileEntity(data.getPos)
     entity match {
-      case tank: TileTankNoDisplay if showTOP =>
+      case v: TileTankVoid =>
+        probeInfo.text(s"Tier: ${v.tier.toString}")
+      case tank: TileTankNoDisplay =>
         val tier = s"Tier: ${tank.tier.toString}" //I18n.translateToLocalFormatted(WAILA_TIER, tank.tier.toString)
         val fluid = s"Content: ${tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL)}" //I18n.translateToLocalFormatted(WAILA_CONTENT, tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL))
         val list = if (tank.connection.hasCreative) Seq(tier, fluid)
