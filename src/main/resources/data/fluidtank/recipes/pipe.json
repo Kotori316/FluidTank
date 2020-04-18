@@ -28,5 +28,20 @@
   },
   "result": {
     "item": "fluidtank:pipe"
-  }
+  },
+  "conditions": [
+    {
+      "value": {
+        "type": "fluidtank:easy"
+      },
+      "type": "forge:not"
+    },
+    {
+      "value": {
+        "tag": "forge:ender_pearls",
+        "type": "forge:tag_empty"
+      },
+      "type": "forge:not"
+    }
+  ]
 }

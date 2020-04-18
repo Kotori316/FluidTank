@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.world.{IBlockReader, World}
+import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 
 class BlockCreativeTank extends BlockTank(Tiers.CREATIVE) {
@@ -25,6 +26,7 @@ class BlockCreativeTank extends BlockTank(Tiers.CREATIVE) {
   }
 
   override val itemBlock = new ItemBlockTank(this) {
+    @OnlyIn(Dist.CLIENT)
     override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
       tooltip.add(new StringTextComponent("Creative"))
     }

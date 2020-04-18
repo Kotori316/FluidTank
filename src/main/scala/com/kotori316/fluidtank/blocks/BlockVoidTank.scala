@@ -8,8 +8,9 @@ import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.text.{ITextComponent, StringTextComponent}
+import net.minecraft.util.text.ITextComponent
 import net.minecraft.world.{IBlockReader, World}
+import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 
 class BlockVoidTank extends BlockTank(Tiers.VOID) {
@@ -22,9 +23,8 @@ class BlockVoidTank extends BlockTank(Tiers.VOID) {
   }
 
   override val itemBlock = new ItemBlockTank(this) {
-    override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
-      tooltip.add(new StringTextComponent("Void"))
-    }
+    @OnlyIn(Dist.CLIENT)
+    override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = ()
 
     override def hasRecipe: Boolean = false
 
