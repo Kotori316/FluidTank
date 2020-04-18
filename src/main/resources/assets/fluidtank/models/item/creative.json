@@ -1,5 +1,5 @@
 {
-  "parent": "fluidtank:item/itemtank",
+  "parent": "fluidtank:item/item_tank",
   "textures": {
     "1": "fluidtank:blocks/creative1",
     "2": "fluidtank:blocks/creative2"
