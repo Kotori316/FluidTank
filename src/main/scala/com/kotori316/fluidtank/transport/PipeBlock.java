@@ -171,10 +171,14 @@ public class PipeBlock extends Block {
 
     private Connection canConnectTo(IWorld worldIn, BlockPos pos, Direction direction) {
         BlockState blockState = worldIn.getBlockState(pos);
+        TileEntity entity = worldIn.getTileEntity(pos);
         if (blockState.getBlock() == this) {
+            if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTile) {
+                PipeTile p = (PipeTile) entity;
+                return p.getColor() == Config.content().pipeColor().get() ? Connection.CONNECTED : Connection.NO_CONNECTION;
+            }
             return Connection.CONNECTED;
         } else {
-            TileEntity entity = worldIn.getTileEntity(pos);
             if (entity != null) {
                 LazyOptional<IFluidHandler> capability = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
                 if (capability.isPresent())
@@ -324,7 +328,7 @@ public class PipeBlock extends Block {
     public static boolean isFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
         TileEntity t = world.getTileEntity(pos);
         if (t != null && t.getWorld() != null)
-            return FluidUtil.getFluidHandler(t.getWorld(), pos, direction).isPresent();
+            return FluidUtil.getFluidHandler(t.getWorld(), pos, direction.getOpposite()).isPresent();
         else return false;
     }
 }

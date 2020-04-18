@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
-import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
@@ -129,7 +128,6 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
     }
   }
 
-  @OnlyIn(Dist.CLIENT)
   def getColor: Int = this.color
 }
 
