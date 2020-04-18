@@ -33,6 +33,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     new TileTank(tier)
   }
 
+  //noinspection ScalaDeprecation
   override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay =>
@@ -62,6 +63,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
 
   //  override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
+  //noinspection ScalaDeprecation
   override final def isSideInvisible(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
 
   override final def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack): Unit = {
@@ -72,8 +74,10 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     }
   }
 
+  //noinspection ScalaDeprecation
   override final def hasComparatorInputOverride(state: BlockState): Boolean = true
 
+  //noinspection ScalaDeprecation
   override final def getComparatorInputOverride(blockState: BlockState, worldIn: World, pos: BlockPos): Int = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
@@ -81,6 +85,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     }
   }
 
+  //noinspection ScalaDeprecation
   override final def onReplaced(state: BlockState, worldIn: World, pos: BlockPos, newState: BlockState, isMoving: Boolean): Unit = {
     worldIn.getTileEntity(pos) match {
       case tank: TileTankNoDisplay => tank.onDestroy()
@@ -102,6 +107,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
     stack
   }
 
+  //noinspection ScalaDeprecation
   override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
 
 }

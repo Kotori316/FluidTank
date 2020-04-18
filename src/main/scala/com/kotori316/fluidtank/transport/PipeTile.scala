@@ -116,10 +116,9 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
   override def getUpdateTag: CompoundNBT = super.serializeNBT()
 
   def changeColor(color: DyeColor): Unit = {
-    this.connection.poses.map(world.getTileEntity).collect {
-      case tile: PipeTile => tile
-    }.foreach { t =>
-      t.setColor(color.getColorValue)
+    this.connection.poses.map(world.getTileEntity).foreach {
+      case tile: PipeTile => tile.setColor(color.getColorValue)
+      case _ =>
     }
   }
 
