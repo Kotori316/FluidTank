@@ -36,6 +36,7 @@ object Tiers {
   val CREATIVE: Tiers = new Tiers(8, 0, "Creative", "Unknown", hasTagRecipe = false) {
     override val amount: Long = Long.MaxValue
   }
+  val VOID = new Tiers(0, 0, "Void", "Unknown", hasTagRecipe = false)
 
   val COPPER = new Tiers(2, 1 << 5, "Copper", "forge:ingots/copper", hasTagRecipe = true)
   val TIN = new Tiers(2, 1 << 6, "Tin", "forge:ingots/tin", hasTagRecipe = true)
