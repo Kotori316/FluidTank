@@ -31,7 +31,7 @@ class RenderPipe extends TileEntityRendererFast[PipeTile] {
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF
     val blue = color >> 0 & 0xFF
-    val alpha = 240
+    val alpha = Math.max(color >> 24 & 0xFF, 128) // Dummy code.
     //    RenderPipe.BOX_AABB.render(buffer, texture, 128, red, green, blue)
 
     def drawWhite(p: ((Double, Double, Double), (Double, Double, Double), (Double, Double, Double), (Double, Double, Double))): Unit = {
