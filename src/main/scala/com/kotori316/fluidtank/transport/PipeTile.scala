@@ -132,5 +132,5 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
 }
 
 object PipeTile {
-  final val amountPerTick = Utils.toInt(Tiers.STAR.amount / 20)
+  final val amountPerTick = Utils.toInt(Tiers.STONE.amount)
 }
