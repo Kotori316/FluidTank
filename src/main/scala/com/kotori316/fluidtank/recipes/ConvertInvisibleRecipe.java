@@ -12,13 +12,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.Utils;
+import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
+import com.kotori316.fluidtank.tiles.Tiers;
 
 public class ConvertInvisibleRecipe extends SpecialRecipe {
     private static final Logger LOGGER = LogManager.getLogger(ConvertInvisibleRecipe.class);
@@ -49,24 +53,30 @@ public class ConvertInvisibleRecipe extends SpecialRecipe {
             .mapToObj(inv::getStackInSlot)
             .filter(NON_EMPTY)
             .findFirst();
-        Optional<Block> block = stackOptional
+        BlockTank block = stackOptional
             .map(ItemStack::getItem)
-            .map(Block::getBlockFromItem);
-        if (!stackOptional.isPresent()) return ItemStack.EMPTY;
-        if (ModObjects.blockTanks().contains(block.get())) {
-            int index = ModObjects.blockTanks().indexOf(block.get());
-            ItemStack stack = new ItemStack(ModObjects.blockTanksInvisible().apply(index));
-            stack.setTag(stackOptional.get().getTag());
-            return stack;
-        } else if (ModObjects.blockTanksInvisible().contains(block.get())) {
-            int index = ModObjects.blockTanksInvisible().indexOf(block.get());
-            ItemStack stack = new ItemStack(ModObjects.blockTanks().apply(index));
-            stack.setTag(stackOptional.get().getTag());
-            return stack;
+            .map(Block::getBlockFromItem)
+            .filter(BlockTank.class::isInstance)
+            .map(BlockTank.class::cast)
+            .orElse(null);
+        if (block == null) return ItemStack.EMPTY;
+        if (ModObjects.blockTanks().contains(block)) {
+            return getInvertedTank(block.tier(), stackOptional.get().getTag(), ModObjects.blockTanksInvisible());
+        } else if (ModObjects.blockTanksInvisible().contains(block)) {
+            return getInvertedTank(block.tier(), stackOptional.get().getTag(), ModObjects.blockTanks());
         }
         LOGGER.debug("No result item for inventory: {}",
             IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot).collect(Collectors.toList()));
         return ItemStack.EMPTY;
+    }
+
+    private static ItemStack getInvertedTank(Tiers tiers, CompoundNBT tag, scala.collection.immutable.List<BlockTank> list) {
+        return Utils.toJava(list.find(b -> b.tier() == tiers))
+            .map(ItemStack::new)
+            .map(i -> {
+                i.setTag(tag);
+                return i;
+            }).orElse(ItemStack.EMPTY);
     }
 
     @Override

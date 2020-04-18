@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gtg",
+    "   ",
+    "gtg"
+  ],
+  "key": {
+    "t": [
+      {
+        "item": "fluidtank:tank_wood"
+      },
+      {
+        "item": "fluidtank:invisible_tank_wood"
+      }
+    ],
+    "g": {
+      "tag": "forge:glass"
+    }
+  },
+  "result": {
+    "item": "fluidtank:pipe"
+  },
+  "conditions": [
+    {
+      "type": "fluidtank:easy"
+    }
+  ]
+}

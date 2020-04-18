@@ -37,7 +37,7 @@ object ModObjects {
   private[this] final val creativeTank = new BlockCreativeTank
   private[this] final val voidTank = new BlockVoidTank
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
-  final val blockTanksInvisible = voidTank :: woodTankInvisible :: normalTanksInv.toList
+  final val blockTanksInvisible = woodTankInvisible +: normalTanksInv.toList :+ voidTank
   final val blockCat = new BlockCAT
   final val blockPipe = new PipeBlock
   final val blockSource = new FluidSourceBlock
