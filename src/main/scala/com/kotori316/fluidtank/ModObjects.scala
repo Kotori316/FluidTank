@@ -36,8 +36,9 @@ object ModObjects {
   private[this] final val normalTanks = Tiers.list.filter(_.hasTagRecipe).map(new BlockTank(_))
   private[this] final val normalTanksInv = Tiers.list.filter(_.hasTagRecipe).map(new BlockInvisibleTank(_))
   private[this] final val creativeTank = new BlockCreativeTank
+  private[this] final val voidTank = new BlockVoidTank
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
-  final val blockTanksInvisible = woodTankInvisible :: normalTanksInv.toList
+  final val blockTanksInvisible = voidTank :: woodTankInvisible :: normalTanksInv.toList
   final val blockCat = new BlockCAT
   final val blockPipe = new PipeBlock
   final val blockSource = new FluidSourceBlock
@@ -48,6 +49,7 @@ object ModObjects {
   final val TANK_TYPE = createTileType(() => new TileTank, blockTanks)
   final val TANK_NO_DISPLAY_TYPE = createTileType(() => new TileTankNoDisplay, blockTanksInvisible)
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
+  final val TANK_VOID_TYPE = createTileType(() => new TileTankVoid, List(voidTank))
   final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
   final val PIPE_TYPE = createTileType(() => new PipeTile, List(blockPipe))
   final val SOURCE_TYPE = createTileType(() => new FluidSourceTile, List(blockSource))
