@@ -4,7 +4,6 @@ import cats._
 import cats.implicits._
 import cats.kernel.CommutativeGroup
 import com.kotori316.scala_lib.util.Norm
-import com.kotori316.scala_lib.util.Norm._
 import net.minecraft.util.math.{BlockPos, Vec3i}
 
 case class PipeConnection[A: Norm : Group](poses: Set[A], updateFunc: (A, PipeConnection[A]) => Unit, isOutput: A => Boolean) {
@@ -12,7 +11,7 @@ case class PipeConnection[A: Norm : Group](poses: Set[A], updateFunc: (A, PipeCo
 
   def outputs: Seq[A] = poses.filter(isOutput).toSeq
 
-  def outputSorted(origin: A): List[A] = outputs.sortBy(p => (p |-| origin).norm).toList
+//  def outputSorted(origin: A): List[A] = outputs.sortBy(p => (p |-| origin).norm).toList
 
   def add(a: A): PipeConnection[A] = this.copy(poses = poses + a)
 
