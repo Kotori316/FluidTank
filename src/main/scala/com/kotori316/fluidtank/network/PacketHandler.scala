@@ -5,11 +5,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import com.kotori316.fluidtank.FluidTank
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
+import net.minecraftforge.fml.network.simple.SimpleChannel
 import net.minecraftforge.fml.network.{NetworkRegistry, PacketDistributor}
 
 object PacketHandler {
   private[this] final val PROTOCOL = "1"
-  val INSTANCE =
+  val INSTANCE: SimpleChannel =
     NetworkRegistry.ChannelBuilder.named(new ResourceLocation(FluidTank.modID, "main"))
       .networkProtocolVersion(() => PROTOCOL)
       .clientAcceptedVersions(PROTOCOL.equals)

@@ -9,7 +9,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.world.World
 
 class TankDataProvider extends IProbeInfoProvider {
-  override def getID = FluidTank.modID + ":toptank"
+  override def getID: String = FluidTank.modID + ":toptank"
 
   private lazy val showTOP = Config.content.showTOP.get().booleanValue()
 

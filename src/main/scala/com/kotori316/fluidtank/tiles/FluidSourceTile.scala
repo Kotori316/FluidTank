@@ -13,7 +13,7 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
   private[this] var mFluid = FluidAmount.EMPTY
   var interval = 1
   var locked = true
-  lazy val enabled = Config.content.enableFluidSupplier.get().booleanValue()
+  lazy val enabled: Boolean = Config.content.enableFluidSupplier.get().booleanValue()
 
   override def tick(): Unit = if (!world.isRemote && world.getGameTime % interval == 0 && enabled) {
     // In server world only.
@@ -77,6 +77,6 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
     super.write(compound)
   }
 
-  override def getUpdateTag = this.write(new CompoundNBT)
+  override def getUpdateTag: CompoundNBT = this.write(new CompoundNBT)
 
 }

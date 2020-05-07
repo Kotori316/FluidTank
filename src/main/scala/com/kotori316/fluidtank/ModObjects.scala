@@ -61,7 +61,7 @@ object ModObjects {
     t
   }
 
-  def getTileTypes = types
+  def getTileTypes: List[TileEntityType[_ <: TileEntity]] = types
 
   //---------- Containers ----------
 

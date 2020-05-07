@@ -41,7 +41,7 @@ package object fluidtank {
     }
   }
 
-  def transform0[T](cap: LazyOptional[T]) = Eval.always {
+  def transform0[T](cap: LazyOptional[T]): Eval[Option[T]] = Eval.always {
     if (cap.isPresent) {
       cap.orElseThrow(thrower).some
     } else {
@@ -68,7 +68,7 @@ package object fluidtank {
     override def eqv(x: FluidStack, y: FluidStack): Boolean = x isFluidStackIdentical y
   }
 
-  val directions = Direction.values().toList
+  val directions: List[Direction] = Direction.values().toList
   val evalExtractor: Eval ~> Id = new (Eval ~> Id) {
     override def apply[A](fa: Eval[A]): A = fa.value
   }

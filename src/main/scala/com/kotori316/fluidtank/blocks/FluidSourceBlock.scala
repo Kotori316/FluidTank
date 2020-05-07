@@ -137,7 +137,7 @@ object FluidSourceBlock {
   final val CHEAT_MODE = BooleanProperty.create("cheat_mode")
   val KEY_CHEAT = "unlocked"
 
-  def isCheatStack(stack: ItemStack) = {
+  def isCheatStack(stack: ItemStack): Boolean = {
     Option(stack.getTag).exists(_.contains(FluidSourceBlock.KEY_CHEAT))
   }
 

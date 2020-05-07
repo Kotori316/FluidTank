@@ -13,7 +13,7 @@ import net.minecraftforge.fml.network.NetworkEvent
  * To both client and server.
  */
 class TileMessage {
-  var pos = BlockPos.ZERO
+  var pos: BlockPos = BlockPos.ZERO
   var dim = 0
   var nbt: CompoundNBT = _
 

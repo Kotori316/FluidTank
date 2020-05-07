@@ -106,43 +106,43 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
 object RenderPipe {
   private final val d = 1d / 16d
   final val duration = 200
-  val BOX_AABB = Box.apply(
+  val BOX_AABB: Box = Box.apply(
     startX = 8 * d, startY = 4 * d + 0.001, startZ = 8 * d,
     endX = 8 * d, endY = 12 * d - 0.001, endZ = 8 * d,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,
     firstSide = true, endSide = true
   )
-  val North_AABB = Box.apply(
+  val North_AABB: Box = Box.apply(
     startX = 8 * d, startY = 8 * d, startZ = 0.001,
     endX = 8 * d, endY = 8 * d, endZ = 4 * d - 0.001,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,
     firstSide = false, endSide = false
   )
-  val South_AABB = Box.apply(
+  val South_AABB: Box = Box.apply(
     startX = 8 * d, startY = 8 * d, startZ = 12 * d + 0.001,
     endX = 8 * d, endY = 8 * d, endZ = 16 * d - 0.001,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,
     firstSide = false, endSide = false
   )
-  val West_AABB = Box.apply(
+  val West_AABB: Box = Box.apply(
     startX = 0.001, startY = 8 * d, startZ = 8 * d,
     endX = 4 * d - 0.001, endY = 8 * d, endZ = 8 * d,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,
     firstSide = false, endSide = false
   )
-  val East_AABB = Box.apply(
+  val East_AABB: Box = Box.apply(
     startX = 12 * d + 0.001, startY = 8 * d, startZ = 8 * d,
     endX = 16 * d - 0.001, endY = 8 * d, endZ = 8 * d,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,
     firstSide = false, endSide = false
   )
-  val UP_AABB = Box.apply(
+  val UP_AABB: Box = Box.apply(
     startX = 8 * d, startY = 12 * d + 0.001, startZ = 8 * d,
     endX = 8 * d, endY = 16 * d - 0.001, endZ = 8 * d,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,
     firstSide = false, endSide = false
   )
-  val Down_AABB = Box.apply(
+  val Down_AABB: Box = Box.apply(
     startX = 8 * d, startY = 0.001, startZ = 8 * d,
     endX = 8 * d, endY = 4 * d - 0.001, endZ = 8 * d,
     sizeX = d * 8 - 0.001, sizeY = d * 8 - 0.001, sizeZ = d * 8 - 0.001,

@@ -8,7 +8,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.shapes.ISelectionContext
+import net.minecraft.util.math.shapes.{ISelectionContext, VoxelShape}
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.{ActionResultType, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
@@ -108,6 +108,6 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
   }
 
   //noinspection ScalaDeprecation
-  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext): VoxelShape = ModObjects.TANK_SHAPE
 
 }
