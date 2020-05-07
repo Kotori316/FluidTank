@@ -22,6 +22,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
   itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   setDefaultState(getStateContainer.getBaseState.`with`(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
 
+  //noinspection ScalaDeprecation
   override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
   override def createNewTileEntity(worldIn: IBlockReader): TileEntity = ModObjects.SOURCE_TYPE.create()
@@ -56,6 +57,7 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
     items.add(stack)
   }
 
+  //noinspection ScalaDeprecation
   override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos,
                                 player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     if (Config.content.enableFluidSupplier.get()) {

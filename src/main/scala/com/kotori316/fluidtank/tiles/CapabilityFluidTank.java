@@ -49,7 +49,7 @@ public class CapabilityFluidTank implements Capability.IStorage<FluidAmount.Tank
 
     private static class Tank implements FluidAmount.Tank {
         FluidAmount content = FluidAmount.EMPTY();
-        int capacity = 4000;
+        final int capacity = 4000;
 
         @Override
         public FluidAmount fill(FluidAmount fluidAmount, boolean doFill, int min) {

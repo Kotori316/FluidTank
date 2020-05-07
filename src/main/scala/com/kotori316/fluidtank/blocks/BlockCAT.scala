@@ -24,12 +24,14 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
 
   override def fillStateContainer(builder: StateContainer.Builder[Block, BlockState]): Unit = builder.add(FACING)
 
+  //noinspection ScalaDeprecation,ScalaDeprecation
   override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
 
   override def createNewTileEntity(worldIn: IBlockReader): TileEntity = new CATTile
 
   override def getStateForPlacement(context: BlockItemUseContext): BlockState = this.getDefaultState.`with`(FACING, context.getNearestLookingDirection)
 
+  //noinspection ScalaDeprecation
   override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     val stack = player.getHeldItem(handIn)
     if (!player.isCrouching) {
