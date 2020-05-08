@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank
 
-import com.kotori316.fluidtank.blocks.{BlockCAT, BlockCreativeTank, BlockInvisibleTank, BlockTank, FluidSourceBlock}
+import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}

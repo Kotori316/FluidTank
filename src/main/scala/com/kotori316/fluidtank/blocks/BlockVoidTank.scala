@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 
 class BlockVoidTank extends BlockTank(Tiers.VOID) {
-  override def createTileEntity(state: BlockState, world: IBlockReader): TileEntity = ModObjects.TANK_VOID_TYPE.create()
+  override def createTileEntity(state: BlockState, world: IBlockReader): TileTankNoDisplay = ModObjects.TANK_VOID_TYPE.create()
 
   override def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
     // Just save custom name.

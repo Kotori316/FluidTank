@@ -201,16 +201,6 @@ public class TierRecipe implements ICraftingRecipe {
         return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
     }
 
-    @Override
-    public int getRecipeWidth() {
-        return 3;
-    }
-
-    @Override
-    public int getRecipeHeight() {
-        return 3;
-    }
-
     public static final String KEY_ID = "recipeId";
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
