@@ -12,8 +12,6 @@ public abstract class SideProxy {
 
     public abstract scala.Option<World> getWorld(NetworkEvent.Context context);
 
-    public abstract void registerTESR();
-
     public static boolean isServer(TileEntity entity) {
         if (entity == null) return false;
         World world = entity.getWorld();
