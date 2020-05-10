@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -19,12 +19,12 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/forge_version.properties') }}
+        key: ${{ runner.os }}-gradle15-${{ hashFiles('**/forge_version.properties') }}
     - name: Precompile
       run: chmod +x ./gradlew && ./gradlew compileScala --continue
-    - name: Build with Gradle and Publish
+    - name: Build with Gradle
       run: |
         chmod +x ./gradlew
-        ./gradlew test publish --continue
+        ./gradlew test build --continue
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}

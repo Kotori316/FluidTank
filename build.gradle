@@ -129,7 +129,7 @@ repositories {
     if (hasGitHubToken()) {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
+            url = uri("https://maven.pkg.github.com/Kotori316/SLP")
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
                 password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
@@ -148,13 +148,12 @@ dependencies {
     // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
     def forge_prop = loadProperties("forge_version.properties")
     minecraft(forge_prop.getProperty("forge_version"))
-    implementation "org.scala-lang:scala-library:2.13.1"
+    implementation "org.scala-lang:scala-library:2.13.2"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    def mc_version = "1.15.2"
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:" + forge_prop.getProperty("hwyla_version"))
-    implementation fg.deobf("mezz.jei:jei-${mc_version}:${forge_prop.getProperty("jei_version")}")
-    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:${forge_prop.getProperty("top_version")}")
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2" )
+    implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
+    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.1-build-7:dev")
