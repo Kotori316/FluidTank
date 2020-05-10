@@ -1,7 +1,5 @@
 package com.kotori316.fluidtank;
 
-import java.lang.reflect.Method;
-
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
@@ -10,16 +8,13 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.functions.LootFunctionManager;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +30,6 @@ import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.EasyCondition;
-import com.kotori316.fluidtank.recipes.FluidTankDataProvider;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
 
@@ -48,30 +42,20 @@ public class FluidTank {
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
-        IEventBus modEventBus = modBus();
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> modEventBus.register(proxy));
-        modEventBus.addListener(this::clientInit);
-        modEventBus.addListener(this::init);
-        modEventBus.register(Register.class);
-        modEventBus.addListener(FluidTankDataProvider::gatherData);
 //        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
 //        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
     }
 
-    @SuppressWarnings("unused")
-    public void init(FMLCommonSetupEvent event) {
-        PacketHandler.init();
-        CapabilityFluidTank.register();
-        FluidTankTOPPlugin.sendIMC().apply(modID);
-        LootFunctionManager.registerFunction(new ContentTankSerializer());
-    }
-
-    @SuppressWarnings("unused")
-    public void clientInit(FMLClientSetupEvent event) {
-        proxy.registerTESR();
-    }
-
+    @Mod.EventBusSubscriber(modid = modID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class Register {
+        @SubscribeEvent
+        public static void init(FMLCommonSetupEvent event) {
+            PacketHandler.init();
+            CapabilityFluidTank.register();
+            FluidTankTOPPlugin.sendIMC().apply(modID);
+            LootFunctionManager.registerFunction(new ContentTankSerializer());
+        }
+
         @SubscribeEvent
         public static void registerBlocks(RegistryEvent.Register<Block> event) {
             CollectionConverters.asJava(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
@@ -114,13 +98,4 @@ public class FluidTank {
         }
     }
 
-    private static IEventBus modBus() {
-        Object o = ModLoadingContext.get().extension();
-        try {
-            Method busGetter = o.getClass().getMethod("getModEventBus");
-            return (IEventBus) busGetter.invoke(o);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Error in getting event bus.", e);
-        }
-    }
 }

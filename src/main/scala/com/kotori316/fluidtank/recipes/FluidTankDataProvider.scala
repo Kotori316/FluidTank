@@ -16,10 +16,14 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
+import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 
+@Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
+  @SubscribeEvent
   def gatherData(event: GatherDataEvent): Unit = {
     if (event.includeServer()) {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))

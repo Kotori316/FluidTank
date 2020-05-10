@@ -17,6 +17,8 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.CollectionConverters;
@@ -51,48 +53,52 @@ public class ClientProxy extends SideProxy {
     }
 
     @Override
-    public void registerTESR() {
-        RENDER_PIPE.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
-        ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
-        ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
-        ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
-    }
-
-    @Override
     public Item.Properties getTankProperties() {
-        return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setTEISR(() -> () -> RENDER_ITEM_TANK);
+        return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setISTER(() -> () -> RENDER_ITEM_TANK);
     }
 
-    @SubscribeEvent
-    public void registerModels(ModelRegistryEvent event) {
+    @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    static class ClientEventHandlers {
+
+        @SubscribeEvent
+        public static void registerTESR(FMLClientSetupEvent event) {
+            RENDER_PIPE.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
+            ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, RENDER_TANK);
+            ClientRegistry.bindTileEntitySpecialRenderer(PipeTile.class, RENDER_PIPE);
+            ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void registerModels(ModelRegistryEvent event) {
         /*if (!Config.content().enableOldRender().get()) {
             FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).forEach(item ->
                 ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
             );
         }*/
-    }
-
-    @SubscribeEvent
-    public void onBake(ModelBakeEvent event) {
-        event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
-        CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
-            ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
-//            IBakedModel model = event.getModelManager().getModel(modelLocation);
-            event.getModelRegistry().put(modelLocation, MODEL_TANK);
-        });
-    }
-
-    @SubscribeEvent
-    public void registerTexture(TextureStitchEvent.Pre event) {
-        if (event.getMap().getBasePath().equals("textures")) {
-            event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
-    }
 
-    @SubscribeEvent
-    public void putTexture(TextureStitchEvent.Post event) {
-        if (event.getMap().getBasePath().equals("textures")) {
-            whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+        @SubscribeEvent
+        public static void onBake(ModelBakeEvent event) {
+            event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
+            CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
+                ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
+//            IBakedModel model = event.getModelManager().getModel(modelLocation);
+                event.getModelRegistry().put(modelLocation, MODEL_TANK);
+            });
+        }
+
+        @SubscribeEvent
+        public static void registerTexture(TextureStitchEvent.Pre event) {
+            if (event.getMap().getBasePath().equals("textures")) {
+                event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+            }
+        }
+
+        @SubscribeEvent
+        public static void putTexture(TextureStitchEvent.Post event) {
+            if (event.getMap().getBasePath().equals("textures")) {
+                whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+            }
         }
     }
 }

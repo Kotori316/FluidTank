@@ -18,10 +18,6 @@ public class ServerProxy extends SideProxy {
     }
 
     @Override
-    public void registerTESR() {
-    }
-
-    @Override
     public Item.Properties getTankProperties() {
         return new Item.Properties().group(ModObjects.CREATIVE_TABS());
     }
