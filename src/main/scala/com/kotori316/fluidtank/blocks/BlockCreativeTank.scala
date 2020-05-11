@@ -25,7 +25,7 @@ class BlockCreativeTank extends BlockTank(Tiers.CREATIVE) {
       .foreach(stack.setDisplayName)
   }
 
-  override val itemBlock = new ItemBlockTank(this) {
+  override val itemBlock: ItemBlockTank = new ItemBlockTank(this) {
     @OnlyIn(Dist.CLIENT)
     override def addInformation(stack: ItemStack, worldIn: World, tooltip: util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
       tooltip.add(new StringTextComponent("Creative"))

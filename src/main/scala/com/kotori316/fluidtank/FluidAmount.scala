@@ -12,7 +12,7 @@ import net.minecraft.nbt.{CompoundNBT, NBTDynamicOps}
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
-import net.minecraftforge.registries.ForgeRegistries
+import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 
 import scala.jdk.javaapi.CollectionConverters
 
@@ -45,7 +45,7 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
 
   def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount))
 
-  override def toString = FluidAmount.registry.getKey(fluid).getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
+  override def toString: String = FluidAmount.registry.getKey(fluid).getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
 }
 
 object FluidAmount {
@@ -53,10 +53,10 @@ object FluidAmount {
   final val NBT_amount = "amount"
   final val NBT_tag = "tag"
   final val AMOUNT_BUCKET = FluidAttributes.BUCKET_VOLUME
-  val EMPTY = FluidAmount(Fluids.EMPTY, 0, None)
-  val BUCKET_LAVA = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
-  val BUCKET_WATER = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
-  val BUCKET_MILK = FluidAmount(ModObjects.MILK_FLUID, AMOUNT_BUCKET, None)
+  val EMPTY: FluidAmount = FluidAmount(Fluids.EMPTY, 0, None)
+  val BUCKET_LAVA: FluidAmount = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
+  val BUCKET_WATER: FluidAmount = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
+  val BUCKET_MILK: FluidAmount = FluidAmount(ModObjects.MILK_FLUID, AMOUNT_BUCKET, None)
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
@@ -80,7 +80,7 @@ object FluidAmount {
     }
   }
 
-  def registry = ForgeRegistries.FLUIDS
+  def registry: IForgeRegistry[Fluid] = ForgeRegistries.FLUIDS
 
   trait Tank extends IFluidHandler {
     /**

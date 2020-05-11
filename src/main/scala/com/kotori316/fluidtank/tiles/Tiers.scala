@@ -10,10 +10,11 @@ import com.mojang.datafixers.types.DynamicOps
 import net.minecraft.nbt.INBT
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
 class Tiers private(val rank: Int, buckets: Int, override val toString: String, val tagName: String, val hasTagRecipe: Boolean) {
-  val lowerName = toString.toLowerCase
+  val lowerName: String = toString.toLowerCase
   val amount: Long = buckets * 1000
   Tiers.list.append(this)
 
@@ -23,7 +24,7 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
 }
 
 object Tiers {
-  val list = mutable.ArrayBuffer.empty[Tiers]
+  val list: ArrayBuffer[Tiers] = mutable.ArrayBuffer.empty[Tiers]
 
   val Invalid = new Tiers(0, 0, "Invalid", "Unknown", hasTagRecipe = false)
   val WOOD = new Tiers(1, 1 << 2, "Wood", "minecraft:logs", hasTagRecipe = false)

@@ -148,7 +148,7 @@ dependencies {
 
     def mc_version = "1.14.4"
     def jei_version = "6.0.0.18"
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.5-B66_1.14.4")
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.6-B67_1.14.4")
 //    implementation  "mcp.mobius.waila:Hwyla:1.10.2-B58_${mc_version}:source"
 
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")

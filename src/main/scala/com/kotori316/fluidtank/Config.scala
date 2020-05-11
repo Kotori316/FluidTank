@@ -23,26 +23,26 @@ object Config {
 
   class Content(builder: ForgeConfigSpec.Builder) {
     builder.comment("Settings for FluidTank.").push("common")
-    val removeRecipe = builder.worldRestart().comment("Remove all recipe to make tanks.")
+    val removeRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipe to make tanks.")
       .define("RemoveRecipe", false)
 
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
-    val easyRecipe = builder.comment("True to use easy recipe.").define("easyRecipe", false)
+    val easyRecipe: ForgeConfigSpec.BooleanValue = builder.comment("True to use easy recipe.").define("easyRecipe", false)
 
     builder.pop()
 
-    val showInvisibleTank = builder.worldRestart().comment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
+    val showInvisibleTank: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
       .define("showInvisibleTankInTab", false)
 
-    val showTOP = builder.comment("Show tank info on TOP tooltip.").define("showTOP", true)
+    val showTOP: ForgeConfigSpec.BooleanValue = builder.comment("Show tank info on TOP tooltip.").define("showTOP", true)
 
-    val enableWailaAndTOP = builder.comment("True to enable waila and top to show tank info.").define("showToolTipOnMods", true)
+    val enableWailaAndTOP: ForgeConfigSpec.BooleanValue = builder.comment("True to enable waila and top to show tank info.").define("showToolTipOnMods", true)
 
-    val enableFluidSupplier = builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", true)
+    val enableFluidSupplier: ForgeConfigSpec.BooleanValue = builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", true)
 
-    val enablePipeRainbowRenderer = builder.worldRestart().comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false)
-    val pipeColor = builder.worldRestart().comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.").define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF))
+    val enablePipeRainbowRenderer: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false)
+    val pipeColor: ForgeConfigSpec.ConfigValue[Integer] = builder.worldRestart().comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.").define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF))
     builder.pop()
 
   }

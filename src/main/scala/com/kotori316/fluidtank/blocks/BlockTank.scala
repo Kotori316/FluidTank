@@ -8,7 +8,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.shapes.ISelectionContext
+import net.minecraft.util.math.shapes.{ISelectionContext, VoxelShape}
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
 import net.minecraft.util.{BlockRenderLayer, Direction, Hand}
 import net.minecraft.world.{IBlockReader, World}
@@ -34,7 +34,7 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
   }
 
   //noinspection ScalaDeprecation
-  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult) = {
+  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): Boolean = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay =>
         val stack = playerIn.getHeldItem(handIn)
@@ -103,14 +103,14 @@ class BlockTank(val tier: Tiers) extends Block(Block.Properties.create(ModObject
       .foreach(stack.setDisplayName)
   }
 
-  override final def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity) = {
+  override final def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity): ItemStack = {
     val stack = super.getPickBlock(state, target, world, pos, player)
     saveTankNBT(world.getTileEntity(pos), stack)
     stack
   }
 
   //noinspection ScalaDeprecation
-  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext): VoxelShape = ModObjects.TANK_SHAPE
 
-  override def getCollisionShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext) = ModObjects.TANK_SHAPE
+  override def getCollisionShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext): VoxelShape = ModObjects.TANK_SHAPE
 }

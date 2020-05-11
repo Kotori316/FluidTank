@@ -22,7 +22,7 @@ class BlockVoidTank extends BlockTank(Tiers.VOID) {
       .foreach(stack.setDisplayName)
   }
 
-  override val itemBlock = new ItemBlockTank(this) {
+  override val itemBlock: ItemBlockTank = new ItemBlockTank(this) {
     @OnlyIn(Dist.CLIENT)
     override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = ()
 

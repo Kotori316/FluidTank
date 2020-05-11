@@ -1,11 +1,13 @@
 package com.kotori316.fluidtank.render
 
+import java.util
 import java.util.{Collections, Random}
 
 import javax.vecmath.{Matrix4f, Vector3f}
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType
-import net.minecraft.client.renderer.model.{IBakedModel, ItemOverrideList}
+import net.minecraft.client.renderer.model.{BakedQuad, IBakedModel, ItemOverrideList}
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.model.TRSRTransformation
@@ -31,15 +33,15 @@ class ItemModelTank extends IBakedModel {
 
   override def isGui3d = false
 
-  override def getOverrides = ItemOverrideList.EMPTY
+  override def getOverrides: ItemOverrideList = ItemOverrideList.EMPTY
 
   override def isAmbientOcclusion = false
 
-  override def getQuads(state: BlockState, side: Direction, rand: Random) = Collections.emptyList()
+  override def getQuads(state: BlockState, side: Direction, rand: Random): util.List[BakedQuad] = Collections.emptyList()
 
   override def isBuiltInRenderer = true
 
-  override def getParticleTexture = null
+  override def getParticleTexture: TextureAtlasSprite = null
 
   override def handlePerspective(cameraTransformType: TransformType): Pair[_ <: IBakedModel, Matrix4f] = {
     //        PerspectiveMapWrapper.handlePerspective(this, transMap, cameraTransformType)

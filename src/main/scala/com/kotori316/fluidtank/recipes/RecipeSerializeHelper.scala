@@ -33,7 +33,7 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
     o
   }
 
-  def location = if (saveName == null) recipe.getID else saveName
+  def location: ResourceLocation = if (saveName == null) recipe.getID else saveName
 
 }
 

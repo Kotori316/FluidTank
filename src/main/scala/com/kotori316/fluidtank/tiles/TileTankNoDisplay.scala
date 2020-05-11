@@ -11,6 +11,7 @@ import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.util.{Direction, INameable}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.fluids.FluidStack
 //import net.minecraftforge.fml.common.Optional
 
 //@Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
@@ -32,7 +33,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   }
 
   val tank = new Tank
-  var connection = Connection.invalid
+  var connection: Connection = Connection.invalid
   var loading = false
   var stackName: ITextComponent = _
 
@@ -111,14 +112,14 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   override def getName: ITextComponent = getStackName
     .getOrElse(new StringTextComponent(tier.toString + " Tank"))
 
-  override def hasCustomName = stackName != null
+  override def hasCustomName: Boolean = stackName != null
 
   override def getCustomName: ITextComponent = getStackName.orNull
 
   class Tank extends FluidAmount.Tank /*extends net.minecraftforge.fluids.FluidTank(Utils.toInt(tier.amount))*/ {
     var box: Box = _
-    var fluid = FluidAmount.EMPTY
-    var capacity = Utils.toInt(tier.amount)
+    var fluid: FluidAmount = FluidAmount.EMPTY
+    var capacity: Int = Utils.toInt(tier.amount)
 
     def onContentsChanged(): Unit = {
       sendPacket()
@@ -145,7 +146,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
       }
     }
 
-    def readFromNBT(nbt: CompoundNBT) = {
+    def readFromNBT(nbt: CompoundNBT): Tank = {
       capacity = nbt.getInt(TileTankNoDisplay.NBT_Capacity)
       val fluid = FluidAmount.fromNBT(nbt)
       setFluid(fluid)
@@ -235,9 +236,9 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
       }
     }
 
-    override def getFluidInTank(tank: Int) = fluid.toStack
+    override def getFluidInTank(tank: Int): FluidStack = fluid.toStack
 
-    override def getTankCapacity(tank: Int) = capacity
+    override def getTankCapacity(tank: Int): Int = capacity
   }
 
   /*@Optional.Method(modid = TileTankNoDisplay.bcId)
