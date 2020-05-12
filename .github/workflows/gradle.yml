@@ -23,12 +23,12 @@ jobs:
       - name: Precompile
         run: chmod +x ./gradlew && ./gradlew compileScala --continue
       - name: Build with Gradle
-          run: |
+        run: |
             chmod +x ./gradlew
             ./gradlew test build --continue
-          env:
+        env:
             REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          - name: Publish
-              uses: actions/upload-artifact@v2
-              with:
-                path: build/libs/*
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/libs/*
