@@ -26,6 +26,6 @@ jobs:
     - name: Build with Gradle and Publish
       run: |
         chmod +x ./gradlew
-        ./gradlew test publish --continue
+        ./gradlew test build --continue
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
