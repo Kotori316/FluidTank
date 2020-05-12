@@ -1,10 +1,6 @@
 package com.kotori316.fluidtank.transport
 
-import cats.implicits.{catsKernelStdGroupForInt, catsKernelStdGroupForTuple2}
-import com.kotori316.fluidtank.transport.PipeConnection._
 import com.kotori316.fluidtank.transport.PipeConnectionTest.Holder
-import com.kotori316.scala_lib.util.Norm._
-import com.kotori316.scala_lib.util.NormInstanceL2._
 import net.minecraft.util.math.BlockPos
 import org.junit.jupiter.api.Assertions.{assertEquals, assertNotEquals, assertTrue}
 import org.junit.jupiter.api.Test
@@ -13,7 +9,7 @@ class PipeConnectionTest {
 
   @Test
   def dummy(): Unit = {
-    assertEquals(Math.sqrt(3), new BlockPos(1, 1, 1).norm)
+//    assertEquals(Math.sqrt(3), new BlockPos(1, 1, 1).norm)
     assertTrue(PipeConnection.empty[BlockPos]({ case (_, _) => () }, _ => false).isEmpty)
   }
 
