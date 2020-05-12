@@ -121,21 +121,6 @@ repositories {
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
-    maven {
-        // Curse Forge
-        name 'Curse Forge'
-        url 'https://minecraft.curseforge.com/api/maven/'
-    }
-    if (hasGitHubToken()) {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Kotori316/SLP")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
-            }
-        }
-    }
 }
 
 private boolean hasGitHubToken() {
@@ -154,16 +139,6 @@ dependencies {
     implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
     implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
     implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
-
-    if (hasGitHubToken()) {
-        implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")
-    } else {
-        implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
-    }
-    // https://minecraft.curseforge.com/api/maven/scalable-cats-force/ScalableCatsForce/2.13.1/ScalableCatsForce-2.13.1-dev.jar
-
-    // Runtime mod dependencies.
-//    runtimeOnly
 
     // Test Dependencies.
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')
@@ -369,12 +344,19 @@ task checkMethod() {
 
 publishing {
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
+        if (hasGitHubToken()) {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
+                    password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
+                }
+            }
+        } else {
+            maven {
+                name = "BuildDir"
+                url = "$buildDir/repo"
             }
         }
     }
