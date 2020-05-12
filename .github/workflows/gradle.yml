@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -22,10 +22,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     - name: Precompile
-      run: chmod +x ./gradlew && ./gradlew compileScala --continue
+      run: chmod +x ./gradlew && ./gradlew compileScala --continue --info
     - name: Build with Gradle and Publish
       run: |
         chmod +x ./gradlew
-        ./gradlew test publish --continue
+        ./gradlew test build --continue
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
