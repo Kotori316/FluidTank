@@ -30,6 +30,6 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
-          uses: actions/upload-artifact@v2
-          with:
-            path: build/libs/*
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/libs/*
