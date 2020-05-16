@@ -3,7 +3,7 @@ package com.kotori316.fluidtank
 import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
-import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
+import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}

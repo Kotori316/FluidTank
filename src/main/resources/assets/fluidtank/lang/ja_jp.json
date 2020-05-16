@@ -27,6 +27,7 @@
   "block.fluidtank.invisible_tank_emerald": "不可視のエメラルドのタンク",
   "block.fluidtank.invisible_tank_star": "不可視の星のタンク",
   "block.fluidtank.pipe": "液体パイプ",
+  "block.fluidtank.item_pipe": "アイテムパイプ",
   "block.fluidtank.milk": "牛乳",
   "block.fluidtank.fluid_source": "液体の湧き出し元",
   "block.fluidtank.water_source": "水の湧き出し元",

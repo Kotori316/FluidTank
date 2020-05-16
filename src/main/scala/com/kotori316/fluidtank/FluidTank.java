@@ -61,7 +61,8 @@ public class FluidTank {
             CollectionConverters.asJava(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
             CollectionConverters.asJava(ModObjects.blockTanksInvisible()).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat());
-            event.getRegistry().register(ModObjects.blockPipe());
+            event.getRegistry().register(ModObjects.blockFluidPipe());
+            event.getRegistry().register(ModObjects.blockItemPipe());
             event.getRegistry().register(ModObjects.blockSource());
         }
 
@@ -70,7 +71,8 @@ public class FluidTank {
             CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat().itemBlock());
-            event.getRegistry().register(ModObjects.blockPipe().itemBlock());
+            event.getRegistry().register(ModObjects.blockFluidPipe().itemBlock());
+            event.getRegistry().register(ModObjects.blockItemPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockSource().itemBlock());
         }
 

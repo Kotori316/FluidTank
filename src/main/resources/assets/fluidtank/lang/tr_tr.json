@@ -27,6 +27,7 @@
   "block.fluidtank.invisible_tank_emerald": "Görünmez Zümrüt Tank",
   "block.fluidtank.invisible_tank_star": "Görünmez Yıldız Tank",
   "block.fluidtank.pipe": "Fluid Pipe",
+  "block.fluidtank.item_pipe": "Item Pipe",
   "block.fluidtank.milk": "Milk",
   "block.fluidtank.fluid_source": "Infinite Fluid Supplier",
   "block.fluidtank.water_source": "Infinite Water Supplier",
