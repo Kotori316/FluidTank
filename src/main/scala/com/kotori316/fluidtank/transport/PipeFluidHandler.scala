@@ -6,7 +6,7 @@ import com.kotori316.fluidtank._
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
-class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
+class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
   /**
    * @param fluidAmount the fluid representing the kind and maximum amount to drain.
    *                    Empty Fluid means fluid type can be anything.

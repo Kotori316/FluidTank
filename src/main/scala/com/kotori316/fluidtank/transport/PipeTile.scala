@@ -3,37 +3,16 @@ package com.kotori316.fluidtank.transport
 import cats.Eval
 import cats.data.OptionT
 import cats.implicits._
-import com.kotori316.fluidtank.network.{PacketHandler, TileMessage}
+import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.{CapabilityFluidTank, Tiers}
-import com.kotori316.fluidtank.transport.PipeConnection._
-import com.kotori316.fluidtank.{FluidTank, ModObjects, _}
-import net.minecraft.item.DyeColor
-import net.minecraft.nbt.CompoundNBT
-import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
 import net.minecraft.util.Direction
-import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
-class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity {
-  var connection: PipeConnection[BlockPos] = getEmptyConnection
+class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
   val handler = new PipeFluidHandler(this)
-  private[this] final var color = Int.unbox(Config.content.pipeColor.get())
-
-  private def getEmptyConnection: PipeConnection[BlockPos] = PipeConnection.empty({ case (p, c) =>
-    getWorld.getTileEntity(p) match {
-      case pipeTile: PipeTile => pipeTile.connection = c
-      case _ =>
-    }
-  }, p =>
-    getWorld.getBlockState(p) match {
-      case s if s.getBlock == ModObjects.blockPipe =>
-        PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(pr => s.get(pr).isOutput)
-      case _ => false
-    }
-  )
 
   override def tick(): Unit = if (!world.isRemote) {
     if (connection.isEmpty)
@@ -69,30 +48,6 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
     }
   }
 
-  def makeConnection(): Unit = {
-    val checked = scala.collection.mutable.Set.empty[BlockPos]
-
-    def makePosList(start: BlockPos): List[BlockPos] = {
-      for {
-        d <- directions
-        pos <- start.offset(d).pure[List]
-        if checked.add(pos) // True means it's first time to check the pos. False means the pos already checked.
-        state <- getWorld.getBlockState(pos).pure[List]
-        if state.getBlock == ModObjects.blockPipe
-        if state.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(d.getOpposite)) == PipeBlock.Connection.CONNECTED
-        pos2 <- pos :: makePosList(pos)
-      } yield pos2
-    }
-
-    val poses: List[BlockPos] = makePosList(getPos)
-    val lastConnection = if (poses.isEmpty) getEmptyConnection.add(getPos) else poses.foldl(getEmptyConnection) { case (c, p) => c add p }
-    FluidTank.LOGGER.debug(s"PipeConnection, fromPos: $pos, made: $lastConnection")
-  }
-
-  def connectorUpdate(): Unit = {
-    connection.reset()
-  }
-
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
     Cap.asJava(
       Cap.make(handler.asInstanceOf[T])
@@ -102,33 +57,6 @@ class PipeTile extends TileEntity(ModObjects.PIPE_TYPE) with ITickableTileEntity
     )
   }
 
-  override def read(compound: CompoundNBT): Unit = {
-    super.read(compound)
-    this.color = compound.getInt("color")
-  }
-
-  override def write(compound: CompoundNBT): CompoundNBT = {
-    compound.putInt("color", this.color)
-    super.write(compound)
-  }
-
-  override def getUpdateTag: CompoundNBT = super.serializeNBT()
-
-  def changeColor(color: DyeColor): Unit = {
-    this.connection.poses.map(world.getTileEntity).foreach {
-      case tile: PipeTile => tile.setColor(color.getColorValue | 0xF0000000)
-      case _ =>
-    }
-  }
-
-  def setColor(c: Int): Unit = {
-    this.color = c
-    if (world != null && !world.isRemote) {
-      PacketHandler.sendToClient(TileMessage(this), world)
-    }
-  }
-
-  def getColor: Int = this.color
 }
 
 object PipeTile {

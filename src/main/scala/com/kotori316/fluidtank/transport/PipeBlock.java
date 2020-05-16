@@ -7,11 +7,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableBiMap;
+import javax.annotation.Nonnull;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
@@ -35,18 +35,13 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 
-public class PipeBlock extends Block {
+public abstract class PipeBlock extends Block {
     public static final VoxelShape BOX_AABB = VoxelShapes.create(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
     public static final VoxelShape North_AABB = VoxelShapes.create(0.25, 0.25, 0, 0.75, 0.75, 0.25);
     public static final VoxelShape South_AABB = VoxelShapes.create(0.25, 0.25, .75, 0.75, 0.75, 1);
@@ -89,7 +84,7 @@ public class PipeBlock extends Block {
     public PipeBlock() {
         super(Block.Properties.create(ModObjects.MATERIAL_PIPE())
             .hardnessAndResistance(0.5f));
-        setRegistryName(FluidTank.modID, "pipe");
+        setRegistryName(FluidTank.modID, getRegName());
         setDefaultState(getStateContainer().getBaseState()
                 .with(NORTH, Connection.NO_CONNECTION)
                 .with(SOUTH, Connection.NO_CONNECTION)
@@ -100,8 +95,16 @@ public class PipeBlock extends Block {
 //            .with(WATERLOGGED, false)
         );
         blockItem = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS()));
-        blockItem.setRegistryName(FluidTank.modID, "pipe");
+        blockItem.setRegistryName(FluidTank.modID, getRegName());
     }
+
+    @Nonnull
+    protected abstract String getRegName();
+
+    protected abstract boolean isHandler(IBlockReader world, BlockPos pos, EnumProperty<Connection> property);
+
+    @Override
+    public abstract TileEntity createTileEntity(BlockState state, IBlockReader world);
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -112,7 +115,7 @@ public class PipeBlock extends Block {
     @SuppressWarnings("deprecation")
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
         return SHAPE_MAP.entrySet().stream()
-            .filter(s -> state.get(s.getKey()) != Connection.NO_CONNECTION || isFluidHandler(worldIn, pos, s.getKey()))
+            .filter(s -> state.get(s.getKey()) != Connection.NO_CONNECTION || isHandler(worldIn, pos, s.getKey()))
             .map(Map.Entry::getValue)
             .reduce(BOX_AABB, VoxelShapes::or);
     }
@@ -165,35 +168,26 @@ public class PipeBlock extends Block {
         BlockState blockState = worldIn.getBlockState(pos);
         TileEntity entity = worldIn.getTileEntity(pos);
         if (blockState.getBlock() == this) {
-            if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTile) {
-                PipeTile p = (PipeTile) entity;
+            if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTileBase) {
+                PipeTileBase p = (PipeTileBase) entity;
                 return p.getColor() == Config.content().pipeColor().get() ? Connection.CONNECTED : Connection.NO_CONNECTION;
             }
             return Connection.CONNECTED;
         } else {
             if (entity != null) {
-                LazyOptional<IFluidHandler> capability = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
-                if (capability.isPresent())
-                    if (capability.map(f -> f.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)).orElse(0) >= 4000)
-                        return Connection.OUTPUT;
-                    else
-                        return Connection.CONNECTED;
-                else
-                    return Connection.NO_CONNECTION;
+                return getConnection(direction, entity);
             } else {
                 return Connection.NO_CONNECTION;
             }
         }
     }
 
+    @Nonnull
+    protected abstract Connection getConnection(Direction direction, @Nonnull TileEntity entity);
+
     @Override
     public boolean hasTileEntity(BlockState state) {
         return true;
-    }
-
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return ModObjects.PIPE_TYPE().create();
     }
 
     @Override
@@ -205,7 +199,7 @@ public class PipeBlock extends Block {
         DyeColor color = DyeColor.getColor(player.getHeldItem(handIn));
         if (color != null && !Config.content().enablePipeRainbowRenderer().get()) {
             if (!worldIn.isRemote) {
-                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(p -> p.changeColor(color));
+                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(color));
                 player.sendStatusMessage(
                     new TranslationTextComponent("chat.fluidtank.change_color", new TranslationTextComponent("color.minecraft." + color)),
                     false);
@@ -233,7 +227,7 @@ public class PipeBlock extends Block {
             if (!worldIn.isRemote) {
                 worldIn.setBlockState(pos, blockState.get().getKey());
                 if (blockState.get().getValue())
-                    Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTile.class::cast).ifPresent(PipeTile::connectorUpdate);
+                    Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTileBase.class::cast).ifPresent(PipeTileBase::connectorUpdate);
             }
             return ActionResultType.SUCCESS;
         } else {
@@ -264,8 +258,8 @@ public class PipeBlock extends Block {
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
             TileEntity entity = worldIn.getTileEntity(pos);
-            if (entity instanceof PipeTile) {
-                PipeTile tile = (PipeTile) entity;
+            if (entity instanceof PipeTileBase) {
+                PipeTileBase tile = (PipeTileBase) entity;
                 tile.connectorUpdate();
             }
             super.onReplaced(state, worldIn, pos, newState, isMoving);
@@ -313,15 +307,4 @@ public class PipeBlock extends Block {
         }
     }
 
-    private static boolean isFluidHandler(IBlockReader w, BlockPos pipePos, EnumProperty<Connection> p) {
-        Direction d = FACING_TO_PROPERTY_MAP.inverse().get(p);
-        return isFluidHandler(w, pipePos.offset(d), d);
-    }
-
-    public static boolean isFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
-        TileEntity t = world.getTileEntity(pos);
-        if (t != null && t.getWorld() != null)
-            return FluidUtil.getFluidHandler(t.getWorld(), pos, direction.getOpposite()).isPresent();
-        else return false;
-    }
 }

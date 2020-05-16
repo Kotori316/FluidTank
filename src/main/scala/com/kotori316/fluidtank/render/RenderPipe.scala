@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.render
 import java.awt.Color
 
 import com.kotori316.fluidtank.network.ClientProxy
-import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
+import com.kotori316.fluidtank.transport.{PipeBlock, PipeTileBase}
 import com.mojang.blaze3d.matrix.MatrixStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
@@ -11,10 +11,10 @@ import net.minecraft.client.renderer.{IRenderTypeBuffer, RenderType}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 @OnlyIn(Dist.CLIENT)
-class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[PipeTile](d) {
+class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[PipeTileBase](d) {
   var useColor: Boolean = false
 
-  override def render(te: PipeTile, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def render(te: PipeTileBase, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
 
     val maxD = 12 * RenderPipe.d - 0.01
     val minD = 4 * RenderPipe.d + 0.01

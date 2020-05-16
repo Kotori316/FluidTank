@@ -119,7 +119,7 @@ object FluidTankDataProvider {
           .patternLine("xpx")
           .patternLine("xxx"))
       val PIPE = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockPipe)
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockFluidPipe)
           .key('t', woodTanks)
           .key('g', Tags.Items.GLASS)
           .key('e', ingredientArray(Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromItems(Items.ENDER_EYE)))
@@ -129,7 +129,7 @@ object FluidTankDataProvider {
         .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.getId)))
         .addCondition(new NotCondition(EasyCondition.getInstance()))
       val PIPE_EASY = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockPipe)
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockFluidPipe)
           .key('t', woodTanks)
           .key('g', Tags.Items.GLASS)
           .patternLine("gtg")
