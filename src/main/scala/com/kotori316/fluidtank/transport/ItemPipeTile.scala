@@ -9,7 +9,7 @@ import net.minecraftforge.items.CapabilityItemHandler
 class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
   val handler = new PipeItemHandler(this)
 
-  override def tick(): Unit = {
+  override def tick(): Unit = if (!world.isRemote) {
     if (connection.isEmpty)
       makeConnection()
   }

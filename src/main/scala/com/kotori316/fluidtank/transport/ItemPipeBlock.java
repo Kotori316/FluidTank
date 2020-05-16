@@ -15,6 +15,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import com.kotori316.fluidtank.ModObjects;
+
 public class ItemPipeBlock extends PipeBlock {
     @Nonnull
     @Override
@@ -42,14 +44,14 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return null;
+        return ModObjects.ITEM_PIPE_TYPE().create();
     }
 
     @Nonnull
     @Override
     protected Connection getConnection(Direction direction, @Nonnull TileEntity entity) {
         if (entity instanceof IInventory ||
-            !entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent())
+            entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent())
             return Connection.CONNECTED;
         else
             return Connection.NO_CONNECTION;
