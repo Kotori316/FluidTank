@@ -70,6 +70,11 @@ public class ClientProxy extends SideProxy {
                 renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
                 return renderPipe;
             });
+            ClientRegistry.bindTileEntityRenderer(ModObjects.ITEM_PIPE_TYPE(), d -> {
+                RenderPipe renderPipe = new RenderPipe(d);
+                renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
+                return renderPipe;
+            });
             ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
             RenderType rendertype = RenderType.getCutoutMipped();
@@ -78,6 +83,7 @@ public class ClientProxy extends SideProxy {
             CollectionConverters.asJava(ModObjects.blockTanksInvisible())
                 .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
             RenderTypeLookup.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
+            RenderTypeLookup.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
         }
 
         @SubscribeEvent
