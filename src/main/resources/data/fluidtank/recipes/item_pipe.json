@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "gtg",
-    " e ",
-    "gtg"
+    "g g",
+    "tet",
+    "g g"
   ],
   "key": {
     "t": [
@@ -27,12 +27,20 @@
     ]
   },
   "result": {
-    "item": "fluidtank:pipe"
+    "item": "fluidtank:item_pipe",
+    "count": 4
   },
   "conditions": [
     {
       "value": {
         "type": "fluidtank:easy"
+      },
+      "type": "forge:not"
+    },
+    {
+      "value": {
+        "tag": "forge:ender_pearls",
+        "type": "forge:tag_empty"
       },
       "type": "forge:not"
     }

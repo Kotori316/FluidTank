@@ -43,9 +43,7 @@ object FluidTankDataProvider {
       val TANK_WOOD = AdvancementSerializeHelper(woodLocation)
         .addCriterion("has_bucket", FilledBucketTrigger.Instance.forItem(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build()))
         .addItemCriterion(Tags.Items.GLASS)
-      val TANK_WOOD_EASY = AdvancementSerializeHelper(ID("tank_wood_easy"))
-        .addCriterion("has_bucket", FilledBucketTrigger.Instance.forItem(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build()))
-        .addItemCriterion(Tags.Items.GLASS)
+      val TANK_WOOD_EASY = TANK_WOOD.copy(location = ID("tank_wood_easy"))
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(new Tag[Item](new ResourceLocation(tier.tagName))))
       val VOID_TANK = AdvancementSerializeHelper(ID("tank_void"))
@@ -58,15 +56,17 @@ object FluidTankDataProvider {
         .addCriterion("has_pearl", InventoryChangeTrigger.Instance.forItems(
           ItemPredicate.Builder.create().item(Items.ENDER_EYE).build(),
           ItemPredicate.Builder.create().tag(Tags.Items.ENDER_PEARLS).build()))
-        .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.getId)))
         .addCondition(new NotCondition(EasyCondition.getInstance()))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
       val PIPE_EASY = AdvancementSerializeHelper(ID("pipe_easy"))
         .addCondition(EasyCondition.getInstance())
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
+      val ITEM_PIPE = PIPE.copy(location = ID("item_pipe"))
+      val ITEM_PIPE_EASY = PIPE_EASY.copy(location = ID("item_pipe_easy"))
       val FLUID_SOURCE = AdvancementSerializeHelper(ID("fluid_source"))
         .addItemCriterion(Items.WATER_BUCKET)
-      val recipeAdvancements = FLUID_SOURCE :: PIPE :: PIPE_EASY :: CAT :: TANK_WOOD :: TANK_WOOD_EASY :: VOID_TANK :: TANKS
+      val recipeAdvancements = FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY ::
+        CAT :: TANK_WOOD :: TANK_WOOD_EASY :: VOID_TANK :: TANKS
 
       for (advancement <- recipeAdvancements) {
         val out = path.resolve(s"data/${advancement.location.getNamespace}/advancements/${advancement.location.getPath}.json")
@@ -126,15 +126,32 @@ object FluidTankDataProvider {
           .patternLine("gtg")
           .patternLine(" e ")
           .patternLine("gtg"))
-        .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.getId)))
         .addCondition(new NotCondition(EasyCondition.getInstance()))
       val PIPE_EASY = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockFluidPipe)
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockFluidPipe, 2)
           .key('t', woodTanks)
           .key('g', Tags.Items.GLASS)
           .patternLine("gtg")
           .patternLine("   ")
           .patternLine("gtg"), saveName = ID("pipe_easy"))
+        .addCondition(EasyCondition.getInstance())
+      val ITEM_PIPE = RecipeSerializeHelper.by(
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockItemPipe, 4)
+          .key('t', woodTanks)
+          .key('g', Tags.Items.GLASS)
+          .key('e', ingredientArray(Ingredient.fromTag(Tags.Items.ENDER_PEARLS), Ingredient.fromItems(Items.ENDER_EYE)))
+          .patternLine("g g")
+          .patternLine("tet")
+          .patternLine("g g"))
+        .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.getId)))
+        .addCondition(new NotCondition(EasyCondition.getInstance()))
+      val ITEM_PIPE_EASY = RecipeSerializeHelper.by(
+        ShapedRecipeBuilder.shapedRecipe(ModObjects.blockItemPipe, 8)
+          .key('t', woodTanks)
+          .key('g', Tags.Items.GLASS)
+          .patternLine("g g")
+          .patternLine("t t")
+          .patternLine("g g"), saveName = ID("item_pipe_easy"))
         .addCondition(EasyCondition.getInstance())
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
@@ -151,7 +168,7 @@ object FluidTankDataProvider {
           .key('I', Tags.Items.STORAGE_BLOCKS_IRON)
           .key('d', Blocks.DIRT))
 
-      val recipes = FLUID_SOURCE :: PIPE :: PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
+      val recipes = FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")

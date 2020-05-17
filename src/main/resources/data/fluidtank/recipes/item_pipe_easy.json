@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "gtg",
-    "   ",
-    "gtg"
+    "g g",
+    "t t",
+    "g g"
   ],
   "key": {
     "t": [
@@ -19,8 +19,8 @@
     }
   },
   "result": {
-    "item": "fluidtank:pipe",
-    "count": 2
+    "item": "fluidtank:item_pipe",
+    "count": 8
   },
   "conditions": [
     {

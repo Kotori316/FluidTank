@@ -2,14 +2,14 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:pipe"
+      "fluidtank:item_pipe_easy"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:pipe"
+        "recipe": "fluidtank:item_pipe_easy"
       }
     },
     "has_tank_wood": {
@@ -21,34 +21,17 @@
           }
         ]
       }
-    },
-    "has_pearl": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "item": "minecraft:ender_eye"
-          },
-          {
-            "tag": "forge:ender_pearls"
-          }
-        ]
-      }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_tank_wood",
-      "has_pearl"
+      "has_tank_wood"
     ]
   ],
   "conditions": [
     {
-      "value": {
-        "type": "fluidtank:easy"
-      },
-      "type": "forge:not"
+      "type": "fluidtank:easy"
     }
   ]
 }
