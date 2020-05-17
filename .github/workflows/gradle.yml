@@ -22,12 +22,12 @@ jobs:
           key: ${{ runner.os }}-gradle15-${{ hashFiles('**/forge_version.properties') }}
       - name: Precompile
         run: chmod +x ./gradlew && ./gradlew compileScala --continue
-      - name: Build with Gradle
-        run: |
-            chmod +x ./gradlew
-            ./gradlew test build --continue
         env:
-            REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build with Gradle
+        run: chmod +x ./gradlew && ./gradlew build --continue
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
         uses: actions/upload-artifact@v2
         with:

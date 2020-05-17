@@ -3,6 +3,7 @@ package com.kotori316
 import cats._
 import cats.data._
 import cats.implicits._
+import com.kotori316.scala_lib.util.Neighbor
 import net.minecraft.fluid.Fluid
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.Direction
@@ -85,4 +86,7 @@ package object fluidtank {
 
   def toScalaOption[T](o: java.util.Optional[T]): Option[T] = if (o.isPresent) Some(o.get()) else None
 
+  implicit final val NeighborOfBlockPos: Neighbor[BlockPos] = (origin: BlockPos) => Set(
+    origin.up, origin.down, origin.north, origin.east, origin.south, origin.west
+  )
 }

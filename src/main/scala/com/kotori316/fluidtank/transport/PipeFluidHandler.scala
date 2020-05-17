@@ -32,7 +32,7 @@ class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
    * @return Fluid that was accepted by the tank.
    */
   override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
-    val pipePosIterator = pipeTile.connection.outputs.iterator
+    val pipePosIterator = pipeTile.connection.outputs(pipeTile.getPos).iterator
     var rest = fluidAmount
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
