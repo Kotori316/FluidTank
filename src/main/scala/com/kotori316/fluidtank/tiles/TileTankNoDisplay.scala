@@ -24,11 +24,11 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     with IDebuggable*/ {
   self =>
 
-  def this() {
+  def this() = {
     this(Tiers.Invalid, ModObjects.TANK_NO_DISPLAY_TYPE)
   }
 
-  def this(t: Tiers) {
+  def this(t: Tiers) = {
     this(t, ModObjects.TANK_NO_DISPLAY_TYPE)
   }
 

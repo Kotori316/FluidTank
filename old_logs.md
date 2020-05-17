@@ -1,3 +1,9 @@
+## v15.2.7
+* **Requires library mod newer than [2.13.2-build2](https://www.curseforge.com/minecraft/mc-mods/scalable-cats-force/files/2954109)**
+* Internal changes
+* Update forge to 31.2.0
+* Update mapping
+
 ## v15.2.6
 * Changed pipe transfer rate to 16,000 mB/t.
 * Pipes can be colored by dye.
