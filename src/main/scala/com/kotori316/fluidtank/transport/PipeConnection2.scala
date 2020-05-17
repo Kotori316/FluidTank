@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.transport
 
+import java.util.Objects
+
 import com.kotori316.scala_lib.util.Neighbor
 import com.kotori316.scala_lib.util.Neighbor._
 
@@ -27,10 +29,7 @@ class PipeConnection2[A](val poses: Set[A], isOutput: A => Boolean)(implicit pri
     case _ => false
   }
 
-  override def hashCode(): Int = {
-    val state = Seq(poses, neighbor)
-    state.map(_.##).foldLeft(0)((a, b) => 0x1F * a + b)
-  }
+  override def hashCode(): Int = Objects.hash(poses, neighbor)
 
   def isEmpty: Boolean = poses.isEmpty
 
