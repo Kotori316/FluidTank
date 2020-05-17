@@ -1,7 +1,5 @@
 package com.kotori316.fluidtank.transport
 
-import cats.Eval
-import cats.data.OptionT
 import cats.implicits._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.{CapabilityFluidTank, Tiers}
@@ -22,7 +20,7 @@ class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
       if (getBlockState.get(value).isInput) {
         val sourcePos = pos.offset(direction)
         val c = for {
-          t <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(sourcePos)))
+          t <- Cap.make(getWorld.getTileEntity(sourcePos))
           cap <- t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
         } yield cap -> sourcePos
         c.toList
@@ -31,11 +29,11 @@ class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
       }
     }.foreach { case (f, sourcePos) =>
       for {
-        p <- connection.outputs
+        p <- connection.outputNonOrdered
         (direction, pos) <- directions.map(f => f -> p.offset(f))
         if pos != sourcePos
         if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-        dest <- OptionT.fromOption[Eval](Option(getWorld.getTileEntity(pos)))
+        dest <- Cap.make(getWorld.getTileEntity(pos))
           .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
           .toList
         if f != dest

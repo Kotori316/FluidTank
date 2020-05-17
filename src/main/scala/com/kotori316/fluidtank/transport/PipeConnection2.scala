@@ -14,6 +14,8 @@ class PipeConnection2[A](val poses: Set[A], isOutput: A => Boolean)(implicit pri
       .sortBy(_._2)
       .map(_._1)
 
+  def outputNonOrdered: Seq[A] = poses.toSeq
+
   def copy(poses: Set[A] = this.poses, isOut: A => Boolean = isOutput): PipeConnection2[A] = {
     if (poses == this.poses && isOut == this.isOutput) this
     else new PipeConnection2(poses, isOut)

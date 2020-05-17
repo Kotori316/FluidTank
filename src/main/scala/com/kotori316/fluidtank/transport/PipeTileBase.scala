@@ -9,15 +9,10 @@ import net.minecraft.tileentity.{ITickableTileEntity, TileEntity, TileEntityType
 import net.minecraft.util.math.BlockPos
 
 abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEntity(t) with ITickableTileEntity {
-  var connection: PipeConnection[BlockPos] = getEmptyConnection
+  var connection: PipeConnection2[BlockPos] = getEmptyConnection
   private[this] final var color = Int.unbox(Config.content.pipeColor.get())
 
-  private def getEmptyConnection: PipeConnection[BlockPos] = PipeConnection.empty({ case (p, c) =>
-    getWorld.getTileEntity(p) match {
-      case pipeTile: PipeTileBase => pipeTile.connection = c
-      case _ =>
-    }
-  }, p => {
+  private def getEmptyConnection: PipeConnection2[BlockPos] = PipeConnection2.empty { p =>
     val state = getWorld.getBlockState(p)
     if (PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().allMatch(pr => state.has(pr))) {
       PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(pr => state.get(pr).isOutput)
@@ -25,7 +20,6 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
       false
     }
   }
-  )
 
   def makeConnection(): Unit = {
     val checked = scala.collection.mutable.Set.empty[BlockPos]
@@ -43,13 +37,17 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
     }
 
     val poses: List[BlockPos] = makePosList(getPos)
-    val lastConnection = if (poses.isEmpty) getEmptyConnection.add(getPos) else poses.foldl(getEmptyConnection) { case (c, p) => c add p }
-    FluidTank.LOGGER.debug(s"PipeConnection, fromPos: $pos, made: $lastConnection")
+    val lastConnection = if (poses.isEmpty) {
+      PipeConnection2.add(getEmptyConnection, getPos)
+    } else {
+      poses.foldl(getEmptyConnection)(PipeConnection2.add)
+    }
+    applyToAllPipe(tile => tile.connection = lastConnection, c = lastConnection)
+    FluidTank.LOGGER.debug(s"PipeConnection2, fromPos: $pos, made: $lastConnection")
   }
 
-  def connectorUpdate(): Unit = {
-    connection.reset()
-  }
+  def connectorUpdate(): Unit =
+    applyToAllPipe(tile => tile.connection = tile.getEmptyConnection)
 
   override def read(compound: CompoundNBT): Unit = {
     super.read(compound)
@@ -63,12 +61,8 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
 
   override def getUpdateTag: CompoundNBT = super.serializeNBT()
 
-  def changeColor(color: DyeColor): Unit = {
-    this.connection.poses.map(world.getTileEntity).foreach {
-      case tile: PipeTileBase => tile.setColor(color.getColorValue | 0xF0000000)
-      case _ =>
-    }
-  }
+  def changeColor(color: DyeColor): Unit =
+    applyToAllPipe(_.setColor(color.getColorValue | 0xF0000000))
 
   def setColor(c: Int): Unit = {
     this.color = c
@@ -78,4 +72,13 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
   }
 
   def getColor: Int = this.color
+
+  private def applyToAllPipe(consumer: PipeTileBase => Unit, c: PipeConnection2[BlockPos] = this.connection): Unit = {
+    c.foreach { p =>
+      getWorld.getTileEntity(p) match {
+        case tile: PipeTileBase => consumer.apply(tile)
+        case _ =>
+      }
+    }
+  }
 }

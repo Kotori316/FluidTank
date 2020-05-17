@@ -35,21 +35,24 @@ class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
           List.empty
         }
       }
-      handlers.foreach { case (f, sourcePos) =>
-        val func = (i: Int) => Option(f.extractItem(i, ItemPipeTile.transferItemCount, true)).filterNot(_.isEmpty).map(item => i -> item)
-        for {
-          p <- connection.outputs
-          (direction, pos) <- directions.map(f => f -> p.offset(f))
-          if pos != sourcePos
-          if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-          dest <- findItemHandler(getWorld, pos, direction).map { case (i, _) => i }.toList
-          if f != dest
-          (index, item) <- List.range(0, f.getSlots).collectFirst(Function.unlift(func))
-        } {
-          val transferSimulate = ItemHandlerHelper.insertItem(dest, item, true)
-          if (!ItemStack.areItemsEqual(item, transferSimulate)) {
-            val result = ItemHandlerHelper.insertItem(dest, item, false)
-            f.extractItem(index, item.getCount - result.getCount, false)
+      if (handlers.nonEmpty) {
+        val outputPoses = connection.outputs(getPos)
+        handlers.foreach { case (f, sourcePos) =>
+          val func = (i: Int) => Option(f.extractItem(i, ItemPipeTile.transferItemCount, true)).filterNot(_.isEmpty).map(item => i -> item)
+          for {
+            p <- outputPoses
+            (direction, pos) <- directions.map(f => f -> p.offset(f))
+            if pos != sourcePos
+            if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
+            dest <- findItemHandler(getWorld, pos, direction).map { case (i, _) => i }.toList
+            if f != dest
+            (index, item) <- List.range(0, f.getSlots).collectFirst(Function.unlift(func))
+          } {
+            val transferSimulate = ItemHandlerHelper.insertItem(dest, item, true)
+            if (!ItemStack.areItemsEqual(item, transferSimulate)) {
+              val result = ItemHandlerHelper.insertItem(dest, item, false)
+              f.extractItem(index, item.getCount - result.getCount, false)
+            }
           }
         }
       }
