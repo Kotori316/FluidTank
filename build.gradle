@@ -130,6 +130,12 @@ repositories {
                 password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
             }
         }
+    } else {
+        maven {
+            // Curse Forge
+            name 'Curse Forge'
+            url 'https://minecraft.curseforge.com/api/maven/'
+        }
     }
 }
 
