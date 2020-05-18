@@ -1,3 +1,8 @@
+## v15.2.8
+* Added item pipe.
+* Internal changes
+* Changed the number of fluid pipe crafted in the easy recipe.
+
 ## v15.2.7
 * **Requires library mod newer than [2.13.2-build2](https://www.curseforge.com/minecraft/mc-mods/scalable-cats-force/files/2954109)**
 * Internal changes
