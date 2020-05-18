@@ -16,9 +16,9 @@ import net.minecraftforge.items.wrapper.InvWrapper
 import net.minecraftforge.items.{CapabilityItemHandler, IItemHandler, ItemHandlerHelper}
 
 final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
-  private [this] final val handler = new PipeItemHandler(this)
-  private[this] final var coolTime = ItemPipeTile.defaultCoolTime
-  private[this] final var repeated = 0
+  private[this] val handler = new PipeItemHandler(this)
+  private[this] var coolTime = ItemPipeTile.defaultCoolTime
+  private[this] var repeated = 0
 
   override def tick(): Unit = if (!world.isRemote) {
     if (connection.isEmpty)
@@ -56,7 +56,7 @@ final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
           }
         }
       }
-      repeated = if (handlers.isEmpty) Math.max(repeated - 1, 0) else repeated + 1
+      repeated = if (handlers.isEmpty) Math.max(repeated - 4, 0) else repeated + 1
       coolTime = ItemPipeTile.getCoolTime(repeated)
     }
 

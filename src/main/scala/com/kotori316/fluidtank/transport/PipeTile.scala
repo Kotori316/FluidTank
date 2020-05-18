@@ -9,8 +9,8 @@ import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
-class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
-  val handler = new PipeFluidHandler(this)
+final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
+  private[this] val handler = new PipeFluidHandler(this)
 
   override def tick(): Unit = if (!world.isRemote) {
     if (connection.isEmpty)
