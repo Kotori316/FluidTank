@@ -3,7 +3,7 @@ package com.kotori316.fluidtank
 import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
-import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
+import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
@@ -40,7 +40,8 @@ object ModObjects {
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
   final val blockTanksInvisible = woodTankInvisible +: normalTanksInv.toList :+ voidTank
   final val blockCat = new BlockCAT
-  final val blockPipe = new PipeBlock
+  final val blockFluidPipe = new FluidPipeBlock
+  final val blockItemPipe = new ItemPipeBlock
   final val blockSource = new FluidSourceBlock
 
   //---------- TileEntities ----------
@@ -51,7 +52,8 @@ object ModObjects {
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
   final val TANK_VOID_TYPE = createTileType(() => new TileTankVoid, List(voidTank))
   final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
-  final val PIPE_TYPE = createTileType(() => new PipeTile, List(blockPipe))
+  final val FLUID_PIPE_TYPE = createTileType(() => new PipeTile, List(blockFluidPipe))
+  final val ITEM_PIPE_TYPE = createTileType(() => new ItemPipeTile, List(blockItemPipe))
   final val SOURCE_TYPE = createTileType(() => new FluidSourceTile, List(blockSource))
 
   def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {

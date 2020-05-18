@@ -2,14 +2,14 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:pipe"
+      "fluidtank:item_pipe"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:pipe"
+        "recipe": "fluidtank:item_pipe"
       }
     },
     "has_tank_wood": {

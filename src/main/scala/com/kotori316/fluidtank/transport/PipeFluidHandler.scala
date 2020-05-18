@@ -6,7 +6,7 @@ import com.kotori316.fluidtank._
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
-class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
+class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
   /**
    * @param fluidAmount the fluid representing the kind and maximum amount to drain.
    *                    Empty Fluid means fluid type can be anything.
@@ -32,7 +32,7 @@ class PipeFluidHandler(pipeTile: PipeTile) extends FluidAmount.Tank {
    * @return Fluid that was accepted by the tank.
    */
   override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
-    val pipePosIterator = pipeTile.connection.outputs.iterator
+    val pipePosIterator = pipeTile.connection.outputs(pipeTile.getPos).iterator
     var rest = fluidAmount
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
