@@ -159,7 +159,7 @@ dependencies {
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")
     } else {
-        implementation("scalable-cats-force:ScalableCatsForce:2.13.1:dev")
+        implementation("scalable-cats-force:ScalableCatsForce-2.13.2-build:2:dev")
     }
     // Test Dependencies.
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')

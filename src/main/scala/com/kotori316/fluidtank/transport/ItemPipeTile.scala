@@ -15,8 +15,8 @@ import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.items.wrapper.InvWrapper
 import net.minecraftforge.items.{CapabilityItemHandler, IItemHandler, ItemHandlerHelper}
 
-class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
-  val handler = new PipeItemHandler(this)
+final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
+  private [this] final val handler = new PipeItemHandler(this)
   private[this] final var coolTime = ItemPipeTile.defaultCoolTime
   private[this] final var repeated = 0
 
