@@ -1,3 +1,7 @@
+## v14.9.8
+* Tanks can now be used as fluid source when crafting.
+  * Not consumed when crafting.
+
 ## v14.9.7
 * Imported changes from 1.15.2
     * Added void tank.
