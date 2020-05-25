@@ -14,6 +14,8 @@ import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.world.World
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
+import net.minecraftforge.fluids.FluidUtil
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, FluidTank.proxy.getTankProperties) {
   setRegistryName(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
@@ -79,4 +81,14 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
       super.tryPlace(context)
     }
   }
+
+  override def getContainerItem(itemStack: ItemStack): ItemStack = {
+    import com.kotori316.fluidtank._
+    FluidUtil.getFluidHandler(itemStack.copy()).asScala
+      .map { f => f.drain(FluidAmount.AMOUNT_BUCKET, FluidAction.EXECUTE); f.getContainer }
+      .getOrElse(itemStack)
+      .value
+  }
+
+  override def hasContainerItem(stack: ItemStack): Boolean = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag) != null
 }

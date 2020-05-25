@@ -74,6 +74,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
       return FluidStack.EMPTY
     }
     val copy = fluid.copy()
+    copy.setAmount(maxDrain)
     drain(copy, action)
   }
 
