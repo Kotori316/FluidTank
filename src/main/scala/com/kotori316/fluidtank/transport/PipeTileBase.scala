@@ -27,9 +27,9 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
     def makePosList(start: BlockPos): List[BlockPos] = {
       for {
         d <- directions
-        pos <- start.offset(d).pure[List]
+        pos = start.offset(d)
         if checked.add(pos) // True means it's first time to check the pos. False means the pos already checked.
-        state <- getWorld.getBlockState(pos).pure[List]
+        state = getWorld.getBlockState(pos)
         if state.getBlock == this.getBlockState.getBlock
         if state.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(d.getOpposite)) == PipeBlock.Connection.CONNECTED
         pos2 <- pos :: makePosList(pos)

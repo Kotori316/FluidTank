@@ -255,12 +255,14 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     left add tank.toString
   }*/
   override def tick(): Unit = {
-    if (loading && SideProxy.isServer(this)) {
-      getWorld.getProfiler.startSection("Connection Loading")
-      if (this.connection == Connection.invalid)
-        Connection.load(getWorld, getPos)
+    if (loading) {
       loading = false
-      getWorld.getProfiler.endSection()
+      if (SideProxy.isServer(this)) {
+        getWorld.getProfiler.startSection("Connection Loading")
+        if (this.connection == Connection.invalid)
+          Connection.load(getWorld, getPos)
+        getWorld.getProfiler.endSection()
+      }
     }
   }
 }

@@ -62,7 +62,7 @@ object Tiers {
       (d.asString().asScala orElse d.get("string").asString().asScala)
         .flatMap(byName)
         .getOrElse {
-          FluidTank.LOGGER.error(s"The tag '${d.getValue}' isn't have tier data.", new IllegalArgumentException("Invalid tier name."))
+          FluidTank.LOGGER.error(s"The tag '${d.getValue}' doesn't have tier data.", new IllegalArgumentException("Invalid tier name."))
           WOOD
         }
     }

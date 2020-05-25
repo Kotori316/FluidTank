@@ -14,11 +14,16 @@ class PipeItemHandler(pipeTile: ItemPipeTile) extends IItemHandler {
     var rest = stack
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
-      val handlerIterator = directions.map(dir => pipePos.offset(dir) -> dir).iterator
-        .filter { case (_, direction) => pipeTile.getWorld.getBlockState(pipePos).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput }
-        .flatMap { case (pos, direction) => pipeTile.findItemHandler(pipeTile.getWorld, pos, direction).value.value }
+      val handlerIterator =
+        for {
+          direction <- directions.iterator
+          pos = pipePos.offset(direction)
+          if pipeTile.getWorld.getBlockState(pipePos).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
+          h <- pipeTile.findItemHandler(pipeTile.getWorld, pos, direction).value.value
+        } yield h._1
+
       while (handlerIterator.hasNext) {
-        val (handler, _) = handlerIterator.next()
+        val handler = handlerIterator.next()
         rest = handler.insertItem(slot, rest, simulate)
         if (rest.isEmpty)
           return ItemStack.EMPTY

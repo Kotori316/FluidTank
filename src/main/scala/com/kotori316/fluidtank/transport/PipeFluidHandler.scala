@@ -1,7 +1,5 @@
 package com.kotori316.fluidtank.transport
 
-import cats.Eval
-import cats.data.OptionT
 import com.kotori316.fluidtank._
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
@@ -38,7 +36,7 @@ class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
       val pipePos = pipePosIterator.next()
       val handlerIterator = directions.map(dir => pipePos.offset(dir) -> dir).iterator
         .filter { case (_, direction) => pipeTile.getWorld.getBlockState(pipePos).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput }
-        .flatMap { case (pos, direction) => OptionT.fromOption[Eval](Option(pipeTile.getWorld.getTileEntity(pos)))
+        .flatMap { case (pos, direction) => Cap.make(pipeTile.getWorld.getTileEntity(pos))
           .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala).value.value
         }
       while (handlerIterator.hasNext) {

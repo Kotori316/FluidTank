@@ -30,7 +30,8 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
     }.foreach { case (f, sourcePos) =>
       for {
         p <- connection.outputNonOrdered
-        (direction, pos) <- directions.map(f => f -> p.offset(f))
+        direction <- directions
+        pos = p.offset(direction)
         if pos != sourcePos
         if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
         dest <- Cap.make(getWorld.getTileEntity(pos))
