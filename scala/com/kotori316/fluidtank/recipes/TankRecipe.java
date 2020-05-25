@@ -14,6 +14,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -24,6 +25,7 @@ import net.minecraftforge.oredict.OreIngredient;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 
 public class TankRecipe extends ShapedRecipes {
@@ -101,6 +103,18 @@ public class TankRecipe extends ShapedRecipes {
             }
         }
         return true;
+    }
+
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+        NonNullList<ItemStack> stacks = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+        for (int i = 0; i < stacks.size(); ++i) {
+            ItemStack item = inv.getStackInSlot(i);
+            if (item.getItem().hasContainerItem(item) && !(item.getItem() instanceof ItemBlockTank)) {
+                stacks.set(i, ForgeHooks.getContainerItem(item));
+            }
+        }
+        return stacks;
     }
 
     @Override

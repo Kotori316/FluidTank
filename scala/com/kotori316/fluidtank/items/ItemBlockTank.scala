@@ -14,7 +14,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.ICapabilityProvider
-import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.fluids.{Fluid, FluidStack, FluidUtil}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.JavaConverters._
@@ -97,4 +97,12 @@ class ItemBlockTank(val blockTank: AbstractTank, val rank: Int) extends ItemBloc
     }
     true
   }
+
+  override def getContainerItem(itemStack: ItemStack): ItemStack = {
+    Option(FluidUtil.getFluidHandler(itemStack.copy()))
+      .map { f => f.drain(Fluid.BUCKET_VOLUME, true); f.getContainer }
+      .getOrElse(itemStack)
+  }
+
+  override def hasContainerItem(stack: ItemStack): Boolean = stack.getSubCompound(TileTankNoDisplay.NBT_BlockTag) != null
 }

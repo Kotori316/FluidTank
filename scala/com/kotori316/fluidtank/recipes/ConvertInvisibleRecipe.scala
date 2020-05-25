@@ -14,8 +14,7 @@ object ConvertInvisibleRecipe extends IForgeRegistryEntry.Impl[IRecipe] with IRe
   override def canFit(width: Int, height: Int) = width * height >= 1
 
   override def getCraftingResult(inv: InventoryCrafting) = {
-    val stack = (for (i <- 0 until inv.getWidth;
-                      j <- 0 until inv.getHeight) yield inv.getStackInRowAndColumn(i, j)).filterNot(_.isEmpty).headOption
+    val stack = getItemInInv(inv).headOption
     stack.map(_.copy()).map(s => {
       val d = s.getItemDamage
       if ((d & 8) == 8) s.setItemDamage(~(~d | 8))
@@ -26,10 +25,20 @@ object ConvertInvisibleRecipe extends IForgeRegistryEntry.Impl[IRecipe] with IRe
   }
 
   override def matches(inv: InventoryCrafting, worldIn: World) = {
-    val stacks = (for (i <- 0 until inv.getWidth;
-                       j <- 0 until inv.getHeight) yield inv.getStackInRowAndColumn(i, j)).filterNot(_.isEmpty)
+    val stacks = getItemInInv(inv)
     stacks.size == 1 && TankIngredient.apply(stacks.head)
   }
+
+  private def getItemInInv(inv: InventoryCrafting) = {
+    for {
+      i <- 0 until inv.getWidth
+      j <- 0 until inv.getHeight
+      stack = inv.getStackInRowAndColumn(i, j)
+      if !stack.isEmpty
+    } yield stack
+  }
+
+  override def getRemainingItems(inv: InventoryCrafting): NonNullList[ItemStack] = NonNullList.withSize(inv.getSizeInventory, ItemStack.EMPTY)
 
   override def getRecipeOutput = new ItemStack(FluidTank.BLOCK_TANKS.get(0).itemBlock, 1, 8)
 
