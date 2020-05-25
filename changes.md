@@ -1,4 +1,3 @@
-## v15.2.8
-* Added item pipe.
-* Internal changes
-* Changed the number of fluid pipe crafted in the easy recipe.
+## v15.2.9
+* Tanks can now be used as fluid source when crafting.
+  * Not consumed when crafting.
