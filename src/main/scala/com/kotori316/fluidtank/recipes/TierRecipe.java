@@ -177,6 +177,20 @@ public class TierRecipe implements ICraftingRecipe {
         return allSlot().sorted(Comparator.comparing(Pair::getLeft)).map(Pair::getRight).collect(Collectors.toCollection(NonNullList::create));
     }
 
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+        NonNullList<ItemStack> stacks = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+
+        for (int i = 0; i < stacks.size(); ++i) {
+            ItemStack item = inv.getStackInSlot(i);
+            if (item.hasContainerItem() && !(item.getItem() instanceof ItemBlockTank)) {
+                stacks.set(i, item.getContainerItem());
+            }
+        }
+
+        return stacks;
+    }
+
     public Ingredient getTankItems() {
         return tankItems;
     }
