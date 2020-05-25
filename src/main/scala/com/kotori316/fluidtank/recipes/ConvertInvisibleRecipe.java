@@ -13,6 +13,7 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +46,11 @@ public class ConvertInvisibleRecipe extends SpecialRecipe {
         return stacks.size() == 1
             && stacks.get(0).getItem() instanceof ItemBlockTank
             && ((ItemBlockTank) stacks.get(0).getItem()).hasRecipe();
+    }
+
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+        return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 
     @Override
