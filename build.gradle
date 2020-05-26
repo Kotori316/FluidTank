@@ -137,11 +137,11 @@ dependencies {
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.0.0'
 
     def mc_version = "1.14.4"
-    def jei_version = "6.0.0.18"
+    def jei_version = "6.0.0.27"
     implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.6-B67_1.14.4")
 
     implementation fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
-    // https://dvs1.progwml6.com/files/maven/mezz/jei/jei-1.14.4/6.0.0.25/jei-1.14.4-6.0.0.25.jar
+    // https://dvs1.progwml6.com/files/maven/mezz/jei/jei-1.14.4/6.0.0.27/jei-1.14.4-6.0.0.27.jar
     implementation(fg.deobf("immersive-engineering:ImmersiveEngineering:0.14:96"))
 
     compileOnly("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.32-alpha-9:api")
