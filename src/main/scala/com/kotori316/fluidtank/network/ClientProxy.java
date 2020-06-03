@@ -25,6 +25,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.CollectionConverters;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -50,7 +51,7 @@ public class ClientProxy extends SideProxy {
     @Override
     public Option<World> getWorld(NetworkEvent.Context context) {
         Optional<World> world = LogicalSidedProvider.CLIENTWORLD.get(context.getDirection().getReceptionSide());
-        return fromJava(world);
+        return OptionConverters.toScala(world);
     }
 
     @Override

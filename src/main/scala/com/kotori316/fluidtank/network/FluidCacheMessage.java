@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.FluidTank;
@@ -49,9 +50,12 @@ public class FluidCacheMessage {
     }
 
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
-        FluidTank.proxy.getWorld(ctx.get()).filter(w -> w.getDimension().getType().getId() == dimensionId)
-            .map(w -> ((CATTile) w.getTileEntity(pos)))
-            .foreach(tile -> ctx.get().enqueueWork(() -> tile.fluidCache = this.amounts));
+        OptionConverters.toJava(FluidTank.proxy.getWorld(ctx.get()))
+            .filter(w -> w.getDimension().getType().getId() == dimensionId)
+            .map(w -> w.getTileEntity(pos))
+            .filter(CATTile.class::isInstance)
+            .map(CATTile.class::cast)
+            .ifPresent(tile -> ctx.get().enqueueWork(() -> tile.fluidCache = this.amounts));
         ctx.get().setPacketHandled(true);
     }
 }

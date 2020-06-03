@@ -1,12 +1,9 @@
 package com.kotori316.fluidtank.network;
 
-import java.util.Optional;
-
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
-import scala.Option;
 
 public abstract class SideProxy {
 
@@ -20,12 +17,4 @@ public abstract class SideProxy {
 
     public abstract Item.Properties getTankProperties();
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // Just a converting method.
-    protected static <T> Option<T> fromJava(Optional<T> option) {
-        if (option.isPresent()) {
-            return Option.apply(option.get());
-        } else {
-            return Option.empty();
-        }
-    }
 }

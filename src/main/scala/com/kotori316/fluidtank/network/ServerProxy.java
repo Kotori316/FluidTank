@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.ModObjects;
 
@@ -14,7 +15,7 @@ public class ServerProxy extends SideProxy {
 
     @Override
     public Option<World> getWorld(NetworkEvent.Context context) {
-        return fromJava(Optional.ofNullable(context.getSender()).map(Entity::getEntityWorld));
+        return OptionConverters.toScala(Optional.ofNullable(context.getSender()).map(Entity::getEntityWorld));
     }
 
     @Override
