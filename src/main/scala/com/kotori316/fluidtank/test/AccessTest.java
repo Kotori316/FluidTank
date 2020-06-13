@@ -27,4 +27,8 @@ class AccessTest {
     void failTest() {
         fail("Fail Test");
     }
+
+    void notCompile() {
+        1 + 1;
+    }
 }
