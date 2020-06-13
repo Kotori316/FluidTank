@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.test;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,6 +23,7 @@ class AccessTest {
     }
 
     @Test
+    @Disabled
     void failTest() {
         fail("Fail Test");
     }
