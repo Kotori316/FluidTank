@@ -291,6 +291,12 @@ task signJar2() {
 if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
     // Runs this task automatically when build is ran.
     assemble.dependsOn(signJar2)
+} else {
+    // In CI
+    tasks.withType(JavaExec) {
+        // Avoid error of GL
+        systemProperty("fml.earlyprogresswindow", false)
+    }
 }
 
 void moveOldLog() {
