@@ -3,6 +3,7 @@ package com.kotori316.fluidtank;
 import java.util.Optional;
 
 import scala.Option;
+import scala.jdk.javaapi.OptionConverters;
 
 public class Utils {
     public static int toInt(long l) {
@@ -15,11 +16,7 @@ public class Utils {
     }
 
     public static <T> Optional<T> toJava(Option<T> option) {
-        if (option != null && option.isDefined()) {
-            return Optional.ofNullable(option.get());
-        } else {
-            return Optional.empty();
-        }
+        return OptionConverters.toJava(option);
     }
 
     @SuppressWarnings({"unused", "SpellCheckingInspection"})

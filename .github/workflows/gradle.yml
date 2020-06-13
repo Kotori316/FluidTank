@@ -27,7 +27,7 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - name: Test-RunData
-        run: chmod +x ./gradlew && ./gradlew -Dfml.earlyprogresswindow=false runData --info
+        run: chmod +x ./gradlew && ./gradlew -Dfml.earlyprogresswindow=false runData
         continue-on-error: true
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
