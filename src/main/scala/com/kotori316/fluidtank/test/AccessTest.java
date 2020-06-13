@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class AccessTest {
     @Test
@@ -18,5 +19,10 @@ class AccessTest {
     @Test
     void tag() {
         assertTrue(FluidTags.WATER.getAllElements().isEmpty(), "Tag is empty.");
+    }
+
+    @Test
+    void failTest() {
+        fail("Fail Test");
     }
 }
