@@ -71,7 +71,7 @@ class FluidAmountTest {
     }
     locally {
       val lw = FluidAmount.BUCKET_LAVA + FluidAmount.BUCKET_WATER
-      assertTrue(FluidAmount.BUCKET_WATER.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === lw)
+      assertTrue(FluidAmount.BUCKET_LAVA.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === lw)
       assertEquals(Fluids.LAVA, lw.fluid)
     }
   }
