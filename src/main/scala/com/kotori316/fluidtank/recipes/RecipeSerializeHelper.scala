@@ -47,7 +47,9 @@ object RecipeSerializeHelper {
     t
   }
 
-  val TierRecipeSerializer: DynamicSerializable[TierRecipe] = new DynamicSerializable[TierRecipe] {
+  val TierRecipeSerializer: DynamicSerializable[TierRecipe] = TierRecipeSerializerObj
+
+  private object TierRecipeSerializerObj extends DynamicSerializable[TierRecipe] {
     private[this] final val LOGGER = org.apache.logging.log4j.LogManager.getLogger(classOf[TierRecipe])
 
     import cats._
@@ -77,11 +79,14 @@ object RecipeSerializeHelper {
     }
   }
 
-  implicit val IngredientSerialize: DynamicSerializable[Ingredient] = new DynamicSerializable[Ingredient] {
+  implicit val IngredientSerialize: DynamicSerializable[Ingredient] = IngredientSerializeObj
+
+  private object IngredientSerializeObj extends DynamicSerializable[Ingredient] {
     override def serialize[DataType](t: Ingredient)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] =
       new datafixers.Dynamic(JsonOps.INSTANCE, t.serialize()).convert(ops)
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Ingredient =
       Ingredient.deserialize(d.convert(JsonOps.INSTANCE).getValue)
   }
+
 }
