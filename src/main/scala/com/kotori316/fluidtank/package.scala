@@ -74,18 +74,6 @@ package object fluidtank {
     override def apply[A](fa: Eval[A]): A = fa.value
   }
 
-  implicit class SOM[T](private val o: java.util.Optional[T]) extends AnyVal {
-    def scalaMap[B](f: T => B): Option[B] = toScalaOption(o).map(f)
-
-    def scalaFilter(p: T => Boolean): Option[T] = toScalaOption(o).filter(p)
-
-    def asScala: Option[T] = toScalaOption(o)
-
-    def toList: List[T] = if (o.isPresent) List(o.get()) else Nil
-  }
-
-  def toScalaOption[T](o: java.util.Optional[T]): Option[T] = if (o.isPresent) Some(o.get()) else None
-
   implicit final val NeighborOfBlockPos: Neighbor[BlockPos] = (origin: BlockPos) => Set(
     origin.up, origin.down, origin.north, origin.east, origin.south, origin.west
   )

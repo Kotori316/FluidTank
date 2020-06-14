@@ -12,6 +12,7 @@ import net.minecraft.nbt.INBT
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
+import scala.jdk.OptionConverters._
 
 class Tiers private(val rank: Int, buckets: Int, override val toString: String, val tagName: String, val hasTagRecipe: Boolean) {
   val lowerName: String = toString.toLowerCase
@@ -59,7 +60,7 @@ object Tiers {
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Tiers = {
-      (d.asString().asScala orElse d.get("string").asString().asScala)
+      (d.asString().toScala orElse d.get("string").asString().toScala)
         .flatMap(byName)
         .getOrElse {
           FluidTank.LOGGER.error(s"The tag '${d.getValue}' doesn't have tier data.", new IllegalArgumentException("Invalid tier name."))

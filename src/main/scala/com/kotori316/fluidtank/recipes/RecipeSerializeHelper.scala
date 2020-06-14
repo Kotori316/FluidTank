@@ -52,6 +52,7 @@ object RecipeSerializeHelper {
 
     import cats._
     import cats.implicits._
+    import scala.jdk.OptionConverters._
 
     override def serialize[DataType](t: TierRecipe)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
       val map = ops.emptyMap().pure[Id]
@@ -62,11 +63,11 @@ object RecipeSerializeHelper {
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): TierRecipe = {
-      val recipeId = d.get(TierRecipe.KEY_ID).asString().asScala.map(new ResourceLocation(_)).get
-      val tiers = d.get(TierRecipe.KEY_TIER).get().asScala
+      val recipeId = d.get(TierRecipe.KEY_ID).asString().toScala.map(new ResourceLocation(_)).get
+      val tiers = d.get(TierRecipe.KEY_TIER).get().toScala
         .map(DynamicSerializable[Tiers].deserialize)
         .getOrElse(Tiers.Invalid)
-      val subItem = d.get(TierRecipe.KEY_SUB_ITEM).get().asScala
+      val subItem = d.get(TierRecipe.KEY_SUB_ITEM).get().toScala
         .map(DynamicSerializable[Ingredient].deserialize)
         .getOrElse(Ingredient.EMPTY)
       if (subItem == Ingredient.EMPTY)

@@ -115,6 +115,7 @@ object FluidAmount {
   implicit val showFA: Show[FluidAmount] = Show.fromToString
 
   implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
+    import scala.jdk.OptionConverters._
     override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
       val map = Map[String, DataType](
         NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
@@ -126,7 +127,7 @@ object FluidAmount {
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): FluidAmount = {
-      val fluidName = d.get(NBT_fluid).asString().asScala
+      val fluidName = d.get(NBT_fluid).asString().toScala
         .map(s => new ResourceLocation(s))
         .getOrElse(Fluids.EMPTY.getRegistryName)
       val fluid = registry.getValue(fluidName)
@@ -134,7 +135,7 @@ object FluidAmount {
         EMPTY
       } else {
         val amount = d.get(NBT_amount).asLong(0L)
-        val nbt = d.getElement(NBT_tag).scalaMap(c => datafixers.Dynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
+        val nbt = d.getElement(NBT_tag).toScala.map(c => datafixers.Dynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
           .collect { case t: CompoundNBT if !t.isEmpty => t }
         FluidAmount(fluid, amount, nbt)
       }
