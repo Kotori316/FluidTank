@@ -10,8 +10,9 @@ import com.mojang.datafixers.types.JsonOps
 import net.minecraft.nbt.{INBT, NBTDynamicOps}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
 
-class DynamicSerializableTest {
+class TierTest {
   implicit val eqNBT: Eq[INBT] = Eq.fromUniversalEquals
   implicit val eqJson: Eq[JsonElement] = Eq.fromUniversalEquals
 
@@ -31,5 +32,15 @@ class DynamicSerializableTest {
     assertTrue(serializedJson === convertedToJson)
     assertEquals(serializedJson, convertedToJson)
     assertEquals(serializedNBT, convertedToNBT)
+  }
+
+  @Test
+  def recipeIfTagDefined(): Unit = {
+    val tiers = Tiers.list.toList
+    val tests = tiers.map[Executable] { t =>
+      val predicate: String => Boolean = if (t.hasTagRecipe) s => s.contains(":") && s.toLowerCase.contains(t.lowerName) else _ => true
+      () => assertTrue(predicate(t.tagName), s"Tag check of $t.")
+    }
+    assertAll(tests: _*)
   }
 }
