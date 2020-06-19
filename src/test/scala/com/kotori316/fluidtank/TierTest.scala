@@ -43,4 +43,17 @@ class TierTest {
     }
     assertAll(tests: _*)
   }
+
+  @Test
+  def tierMaxIsLessThanNextTierMin(): Unit = {
+    val max = Tiers.list.groupBy(_.rank).map { case (i, value) => i -> value.maxBy(_.amount) }.toSeq.sortBy(_._1)
+    val min = Tiers.list.groupBy(_.rank).map { case (i, value) => i -> value.minBy(_.amount) }.toSeq.sortBy(_._1)
+    assertAll((max.dropRight(1) zip min.drop(1)).flatMap {
+      case ((maxL, maxAmount), (minL, minAmount)) =>
+        List.apply[Executable](
+          () => assertTrue(maxL < minL, s"Rank check of $maxL, $minL."),
+          () => assertTrue(maxAmount.amount * 4 <= minAmount.amount, s"Amount check of $maxAmount, $minAmount."),
+        )
+    }: _*)
+  }
 }
