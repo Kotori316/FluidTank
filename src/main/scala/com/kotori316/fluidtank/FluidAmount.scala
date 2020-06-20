@@ -113,6 +113,7 @@ object FluidAmount {
     else IFluidHandler.FluidAction.SIMULATE
 
   implicit val showFA: Show[FluidAmount] = Show.fromToString
+  implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
 
   implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
     import scala.jdk.OptionConverters._

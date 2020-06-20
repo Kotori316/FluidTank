@@ -3,27 +3,37 @@ name: PullRequest Test
 on:
   pull_request:
     branches:
-      - 1.14.3
       - 1.15.1
 
 jobs:
   compile-check:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        # test against latest update of each major Java version, as well as specific updates of LTS versions:
+        java: [ 1.8, 11 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 1.8
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: ${{ matrix.java }}
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/forge_version.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Precompile
-        run: chmod +x ./gradlew && ./gradlew compileScala test --continue
+          key: ${{ runner.os }}-gradle15-${{ hashFiles('**/forge_version.properties') }}
+      - name: Test-JUnit
+        run: chmod +x ./gradlew && ./gradlew test
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Test-RunData
+        run: chmod +x ./gradlew && ./gradlew -Dfml.earlyprogresswindow=false runData
+        continue-on-error: true
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      - id: check-error
+        run: |
+          ! [ -f error-trace.txt ]
+      - id: show-failure-log
+        if: failure()
+        run: cat error-trace.txt

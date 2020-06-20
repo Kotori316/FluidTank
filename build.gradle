@@ -162,8 +162,9 @@ dependencies {
         implementation("scalable-cats-force:ScalableCatsForce-2.13.2-build:2:dev")
     }
     // Test Dependencies.
-    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')
-    testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2')
+    implementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')
+    runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2')
+    implementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.6.2')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -291,6 +292,12 @@ task signJar2() {
 if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
     // Runs this task automatically when build is ran.
     assemble.dependsOn(signJar2)
+} else {
+    // In CI
+    tasks.withType(JavaExec) {
+        // Avoid error of GL
+        systemProperty("fml.earlyprogresswindow", false)
+    }
 }
 
 void moveOldLog() {
