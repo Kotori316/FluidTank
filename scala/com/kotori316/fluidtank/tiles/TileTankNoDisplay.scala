@@ -34,6 +34,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
   var connection = Connection.invalid
   var loading = false
   var stackName: String = _
+  val fluidHandlerWrapper = new Connection.HandlerWrapper(() => this.connection)
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
     compound.setTag(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new NBTTagCompound))
@@ -79,7 +80,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     if (loading && SideProxy.isServer(this)) {
       getWorld.profiler.startSection("Connection Loading")
       if (this.connection == Connection.invalid)
-      Connection.load(getWorld, getPos)
+        Connection.load(getWorld, getPos)
       loading = false
       getWorld.profiler.endSection()
     }
@@ -90,6 +91,10 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
       // com.kotori316.fluidtank.FluidTank.LOGGER.info("Called getCapability in client side.")
       // Returning handler on client side? Not recommend, but Evil Craft requires this. See https://github.com/Kotori316/FluidTank/issues/14 .
       return net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.tank)
+    }
+    if (capability == net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+      // Ender IO tries to cache fluid handler. So we have to have mutable handler.
+      return net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.fluidHandlerWrapper)
     }
     val c = connection.getCapability(capability, facing)
     if (c != null) c else super.getCapability(capability, facing)

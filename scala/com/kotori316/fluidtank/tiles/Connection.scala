@@ -265,4 +265,15 @@ object Connection {
       .toList.map(_.asInstanceOf[TileTankNoDisplay])
     createAndInit(tanks)
   }
+
+  class HandlerWrapper(supplier: () => Connection) extends IFluidHandler {
+    override def getTankProperties: Array[IFluidTankProperties] = supplier().handler.getTankProperties
+
+    override def fill(resource: FluidStack, doFill: Boolean): Int = supplier().handler.fill(resource, doFill)
+
+    override def drain(resource: FluidStack, doDrain: Boolean): FluidStack = supplier().handler.drain(resource, doDrain)
+
+    override def drain(maxDrain: Int, doDrain: Boolean): FluidStack = supplier().handler.drain(maxDrain, doDrain)
+  }
+
 }
