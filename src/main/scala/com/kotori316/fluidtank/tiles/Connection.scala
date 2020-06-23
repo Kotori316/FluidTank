@@ -14,7 +14,7 @@ import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher,
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -124,6 +124,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   val handler: FluidAmount.Tank = new TankHandler
+  private[tiles] final val lazyOptional: LazyOptional[IFluidHandler] = LazyOptional.of(() => handler)
 
   val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
@@ -161,8 +162,16 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
     val s1Connection = Connection.create(s1)
     val s2Connection = Connection.create(s2.tail)
-    s1.foreach(_.connection = s1Connection)
-    s2.tail.foreach(_.connection = s2Connection)
+    // Connection updated
+    this.lazyOptional.invalidate()
+    s1.foreach { t =>
+      t.connection.lazyOptional.invalidate()
+      t.connection = s1Connection
+    }
+    s2.tail.foreach { t =>
+      t.connection.lazyOptional.invalidate()
+      t.connection = s2Connection
+    }
   }
 
   def getComparatorLevel: Int = {
@@ -176,12 +185,14 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    Cap.asJava(
-      Cap.empty[T]
-        .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
-        .orElse(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.make[T](capability, handler))
-        .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
-    )
+    if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+      lazyOptional.cast()
+    else
+      Cap.asJava(
+        Cap.empty[T]
+          .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
+          .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
+      )
   }
 
   @inline // This is just a bridge method to suppress inspection.
@@ -226,7 +237,10 @@ object Connection {
       val content: FluidAmount = (for (t <- s1) yield t.tank.drain(t.tank.getFluid, doDrain = true)).reduce(_ + _)
       val connection = Connection.create(s1)
       connection.handler.fill(content, doFill = true)
-      s1.foreach(_.connection = connection)
+      s1.foreach { t =>
+        t.connection.lazyOptional.invalidate()
+        t.connection = connection
+      }
       if (s2.nonEmpty) createAndInit(s2)
     }
   }
