@@ -3,14 +3,19 @@ package com.kotori316.fluidtank.transport
 import cats.implicits._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.{CapabilityFluidTank, Tiers}
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.Direction
+import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
+
+import scala.ref.WeakReference
 
 final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
   private[this] val handler = new PipeFluidHandler(this)
+  private[this] val weakValueMap = scala.collection.mutable.Map.empty[(BlockPos, Direction), WeakReference[LazyOptional[IFluidHandler]]]
 
   override def tick(): Unit = if (!world.isRemote) {
     if (connection.isEmpty)
@@ -21,7 +26,7 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
         val sourcePos = pos.offset(direction)
         val c = for {
           t <- Cap.make(getWorld.getTileEntity(sourcePos))
-          cap <- t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala
+          cap <- getCapFromCache(t, sourcePos, direction.getOpposite)
         } yield cap -> sourcePos
         c.toList
       } else {
@@ -34,9 +39,8 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
         pos = p.offset(direction)
         if pos != sourcePos
         if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-        dest <- Cap.make(getWorld.getTileEntity(pos))
-          .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala)
-          .toList
+        t <- Option(getWorld.getTileEntity(pos)).toList
+        dest <- getCapFromCache(t, pos, direction.getOpposite).toList
         if f != dest
       } {
         val transferSimulate = FluidUtil.tryFluidTransfer(dest, f, PipeTile.amountPerTick, false)
@@ -45,6 +49,19 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
         }
       }
     }
+  }
+
+  private def getCapFromCache(t: TileEntity, pos: BlockPos, dOfTile: Direction): Cap[IFluidHandler] = {
+    def getAndCacheCap(): LazyOptional[IFluidHandler] = {
+      val o = t.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dOfTile)
+      weakValueMap.put((pos, dOfTile), WeakReference(o))
+      o
+    }
+
+    weakValueMap.get((pos, dOfTile)).map {
+      case WeakReference(opt) => if (opt.isPresent) opt else getAndCacheCap() // Invalid Cap
+      case _ => getAndCacheCap() // Instance gc-ed.
+    }.getOrElse(getAndCacheCap() /*Not cached*/).asScala
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
