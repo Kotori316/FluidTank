@@ -195,9 +195,6 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
       )
   }
 
-  @inline // This is just a bridge method to suppress inspection.
-  def getCapabilityDummy[T](capability: Capability[T], facing: Direction): LazyOptional[T] = this.getCapability(capability, facing)
-
   override def toString: String = {
     val name = getFluidStack.fold("null")(_.getLocalizedName)
     if (!hasCreative)

@@ -77,7 +77,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = handleUpdateTag(pkt.getNbtCompound)
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    val c = connection.getCapabilityDummy(capability, facing)
+    val c = connection.getCapability(capability, facing)
     if (c.isPresent) c else super.getCapability(capability, facing)
   }
 
@@ -155,9 +155,10 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     }
 
     def writeToNBT(nbt: CompoundNBT): CompoundNBT = {
-      fluid.write(nbt)
-      nbt.putInt(TileTankNoDisplay.NBT_Capacity, capacity)
+      import scala.util.chaining._
       nbt
+        .tap(fluid.write)
+        .tap(_.putInt(TileTankNoDisplay.NBT_Capacity, capacity))
     }
 
     override def toString: String = {

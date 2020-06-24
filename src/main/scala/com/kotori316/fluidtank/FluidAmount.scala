@@ -14,7 +14,9 @@ import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 
-import scala.jdk.javaapi.CollectionConverters
+import scala.jdk.CollectionConverters._
+import scala.jdk.OptionConverters._
+import scala.util.chaining._
 
 case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
   def setAmount(newAmount: Long): FluidAmount = {
@@ -64,8 +66,8 @@ object FluidAmount {
       case Items.WATER_BUCKET => BUCKET_WATER
       case Items.MILK_BUCKET => BUCKET_MILK
       case bucket: BucketItem =>
-        bucket.pure[Id].map(_.getFluid).map(FluidAmount(_, AMOUNT_BUCKET, None))
-      case _ => FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY).pure[Id].map(fromStack)
+        bucket.pipe(_.getFluid).pipe(FluidAmount(_, AMOUNT_BUCKET, None))
+      case _ => FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY).pipe(fromStack)
     }
   }
 
@@ -116,7 +118,6 @@ object FluidAmount {
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
 
   implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
-    import scala.jdk.OptionConverters._
     override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
       val map = Map[String, DataType](
         NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
@@ -124,7 +125,7 @@ object FluidAmount {
       ) ++ t.nbt.map(c => NBT_tag -> datafixers.Dynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
 
       val data = map.map { case (key, data) => ops.createString(key) -> data }
-      new datafixers.Dynamic[DataType](ops, ops.createMap(CollectionConverters.asJava(data)))
+      new datafixers.Dynamic[DataType](ops, ops.createMap(data.asJava))
     }
 
     override def deserialize[DataType](d: datafixers.Dynamic[DataType]): FluidAmount = {
