@@ -56,4 +56,13 @@ class TierTest {
         )
     }: _*)
   }
+
+  @Test
+  def allInstanceIsNotSame(): Unit = {
+    val as = Tiers.list.toList.combinations(2).map[Executable] { buf =>
+      val List(a, b) = buf
+      () => assertTrue(a =!= b, s"$a =!= $b")
+    }.toSeq
+    assertAll(as: _*)
+  }
 }

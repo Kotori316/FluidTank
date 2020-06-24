@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.tiles
 
 import java.util.Collections
 
-import cats.kernel.Eq
+import cats.kernel.Hash
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
 import com.mojang.datafixers
@@ -20,6 +20,11 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
   Tiers.list.append(this)
 
   override def hashCode(): Int = rank.hashCode ^ amount.hashCode ^ toString.hashCode
+
+  override def equals(obj: Any): Boolean = obj match {
+    case that: Tiers => this.rank == that.rank && this.amount == that.amount && this.toString == that.toString
+    case _ => false
+  }
 
   def toNBTTag: INBT = this.asInstanceOf[Tiers].toNBT
 }
@@ -52,7 +57,7 @@ object Tiers {
 
   def byName(s: String): Option[Tiers] = list.find(_.toString.equalsIgnoreCase(s))
 
-  implicit val EqTiers: Eq[Tiers] = Eq.fromUniversalEquals
+  implicit val EqTiers: Hash[Tiers] = Hash.fromUniversalHashCode
 
   implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable[Tiers] {
     override def serialize[DataType](t: Tiers)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
