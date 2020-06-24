@@ -3,14 +3,21 @@ package com.kotori316.fluidtank.transport
 import cats.implicits._
 import com.kotori316.fluidtank.network.{PacketHandler, TileMessage}
 import com.kotori316.fluidtank.{FluidTank, _}
+import javax.annotation.Nonnull
 import net.minecraft.item.DyeColor
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity, TileEntityType}
+import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
+import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.util.LazyOptional
+
+import scala.ref.WeakReference
 
 abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEntity(t) with ITickableTileEntity {
   var connection: PipeConnection2[BlockPos] = getEmptyConnection
   private[this] final var color = Int.unbox(Config.content.pipeColor.get())
+  private[this] val weakValueMap = scala.collection.mutable.Map.empty[(BlockPos, Direction, Capability[_]), WeakReference[LazyOptional[_]]]
 
   private def getEmptyConnection: PipeConnection2[BlockPos] = PipeConnection2.empty { p =>
     val state = getWorld.getBlockState(p)
@@ -80,5 +87,23 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
         case _ =>
       }
     }
+  }
+
+  protected def getCapFromCache[CapType](@Nonnull t: TileEntity, pos: BlockPos, dOfTile: Direction, cap: Capability[CapType]): Cap[CapType] = {
+    def getAndCacheCap(): LazyOptional[CapType] = {
+      val o = t.getCapability(cap, dOfTile)
+      if (o.isPresent)
+        weakValueMap.put((pos, dOfTile, cap), WeakReference(o))
+      o
+    }
+
+    weakValueMap.get((pos, dOfTile, cap)).map {
+      case WeakReference(opt) => if (opt.isPresent) opt else getAndCacheCap() // Invalid Cap
+      case _ => getAndCacheCap() // Instance gc-ed.
+    }.getOrElse(getAndCacheCap() /*Not cached*/).asScala.asInstanceOf[Cap[CapType]]
+  }
+
+  def removeCapCache(tilePos: BlockPos): Unit = {
+    weakValueMap.partition { case ((p, _, _), _) => p == tilePos }._2.values.foreach(_.underlying.clear())
   }
 }

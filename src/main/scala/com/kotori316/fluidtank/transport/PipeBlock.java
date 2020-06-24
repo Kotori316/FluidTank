@@ -240,6 +240,7 @@ public abstract class PipeBlock extends Block {
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
         BlockState fromState = worldIn.getBlockState(fromPos);
+        // Update connection between pipes.
         if (fromState.getBlock() == this) {
             BlockPos vec = fromPos.subtract(pos);
             Direction direction = Direction.byLong(vec.getX(), vec.getY(), vec.getZ());
@@ -250,6 +251,11 @@ public abstract class PipeBlock extends Block {
                     worldIn.setBlockState(pos, state.with(FACING_TO_PROPERTY_MAP.get(direction), Connection.CONNECTED));
                 }
             }
+        }
+        // Update handlers
+        if (!worldIn.isRemote) {
+            Optional.ofNullable((PipeTileBase) worldIn.getTileEntity(pos))
+                .ifPresent(t -> t.removeCapCache(fromPos));
         }
     }
 

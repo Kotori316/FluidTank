@@ -73,7 +73,7 @@ final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
   def findItemHandler(world: World, pos: BlockPos, direction: Direction): OptionT[Eval, (IItemHandler, BlockPos)] = {
     def tileCap: OptionT[Eval, (IItemHandler, BlockPos)] = for {
       t <- Cap.make(world.getTileEntity(pos))
-      cap <- t.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite).asScala
+      cap <- getCapFromCache(t, pos, direction.getOpposite, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
     } yield cap -> pos
 
     def entityCap: OptionT[Eval, (IItemHandler, BlockPos)] = for {
