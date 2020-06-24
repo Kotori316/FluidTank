@@ -26,7 +26,7 @@ final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
     import scala.jdk.CollectionConverters._
     coolTime -= 1
     if (coolTime <= 0) {
-      val handlers = PipeBlock.FACING_TO_PROPERTY_MAP.asScala.toSeq.flatMap { case (direction, value) =>
+      val handlers = PipeBlock.FACING_TO_PROPERTY_MAP.asScala.flatMap { case (direction, value) =>
         if (getBlockState.get(value).isInput) {
           val sourcePos = pos.offset(direction)
           val c = findItemHandler(getWorld, sourcePos, direction)
@@ -37,7 +37,7 @@ final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
       }
       if (handlers.nonEmpty) {
         val outputPoses = connection.outputs(getPos)
-        handlers.foreach { case (f, sourcePos) =>
+        handlers.foreachEntry { (f, sourcePos) =>
           val func = (i: Int) => Option(f.extractItem(i, ItemPipeTile.transferItemCount, true)).filterNot(_.isEmpty).map(item => i -> item)
           for {
             p <- outputPoses

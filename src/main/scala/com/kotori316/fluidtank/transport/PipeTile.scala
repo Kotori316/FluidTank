@@ -16,7 +16,7 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
     if (connection.isEmpty)
       makeConnection()
     import scala.jdk.CollectionConverters._
-    PipeBlock.FACING_TO_PROPERTY_MAP.asScala.toSeq.flatMap { case (direction, value) =>
+    PipeBlock.FACING_TO_PROPERTY_MAP.asScala.flatMap { case (direction, value) =>
       if (getBlockState.get(value).isInput) {
         val sourcePos = pos.offset(direction)
         val c = for {
@@ -27,7 +27,7 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
       } else {
         List.empty
       }
-    }.foreach { case (f, sourcePos) =>
+    }.foreachEntry { (f, sourcePos) =>
       for {
         p <- connection.outputNonOrdered
         direction <- directions
