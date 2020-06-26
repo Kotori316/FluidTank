@@ -32,10 +32,10 @@ object Tiers {
   val list: ArrayBuffer[Tiers] = mutable.ArrayBuffer.empty[Tiers]
 
   val Invalid = new Tiers(0, 0, "Invalid", "Unknown", hasTagRecipe = false)
-  val WOOD = new Tiers(1, 1 << 2, "Wood", "minecraft:logs", hasTagRecipe = false)
-  val STONE = new Tiers(2, 1 << 4, "Stone", "forge:stone", hasTagRecipe = true)
-  val IRON = new Tiers(3, 1 << 8, "Iron", "forge:ingots/iron", hasTagRecipe = true)
-  val GOLD = new Tiers(4, 1 << 12, "Gold", "forge:ingots/gold", hasTagRecipe = true)
+  val WOOD = new Tiers(1, 4, "Wood", "minecraft:logs", hasTagRecipe = false)
+  val STONE = new Tiers(2, 16, "Stone", "forge:stone", hasTagRecipe = true)
+  val IRON = new Tiers(3, 256, "Iron", "forge:ingots/iron", hasTagRecipe = true)
+  val GOLD = new Tiers(4, 4096, "Gold", "forge:ingots/gold", hasTagRecipe = true)
   val DIAMOND = new Tiers(5, 1 << 14, "Diamond", "forge:gems/diamond", hasTagRecipe = true)
   val EMERALD = new Tiers(6, 1 << 16, "Emerald", "forge:gems/emerald", hasTagRecipe = true)
   val STAR = new Tiers(7, 1 << 20, "Star", "forge:nether_stars", hasTagRecipe = true)
@@ -44,11 +44,11 @@ object Tiers {
   }
   val VOID = new Tiers(0, 0, "Void", "Unknown", hasTagRecipe = false)
 
-  val COPPER = new Tiers(2, 1 << 5, "Copper", "forge:ingots/copper", hasTagRecipe = true)
-  val TIN = new Tiers(2, 1 << 6, "Tin", "forge:ingots/tin", hasTagRecipe = true)
-  val BRONZE = new Tiers(3, 1 << 9, "Bronze", "forge:ingots/bronze", hasTagRecipe = true)
-  val LEAD = new Tiers(3, 1 << 8, "Lead", "forge:ingots/lead", hasTagRecipe = true)
-  val SILVER = new Tiers(3, 1 << 10, "Silver", "forge:ingots/silver", hasTagRecipe = true)
+  val COPPER = new Tiers(2, 40, "Copper", "forge:ingots/copper", hasTagRecipe = true)
+  val TIN = new Tiers(2, 48, "Tin", "forge:ingots/tin", hasTagRecipe = true)
+  val BRONZE = new Tiers(3, 384, "Bronze", "forge:ingots/bronze", hasTagRecipe = true)
+  val LEAD = new Tiers(3, 192, "Lead", "forge:ingots/lead", hasTagRecipe = true)
+  val SILVER = new Tiers(3, 1024, "Silver", "forge:ingots/silver", hasTagRecipe = true)
 
   def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
 
