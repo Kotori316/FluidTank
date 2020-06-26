@@ -30,6 +30,8 @@ object FluidTankDataProvider {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
       event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator))
+    }
+    if (event.includeDev) {
       event.getGenerator.addProvider(Starter.getInstance())
     }
   }
@@ -157,7 +159,7 @@ object FluidTankDataProvider {
         .addCondition(EasyCondition.getInstance())
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
-          .addTagCondition(ItemTags.makeWrapperTag(tier.tagName))
+          //          .addTagCondition(ItemTags.makeWrapperTag(tier.tagName))
           .addCondition(ConfigCondition.getInstance()))
       val FLUID_SOURCE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockSource)
