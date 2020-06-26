@@ -5,8 +5,7 @@ import cats.implicits._
 import com.google.gson.JsonElement
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank.tiles.Tiers
-import com.mojang.datafixers.Dynamic
-import com.mojang.datafixers.types.JsonOps
+import com.mojang.serialization.{JsonOps, Dynamic => SerializeDynamic}
 import net.minecraft.nbt.{INBT, NBTDynamicOps}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
@@ -21,13 +20,13 @@ class TierTest {
     val serializedJson = tiers.map(_.toJson)
 
     val d = serializedJson
-      .map(new Dynamic(JsonOps.INSTANCE, _))
+      .map(new SerializeDynamic(JsonOps.INSTANCE, _))
       .map(DynamicSerializable[Tiers].deserialize)
     assertEquals(tiers, d)
 
     val serializedNBT = tiers.map(_.toNBT)
-    val convertedToJson = serializedNBT.map(j => Dynamic.convert(NBTDynamicOps.INSTANCE, JsonOps.INSTANCE, j))
-    val convertedToNBT = serializedJson.map(j => Dynamic.convert(JsonOps.INSTANCE, NBTDynamicOps.INSTANCE, j))
+    val convertedToJson = serializedNBT.map(j => SerializeDynamic.convert(NBTDynamicOps.INSTANCE, JsonOps.INSTANCE, j))
+    val convertedToNBT = serializedJson.map(j => SerializeDynamic.convert(JsonOps.INSTANCE, NBTDynamicOps.INSTANCE, j))
     assertTrue(serializedNBT === convertedToNBT)
     assertTrue(serializedJson === convertedToJson)
     assertEquals(serializedJson, convertedToJson)
