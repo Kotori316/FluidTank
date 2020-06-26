@@ -3,7 +3,7 @@ name: PullRequest Test
 on:
   pull_request:
     branches:
-      - 1.15.1
+      - 1.16
 
 jobs:
   compile-check:

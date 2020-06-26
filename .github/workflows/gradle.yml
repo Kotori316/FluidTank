@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
     branches:
-      - 1.15.1
+      - 1.16
 
 jobs:
   check:
