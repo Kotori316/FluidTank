@@ -1,6 +1,6 @@
 # FluidTank
 
-For Minecraft 1.15.2 (1.15.1 branch)
+For Minecraft 1.16.1 (1.16 branch)
 
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
 [![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
@@ -16,7 +16,7 @@ Add large tanks that can have up to 1048576 buckets of fluid.
 There are 7 tiers in this mod, Wood, Stone, Iron, Gold, Diamond, Emerald and Star.
 The capacity of wood tank is 4000 mB but star one can have 1048576000 mB.
 
-All tanks have Fluid Capability to transfer fluid and their items also have Fluid Capability for items.
+All tanks have Fluid Capability to transfer fluid, and their items also have Fluid Capability for items.
 
 See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more information.
 
@@ -25,10 +25,10 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ### APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.15.2, newer than 1.15.2-31.0.1
+  * For Minecraft 1.16.1, newer than 1.16.1-32.0.6
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-  * Version 2.13.1
+  * Version 2.13.3
   * Licenced under the Apache License 2.0
 
 * **REQUIRED** [Cats](https://github.com/typelevel/cats)
@@ -39,8 +39,8 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
   * Licensed under the MIT License
   * Not used since 1.14.4
 
-* [Hwyla](https://github.com/TehNut/HWYLA/tree/1.15_forge)
+* ~[Hwyla](https://github.com/TehNut/HWYLA/tree/1.15_forge)~
   * Licensed under CC BY-NC-SA 4.0
 
-* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.15)
+* ~[The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.15)~
   * Licensed under the MIT License Copyright © 2016 McJty
