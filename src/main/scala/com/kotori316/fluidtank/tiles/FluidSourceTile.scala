@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.tiles
 
 import com.kotori316.fluidtank._
+import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -59,8 +60,8 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
     }
   }
 
-  override def read(compound: CompoundNBT): Unit = {
-    super.read(compound)
+  override def func_230337_a_(state: BlockState, compound: CompoundNBT): Unit = {
+    super.func_230337_a_(state, compound)
     locked = compound.getBoolean("locked")
     mFluid = FluidAmount.fromNBT(compound.getCompound("fluid"))
     interval = Math.max(1, compound.getInt("interval"))

@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.IVertexBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.math.{AxisAlignedBB, MathHelper}
 
+//noinspection DuplicatedCode
 sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
                  val endX: Double, val endY: Double, val endZ: Double,
                  val sizeX: Double, val sizeY: Double, val sizeZ: Double,
@@ -111,6 +112,7 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
   }
 }
 
+//noinspection DuplicatedCode
 private class BoxX(startX: Double,
                    endX: Double, y: Double, z: Double,
                    sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean)
@@ -169,6 +171,7 @@ private class BoxX(startX: Double,
   }
 }
 
+//noinspection DuplicatedCode
 private class BoxY(startY: Double,
                    endY: Double, x: Double, z: Double,
                    sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean)
@@ -228,6 +231,7 @@ private class BoxY(startY: Double,
   }
 }
 
+//noinspection DuplicatedCode
 private class BoxZ(startZ: Double,
                    endZ: Double, x: Double, y: Double,
                    sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean)

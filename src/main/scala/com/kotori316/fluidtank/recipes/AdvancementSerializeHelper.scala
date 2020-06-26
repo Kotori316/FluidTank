@@ -1,10 +1,11 @@
 package com.kotori316.fluidtank.recipes
 
 import com.google.gson.JsonObject
+import net.minecraft.advancements.criterion.EntityPredicate.AndPredicate
 import net.minecraft.advancements.criterion._
 import net.minecraft.advancements.{Advancement, AdvancementRewards, ICriterionInstance, IRequirementsStrategy}
 import net.minecraft.item.Item
-import net.minecraft.tags.Tag
+import net.minecraft.tags.{ITag, Tag}
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
 
@@ -18,9 +19,9 @@ case class AdvancementSerializeHelper(location: ResourceLocation,
   def addItemCriterion(item: Item): AdvancementSerializeHelper =
     addCriterion(s"has_${item.getRegistryName.getPath}", InventoryChangeTrigger.Instance.forItems(item))
 
-  def addItemCriterion(tag: Tag[Item]): AdvancementSerializeHelper =
-    addCriterion(s"has_${tag.getId.getPath}", InventoryChangeTrigger.Instance.forItems(ItemPredicate.Builder.create().tag(tag).build()))
-      .addCondition(new NotCondition(new TagEmptyCondition(tag.getId)))
+  def addItemCriterion(tag: ITag.INamedTag[Item]): AdvancementSerializeHelper =
+    addCriterion(s"has_${tag.func_230234_a_().getPath}", InventoryChangeTrigger.Instance.forItems(ItemPredicate.Builder.create().tag(tag).build()))
+      .addCondition(new NotCondition(new TagEmptyCondition(tag.func_230234_a_())))
 
   def addCondition(condition: ICondition): AdvancementSerializeHelper =
     copy(conditions = condition :: conditions)
@@ -28,7 +29,7 @@ case class AdvancementSerializeHelper(location: ResourceLocation,
   def build: JsonObject = {
     val builder = Advancement.Builder.builder()
     builder.withParentId(new ResourceLocation("recipes/root"))
-      .withCriterion("has_the_recipe", new RecipeUnlockedTrigger.Instance(location))
+      .withCriterion("has_the_recipe", RecipeUnlockedTrigger.func_235675_a_(location))
       .withRewards(AdvancementRewards.Builder.recipe(location))
       .withRequirementsStrategy(IRequirementsStrategy.OR)
     val obj = criterionList.foldLeft(builder) { case (b, (s, c)) => b.withCriterion(s, c) }

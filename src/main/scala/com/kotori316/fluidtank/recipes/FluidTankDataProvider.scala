@@ -10,9 +10,9 @@ import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.advancements.criterion._
 import net.minecraft.block.Blocks
 import net.minecraft.data._
+import net.minecraft.item.Items
 import net.minecraft.item.crafting.Ingredient
-import net.minecraft.item.{Item, Items}
-import net.minecraft.tags.{ItemTags, Tag}
+import net.minecraft.tags.ItemTags
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
@@ -47,12 +47,12 @@ object FluidTankDataProvider {
         .addItemCriterion(Tags.Items.GLASS)
       val TANK_WOOD_EASY = TANK_WOOD.copy(location = ID("tank_wood_easy"))
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
-        .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(new Tag[Item](new ResourceLocation(tier.tagName))))
+        .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(ItemTags.makeWrapperTag(tier.tagName)))
       val VOID_TANK = AdvancementSerializeHelper(ID("tank_void"))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
       val CAT = AdvancementSerializeHelper(ID("chest_as_tank"))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
-        .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(MinMaxBounds.IntBound.atLeast(10),
+        .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(EntityPredicate.AndPredicate.field_234582_a_, MinMaxBounds.IntBound.atLeast(10),
           MinMaxBounds.IntBound.UNBOUNDED, MinMaxBounds.IntBound.UNBOUNDED, Array(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build())))
       val PIPE = AdvancementSerializeHelper(ID("pipe"))
         .addCriterion("has_pearl", InventoryChangeTrigger.Instance.forItems(
@@ -145,7 +145,7 @@ object FluidTankDataProvider {
           .patternLine("g g")
           .patternLine("tet")
           .patternLine("g g"))
-        .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.getId)))
+        .addCondition(new NotCondition(new TagEmptyCondition(Tags.Items.ENDER_PEARLS.func_230234_a_())))
         .addCondition(new NotCondition(EasyCondition.getInstance()))
       val ITEM_PIPE_EASY = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockItemPipe, 8)
@@ -157,7 +157,7 @@ object FluidTankDataProvider {
         .addCondition(EasyCondition.getInstance())
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
-          .addTagCondition(new Tag[Item](new ResourceLocation(tier.tagName)))
+          .addTagCondition(ItemTags.makeWrapperTag(tier.tagName))
           .addCondition(ConfigCondition.getInstance()))
       val FLUID_SOURCE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockSource)
@@ -188,7 +188,7 @@ object FluidTankDataProvider {
 
   class FluidTagsProvider(g: DataGenerator) extends net.minecraft.data.FluidTagsProvider(g) {
     override def registerTags(): Unit = {
-      getBuilder(ModObjects.MILK_TAG).add(ModObjects.MILK_FLUID)
+      func_240522_a_(ModObjects.MILK_TAG).func_240532_a_(ModObjects.MILK_FLUID)
     }
   }
 

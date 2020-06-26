@@ -7,7 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,10 +18,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
+import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.ContentTankSerializer;
-import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
@@ -38,7 +37,7 @@ public class FluidTank {
     public static final String MOD_NAME = "FluidTank";
     public static final String modID = "fluidtank";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
-    public static final SideProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+    public static final SideProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
@@ -52,8 +51,7 @@ public class FluidTank {
         public static void init(FMLCommonSetupEvent event) {
             PacketHandler.init();
             CapabilityFluidTank.register();
-            FluidTankTOPPlugin.sendIMC().apply(modID);
-            LootFunctionManager.registerFunction(new ContentTankSerializer());
+//            FluidTankTOPPlugin.sendIMC().apply(modID);
         }
 
         @SubscribeEvent

@@ -10,7 +10,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.2.0'
+        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
         classpath group: "gradle.plugin.com.github.breadmoirai", name: "github-release", version: "2.2.9"
     }
 }
@@ -43,7 +43,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200514-1.15.1'
+    mappings channel: 'snapshot', version: '20200514-1.16'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -149,12 +149,12 @@ dependencies {
     // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
     def forge_prop = loadProperties("forge_version.properties")
     minecraft(forge_prop.getProperty("forge_version"))
-    implementation "org.scala-lang:scala-library:2.13.2"
+    implementation "org.scala-lang:scala-library:2.13.3"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
-    implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
-    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
+    //implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+   // implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
+    //implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")
@@ -231,7 +231,7 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.15.2'
+        addGameVersion '1.16.1'
         changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar
@@ -250,7 +250,7 @@ curseforge {
 githubRelease {
     repo = 'FluidTank'
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish = '1.15.1'
+    targetCommitish = '1.16'
     body {
         getLatestChangeLog()
     }

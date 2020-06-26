@@ -5,8 +5,7 @@ import java.util.Collections
 import cats.kernel.Hash
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
-import com.mojang.datafixers
-import com.mojang.datafixers.types.DynamicOps
+import com.mojang.serialization.{DynamicOps, Dynamic => SerializeDynamic}
 import net.minecraft.nbt.INBT
 
 import scala.collection.mutable
@@ -60,12 +59,12 @@ object Tiers {
   implicit val EqTiers: Hash[Tiers] = Hash.fromUniversalHashCode
 
   implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable[Tiers] {
-    override def serialize[DataType](t: Tiers)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
-      new datafixers.Dynamic[DataType](ops, ops.createString(t.lowerName))
+    override def serialize[DataType](t: Tiers)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
+      new SerializeDynamic[DataType](ops, ops.createString(t.lowerName))
     }
 
-    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Tiers = {
-      (d.asString().toScala orElse d.get("string").asString().toScala)
+    override def deserialize[DataType](d: SerializeDynamic[DataType]): Tiers = {
+      (d.asString().result().toScala orElse d.get("string").asString().result().toScala)
         .flatMap(byName)
         .getOrElse {
           FluidTank.LOGGER.error(s"The tag '${d.getValue}' doesn't have tier data.", new IllegalArgumentException("Invalid tier name."))

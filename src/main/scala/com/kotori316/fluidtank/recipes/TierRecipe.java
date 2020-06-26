@@ -9,8 +9,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;

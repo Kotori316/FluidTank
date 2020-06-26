@@ -9,7 +9,7 @@ import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.mojang.blaze3d.matrix.MatrixStack
 import com.mojang.blaze3d.vertex.IVertexBuilder
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.model.IBakedModel
+import net.minecraft.client.renderer.model.{IBakedModel, ItemCameraTransforms}
 import net.minecraft.client.renderer.tileentity.{ItemStackTileEntityRenderer, TileEntityRendererDispatcher}
 import net.minecraft.client.renderer.{IRenderTypeBuffer, ItemRenderer, RenderHelper, RenderTypeLookup}
 import net.minecraft.item.ItemStack
@@ -22,7 +22,8 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
 
   lazy val tileTank = new TileTank()
 
-  override def render(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def func_239207_a_(stack: ItemStack, cameraType: ItemCameraTransforms.TransformType, matrixStack: MatrixStack,
+                              renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: ItemBlockTank =>
 
@@ -30,7 +31,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         val model = Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
-        val renderType = RenderTypeLookup.getRenderType(stack)
+        val renderType = RenderTypeLookup.func_239219_a_(stack, true)
         val b = ItemRenderer.getBuffer(renderTypeBuffer, renderType, true, stack.hasEffect)
         renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
 

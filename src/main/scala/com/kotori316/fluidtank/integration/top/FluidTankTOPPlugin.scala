@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.integration.top
-
+/*
 import cats.data.Reader
 import mcjty.theoneprobe.api.ITheOneProbe
 import net.minecraftforge.fml.{InterModComms, ModList}
@@ -23,3 +23,4 @@ object FluidTankTOPPlugin {
     if (ModList.get().isLoaded(TOP_ID)) send
     else Reader(_ => false)
 }
+*/

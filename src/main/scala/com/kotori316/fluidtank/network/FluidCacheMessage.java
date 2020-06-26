@@ -8,10 +8,10 @@ import java.util.stream.IntStream;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.jdk.javaapi.OptionConverters;
 
@@ -20,12 +20,12 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.tiles.CATTile;
 
 public class FluidCacheMessage {
-    private int dimensionId;
+    private ResourceLocation dimensionId;
     private BlockPos pos;
     private List<FluidAmount> amounts;
 
     public void write(PacketBuffer buffer) {
-        buffer.writeBlockPos(pos).writeInt(dimensionId);
+        buffer.writeBlockPos(pos).writeResourceLocation(dimensionId);
         buffer.writeInt(amounts.size());
         amounts.forEach(a -> buffer.writeCompoundTag(a.write(new CompoundNBT())));
     }
@@ -33,7 +33,7 @@ public class FluidCacheMessage {
     public static FluidCacheMessage apply(PacketBuffer buffer) {
         FluidCacheMessage message = new FluidCacheMessage();
         message.pos = buffer.readBlockPos();
-        message.dimensionId = buffer.readInt();
+        message.dimensionId = buffer.readResourceLocation();
         message.amounts = IntStream.range(0, buffer.readInt())
             .mapToObj(i -> buffer.readCompoundTag())
             .map(FluidAmount::fromNBT)
@@ -44,14 +44,14 @@ public class FluidCacheMessage {
     public static FluidCacheMessage apply(CATTile tile) {
         FluidCacheMessage message = new FluidCacheMessage();
         message.pos = tile.getPos();
-        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::getDimension).map(Dimension::getType).map(DimensionType::getId).orElse(0);
+        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::func_234922_V_).orElse(DimensionType.field_235999_c_).func_240901_a_();
         message.amounts = tile.fluidAmountList();
         return message;
     }
 
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
         OptionConverters.toJava(FluidTank.proxy.getWorld(ctx.get()))
-            .filter(w -> w.getDimension().getType().getId() == dimensionId)
+            .filter(w -> w.func_234922_V_().func_240901_a_().equals(dimensionId))
             .map(w -> w.getTileEntity(pos))
             .filter(CATTile.class::isInstance)
             .map(CATTile.class::cast)

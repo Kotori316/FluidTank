@@ -19,7 +19,7 @@ class AccessTest {
 
     @Test
     void tag() {
-        assertTrue(FluidTags.WATER.getAllElements().isEmpty(), "Tag is empty.");
+        assertTrue(FluidTags.WATER.func_230236_b_().isEmpty(), "Tag is empty.");
     }
 
     @Test

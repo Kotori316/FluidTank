@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.integration.hwyla;
+/*package com.kotori316.fluidtank.integration.hwyla;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,3 +121,4 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
         }
     }
 }
+*/

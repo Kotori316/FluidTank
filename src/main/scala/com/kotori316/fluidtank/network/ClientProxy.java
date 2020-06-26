@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.network;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -9,7 +11,9 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -21,6 +25,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
@@ -31,6 +36,7 @@ import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.blocks.FluidSourceBlock;
 import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderPipe;
@@ -85,6 +91,14 @@ public class ClientProxy extends SideProxy {
                 .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
             RenderTypeLookup.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
             RenderTypeLookup.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
+
+            // Item Properties Override
+            Method registerOverride = ObfuscationReflectionHelper.findMethod(ItemModelsProperties.class, "func_239420_a_", ResourceLocation.class, IItemPropertyGetter.class);
+            try {
+                registerOverride.invoke(null, new ResourceLocation(FluidTank.modID, "source_cheat"), ((IItemPropertyGetter) (stack, world, entity) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f));
+            } catch (ReflectiveOperationException e) {
+                FluidTank.LOGGER.error(e);
+            }
         }
 
         @SubscribeEvent

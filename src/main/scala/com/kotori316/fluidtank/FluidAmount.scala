@@ -3,8 +3,7 @@ package com.kotori316.fluidtank
 import cats._
 import cats.implicits._
 import com.kotori316.fluidtank.DynamicSerializable._
-import com.mojang.datafixers
-import com.mojang.datafixers.types.DynamicOps
+import com.mojang.serialization.{DynamicOps, Dynamic => SerializeDynamic}
 import javax.annotation.Nonnull
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
@@ -118,18 +117,18 @@ object FluidAmount {
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
 
   implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
-    override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
+    override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
       val map = Map[String, DataType](
         NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
         NBT_amount -> ops.createLong(t.amount)
-      ) ++ t.nbt.map(c => NBT_tag -> datafixers.Dynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
+      ) ++ t.nbt.map(c => NBT_tag -> SerializeDynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
 
       val data = map.map { case (key, data) => ops.createString(key) -> data }
-      new datafixers.Dynamic[DataType](ops, ops.createMap(data.asJava))
+      new SerializeDynamic[DataType](ops, ops.createMap(data.asJava))
     }
 
-    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): FluidAmount = {
-      val fluidName = d.get(NBT_fluid).asString().toScala
+    override def deserialize[DataType](d: SerializeDynamic[DataType]): FluidAmount = {
+      val fluidName = d.get(NBT_fluid).asString().result().toScala
         .map(s => new ResourceLocation(s))
         .getOrElse(Fluids.EMPTY.getRegistryName)
       val fluid = registry.getValue(fluidName)
@@ -137,7 +136,7 @@ object FluidAmount {
         EMPTY
       } else {
         val amount = d.get(NBT_amount).asLong(0L)
-        val nbt = d.getElement(NBT_tag).toScala.map(c => datafixers.Dynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
+        val nbt = d.getElement(NBT_tag).result().toScala.map(c => SerializeDynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
           .collect { case t: CompoundNBT if !t.isEmpty => t }
         FluidAmount(fluid, amount, nbt)
       }

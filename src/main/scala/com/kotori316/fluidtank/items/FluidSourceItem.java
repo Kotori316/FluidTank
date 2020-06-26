@@ -11,8 +11,6 @@ import com.kotori316.fluidtank.blocks.FluidSourceBlock;
 public class FluidSourceItem extends BlockItem {
     public FluidSourceItem(Block blockIn, Properties builder) {
         super(blockIn, builder);
-        addPropertyOverride(new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity) ->
-            FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
     }
 
     @Override

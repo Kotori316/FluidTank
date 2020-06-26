@@ -1,8 +1,7 @@
 package com.kotori316.fluidtank
 
 import com.google.gson.JsonElement
-import com.mojang.datafixers.Dynamic
-import com.mojang.datafixers.types.{DynamicOps, JsonOps}
+import com.mojang.serialization.{DynamicOps, JsonOps, Dynamic}
 import net.minecraft.nbt.{INBT, NBTDynamicOps}
 
 trait DynamicSerializable[T] {

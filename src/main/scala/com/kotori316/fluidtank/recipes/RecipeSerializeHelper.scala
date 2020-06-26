@@ -4,12 +4,11 @@ import com.google.gson.JsonObject
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.Tiers
-import com.mojang.datafixers
-import com.mojang.datafixers.types.{DynamicOps, JsonOps}
+import com.mojang.serialization.{DynamicOps, JsonOps, Dynamic => SerializeDynamic}
 import net.minecraft.advancements.criterion.RecipeUnlockedTrigger
 import net.minecraft.data.{IFinishedRecipe, ShapedRecipeBuilder}
 import net.minecraft.item.crafting.Ingredient
-import net.minecraft.tags.Tag
+import net.minecraft.tags.ITag
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
 
@@ -23,8 +22,8 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
   def addCondition(condition: ICondition): RecipeSerializeHelper =
     copy(conditions = condition :: this.conditions)
 
-  def addTagCondition(tag: Tag[_]): RecipeSerializeHelper =
-    addCondition(new NotCondition(new TagEmptyCondition(tag.getId)))
+  def addTagCondition(tag: ITag.INamedTag[_]): RecipeSerializeHelper =
+    addCondition(new NotCondition(new TagEmptyCondition(tag.func_230234_a_())))
 
   def build: JsonObject = {
     val o = recipe.getRecipeJson
@@ -41,7 +40,7 @@ object RecipeSerializeHelper {
   def by(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
 
   private def getConsumeValue(c: ShapedRecipeBuilder): IFinishedRecipe = {
-    c.addCriterion("dummy", new RecipeUnlockedTrigger.Instance(new ResourceLocation("dummy:dummy")))
+    c.addCriterion("dummy", RecipeUnlockedTrigger.func_235675_a_(new ResourceLocation("dummy:dummy")))
     var t: IFinishedRecipe = null
     c.build(p => t = p)
     t
@@ -54,22 +53,23 @@ object RecipeSerializeHelper {
 
     import cats._
     import cats.implicits._
+
     import scala.jdk.OptionConverters._
 
-    override def serialize[DataType](t: TierRecipe)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
+    override def serialize[DataType](t: TierRecipe)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
       val map = ops.emptyMap().pure[Id]
         .map(d => ops.set(d, TierRecipe.KEY_TIER, t.getTier.serialize(ops).getValue))
         .map(d => if (t.getTier.hasTagRecipe) ops.set(d, TierRecipe.KEY_SUB_ITEM, t.getSubItems.serialize(ops).getValue) else d)
 
-      new datafixers.Dynamic[DataType](ops, map)
+      new SerializeDynamic[DataType](ops, map)
     }
 
-    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): TierRecipe = {
-      val recipeId = d.get(TierRecipe.KEY_ID).asString().toScala.map(new ResourceLocation(_)).get
-      val tiers = d.get(TierRecipe.KEY_TIER).get().toScala
+    override def deserialize[DataType](d: SerializeDynamic[DataType]): TierRecipe = {
+      val recipeId = d.get(TierRecipe.KEY_ID).asString().result().toScala.map(new ResourceLocation(_)).get
+      val tiers = d.get(TierRecipe.KEY_TIER).get().result().toScala
         .map(DynamicSerializable[Tiers].deserialize)
         .getOrElse(Tiers.Invalid)
-      val subItem = d.get(TierRecipe.KEY_SUB_ITEM).get().toScala
+      val subItem = d.get(TierRecipe.KEY_SUB_ITEM).get().result().toScala
         .map(DynamicSerializable[Ingredient].deserialize)
         .getOrElse(Ingredient.EMPTY)
       if (subItem == Ingredient.EMPTY)
@@ -82,10 +82,10 @@ object RecipeSerializeHelper {
   implicit val IngredientSerialize: DynamicSerializable[Ingredient] = IngredientSerializeObj
 
   private object IngredientSerializeObj extends DynamicSerializable[Ingredient] {
-    override def serialize[DataType](t: Ingredient)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] =
-      new datafixers.Dynamic(JsonOps.INSTANCE, t.serialize()).convert(ops)
+    override def serialize[DataType](t: Ingredient)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] =
+      new SerializeDynamic(JsonOps.INSTANCE, t.serialize()).convert(ops)
 
-    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): Ingredient =
+    override def deserialize[DataType](d: SerializeDynamic[DataType]): Ingredient =
       Ingredient.deserialize(d.convert(JsonOps.INSTANCE).getValue)
   }
 

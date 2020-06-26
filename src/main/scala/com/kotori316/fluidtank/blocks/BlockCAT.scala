@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.CATTile
-import net.minecraft.block.{Block, BlockRenderType, BlockState, ContainerBlock}
+import net.minecraft.block.{AbstractBlock, Block, BlockRenderType, BlockState, ContainerBlock}
 import net.minecraft.entity.player.{PlayerEntity, ServerPlayerEntity}
 import net.minecraft.item.{BlockItem, BlockItemUseContext, Item}
 import net.minecraft.state.StateContainer
@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fml.network.NetworkHooks
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(0.7f)) {
+class BlockCAT extends ContainerBlock(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(0.7f)) {
   // Chest as Tank
   setRegistryName(FluidTank.modID, BlockCAT.NAME)
   val itemBlock = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))

@@ -4,7 +4,7 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
 import net.minecraft.block.material.Material
-import net.minecraft.block.{Block, BlockRenderType, BlockState, ContainerBlock}
+import net.minecraft.block._
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -16,7 +16,7 @@ import net.minecraft.util.text.{ITextComponent, StringTextComponent, Translation
 import net.minecraft.util.{ActionResultType, Hand, NonNullList}
 import net.minecraft.world.{IBlockReader, World}
 
-class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
+class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
   setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   val itemBlock = new FluidSourceItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
   itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
