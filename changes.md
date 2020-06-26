@@ -1,3 +1,4 @@
-## v15.3.0
-* Fixed NullPointerException of FluidCacheMessage, which is used to send packets from CATTile. 
-[#50](https://github.com/Kotori316/FluidTank/issues/50)
+## v16.0.0-SNAPSHOT
+* First release for Minecraft 1.16.1
+* No support of tooltip mod.
+* **Changed tank capacity.**
