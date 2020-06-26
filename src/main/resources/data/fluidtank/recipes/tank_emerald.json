@@ -9,11 +9,8 @@
       "type": "fluidtank:config"
     },
     {
-      "value": {
-        "tag": "forge:gems/emerald",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:gems/emerald",
+      "type": "fluidtank:tag"
     }
   ]
 }
