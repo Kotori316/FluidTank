@@ -18,10 +18,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
-import com.kotori316.fluidtank.blocks.ContentTankSerializer;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
