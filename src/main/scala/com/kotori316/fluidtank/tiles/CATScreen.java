@@ -36,14 +36,14 @@ public class CATScreen extends ContainerScreen<CATContainer> {
     @SuppressWarnings("NoTranslation")
     protected void func_230451_b_(MatrixStack matrixStack, int mouseX, int mouseY) {
         super.func_230451_b_(matrixStack, mouseX, mouseY);
-        String s = this.func_231171_q_().getString(); // getTitle
-        int x = this.xSize / 2 - this.field_230712_o_.getStringWidth(s) / 2; // font
-        this.field_230712_o_.func_238405_a_(matrixStack, s, x, 6, 0x404040);
-        this.field_230712_o_.func_238405_a_(matrixStack, I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
+//        String s = this.func_231171_q_().getString(); // getTitle
+//        int x = this.xSize / 2 - this.field_230712_o_.getStringWidth(s) / 2; // font
+//        this.field_230712_o_.func_238405_a_(matrixStack, s, x, 6, 0x404040);
+//        this.field_230712_o_.func_238405_a_(matrixStack, I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
         List<FluidAmount> stacks = catTile.fluidCache;
         for (int i = 0; i < stacks.size(); i++) {
             FluidAmount a = stacks.get(i);
-            this.field_230712_o_.func_238405_a_(matrixStack, a.toString(), 8, 16 + 10 * i, 0x404040);
+            this.field_230712_o_.func_238421_b_(matrixStack, a.toString(), 8, 16 + 10 * i, 0x404040);
         }
     }
 
