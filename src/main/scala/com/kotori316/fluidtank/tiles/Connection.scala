@@ -252,6 +252,13 @@ object Connection {
     override val handler: FluidAmount.Tank = EmptyTank.INSTANCE
     override val toString: String = "Connection.Invalid"
 
+    override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
+      if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+        LazyOptional.of(() => handler).cast()
+      else
+        super.getCapability(capability, facing)
+    }
+
     override def getComparatorLevel: Int = 0
 
     override def remove(tileTank: TileTankNoDisplay): Unit = ()
