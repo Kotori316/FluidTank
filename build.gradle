@@ -37,13 +37,15 @@ archivesBaseName = "LargeFluidTank"
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
+static String mappingVersion() { return '20200514-1.16' }
+
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   Snapshot are built nightly.
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200514-1.16'
+    mappings channel: 'snapshot', version: mappingVersion()
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -310,7 +312,11 @@ void moveOldLog() {
     if (new_log_file.exists()) {
         if (!old_log_file.exists())
             old_log_file.createNewFile()
-        def combined = new_log_file.text + "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}" + System.lineSeparator() * 2 + old_log_file.text
+        def combined = new_log_file.text +
+                System.lineSeparator() +
+                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${mappingVersion()}" +
+                System.lineSeparator() * 2 +
+                old_log_file.text
         old_log_file.setText(combined)
     }
 }
