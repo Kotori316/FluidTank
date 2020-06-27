@@ -95,7 +95,9 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
 
         public LazyOptional<IFluidHandlerItem> getFluidHandler(int tank) {
             ItemStack stackInSlot = inventory.getStackInSlot(tank);
-            if (stackInSlot.getItem() == Items.MILK_BUCKET)
+            if (stackInSlot.isEmpty())
+                return LazyOptional.empty();
+            else if (stackInSlot.getItem() == Items.MILK_BUCKET)
                 return LazyOptional.of(() -> new MilkBucketHandler(stackInSlot));
             else
                 return net.minecraftforge.fluids.FluidUtil.getFluidHandler(stackInSlot);
