@@ -1,3 +1,4 @@
-## v15.3.0
-* Fixed NullPointerException of FluidCacheMessage, which is used to send packets from CATTile. 
-[#50](https://github.com/Kotori316/FluidTank/issues/50)
+## v15.3.1
+* Fixed CAT got fluid from empty inventory.
+* Call LazyOptional#invalidate before connection updated.
+* Changes in capability, caching LazyOptional instead of creating new instance every time `getCapability` is called.
