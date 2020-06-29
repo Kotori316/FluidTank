@@ -50,5 +50,6 @@
   "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
   "fluidtank.waila.supplier": "%s",
   "tooltip.fluidtank.source": "水のみ",
-  "tooltip.fluidtank.source_inf": "無限のソース"
+  "tooltip.fluidtank.source_inf": "無限のソース",
+  "tooltip.fluidtank.source_disabled": "無効"
 }
