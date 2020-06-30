@@ -158,7 +158,7 @@ dependencies {
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
     //implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
-    // implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
+     implementation fg.deobf("mezz.jei:jei-1.16.1:7.0.0.2")
     //implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
 
     if (hasGitHubToken()) {
