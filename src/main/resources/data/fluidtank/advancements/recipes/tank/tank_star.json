@@ -31,11 +31,8 @@
   ],
   "conditions": [
     {
-      "value": {
-        "tag": "forge:nether_stars",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:nether_stars",
+      "type": "fluidtank:tag"
     }
   ]
 }

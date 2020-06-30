@@ -40,11 +40,8 @@
   ],
   "conditions": [
     {
-      "value": {
-        "tag": "forge:glass",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:glass",
+      "type": "fluidtank:tag"
     }
   ]
 }

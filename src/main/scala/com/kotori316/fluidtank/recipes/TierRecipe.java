@@ -275,7 +275,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public void serialize(JsonObject json) {
-            Ingredient ingredient = Ingredient.fromTag(ItemTags.getCollection().getOrCreate(new ResourceLocation(tiers.tagName())));
+            Ingredient ingredient = Ingredient.fromTag(ItemTags.makeWrapperTag(this.tiers.tagName()));
             JsonObject object = RecipeSerializeHelper.TierRecipeSerializer().serialize(new TierRecipe(this.recipeId, this.tiers, ingredient), JsonOps.INSTANCE)
                 .getValue().getAsJsonObject();
             object.entrySet().forEach(e -> json.add(e.getKey(), e.getValue()));

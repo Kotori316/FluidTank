@@ -10,7 +10,9 @@ import net.minecraft.data.{IFinishedRecipe, ShapedRecipeBuilder}
 import net.minecraft.item.crafting.Ingredient
 import net.minecraft.tags.ITag
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
+import net.minecraftforge.common.crafting.conditions.ICondition
+
+import scala.util.chaining._
 
 case class RecipeSerializeHelper(recipe: IFinishedRecipe,
                                  conditions: List[ICondition] = Nil,
@@ -23,7 +25,7 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
     copy(conditions = condition :: this.conditions)
 
   def addTagCondition(tag: ITag.INamedTag[_]): RecipeSerializeHelper =
-    addCondition(new NotCondition(new TagEmptyCondition(tag.func_230234_a_())))
+    addCondition(new TagCondition(tag.func_230234_a_()))
 
   def build: JsonObject = {
     val o = recipe.getRecipeJson
@@ -51,15 +53,12 @@ object RecipeSerializeHelper {
   private object TierRecipeSerializerObj extends DynamicSerializable[TierRecipe] {
     private[this] final val LOGGER = org.apache.logging.log4j.LogManager.getLogger(classOf[TierRecipe])
 
-    import cats._
-    import cats.implicits._
-
     import scala.jdk.OptionConverters._
 
     override def serialize[DataType](t: TierRecipe)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
-      val map = ops.emptyMap().pure[Id]
-        .map(d => ops.set(d, TierRecipe.KEY_TIER, t.getTier.serialize(ops).getValue))
-        .map(d => if (t.getTier.hasTagRecipe) ops.set(d, TierRecipe.KEY_SUB_ITEM, t.getSubItems.serialize(ops).getValue) else d)
+      val map = ops.emptyMap()
+        .pipe(d => ops.set(d, TierRecipe.KEY_TIER, t.getTier.serialize(ops).getValue))
+        .pipe(d => if (t.getTier.hasTagRecipe) ops.set(d, TierRecipe.KEY_SUB_ITEM, t.getSubItems.serialize(ops).getValue) else d)
 
       new SerializeDynamic[DataType](ops, map)
     }

@@ -1,13 +1,12 @@
 package com.kotori316.fluidtank.recipes
 
 import com.google.gson.JsonObject
-import net.minecraft.advancements.criterion.EntityPredicate.AndPredicate
 import net.minecraft.advancements.criterion._
 import net.minecraft.advancements.{Advancement, AdvancementRewards, ICriterionInstance, IRequirementsStrategy}
 import net.minecraft.item.Item
-import net.minecraft.tags.{ITag, Tag}
+import net.minecraft.tags.ITag
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
+import net.minecraftforge.common.crafting.conditions.ICondition
 
 case class AdvancementSerializeHelper(location: ResourceLocation,
                                       criterionList: List[(String, ICriterionInstance)] = Nil,
@@ -21,7 +20,7 @@ case class AdvancementSerializeHelper(location: ResourceLocation,
 
   def addItemCriterion(tag: ITag.INamedTag[Item]): AdvancementSerializeHelper =
     addCriterion(s"has_${tag.func_230234_a_().getPath}", InventoryChangeTrigger.Instance.forItems(ItemPredicate.Builder.create().tag(tag).build()))
-      .addCondition(new NotCondition(new TagEmptyCondition(tag.func_230234_a_())))
+      .addCondition(new TagCondition(tag.func_230234_a_()))
 
   def addCondition(condition: ICondition): AdvancementSerializeHelper =
     copy(conditions = condition :: conditions)
