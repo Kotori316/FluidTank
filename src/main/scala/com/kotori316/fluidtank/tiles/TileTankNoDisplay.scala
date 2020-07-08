@@ -88,8 +88,6 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
   def hasContent: Boolean = tank.getFluid.nonEmpty
 
-  override def hasFastRenderer = true
-
   def getComparatorLevel: Int = connection.getComparatorLevel
 
   def onBlockPlacedBy(): Unit = {
