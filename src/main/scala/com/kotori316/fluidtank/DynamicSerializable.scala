@@ -37,11 +37,11 @@ object DynamicSerializable {
     }
   }
 
-  class DynamicSerializableFromCodec[T](private val codec: Codec[T]) extends DynamicSerializable[T] {
+  class DynamicSerializableFromCodec[T](private val codec: Codec[T], private val empty: T) extends DynamicSerializable[T] {
     override def serialize[DataType](t: T)(ops: DynamicOps[DataType]): Dynamic[DataType] =
       codec.encodeStart(ops, t).map[Dynamic[DataType]](r => new Dynamic(ops, r)).result().get()
 
-    override def deserialize[DataType](d: Dynamic[DataType]): T = d.read(codec).result().get()
+    override def deserialize[DataType](d: Dynamic[DataType]): T = d.read(codec).result().orElse(empty)
 
     override def asCodec: Codec[T] = codec
   }

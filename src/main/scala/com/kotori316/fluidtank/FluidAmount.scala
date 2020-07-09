@@ -120,7 +120,7 @@ object FluidAmount {
   implicit val showFA: Show[FluidAmount] = Show.fromToString
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
 
-  implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
+  val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
     override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
       val map = Map[String, DataType](
         NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
@@ -157,4 +157,8 @@ object FluidAmount {
       (f, l, o) => FluidAmount(f, l, o.toScala)
     ))
   }.codec()
+
+  implicit val dynamicSerializableFromCodecFA: DynamicSerializable[FluidAmount] =
+    new DynamicSerializable.DynamicSerializableFromCodec(codecFA, EMPTY)
+
 }
