@@ -2,7 +2,7 @@ package com.kotori316.fluidtank
 
 import com.google.gson.JsonElement
 import com.mojang.datafixers.util.Pair
-import com.mojang.serialization.{Codec, DataResult, Dynamic, DynamicOps, JsonOps}
+import com.mojang.serialization._
 import net.minecraft.nbt.{INBT, NBTDynamicOps}
 
 trait DynamicSerializable[T] {
@@ -35,6 +35,15 @@ object DynamicSerializable {
     override def encode[T](input: A, ops: DynamicOps[T], prefix: T): DataResult[T] = {
       ops.mergeToPrimitive(prefix, dynamicSerializable.serialize(input)(ops).getValue)
     }
+  }
+
+  class DynamicSerializableFromCodec[T](private val codec: Codec[T]) extends DynamicSerializable[T] {
+    override def serialize[DataType](t: T)(ops: DynamicOps[DataType]): Dynamic[DataType] =
+      codec.encodeStart(ops, t).map[Dynamic[DataType]](r => new Dynamic(ops, r)).result().get()
+
+    override def deserialize[DataType](d: Dynamic[DataType]): T = d.read(codec).result().get()
+
+    override def asCodec: Codec[T] = codec
   }
 
 }
