@@ -128,7 +128,7 @@ class SerializeFA {
         assertAll(
             () -> assertEquals(FluidAmount.EMPTY(), FluidAmount.dynamicSerializableFA().deserialize(new Dynamic<>(JsonOps.INSTANCE, element)), message + " by default."),
             () -> assertEquals(FluidAmount.EMPTY(), FluidAmount.dynamicSerializableFromCodecFA().deserialize(new Dynamic<>(JsonOps.INSTANCE, element)), message + " by converted codec."),
-            () -> assertEquals(Optional.of(FluidAmount.EMPTY()), FluidAmount.codecFA().parse(JsonOps.INSTANCE, element).result(), message + "by codec.")
+            () -> assertEquals(Optional.of(FluidAmount.EMPTY()), FluidAmount.codecFA().parse(JsonOps.INSTANCE, element).result(), message + " by codec.")
         );
     }
 
