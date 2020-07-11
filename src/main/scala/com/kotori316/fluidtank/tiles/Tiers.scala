@@ -5,13 +5,12 @@ import java.util.Collections
 import cats.kernel.Hash
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
-import com.mojang.serialization.{DynamicOps, Dynamic => SerializeDynamic}
+import com.mojang.serialization.Codec
 import net.minecraft.nbt.INBT
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
-import scala.jdk.OptionConverters._
 
 class Tiers private(val rank: Int, buckets: Int, override val toString: String, val tagName: String, val hasTagRecipe: Boolean) {
   val lowerName: String = toString.toLowerCase
@@ -58,18 +57,10 @@ object Tiers {
 
   implicit val EqTiers: Hash[Tiers] = Hash.fromUniversalHashCode
 
-  implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable[Tiers] {
-    override def serialize[DataType](t: Tiers)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
-      new SerializeDynamic[DataType](ops, ops.createString(t.lowerName))
-    }
+  implicit val TierCodec: Codec[Tiers] = Codec.STRING.comapFlatMap[Tiers](
+    s => byName(s).toRight(s"Invalid tier name, $s.").toResult,
+    tier => tier.lowerName
+  )
 
-    override def deserialize[DataType](d: SerializeDynamic[DataType]): Tiers = {
-      (d.asString().result().toScala orElse d.get("string").asString().result().toScala)
-        .flatMap(byName)
-        .getOrElse {
-          FluidTank.LOGGER.error(s"The tag '${d.getValue}' doesn't have tier data.", new IllegalArgumentException("Invalid tier name."))
-          WOOD
-        }
-    }
-  }
+  implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable.DynamicSerializableFromCodec[Tiers](TierCodec, WOOD)
 }

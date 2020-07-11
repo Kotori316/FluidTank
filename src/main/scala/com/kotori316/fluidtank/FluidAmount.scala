@@ -159,7 +159,7 @@ object FluidAmount {
     ).apply(inst, inst.stable[com.mojang.datafixers.util.Function3[Fluid, lang.Long, Optional[CompoundNBT], FluidAmount]](
       (f, l, o) => FluidAmount(f, l, o.toScala)
     ))
-  }.withDefault(FluidAmount.EMPTY)
+  }
 
   implicit val dynamicSerializableFromCodecFA: DynamicSerializable[FluidAmount] =
     new DynamicSerializable.DynamicSerializableFromCodec(codecFA, EMPTY)
