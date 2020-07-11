@@ -37,7 +37,8 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
   def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
 
   def +(that: FluidAmount): FluidAmount = {
-    if (fluid == Fluids.EMPTY) that
+    if (this.isEmpty) that
+    else if (that.isEmpty) this
     else setAmount(this.amount + that.amount)
   }
 
