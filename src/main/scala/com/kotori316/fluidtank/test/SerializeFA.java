@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
@@ -21,6 +25,7 @@ import scala.Option;
 import com.kotori316.fluidtank.FluidAmount;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -107,5 +112,41 @@ class SerializeFA {
             .map(Dynamic::getValue)
             .collect(Collectors.toList());
         assertIterableEquals(fromCodec, fromDynamic);
+    }
+
+    @Test
+    void errorCase1() {
+        // Empty input.
+        JsonElement element = new JsonObject();
+        errorInput(element);
+        errorInput(new JsonArray());
+        errorInput(JsonNull.INSTANCE);
+    }
+
+    private static void errorInput(JsonElement element) {
+        String message = "Got empty fluid from " + element;
+        assertAll(
+            () -> assertEquals(FluidAmount.EMPTY(), FluidAmount.dynamicSerializableFA().deserialize(new Dynamic<>(JsonOps.INSTANCE, element)), message + " by default."),
+            () -> assertEquals(FluidAmount.EMPTY(), FluidAmount.dynamicSerializableFromCodecFA().deserialize(new Dynamic<>(JsonOps.INSTANCE, element)), message + " by converted codec."),
+            () -> assertEquals(Optional.of(FluidAmount.EMPTY()), FluidAmount.codecFA().parse(JsonOps.INSTANCE, element).result(), message + "by codec.")
+        );
+    }
+
+    @Test
+    void errorCase2() {
+        // Invalid input
+        errorInput(new JsonPrimitive("fluid"));
+        errorInput(new JsonPrimitive(151163521));
+        errorInput(new JsonPrimitive(false));
+    }
+
+    @Test
+    void errorCase3() {
+        // invalid fluid name.
+        JsonObject object = new JsonObject();
+        object.addProperty("fluid", "dummy:dummy");
+        object.addProperty("amount", 46000L);
+
+        errorInput(object);
     }
 }

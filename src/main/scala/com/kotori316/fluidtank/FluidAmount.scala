@@ -147,7 +147,7 @@ object FluidAmount {
     }
   }
 
-  implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.mapCodec[FluidAmount] { inst =>
+  implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
     inst.group(
       ResourceLocation.field_240908_a_.xmap[Fluid](n => ForgeRegistries.FLUIDS.getValue(n), f => ForgeRegistries.FLUIDS.getKey(f))
         .fieldOf(NBT_fluid).forGetter(_.fluid),
@@ -156,7 +156,7 @@ object FluidAmount {
     ).apply(inst, inst.stable[com.mojang.datafixers.util.Function3[Fluid, lang.Long, Optional[CompoundNBT], FluidAmount]](
       (f, l, o) => FluidAmount(f, l, o.toScala)
     ))
-  }.codec()
+  }.withDefault(FluidAmount.EMPTY)
 
   implicit val dynamicSerializableFromCodecFA: DynamicSerializable[FluidAmount] =
     new DynamicSerializable.DynamicSerializableFromCodec(codecFA, EMPTY)
