@@ -148,5 +148,12 @@ class SerializeFA {
         object.addProperty("amount", 46000L);
 
         errorInput(object);
+
+        assertTrue(FluidAmount.codecFA().parse(JsonOps.INSTANCE, object)
+            .error()
+            .map(DataResult.PartialResult::message)
+            .filter(s -> s.contains("dummy:dummy") && s.contains("No fluid"))
+            .isPresent()
+        );
     }
 }

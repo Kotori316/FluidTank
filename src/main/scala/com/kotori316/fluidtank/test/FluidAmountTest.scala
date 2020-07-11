@@ -7,6 +7,9 @@ import net.minecraft.item.{ItemStack, Items}
 import net.minecraft.nbt.CompoundNBT
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
+
+import scala.util.chaining._
 
 class FluidAmountTest {
   @Test
@@ -74,5 +77,39 @@ class FluidAmountTest {
       assertTrue(FluidAmount.BUCKET_LAVA.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === lw)
       assertEquals(Fluids.LAVA, lw.fluid)
     }
+  }
+
+  @Test
+  def adderEmpty(): Unit = {
+    val tag = Option(new CompoundNBT().tap(_.putInt("a", 1)).tap(_.putBoolean("b", true)))
+    locally {
+      val a = FluidAmount.BUCKET_WATER.copy(nbt = tag, amount = 3000L)
+      assertEquals(a, a + FluidAmount.EMPTY)
+      assertEquals(a, FluidAmount.EMPTY + a)
+    }
+    locally {
+      val a = FluidAmount.BUCKET_LAVA.copy(nbt = tag, amount = 3000L)
+      val e = FluidAmount.EMPTY.copy(nbt = Option(new CompoundNBT()), amount = 2000L)
+
+      assertEquals(3000L, (e + a).amount)
+      assertEquals(a, a + e)
+      assertEquals(a, e + a)
+    }
+  }
+
+  @Test
+  def adder0Fluid(): Unit = {
+    val zeros = List(FluidAmount.EMPTY, FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_MILK.setAmount(0))
+    assertTrue(zeros.forall(_.isEmpty))
+
+    val nonZero = List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_MILK, FluidAmount.BUCKET_LAVA)
+
+    val assertions: List[Executable] = for {
+      zero <- zeros
+      hasContent <- nonZero
+      d <- List(true, false)
+    } yield () => assertEquals(hasContent, if (d) zero + hasContent else hasContent + zero)
+
+    assertAll(assertions: _*)
   }
 }

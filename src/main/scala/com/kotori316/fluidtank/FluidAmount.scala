@@ -40,7 +40,8 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
   def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
 
   def +(that: FluidAmount): FluidAmount = {
-    if (fluid == Fluids.EMPTY) that
+    if (this.isEmpty) that
+    else if (that.isEmpty) this
     else setAmount(this.amount + that.amount)
   }
 
@@ -150,8 +151,8 @@ object FluidAmount {
   implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
     inst.group(
       ResourceLocation.field_240908_a_.comapFlatMap[Fluid](
-        n => if (ForgeRegistries.FLUIDS.containsKey(n)) DataResult.success(ForgeRegistries.FLUIDS.getValue(n)) else DataResult.error(s"No fluid for $n."),
-        f => ForgeRegistries.FLUIDS.getKey(f)
+        name => if (ForgeRegistries.FLUIDS.containsKey(name)) DataResult.success(ForgeRegistries.FLUIDS.getValue(name)) else DataResult.error(s"No fluid for $name."),
+        fluid => ForgeRegistries.FLUIDS.getKey(fluid)
       ).fieldOf(NBT_fluid).forGetter(_.fluid),
       Codec.LONG.fieldOf(NBT_amount).forGetter(_.amount),
       CompoundNBT.field_240597_a_.optionalFieldOf(NBT_tag).forGetter(_.nbt.toJava),
