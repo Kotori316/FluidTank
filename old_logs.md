@@ -1,3 +1,6 @@
+## v15.3.2
+* Fixed potential bug of empty fluids.
+
 ## v15.3.1
 * Fixed CAT got fluid from empty inventory.
 * Call LazyOptional#invalidate before connection updated.
