@@ -19,7 +19,7 @@ object DynamicSerializable {
   def apply[T](implicit ev: DynamicSerializable[T]): DynamicSerializable[T] = ev
 
   implicit class DynamicSerializeOps[T](private val t: T) extends AnyVal {
-    def serialize[DataType](ops: DynamicOps[DataType])(implicit d: DynamicSerializable[T]): Dynamic[DataType] = DynamicSerializable[T].serialize(t)(ops)
+    def serialize[DataType](ops: DynamicOps[DataType])(implicit d: DynamicSerializable[T]): Dynamic[DataType] = d.serialize(t)(ops)
 
     def toNBT(implicit d: DynamicSerializable[T]): INBT = serialize(NBTDynamicOps.INSTANCE).getValue
 

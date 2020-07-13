@@ -64,4 +64,15 @@ class TierTest {
     }.toSeq
     assertAll(as: _*)
   }
+
+  @Test
+  def codecAndSerialize(): Unit = {
+    val tiers = Tiers.list.toList
+    val tests = tiers.map[Executable] { t =>
+      () =>
+        assertEquals(java.util.Optional.of(Tiers.TierDynamicSerialize.serialize(t)(JsonOps.INSTANCE).getValue),
+          Tiers.TierCodec.encodeStart(JsonOps.INSTANCE, t).result())
+    }
+    assertAll(tests: _*)
+  }
 }
