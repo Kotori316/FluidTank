@@ -75,7 +75,7 @@ object FluidAmount {
     }
   }
 
-  def fromNBT(tag: CompoundNBT): FluidAmount = dynamicSerializableFA.deserializeFromNBT(tag)
+  def fromNBT(tag: CompoundNBT): FluidAmount = codecFA.parse(NBTDynamicOps.INSTANCE, tag).result().orElse(EMPTY)
 
   def fromStack(stack: FluidStack): FluidAmount = {
     val fluid = stack.getRawFluid
