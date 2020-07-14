@@ -2,7 +2,8 @@ package com.kotori316.fluidtank.tiles
 
 import java.util.Collections
 
-import cats.kernel.Hash
+import cats._
+import cats.data._
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
 import com.mojang.serialization.Codec
@@ -58,7 +59,10 @@ object Tiers {
   implicit val EqTiers: Hash[Tiers] = Hash.fromUniversalHashCode
 
   implicit val TierCodec: Codec[Tiers] = Codec.STRING.comapFlatMap[Tiers](
-    s => byName(s).toRight(s"Invalid tier name, $s.").toResult,
+    s => (byName(s) match {
+      case Some(value) => Ior.right(value)
+      case None => Ior.both(s"Invalid tier name, $s.", WOOD)
+    }).toResult,
     tier => tier.lowerName
   )
 

@@ -86,4 +86,12 @@ package object fluidtank {
     }
   }
 
+  implicit class IorToResult[A](private val ior: Ior[String, A]) extends AnyVal {
+    def toResult: DataResult[A] = ior match {
+      case Ior.Left(a) => DataResult.error(a)
+      case Ior.Right(b) => DataResult.success(b)
+      case Ior.Both(a, b) => DataResult.error(a, b)
+    }
+  }
+
 }
