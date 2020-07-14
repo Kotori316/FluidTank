@@ -7,16 +7,14 @@ import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPip
 import com.mojang.datafixers.DSL
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
-import net.minecraft.fluid.Fluid
 import net.minecraft.item.{ItemGroup, ItemStack}
 import net.minecraft.loot.LootFunctionType
-import net.minecraft.tags.ITag
+import net.minecraft.tags.FluidTags
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.shapes.VoxelShapes
 import net.minecraft.util.registry.Registry
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 
 import scala.reflect.ClassTag
 
@@ -76,10 +74,7 @@ object ModObjects {
 
   //---------- Fluids ----------
   final val MILK_FLUID = new MilkFluid
-  final val MILK_TAG = {
-    val f = ObfuscationReflectionHelper.findMethod(classOf[net.minecraft.tags.FluidTags], "func_206956_a", classOf[java.lang.String])
-    f.invoke(null, "minecraft:milk").asInstanceOf[ITag.INamedTag[Fluid]]
-  }
+  final val MILK_TAG = FluidTags.makeWrapperTag("minecraft:milk")
 
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.field_239694_aZ_,
