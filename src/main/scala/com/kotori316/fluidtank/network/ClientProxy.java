@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.network;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,6 +9,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
@@ -72,16 +72,8 @@ public class ClientProxy extends SideProxy {
         public static void registerTESR(FMLClientSetupEvent event) {
             ClientRegistry.bindTileEntityRenderer(ModObjects.TANK_TYPE(), RenderTank::new);
             ClientRegistry.bindTileEntityRenderer(ModObjects.TANK_CREATIVE_TYPE(), RenderTank::new);
-            ClientRegistry.bindTileEntityRenderer(ModObjects.FLUID_PIPE_TYPE(), d -> {
-                RenderPipe renderPipe = new RenderPipe(d);
-                renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
-                return renderPipe;
-            });
-            ClientRegistry.bindTileEntityRenderer(ModObjects.ITEM_PIPE_TYPE(), d -> {
-                RenderPipe renderPipe = new RenderPipe(d);
-                renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
-                return renderPipe;
-            });
+            ClientRegistry.bindTileEntityRenderer(ModObjects.FLUID_PIPE_TYPE(), ClientEventHandlers::createPipeRenderer);
+            ClientRegistry.bindTileEntityRenderer(ModObjects.ITEM_PIPE_TYPE(), ClientEventHandlers::createPipeRenderer);
             ScreenManager.registerFactory(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
             RenderType rendertype = RenderType.getCutoutMipped();
@@ -99,6 +91,12 @@ public class ClientProxy extends SideProxy {
             } catch (ReflectiveOperationException e) {
                 FluidTank.LOGGER.error(e);
             }
+        }
+
+        private static RenderPipe createPipeRenderer(TileEntityRendererDispatcher d) {
+            RenderPipe renderPipe = new RenderPipe(d);
+            renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
+            return renderPipe;
         }
 
         @SubscribeEvent
