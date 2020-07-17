@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.CATTile
-import net.minecraft.block.{AbstractBlock, Block, BlockRenderType, BlockState, ContainerBlock}
+import net.minecraft.block._
 import net.minecraft.entity.player.{PlayerEntity, ServerPlayerEntity}
 import net.minecraft.item.{BlockItem, BlockItemUseContext, Item}
 import net.minecraft.state.StateContainer
@@ -50,6 +50,21 @@ class BlockCAT extends ContainerBlock(AbstractBlock.Properties.create(ModObjects
             NetworkHooks.openGui(player.asInstanceOf[ServerPlayerEntity], worldIn.getTileEntity(pos).asInstanceOf[CATTile], pos)
           ActionResultType.SUCCESS
       }
+      /* FluidUtil.getFluidHandler(copiedStack).asScala
+        .filter(_ => !stack.isEmpty)
+        .fold {
+          if (!worldIn.isRemote)
+            NetworkHooks.openGui(player.asInstanceOf[ServerPlayerEntity], worldIn.getTileEntity(pos).asInstanceOf[CATTile], pos)
+          ActionResultType.SUCCESS
+        } { handlerItem =>
+          if (!worldIn.isRemote) {
+            val direction = state.get(FACING)
+            worldIn.getTileEntity(pos).asInstanceOf[CATTile].getFluidHandler(direction).ifPresent(cat =>
+              BucketEventHandler.transferFluid(worldIn, pos, player, handIn, cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack,
+                stack, handlerItem, cat))
+          }
+          ActionResultType.SUCCESS
+        }.value*/
     } else {
       ActionResultType.PASS
     }
