@@ -1,4 +1,7 @@
-## v16.0.1
-* Fixed CAT got fluid from empty inventory.
-* Fixed the pipe didn't have dummy bounding box when pipe wasn't connected to tank.
-* Remove shadow from text in CAT tile.
+## v16.0.2
+* **REQUIRES FORGE NEWER THAN 32.0.66**
+* Move logic to forge function.
+* Changed $plus behavior of FluidAmount.
+* Re-Added support of TOP and updated JEI.
+* Tag of fluid tank items.
+* Disabled fluid supplier by default.

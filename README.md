@@ -25,7 +25,7 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ### APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.16.1, newer than 1.16.1-32.0.6
+  * For Minecraft 1.16.1, newer than 1.16.1-32.0.66
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.3
@@ -39,8 +39,8 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
   * Licensed under the MIT License
   * Not used since 1.14.4
 
-* ~[Hwyla](https://github.com/TehNut/HWYLA/tree/1.15_forge)~
+* ~[Hwyla](https://github.com/TehNut/HWYLA/tree/1.16_forge)~
   * Licensed under CC BY-NC-SA 4.0
 
-* ~[The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.15)~
+* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.16)
   * Licensed under the MIT License Copyright © 2016 McJty
