@@ -115,7 +115,7 @@ repositories {
     }
     maven {
         name = "Hwyla"
-        url "http://tehnut.info/maven"
+        url "https://maven.tehnut.info"
     }
     maven { // The One Probe
         name 'tterrag maven'
