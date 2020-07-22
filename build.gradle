@@ -17,6 +17,7 @@ buildscript {
 
 plugins {
     id("maven-publish")
+    id "com.wynprice.cursemaven" version "2.1.5"
 }
 apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle'
@@ -130,12 +131,11 @@ repositories {
                 password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
             }
         }
-    } else {
-        maven {
-            // Curse Forge
-            name 'Curse Forge'
-            url 'https://minecraft.curseforge.com/api/maven/'
-        }
+    }
+    maven {
+        // Curse Forge
+        name 'Curse Forge'
+        url 'https://minecraft.curseforge.com/api/maven/'
     }
 }
 
@@ -155,6 +155,7 @@ dependencies {
     implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
     implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
     implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
+    implementation(fg.deobf("curse.maven:applied-energistics-2:3010055"))
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")
