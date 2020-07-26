@@ -35,18 +35,33 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
         this.connection = connection;
     }
 
+    /**
+     * Store new items, or simulate the addition of new items into the ME Inventory.
+     *
+     * @param input      item to add.
+     * @param actionable action type
+     * @param src        action source
+     * @return returns the number of items not added.
+     */
     @Override
-    public IAEFluidStack injectItems(IAEFluidStack stack, Actionable actionable, IActionSource iActionSource) {
-        FluidAmount fluidAmount = fromAEStack(stack);
+    public IAEFluidStack injectItems(IAEFluidStack input, Actionable actionable, IActionSource src) {
+        FluidAmount fluidAmount = fromAEStack(input);
         FluidAmount filled = connection.handler().fill(fluidAmount, actionable == Actionable.MODULATE, 0);
         return toAEStack(fluidAmount.$minus(filled));
     }
 
+    /**
+     * Extract the specified item from the ME Inventory
+     *
+     * @param request    item to request ( with stack size. )
+     * @param actionable simulate, or perform action?
+     * @return returns the number of items extracted, null
+     */
     @Override
-    public IAEFluidStack extractItems(IAEFluidStack stack, Actionable actionable, IActionSource iActionSource) {
-        return toAEStack(
-            connection.handler().drain(fromAEStack(stack), actionable == Actionable.MODULATE, 0)
-        );
+    public IAEFluidStack extractItems(IAEFluidStack request, Actionable actionable, IActionSource src) {
+        FluidAmount fluidAmount = fromAEStack(request);
+        FluidAmount drained = connection.handler().drain(fluidAmount, actionable == Actionable.MODULATE, 0);
+        return toAEStack(drained);
     }
 
     @Override
@@ -159,9 +174,17 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
         return AccessRestriction.READ_WRITE;
     }
 
+    /**
+     * determine if a particular item is prioritized for this inventory handler, if
+     * it is, then it will be added to this inventory prior to any non-prioritized
+     * inventories.
+     *
+     * @param input - item that might be added
+     * @return if its prioritized
+     */
     @Override
-    public boolean isPrioritized(IAEFluidStack stack) {
-        return false;
+    public boolean isPrioritized(IAEFluidStack input) {
+        return true;
     }
 
     @Override

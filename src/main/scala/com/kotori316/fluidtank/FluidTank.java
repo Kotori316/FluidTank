@@ -38,7 +38,7 @@ public class FluidTank {
     public static final String MOD_NAME = "FluidTank";
     public static final String modID = "fluidtank";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
-    public static final SideProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+    public static final SideProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
