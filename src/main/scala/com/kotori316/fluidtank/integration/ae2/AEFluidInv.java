@@ -12,11 +12,8 @@ import appeng.api.networking.storage.IBaseMonitor;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.IStorageChannel;
-import appeng.api.storage.IStorageMonitorable;
-import appeng.api.storage.IStorageMonitorableAccessor;
 import appeng.api.storage.channels.IFluidStorageChannel;
 import appeng.api.storage.data.IAEFluidStack;
-import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,15 +21,15 @@ import scala.Option;
 import scala.jdk.javaapi.FunctionConverters;
 
 import com.kotori316.fluidtank.FluidAmount;
-import com.kotori316.fluidtank.tiles.Connection;
+import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
-public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFluidStack>, IMEMonitorHandlerReceiver<IAEFluidStack> {
+public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerReceiver<IAEFluidStack> {
     private final IAppEngApi api;
-    private final Connection connection;
+    private final TileTankNoDisplay tank;
 
-    public AEFluidInv(IAppEngApi api, Connection connection) {
+    public AEFluidInv(IAppEngApi api, TileTankNoDisplay tank) {
         this.api = api;
-        this.connection = connection;
+        this.tank = tank;
     }
 
     /**
@@ -46,7 +43,7 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
     @Override
     public IAEFluidStack injectItems(IAEFluidStack input, Actionable actionable, IActionSource src) {
         FluidAmount fluidAmount = fromAEStack(input);
-        FluidAmount filled = connection.handler().fill(fluidAmount, actionable == Actionable.MODULATE, 0);
+        FluidAmount filled = tank.connection().handler().fill(fluidAmount, actionable == Actionable.MODULATE, 0);
         return toAEStack(fluidAmount.$minus(filled));
     }
 
@@ -60,16 +57,16 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
     @Override
     public IAEFluidStack extractItems(IAEFluidStack request, Actionable actionable, IActionSource src) {
         FluidAmount fluidAmount = fromAEStack(request);
-        FluidAmount drained = connection.handler().drain(fluidAmount, actionable == Actionable.MODULATE, 0);
+        FluidAmount drained = tank.connection().handler().drain(fluidAmount, actionable == Actionable.MODULATE, 0);
         return toAEStack(drained);
     }
 
     @Override
     @Deprecated
     public IItemList<IAEFluidStack> getAvailableItems(IItemList<IAEFluidStack> iItemList) {
-        connection.getFluidStack()
+        tank.connection().getFluidStack()
             .map(this::toAEStack)
-            .map(s -> s.setStackSize(connection.amount()))
+            .map(s -> s.setStackSize(tank.connection().amount()))
             .foreach(FunctionConverters.asScalaFromConsumer(iItemList::add));
         return iItemList;
     }
@@ -77,9 +74,9 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
     @Override
     public IItemList<IAEFluidStack> getStorageList() {
         IItemList<IAEFluidStack> list = getChannel().createList();
-        connection.getFluidStack()
+        tank.connection().getFluidStack()
             .map(this::toAEStack)
-            .map(s -> s.setStackSize(connection.amount()))
+            .map(s -> s.setStackSize(tank.connection().amount()))
             .foreach(FunctionConverters.asScalaFromConsumer(list::add));
         return list;
     }
@@ -87,20 +84,6 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
     @Override
     public IStorageChannel<IAEFluidStack> getChannel() {
         return api.storage().getStorageChannel(IFluidStorageChannel.class);
-    }
-
-    @Override
-    public IStorageMonitorable getInventory(IActionSource iActionSource) {
-        return new IStorageMonitorable() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public <T extends IAEStack<T>> IMEMonitor<T> getInventory(IStorageChannel<T> iStorageChannel) {
-                if (iStorageChannel == getChannel())
-                    return ((IMEMonitor<T>) AEFluidInv.this);
-                else
-                    return null;
-            }
-        };
     }
 
     @Nonnull
@@ -166,7 +149,7 @@ public class AEFluidInv implements IStorageMonitorableAccessor, IMEMonitor<IAEFl
 
     @Override
     public boolean isValid(Object o) {
-        return this.connection == o;
+        return this.tank.connection() == o;
     }
 
     @Override

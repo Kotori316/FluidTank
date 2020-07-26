@@ -12,6 +12,8 @@ import net.minecraft.util.{Direction, INameable}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
+
+import scala.collection.mutable.ArrayBuffer
 //import net.minecraftforge.fml.common.Optional
 
 //@Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
@@ -33,9 +35,17 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   }
 
   val tank = new Tank
-  var connection: Connection = Connection.invalid
+  private final var mConnection: Connection = Connection.invalid
+  final val connectionAttaches: ArrayBuffer[Connection => Unit] = ArrayBuffer.empty
   var loading = false
   var stackName: ITextComponent = _
+
+  def connection: Connection = mConnection
+
+  def connection_=(c: Connection): Unit = {
+    mConnection = c
+    connectionAttaches.foreach(_.apply(c))
+  }
 
   override def write(compound: CompoundNBT): CompoundNBT = {
     compound.put(TileTankNoDisplay.NBT_Tank, tank.writeToNBT(new CompoundNBT))
