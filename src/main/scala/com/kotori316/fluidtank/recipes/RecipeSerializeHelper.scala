@@ -25,7 +25,7 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
     copy(conditions = condition :: this.conditions)
 
   def addTagCondition(tag: ITag.INamedTag[_]): RecipeSerializeHelper =
-    addCondition(new TagCondition(tag.func_230234_a_()))
+    addCondition(new TagCondition(tag.getName))
 
   def build: JsonObject = {
     val o = recipe.getRecipeJson
@@ -42,7 +42,7 @@ object RecipeSerializeHelper {
   def by(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
 
   private def getConsumeValue(c: ShapedRecipeBuilder): IFinishedRecipe = {
-    c.addCriterion("dummy", RecipeUnlockedTrigger.func_235675_a_(new ResourceLocation("dummy:dummy")))
+    c.addCriterion("dummy", RecipeUnlockedTrigger.create(new ResourceLocation("dummy:dummy")))
     var t: IFinishedRecipe = null
     c.build(p => t = p)
     t

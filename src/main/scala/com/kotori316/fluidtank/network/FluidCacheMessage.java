@@ -10,7 +10,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.jdk.javaapi.OptionConverters;
@@ -44,14 +43,14 @@ public class FluidCacheMessage {
     public static FluidCacheMessage apply(CATTile tile) {
         FluidCacheMessage message = new FluidCacheMessage();
         message.pos = tile.getPos();
-        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::func_234922_V_).orElse(DimensionType.field_235999_c_).func_240901_a_();
+        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::func_234923_W_).orElse(World.field_234918_g_).func_240901_a_();
         message.amounts = tile.fluidAmountList();
         return message;
     }
 
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
         OptionConverters.toJava(FluidTank.proxy.getWorld(ctx.get()))
-            .filter(w -> w.func_234922_V_().func_240901_a_().equals(dimensionId))
+            .filter(w -> w.func_234923_W_().func_240901_a_().equals(dimensionId))
             .map(w -> w.getTileEntity(pos))
             .filter(CATTile.class::isInstance)
             .map(CATTile.class::cast)

@@ -54,7 +54,7 @@ object FluidTankDataProvider {
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
       val CAT = AdvancementSerializeHelper(ID("chest_as_tank"))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
-        .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(EntityPredicate.AndPredicate.field_234582_a_, MinMaxBounds.IntBound.atLeast(10),
+        .addCriterion("has_lots_of_items", new InventoryChangeTrigger.Instance(EntityPredicate.AndPredicate.ANY_AND, MinMaxBounds.IntBound.atLeast(10),
           MinMaxBounds.IntBound.UNBOUNDED, MinMaxBounds.IntBound.UNBOUNDED, Array(ItemPredicate.Builder.create().item(Items.WATER_BUCKET).build())))
       val PIPE = AdvancementSerializeHelper(ID("pipe"))
         .addCriterion("has_pearl", InventoryChangeTrigger.Instance.forItems(
@@ -100,7 +100,7 @@ object FluidTankDataProvider {
           .patternLine("xxx"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(new NotCondition(EasyCondition.getInstance()))
-        .addCondition(new TagCondition(Tags.Items.GLASS.func_230234_a_()))
+        .addCondition(new TagCondition(Tags.Items.GLASS.getName()))
       val EASY_WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(tankWoodItem)
           .key('x', Tags.Items.GLASS).key('p', ItemTags.PLANKS)
@@ -109,7 +109,7 @@ object FluidTankDataProvider {
           .patternLine("xpx"), saveName = ID("tank_wood_easy"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(EasyCondition.getInstance())
-        .addCondition(new TagCondition(Tags.Items.GLASS.func_230234_a_()))
+        .addCondition(new TagCondition(Tags.Items.GLASS.getName()))
       val VOID = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(ID("tank_void")))
           .key('o', Tags.Items.OBSIDIAN).key('t', woodTanks)
@@ -191,7 +191,7 @@ object FluidTankDataProvider {
 
   class FluidTagsProvider(g: DataGenerator) extends net.minecraft.data.FluidTagsProvider(g) {
     override def registerTags(): Unit = {
-      func_240522_a_(ModObjects.MILK_TAG).func_240532_a_(ModObjects.MILK_FLUID)
+      getOrCreateBuilder(ModObjects.MILK_TAG).addItemEntry(ModObjects.MILK_FLUID)
     }
   }
 

@@ -60,8 +60,8 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
     }
   }
 
-  override def func_230337_a_(state: BlockState, compound: CompoundNBT): Unit = {
-    super.func_230337_a_(state, compound)
+  override def read(state: BlockState, compound: CompoundNBT): Unit = {
+    super.read(state, compound)
     locked = compound.getBoolean("locked")
     mFluid = FluidAmount.fromNBT(compound.getCompound("fluid"))
     interval = Math.max(1, compound.getInt("interval"))

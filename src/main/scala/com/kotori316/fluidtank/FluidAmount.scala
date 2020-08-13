@@ -150,7 +150,7 @@ object FluidAmount {
 
   implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
     inst.group(
-      ResourceLocation.field_240908_a_.comapFlatMap[Fluid](
+      ResourceLocation.RESOURCE_LOCATION_CODEC.comapFlatMap[Fluid](
         name => if (ForgeRegistries.FLUIDS.containsKey(name)) DataResult.success(ForgeRegistries.FLUIDS.getValue(name)) else DataResult.error(s"No fluid for $name."),
         fluid => ForgeRegistries.FLUIDS.getKey(fluid)
       ).fieldOf(NBT_fluid).forGetter(_.fluid),

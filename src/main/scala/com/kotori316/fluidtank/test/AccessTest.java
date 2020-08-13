@@ -20,7 +20,7 @@ class AccessTest {
     @Test
     @Disabled("Access tag before bounding will cause crash.")
     void tag() {
-        assertTrue(FluidTags.WATER.func_230236_b_().isEmpty(), "Tag is empty.");
+        assertTrue(FluidTags.WATER.getAllElements().isEmpty(), "Tag is empty.");
     }
 
     @Test

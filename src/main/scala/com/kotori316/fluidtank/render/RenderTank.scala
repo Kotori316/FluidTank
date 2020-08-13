@@ -54,7 +54,7 @@ object RenderTank {
 
   private[this] def worldAndPos(tileTank: TileTank): (World, BlockPos) = {
     if (tileTank.hasWorld) (tileTank.getWorld, tileTank.getPos)
-    else (Minecraft.getInstance().world, Minecraft.getInstance().player.func_233580_cy_)
+    else (Minecraft.getInstance().world, Minecraft.getInstance().player.getPosition)
   }
 
 }

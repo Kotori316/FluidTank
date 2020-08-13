@@ -8,7 +8,7 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.DimensionType
+import net.minecraft.world.World
 import net.minecraftforge.fml.network.NetworkEvent
 
 /**
@@ -25,9 +25,9 @@ class TileMessage {
   }
 
   def onReceive(supplier: Supplier[NetworkEvent.Context]): Unit = {
-    for (world <- FluidTank.proxy.getWorld(supplier.get()) if world.func_234922_V_.func_240901_a_() == dim;
+    for (world <- FluidTank.proxy.getWorld(supplier.get()) if world.func_234923_W_().func_240901_a_() == dim;
          tile <- Option(world.getTileEntity(pos))) {
-      supplier.get().enqueueWork(() => tile.func_230337_a_(world.getBlockState(pos), nbt))
+      supplier.get().enqueueWork(() => tile.read(world.getBlockState(pos), nbt))
     }
     supplier.get().setPacketHandled(true)
   }
@@ -45,7 +45,7 @@ object TileMessage {
   def apply(tile: TileEntity): TileMessage = {
     val m = new TileMessage()
     m.pos = tile.getPos
-    m.dim = Option(tile.getWorld).map(_.func_234922_V_).getOrElse(DimensionType.field_235999_c_).func_240901_a_()
+    m.dim = Option(tile.getWorld).map(_.func_234923_W_()).getOrElse(World.field_234918_g_).func_240901_a_()
     m.nbt = tile.write(new CompoundNBT)
     m
   }

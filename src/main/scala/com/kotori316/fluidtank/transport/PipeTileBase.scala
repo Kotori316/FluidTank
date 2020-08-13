@@ -22,7 +22,7 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
 
   private def getEmptyConnection: PipeConnection2[BlockPos] = PipeConnection2.empty { p =>
     val state = getWorld.getBlockState(p)
-    if (PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().allMatch(pr => state.func_235901_b_(pr) /*has*/)) {
+    if (PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().allMatch(pr => state.hasProperty(pr))) {
       PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(pr => state.get(pr).isOutput)
     } else {
       false
@@ -60,8 +60,8 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
   /**
    * read nbt
    */
-  override def func_230337_a_(state: BlockState, compound: CompoundNBT): Unit = {
-    super.func_230337_a_(state, compound)
+  override def read(state: BlockState, compound: CompoundNBT): Unit = {
+    super.read(state, compound)
     this.color = compound.getInt("color")
     read(compound)
   }

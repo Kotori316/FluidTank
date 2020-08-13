@@ -55,8 +55,8 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
   override def getUpdatePacket = new SUpdateTileEntityPacket(getPos, 0, getUpdateTag)
 
-  override def func_230337_a_(state: BlockState, compound: CompoundNBT): Unit = {
-    super.func_230337_a_(state, compound)
+  override def read(state: BlockState, compound: CompoundNBT): Unit = {
+    super.read(state, compound)
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {

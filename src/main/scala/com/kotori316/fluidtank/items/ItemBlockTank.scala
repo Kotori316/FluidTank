@@ -55,7 +55,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
             nbt.putInt("x", pos.getX)
             nbt.putInt("y", pos.getY)
             nbt.putInt("z", pos.getZ)
-            tileentity.func_230337_a_(state, nbt)
+            tileentity.read(state, nbt)
             tileentity.markDirty()
           }
         }

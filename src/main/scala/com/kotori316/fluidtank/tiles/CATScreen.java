@@ -24,36 +24,36 @@ public class CATScreen extends ContainerScreen<CATContainer> {
 
     @Override
     @SuppressWarnings("deprecation")
-    protected void func_230450_a_(MatrixStack matrixStack, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
         // background
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.getMinecraft().getTextureManager().bindTexture(resourceLocation);
-        int i = (this.field_230708_k_ - this.xSize) / 2; // width
-        int j = (this.field_230709_l_ - this.ySize) / 2; // height
-        this.func_238474_b_(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2; // width
+        int j = (this.height - this.ySize) / 2; // height
+        this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
     }
 
     @Override
     @SuppressWarnings("NoTranslation")
-    protected void func_230451_b_(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
         //Foreground
-        super.func_230451_b_(matrixStack, mouseX, mouseY);
-//        String s = this.func_231171_q_().getString(); // getTitle
-//        int x = this.xSize / 2 - this.field_230712_o_.getStringWidth(s) / 2; // font
-//        this.field_230712_o_.func_238405_a_(matrixStack, s, x, 6, 0x404040);
-//        this.field_230712_o_.func_238405_a_(matrixStack, I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
+        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
+//        String s = this.getTitle().getString(); // getTitle
+//        int x = this.xSize / 2 - this.font.getStringWidth(s) / 2; // font
+//        this.font.func_238405_a_(matrixStack, s, x, 6, 0x404040);
+//        this.font.func_238405_a_(matrixStack, I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
         List<FluidAmount> stacks = catTile.fluidCache;
         for (int i = 0; i < stacks.size(); i++) {
             FluidAmount a = stacks.get(i);
-            this.field_230712_o_.func_238421_b_(matrixStack, a.toString(), 8, 16 + 10 * i, 0x404040);
+            this.font.drawString(matrixStack, a.toString(), 8, 16 + 10 * i, 0x404040);
         }
     }
 
     @Override
-    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         // render
-        this.func_230446_a_(matrixStack); // back ground
-        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks); // super.render
+        this.renderBackground(matrixStack); // back ground
+        super.render(matrixStack, mouseX, mouseY, partialTicks); // super.render
         this.func_230459_a_(matrixStack, mouseX, mouseY); // render tooltip
     }
 }
