@@ -37,7 +37,7 @@ archivesBaseName = "LargeFluidTank"
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
-static String mappingVersion() { return '20200514-1.16' }
+static String mappingVersion() { return '20200723-1.16.1' }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
