@@ -159,9 +159,9 @@ dependencies {
     implementation "org.scala-lang:scala-library:2.13.3"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    //implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
-    implementation fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6")
-    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.0-beta-3")
+    //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+    implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.0.11")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.0-beta-3")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")
