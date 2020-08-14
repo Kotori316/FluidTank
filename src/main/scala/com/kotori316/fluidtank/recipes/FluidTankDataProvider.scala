@@ -10,9 +10,9 @@ import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.advancements.criterion._
 import net.minecraft.block.Blocks
 import net.minecraft.data._
-import net.minecraft.item.Items
 import net.minecraft.item.crafting.Ingredient
-import net.minecraft.tags.ItemTags
+import net.minecraft.item.{Item, Items}
+import net.minecraft.tags.{ITag, ItemTags, TagCollectionManager}
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
@@ -38,6 +38,11 @@ object FluidTankDataProvider {
 
   private[this] final val ID = (s: String) => new ResourceLocation(FluidTank.modID, s)
 
+  private def tag(name: ResourceLocation): ITag.INamedTag[Item] = TagCollectionManager.func_242178_a().func_241836_b().func_241834_b(name) match {
+    case tag: ITag.INamedTag[_] => tag.asInstanceOf[ITag.INamedTag[Item]]
+    case _ => ItemTags.makeWrapperTag(name.toString)
+  }
+
   class AdvancementProvider(generatorIn: DataGenerator) extends IDataProvider {
     override def act(cache: DirectoryCache): Unit = {
       val path = generatorIn.getOutputFolder
@@ -49,7 +54,7 @@ object FluidTankDataProvider {
         .addItemCriterion(Tags.Items.GLASS)
       val TANK_WOOD_EASY = TANK_WOOD.copy(location = ID("tank_wood_easy"))
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
-        .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(ItemTags.makeWrapperTag(tier.tagName)))
+        .map(tier => AdvancementSerializeHelper(ID("tank_" + tier.toString.toLowerCase)).addItemCriterion(tag(new ResourceLocation(tier.tagName))))
       val VOID_TANK = AdvancementSerializeHelper(ID("tank_void"))
         .addItemCriterion(ForgeRegistries.ITEMS.getValue(woodLocation))
       val CAT = AdvancementSerializeHelper(ID("chest_as_tank"))
@@ -100,7 +105,7 @@ object FluidTankDataProvider {
           .patternLine("xxx"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(new NotCondition(EasyCondition.getInstance()))
-        .addCondition(new TagCondition(Tags.Items.GLASS.getName()))
+        .addCondition(new TagCondition(Tags.Items.GLASS.getName))
       val EASY_WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(tankWoodItem)
           .key('x', Tags.Items.GLASS).key('p', ItemTags.PLANKS)
@@ -109,7 +114,7 @@ object FluidTankDataProvider {
           .patternLine("xpx"), saveName = ID("tank_wood_easy"))
         .addCondition(ConfigCondition.getInstance())
         .addCondition(EasyCondition.getInstance())
-        .addCondition(new TagCondition(Tags.Items.GLASS.getName()))
+        .addCondition(new TagCondition(Tags.Items.GLASS.getName))
       val VOID = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ForgeRegistries.ITEMS.getValue(ID("tank_void")))
           .key('o', Tags.Items.OBSIDIAN).key('t', woodTanks)
@@ -160,7 +165,7 @@ object FluidTankDataProvider {
         .addCondition(EasyCondition.getInstance())
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierRecipe.FinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
-          .addTagCondition(ItemTags.makeWrapperTag(tier.tagName))
+          .addTagCondition(tag(new ResourceLocation(tier.tagName)))
           .addCondition(ConfigCondition.getInstance()))
       val FLUID_SOURCE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(ModObjects.blockSource)
