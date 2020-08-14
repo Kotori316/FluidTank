@@ -32,7 +32,8 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - id: check-test-started
-        run: [ -f test_started.txt ]
+        run: | 
+          [ -f test_started.txt ]
       - id: check-error
         run: |
           ! [ -f error-trace.txt ]
