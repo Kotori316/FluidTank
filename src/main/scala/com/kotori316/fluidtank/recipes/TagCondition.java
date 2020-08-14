@@ -44,6 +44,13 @@ public class TagCondition implements ICondition {
         return Objects.hash(tag_name);
     }
 
+    @Override
+    public String toString() {
+        return "TagCondition{" +
+            "tag_name=" + tag_name +
+            '}';
+    }
+
     public static class Serializer implements IConditionSerializer<TagCondition> {
         public static final TagCondition.Serializer INSTANCE = new TagCondition.Serializer();
 
