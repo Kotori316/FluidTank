@@ -238,7 +238,7 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.16.1'
+        addGameVersion '1.16.2'
         changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar
