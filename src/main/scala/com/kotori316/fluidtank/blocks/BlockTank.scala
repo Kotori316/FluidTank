@@ -87,11 +87,13 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
 
   //noinspection ScalaDeprecation
   override final def onReplaced(state: BlockState, worldIn: World, pos: BlockPos, newState: BlockState, isMoving: Boolean): Unit = {
-    worldIn.getTileEntity(pos) match {
-      case tank: TileTankNoDisplay => tank.onDestroy()
-      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+    if (!state.isIn(newState.getBlock)) {
+      worldIn.getTileEntity(pos) match {
+        case tank: TileTankNoDisplay => tank.onDestroy()
+        case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+      }
+      worldIn.removeTileEntity(pos)
     }
-    worldIn.removeTileEntity(pos)
   }
 
   def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
