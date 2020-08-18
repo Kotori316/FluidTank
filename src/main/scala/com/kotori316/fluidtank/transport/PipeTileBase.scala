@@ -4,6 +4,7 @@ import cats.implicits._
 import com.kotori316.fluidtank.network.{PacketHandler, TileMessage}
 import com.kotori316.fluidtank.{FluidTank, _}
 import javax.annotation.Nonnull
+import net.minecraft.block.BlockState
 import net.minecraft.item.DyeColor
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity, TileEntityType}
@@ -21,7 +22,7 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
 
   private def getEmptyConnection: PipeConnection2[BlockPos] = PipeConnection2.empty { p =>
     val state = getWorld.getBlockState(p)
-    if (PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().allMatch(pr => state.has(pr))) {
+    if (PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().allMatch(pr => state.hasProperty(pr))) {
       PipeBlock.FACING_TO_PROPERTY_MAP.values().stream().anyMatch(pr => state.get(pr).isOutput)
     } else {
       false
@@ -56,10 +57,16 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
   def connectorUpdate(): Unit =
     applyToAllPipe(tile => tile.connection = tile.getEmptyConnection)
 
-  override def read(compound: CompoundNBT): Unit = {
-    super.read(compound)
+  /**
+   * read nbt
+   */
+  override def read(state: BlockState, compound: CompoundNBT): Unit = {
+    super.read(state, compound)
     this.color = compound.getInt("color")
+    read(compound)
   }
+
+  def read(compound: CompoundNBT): Unit = ()
 
   override def write(compound: CompoundNBT): CompoundNBT = {
     compound.putInt("color", this.color)

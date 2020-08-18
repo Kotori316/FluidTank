@@ -9,11 +9,8 @@
       "type": "fluidtank:config"
     },
     {
-      "value": {
-        "tag": "forge:ingots/lead",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:ingots/lead",
+      "type": "fluidtank:tag"
     }
   ]
 }

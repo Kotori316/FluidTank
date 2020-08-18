@@ -4,6 +4,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.scala_lib.util.Neighbor
+import com.mojang.serialization.DataResult
 import net.minecraft.fluid.Fluid
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.Direction
@@ -77,4 +78,20 @@ package object fluidtank {
   implicit final val NeighborOfBlockPos: Neighbor[BlockPos] = (origin: BlockPos) => Set(
     origin.up, origin.down, origin.north, origin.east, origin.south, origin.west
   )
+
+  implicit class EitherToResult[A](private val either: Either[String, A]) extends AnyVal {
+    def toResult: DataResult[A] = either match {
+      case Left(value) => DataResult.error(value)
+      case Right(value) => DataResult.success(value)
+    }
+  }
+
+  implicit class IorToResult[A](private val ior: Ior[String, A]) extends AnyVal {
+    def toResult: DataResult[A] = ior match {
+      case Ior.Left(a) => DataResult.error(a)
+      case Ior.Right(b) => DataResult.success(b)
+      case Ior.Both(a, b) => DataResult.error(a, b)
+    }
+  }
+
 }

@@ -2,8 +2,8 @@ package com.kotori316.fluidtank
 
 import com.mojang.blaze3d.matrix.MatrixStack
 import com.mojang.blaze3d.vertex.IVertexBuilder
-import net.minecraft.client.renderer.{Vector3f, Vector4f}
 import net.minecraft.util.Direction
+import net.minecraft.util.math.vector.{Vector3f, Vector4f}
 
 package object render {
 

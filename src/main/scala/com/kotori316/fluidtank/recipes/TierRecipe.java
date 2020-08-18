@@ -9,8 +9,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
@@ -275,7 +275,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public void serialize(JsonObject json) {
-            Ingredient ingredient = Ingredient.fromTag(ItemTags.getCollection().getOrCreate(new ResourceLocation(tiers.tagName())));
+            Ingredient ingredient = Ingredient.fromTag(ItemTags.makeWrapperTag(this.tiers.tagName()));
             JsonObject object = RecipeSerializeHelper.TierRecipeSerializer().serialize(new TierRecipe(this.recipeId, this.tiers, ingredient), JsonOps.INSTANCE)
                 .getValue().getAsJsonObject();
             object.entrySet().forEach(e -> json.add(e.getKey(), e.getValue()));

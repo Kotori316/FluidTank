@@ -12,7 +12,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.DyeColor;
@@ -27,10 +27,10 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -126,7 +126,7 @@ public abstract class PipeBlock extends Block {
         BlockPos pos = context.getPos();
 //        return FACING_TO_PROPERTY_MAP.entrySet().stream()
 //        .reduce(this.getDefaultState(), (s, e) -> s.with(e.getValue(), canConnectTo(worldIn, pos.offset(e.getKey()), e.getKey())), (s1, s2) -> s1);
-//        IFluidState fluidState = worldIn.getFluidState(pos);
+//        FluidState fluidState = worldIn.getFluidState(pos);
         return this.getDefaultState()
             .with(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
             .with(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))
@@ -208,7 +208,7 @@ public abstract class PipeBlock extends Block {
         }
 
         // Modifying pipe connection.
-        Vec3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
+        Vector3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
         Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
             AxisAlignedBB box = e.getValue().getBoundingBox();
             return box.minX <= d.x && box.maxX >= d.x && box.minY <= d.y && box.maxY >= d.y && box.minZ <= d.z && box.maxZ >= d.z;
@@ -219,7 +219,7 @@ public abstract class PipeBlock extends Block {
             .findFirst()
             .map(p -> {
                 if (worldIn.getBlockState(pos.offset(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
-                    return Pair.of(state.cycle(p), false);
+                    return Pair.of(state.func_235896_a_(p), false);
                 else
                     return Pair.of(state.with(p, Connection.onOffConnection(state.get(p))), true);
             });
@@ -274,7 +274,7 @@ public abstract class PipeBlock extends Block {
 
     @Override
     @SuppressWarnings("deprecation")
-    public IFluidState getFluidState(BlockState state) {
+    public FluidState getFluidState(BlockState state) {
         return /*state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) :*/ super.getFluidState(state);
     }
 
@@ -284,7 +284,6 @@ public abstract class PipeBlock extends Block {
         INPUT,
         OUTPUT;
 
-        @Override
         public String getName() {
             return name().toLowerCase();
         }
@@ -310,6 +309,11 @@ public abstract class PipeBlock extends Block {
                 return CONNECTED;
             else
                 return NO_CONNECTION;
+        }
+
+        @Override
+        public String getString() {
+            return getName();
         }
     }
 

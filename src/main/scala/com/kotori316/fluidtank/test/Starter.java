@@ -41,6 +41,14 @@ public class Starter implements IDataProvider {
             )
             .build();
 
+        if (isInCI()) {
+            try {
+                Files.createFile(Paths.get("..", "test_started.txt"));
+            } catch (IOException e) {
+                LOGGER.error("File IO", e);
+            }
+        }
+
         Launcher launcher = LauncherFactory.create();
 
         // Register a listener of your choice

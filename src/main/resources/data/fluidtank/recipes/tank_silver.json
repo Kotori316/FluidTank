@@ -9,11 +9,8 @@
       "type": "fluidtank:config"
     },
     {
-      "value": {
-        "tag": "forge:ingots/silver",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:ingots/silver",
+      "type": "fluidtank:tag"
     }
   ]
 }

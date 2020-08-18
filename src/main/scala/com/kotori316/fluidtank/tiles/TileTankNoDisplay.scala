@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.tiles
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.{FluidAmount, ModObjects, Utils}
+import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SUpdateTileEntityPacket
@@ -64,12 +65,12 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
   override def getUpdatePacket = new SUpdateTileEntityPacket(getPos, 0, getUpdateTag)
 
-  override def read(compound: CompoundNBT): Unit = {
-    super.read(compound)
+  override def read(state: BlockState, compound: CompoundNBT): Unit = {
+    super.read(state, compound)
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
-      stackName = ITextComponent.Serializer.fromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
+      stackName = ITextComponent.Serializer.func_240643_a_(compound.getString(TileTankNoDisplay.NBT_StackName))
     }
     loading = true
   }
@@ -78,13 +79,13 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
-      stackName = ITextComponent.Serializer.fromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
+      stackName = ITextComponent.Serializer.func_240643_a_(compound.getString(TileTankNoDisplay.NBT_StackName))
     } else {
       stackName = null
     }
   }
 
-  override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = handleUpdateTag(pkt.getNbtCompound)
+  override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = () //handleUpdateTag(pkt.getNbtCompound) // No way to get state
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     val c = connection.getCapability(capability, facing)
@@ -96,8 +97,6 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   }
 
   def hasContent: Boolean = tank.getFluid.nonEmpty
-
-  override def hasFastRenderer = true
 
   def getComparatorLevel: Int = connection.getComparatorLevel
 

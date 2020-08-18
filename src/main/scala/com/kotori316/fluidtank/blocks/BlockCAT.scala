@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.CATTile
-import net.minecraft.block.{Block, BlockRenderType, BlockState, ContainerBlock}
+import net.minecraft.block._
 import net.minecraft.entity.player.{PlayerEntity, ServerPlayerEntity}
 import net.minecraft.item.{BlockItem, BlockItemUseContext, Item}
 import net.minecraft.state.StateContainer
@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fml.network.NetworkHooks
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(0.7f)) {
+class BlockCAT extends ContainerBlock(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(0.7f)) {
   // Chest as Tank
   setRegistryName(FluidTank.modID, BlockCAT.NAME)
   val itemBlock = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
@@ -50,6 +50,21 @@ class BlockCAT extends ContainerBlock(Block.Properties.create(ModObjects.MATERIA
             NetworkHooks.openGui(player.asInstanceOf[ServerPlayerEntity], worldIn.getTileEntity(pos).asInstanceOf[CATTile], pos)
           ActionResultType.SUCCESS
       }
+      /* FluidUtil.getFluidHandler(copiedStack).asScala
+        .filter(_ => !stack.isEmpty)
+        .fold {
+          if (!worldIn.isRemote)
+            NetworkHooks.openGui(player.asInstanceOf[ServerPlayerEntity], worldIn.getTileEntity(pos).asInstanceOf[CATTile], pos)
+          ActionResultType.SUCCESS
+        } { handlerItem =>
+          if (!worldIn.isRemote) {
+            val direction = state.get(FACING)
+            worldIn.getTileEntity(pos).asInstanceOf[CATTile].getFluidHandler(direction).ifPresent(cat =>
+              BucketEventHandler.transferFluid(worldIn, pos, player, handIn, cat.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack,
+                stack, handlerItem, cat))
+          }
+          ActionResultType.SUCCESS
+        }.value*/
     } else {
       ActionResultType.PASS
     }

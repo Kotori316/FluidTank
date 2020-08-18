@@ -3,8 +3,8 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
+import net.minecraft.block._
 import net.minecraft.block.material.Material
-import net.minecraft.block.{Block, BlockRenderType, BlockState, ContainerBlock}
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -16,7 +16,9 @@ import net.minecraft.util.text.{ITextComponent, StringTextComponent, Translation
 import net.minecraft.util.{ActionResultType, Hand, NonNullList}
 import net.minecraft.world.{IBlockReader, World}
 
-class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
+import scala.util.Try
+
+class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
   setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   val itemBlock = new FluidSourceItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
   itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
@@ -120,13 +122,17 @@ class FluidSourceBlock extends ContainerBlock(Block.Properties.create(Material.I
   }
 
   override def addInformation(stack: ItemStack, worldIn: IBlockReader, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
-    tooltip.add(
-      if (FluidSourceBlock.isCheatStack(stack)) {
-        new TranslationTextComponent(FluidSourceBlock.TOOLTIP_INF)
-      } else {
-        new TranslationTextComponent(FluidSourceBlock.TOOLTIP)
-      }
-    )
+    if (Try(Config.content.enableFluidSupplier.get().booleanValue()).getOrElse(false)) {
+      tooltip.add(
+        if (FluidSourceBlock.isCheatStack(stack)) {
+          new TranslationTextComponent(FluidSourceBlock.TOOLTIP_INF)
+        } else {
+          new TranslationTextComponent(FluidSourceBlock.TOOLTIP)
+        }
+      )
+    } else {
+      tooltip.add(new TranslationTextComponent(FluidSourceBlock.TOOLTIP_DISABLED))
+    }
   }
 }
 
@@ -136,6 +142,7 @@ object FluidSourceBlock {
   final val CHANGE_INTERVAL = "chat.fluidtank.change_interval"
   final val TOOLTIP = "tooltip.fluidtank.source"
   final val TOOLTIP_INF = "tooltip.fluidtank.source_inf"
+  final val TOOLTIP_DISABLED = "tooltip.fluidtank.source_disabled"
   final val CHEAT_MODE = BooleanProperty.create("cheat_mode")
   val KEY_CHEAT = "unlocked"
 

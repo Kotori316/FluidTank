@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.integration.hwyla;
+/*package com.kotori316.fluidtank.integration.hwyla;
 
 import java.util.List;
 
@@ -40,3 +40,4 @@ public class SupplierDataProvider implements IServerDataProvider<TileEntity>, IC
         }
     }
 }
+*/

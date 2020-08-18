@@ -1,12 +1,11 @@
 package com.kotori316.fluidtank.blocks
 
 import com.google.gson.{JsonDeserializationContext, JsonObject}
-import com.kotori316.fluidtank.FluidTank
+import com.kotori316.fluidtank.ModObjects
 import com.kotori316.fluidtank.items.ItemBlockTank
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
-import net.minecraft.world.storage.loot.conditions.ILootCondition
-import net.minecraft.world.storage.loot.{LootContext, LootFunction, LootParameters}
+import net.minecraft.loot.conditions.ILootCondition
+import net.minecraft.loot.{LootContext, LootFunction, LootFunctionType, LootParameters}
 
 class ContentTank(cond: Array[ILootCondition]) extends LootFunction(cond) {
   override def doApply(stack: ItemStack, context: LootContext): ItemStack = {
@@ -17,11 +16,10 @@ class ContentTank(cond: Array[ILootCondition]) extends LootFunction(cond) {
     }
     stack
   }
+
+  override def func_230425_b_(): LootFunctionType = ModObjects.TANK_CONTENT_LOOT
 }
 
-class ContentTankSerializer extends LootFunction.Serializer[ContentTank](
-  new ResourceLocation(FluidTank.modID, "content_tank"),
-  classOf[ContentTank]
-) {
+class ContentTankSerializer extends LootFunction.Serializer[ContentTank] {
   override def deserialize(json: JsonObject, c: JsonDeserializationContext, conditionsIn: Array[ILootCondition]): ContentTank = new ContentTank(conditionsIn)
 }

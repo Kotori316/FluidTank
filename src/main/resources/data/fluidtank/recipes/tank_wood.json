@@ -18,6 +18,10 @@
   },
   "conditions": [
     {
+      "tag": "forge:glass",
+      "type": "fluidtank:tag"
+    },
+    {
       "value": {
         "type": "fluidtank:easy"
       },

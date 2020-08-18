@@ -39,7 +39,7 @@ object Config {
 
     val enableWailaAndTOP: ForgeConfigSpec.BooleanValue = builder.comment("True to enable waila and top to show tank info.").define("showToolTipOnMods", true)
 
-    val enableFluidSupplier: ForgeConfigSpec.BooleanValue = builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", true)
+    val enableFluidSupplier: ForgeConfigSpec.BooleanValue = builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", false)
 
     val enablePipeRainbowRenderer: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false)
     val pipeColor: ForgeConfigSpec.ConfigValue[Integer] = builder.worldRestart().comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.").define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF))

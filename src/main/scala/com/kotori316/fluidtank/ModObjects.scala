@@ -8,10 +8,13 @@ import com.mojang.datafixers.DSL
 import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
+import net.minecraft.loot.LootFunctionType
+import net.minecraft.tags.FluidTags
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.shapes.VoxelShapes
+import net.minecraft.util.registry.Registry
 
 import scala.reflect.ClassTag
 
@@ -22,9 +25,9 @@ object ModObjects {
     override def createIcon = new ItemStack(woodTank)
   }.setTabPath(FluidTank.modID)
   final val MATERIAL = new Material(MaterialColor.AIR, false, true, true, false,
-    true, false, false, PushReaction.BLOCK)
+    false, false, PushReaction.BLOCK)
   final val MATERIAL_PIPE = new Material(MaterialColor.AIR, false, false, true, false,
-    true, false, false, PushReaction.BLOCK)
+    false, false, PushReaction.BLOCK)
   private[this] final val d = 1 / 16d
   final val BOUNDING_BOX = new AxisAlignedBB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d)
   final val TANK_SHAPE = VoxelShapes.create(BOUNDING_BOX)
@@ -57,7 +60,7 @@ object ModObjects {
   final val SOURCE_TYPE = createTileType(() => new FluidSourceTile, List(blockSource))
 
   def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
-    val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(DSL.nilType())
+    val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(DSL.emptyPartType())
     t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
     types = t :: types
     t
@@ -71,5 +74,10 @@ object ModObjects {
 
   //---------- Fluids ----------
   final val MILK_FLUID = new MilkFluid
-  final val MILK_TAG = new net.minecraft.tags.FluidTags.Wrapper(new ResourceLocation("minecraft:milk"))
+  final val MILK_TAG = FluidTags.makeWrapperTag("minecraft:milk")
+
+  //---------- LootFunction ----------
+  final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
+    new ResourceLocation(FluidTank.modID, "content_tank"),
+    new LootFunctionType(new ContentTankSerializer))
 }

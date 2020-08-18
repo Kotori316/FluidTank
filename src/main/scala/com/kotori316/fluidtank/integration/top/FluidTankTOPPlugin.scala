@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.integration.top
 
-import cats.data.Reader
+import cats.data.{Kleisli, Reader}
 import mcjty.theoneprobe.api.ITheOneProbe
 import net.minecraftforge.fml.{InterModComms, ModList}
 
@@ -21,5 +21,5 @@ object FluidTankTOPPlugin {
 
   def sendIMC: Reader[String, Boolean] =
     if (ModList.get().isLoaded(TOP_ID)) send
-    else Reader(_ => false)
+    else Kleisli.pure(false)
 }

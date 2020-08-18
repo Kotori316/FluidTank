@@ -31,11 +31,8 @@
   ],
   "conditions": [
     {
-      "value": {
-        "tag": "forge:stone",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:stone",
+      "type": "fluidtank:tag"
     }
   ]
 }

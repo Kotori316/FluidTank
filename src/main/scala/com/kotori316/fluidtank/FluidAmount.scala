@@ -1,10 +1,13 @@
 package com.kotori316.fluidtank
 
+import java.lang
+import java.util.Optional
+
 import cats._
 import cats.implicits._
 import com.kotori316.fluidtank.DynamicSerializable._
-import com.mojang.datafixers
-import com.mojang.datafixers.types.DynamicOps
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import com.mojang.serialization.{Codec, DataResult, DynamicOps, Dynamic => SerializeDynamic}
 import javax.annotation.Nonnull
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
@@ -72,7 +75,7 @@ object FluidAmount {
     }
   }
 
-  def fromNBT(tag: CompoundNBT): FluidAmount = dynamicSerializableFA.deserializeFromNBT(tag)
+  def fromNBT(tag: CompoundNBT): FluidAmount = codecFA.parse(NBTDynamicOps.INSTANCE, tag).result().orElse(EMPTY)
 
   def fromStack(stack: FluidStack): FluidAmount = {
     val fluid = stack.getRawFluid
@@ -118,19 +121,19 @@ object FluidAmount {
   implicit val showFA: Show[FluidAmount] = Show.fromToString
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
 
-  implicit val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
-    override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): datafixers.Dynamic[DataType] = {
+  val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
+    override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
       val map = Map[String, DataType](
         NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
         NBT_amount -> ops.createLong(t.amount)
-      ) ++ t.nbt.map(c => NBT_tag -> datafixers.Dynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
+      ) ++ t.nbt.map(c => NBT_tag -> SerializeDynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
 
       val data = map.map { case (key, data) => ops.createString(key) -> data }
-      new datafixers.Dynamic[DataType](ops, ops.createMap(data.asJava))
+      new SerializeDynamic[DataType](ops, ops.createMap(data.asJava))
     }
 
-    override def deserialize[DataType](d: datafixers.Dynamic[DataType]): FluidAmount = {
-      val fluidName = d.get(NBT_fluid).asString().toScala
+    override def deserialize[DataType](d: SerializeDynamic[DataType]): FluidAmount = {
+      val fluidName = d.get(NBT_fluid).asString().result().toScala
         .map(s => new ResourceLocation(s))
         .getOrElse(Fluids.EMPTY.getRegistryName)
       val fluid = registry.getValue(fluidName)
@@ -138,10 +141,27 @@ object FluidAmount {
         EMPTY
       } else {
         val amount = d.get(NBT_amount).asLong(0L)
-        val nbt = d.getElement(NBT_tag).toScala.map(c => datafixers.Dynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
+        val nbt = d.getElement(NBT_tag).result().toScala.map(c => SerializeDynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
           .collect { case t: CompoundNBT if !t.isEmpty => t }
         FluidAmount(fluid, amount, nbt)
       }
     }
   }
+
+  implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
+    inst.group(
+      ResourceLocation.RESOURCE_LOCATION_CODEC.comapFlatMap[Fluid](
+        name => if (ForgeRegistries.FLUIDS.containsKey(name)) DataResult.success(ForgeRegistries.FLUIDS.getValue(name)) else DataResult.error(s"No fluid for $name."),
+        fluid => ForgeRegistries.FLUIDS.getKey(fluid)
+      ).fieldOf(NBT_fluid).forGetter(_.fluid),
+      Codec.LONG.fieldOf(NBT_amount).forGetter(_.amount),
+      CompoundNBT.field_240597_a_.optionalFieldOf(NBT_tag).forGetter(_.nbt.toJava),
+    ).apply(inst, inst.stable[com.mojang.datafixers.util.Function3[Fluid, lang.Long, Optional[CompoundNBT], FluidAmount]](
+      (f, l, o) => FluidAmount(f, l, o.toScala)
+    ))
+  }
+
+  implicit val dynamicSerializableFromCodecFA: DynamicSerializable[FluidAmount] =
+    new DynamicSerializable.DynamicSerializableFromCodec(codecFA, EMPTY)
+
 }

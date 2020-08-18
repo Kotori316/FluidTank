@@ -2,9 +2,9 @@ package com.kotori316.fluidtank.tiles;
 
 import java.util.List;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
@@ -23,33 +23,37 @@ public class CATScreen extends ContainerScreen<CATContainer> {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    @SuppressWarnings("deprecation")
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float p_230450_2_, int p_230450_3_, int p_230450_4_) {
+        // background
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.getMinecraft().getTextureManager().bindTexture(resourceLocation);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.blit(i, j, 0, 0, this.xSize, this.ySize);
+        int i = (this.width - this.xSize) / 2; // width
+        int j = (this.height - this.ySize) / 2; // height
+        this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
     }
 
     @Override
     @SuppressWarnings("NoTranslation")
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        String s = this.getTitle().getFormattedText();
-        int x = this.xSize / 2 - this.font.getStringWidth(s) / 2;
-        this.font.drawString(s, x, 6, 0x404040);
-        this.font.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+        //Foreground
+        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
+//        String s = this.getTitle().getString(); // getTitle
+//        int x = this.xSize / 2 - this.font.getStringWidth(s) / 2; // font
+//        this.font.func_238405_a_(matrixStack, s, x, 6, 0x404040);
+//        this.font.func_238405_a_(matrixStack, I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 0x404040);
         List<FluidAmount> stacks = catTile.fluidCache;
         for (int i = 0; i < stacks.size(); i++) {
             FluidAmount a = stacks.get(i);
-            this.font.drawString(a.toString(), 8, 16 + 10 * i, 0x404040);
+            this.font.drawString(matrixStack, a.toString(), 8, 16 + 10 * i, 0x404040);
         }
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        // render
+        this.renderBackground(matrixStack); // back ground
+        super.render(matrixStack, mouseX, mouseY, partialTicks); // super.render
+        this.func_230459_a_(matrixStack, mouseX, mouseY); // render tooltip
     }
 }

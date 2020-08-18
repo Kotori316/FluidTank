@@ -31,11 +31,8 @@
   ],
   "conditions": [
     {
-      "value": {
-        "tag": "forge:ingots/tin",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:ingots/tin",
+      "type": "fluidtank:tag"
     }
   ]
 }

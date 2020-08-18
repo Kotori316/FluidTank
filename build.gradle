@@ -10,14 +10,13 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.2.0'
-        classpath group: "gradle.plugin.com.github.breadmoirai", name: "github-release", version: "2.2.9"
+        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
     }
 }
 
 plugins {
     id("maven-publish")
-    id "com.wynprice.cursemaven" version "2.1.5"
+    id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle'
@@ -38,13 +37,17 @@ archivesBaseName = "LargeFluidTank"
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
+static String mappingVersion() { return '20200723-1.16.1' }
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   Snapshot are built nightly.
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200514-1.15.1'
+    mappings channel: 'snapshot', version: mappingVersion()
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -88,7 +91,10 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'info'
 
-            args '--mod', "fluidtank", '--all'
+            if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS")))
+                args '--mod', "fluidtank", '--dev'
+            else
+                args '--mod', "fluidtank", '--all'
 
             mods {
                 fluidtank {
@@ -114,10 +120,10 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-    maven {
-        name = "Hwyla"
-        url "https://maven.tehnut.info"
-    }
+//    maven {
+//        name = "Hwyla"
+//        url "https://maven.tehnut.info"
+//    }
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
@@ -131,11 +137,12 @@ repositories {
                 password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
             }
         }
-    }
-    maven {
-        // Curse Forge
-        name 'Curse Forge'
-        url 'https://minecraft.curseforge.com/api/maven/'
+    } else {
+        maven {
+            // Curse Forge
+            name 'Curse Forge'
+            url 'https://minecraft.curseforge.com/api/maven/'
+        }
     }
 }
 
@@ -149,13 +156,13 @@ dependencies {
     // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
     def forge_prop = loadProperties("forge_version.properties")
     minecraft(forge_prop.getProperty("forge_version"))
-    implementation "org.scala-lang:scala-library:2.13.2"
+    implementation "org.scala-lang:scala-library:2.13.3"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
-    implementation fg.deobf("mezz.jei:jei-1.15.2:6.0.0.4")
-    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.2-4")
-    implementation(fg.deobf("curse.maven:applied-energistics-2:3010055"))
+    //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+    implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.0.11")
+    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.0-beta-3")
+    compileOnly fg.deobf("appeng:appliedenergistics2:8.0.0-beta.1")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")
@@ -232,7 +239,7 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.15.2'
+        addGameVersion '1.16.2'
         changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar
@@ -251,7 +258,7 @@ curseforge {
 githubRelease {
     repo = 'FluidTank'
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish = '1.15.1'
+    targetCommitish = '1.16'
     body {
         getLatestChangeLog()
     }
@@ -308,7 +315,11 @@ void moveOldLog() {
     if (new_log_file.exists()) {
         if (!old_log_file.exists())
             old_log_file.createNewFile()
-        def combined = new_log_file.text + System.lineSeparator() + old_log_file.text
+        def combined = new_log_file.text +
+                System.lineSeparator() +
+                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${mappingVersion()}" +
+                System.lineSeparator() * 2 +
+                old_log_file.text
         old_log_file.setText(combined)
     }
 }

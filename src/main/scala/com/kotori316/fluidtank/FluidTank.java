@@ -7,7 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
-import com.kotori316.fluidtank.blocks.ContentTankSerializer;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
@@ -30,6 +28,7 @@ import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.ConfigCondition;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.EasyCondition;
+import com.kotori316.fluidtank.recipes.TagCondition;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
 
@@ -53,7 +52,6 @@ public class FluidTank {
             PacketHandler.init();
             CapabilityFluidTank.register();
             FluidTankTOPPlugin.sendIMC().apply(modID);
-            LootFunctionManager.registerFunction(new ContentTankSerializer());
         }
 
         @SubscribeEvent
@@ -92,6 +90,7 @@ public class FluidTank {
             event.getRegistry().register(TierRecipe.SERIALIZER);
             CraftingHelper.register(new ConfigCondition.Serializer());
             CraftingHelper.register(new EasyCondition.Serializer());
+            CraftingHelper.register(new TagCondition.Serializer());
         }
 
         @SubscribeEvent

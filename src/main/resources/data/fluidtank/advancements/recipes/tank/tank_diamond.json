@@ -31,11 +31,8 @@
   ],
   "conditions": [
     {
-      "value": {
-        "tag": "forge:gems/diamond",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
+      "tag": "forge:gems/diamond",
+      "type": "fluidtank:tag"
     }
   ]
 }
