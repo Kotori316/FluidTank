@@ -120,10 +120,10 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-//    maven {
-//        name = "Hwyla"
-//        url "http://tehnut.info/maven"
-//    }
+    maven {
+        name = "Hwyla"
+        url "https://maven.tehnut.info"
+    }
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
@@ -159,9 +159,9 @@ dependencies {
     implementation "org.scala-lang:scala-library:2.13.3"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    //compileOnly fg.deobf("mcp.mobius.waila:Hwyla:1.10.8-B72_1.15.2")
+    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
     implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.0.11")
-    compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.0-beta-3")
+    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.2-beta-5")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.2-build-2:dev")

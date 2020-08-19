@@ -1,4 +1,4 @@
-/*package com.kotori316.fluidtank.integration.hwyla;
+package com.kotori316.fluidtank.integration.hwyla;
 
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IWailaPlugin;
@@ -15,7 +15,7 @@ import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 /*
     Use java to avoid strange java.lang.VerifyError.
- *//*
+ */
 @WailaPlugin
 public class TankWailaPlugin implements IWailaPlugin {
 
@@ -44,4 +44,3 @@ public class TankWailaPlugin implements IWailaPlugin {
         }
     }
 }
-*/
