@@ -86,6 +86,7 @@ class AEConnectionCapabilityProvider implements ICapabilityProvider, IStorageMon
             if (aeFluidInv == null) {
                 aeFluidInv = new AEFluidInv(api, tank);
                 tank.connectionAttaches().append(this::addUpdater);
+                this.addUpdater(tank.connection());
             }
             return (IMEMonitor<T>) aeFluidInv;
         } else {
