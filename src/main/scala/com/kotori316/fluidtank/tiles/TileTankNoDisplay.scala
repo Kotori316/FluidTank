@@ -178,7 +178,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
 
     def canFillFluidType(fluid: FluidAmount): Boolean = {
       val fluidType = connection.getFluidStack
-      fluidType.isEmpty || fluidType.exists(fluid.fluidEqual)
+      fluid.nonEmpty && (fluidType.isEmpty || fluidType.exists(fluid.fluidEqual))
     }
 
     // Util methods
