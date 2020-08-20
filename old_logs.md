@@ -1,3 +1,9 @@
+## v16.0.4
+* Support HWYLA
+* Fixed a bug that Creative Tank fills normal tanks with empty fluid.
+
+Build with net.minecraftforge:forge:1.16.2-33.0.5, Mapping: 20200723-1.16.1
+
 ## v16.0.3
 * Update for 1.16.2
 
