@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.network;
 
-import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,7 +10,6 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;
@@ -25,7 +23,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.Option;
@@ -85,12 +82,8 @@ public class ClientProxy extends SideProxy {
             RenderTypeLookup.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
 
             // Item Properties Override
-            Method registerOverride = ObfuscationReflectionHelper.findMethod(ItemModelsProperties.class, "func_239420_a_", ResourceLocation.class, IItemPropertyGetter.class);
-            try {
-                registerOverride.invoke(null, new ResourceLocation(FluidTank.modID, "source_cheat"), ((IItemPropertyGetter) (stack, world, entity) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f));
-            } catch (ReflectiveOperationException e) {
-                FluidTank.LOGGER.error(e);
-            }
+            ItemModelsProperties.func_239418_a_(ModObjects.blockSource().itemBlock(),
+                new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
         }
 
         private static RenderPipe createPipeRenderer(TileEntityRendererDispatcher d) {
