@@ -120,9 +120,11 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
-    maven {
-        name = "Hwyla"
-        url "https://maven.tehnut.info"
+    if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
+        maven {
+            name = "Hwyla"
+            url "https://maven.tehnut.info"
+        }
     }
     maven { // The One Probe
         name 'tterrag maven'
@@ -159,7 +161,9 @@ dependencies {
     implementation "org.scala-lang:scala-library:2.13.3"
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.1.0'
 
-    implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+    if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
+        implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+    }
     implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.0.11")
     implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.2-beta-5")
     compileOnly fg.deobf("appeng:appliedenergistics2:8.0.0-beta.1")
@@ -305,6 +309,15 @@ if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
     tasks.withType(JavaExec) {
         // Avoid error of GL
         systemProperty("fml.earlyprogresswindow", false)
+    }
+    // Remove HWYLA class.
+    sourceSets {
+        main {
+            scala {
+                srcDir 'src/main/scala'
+                exclude "/com/kotori316/fluidtank/integration/hwyla/**"
+            }
+        }
     }
 }
 
