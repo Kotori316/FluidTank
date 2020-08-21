@@ -24,7 +24,7 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
       - name: Test-JUnit
-        run: chmod +x ./gradlew && ./gradlew --no-daemon --all test
+        run: chmod +x ./gradlew && ./gradlew --no-daemon --debug test
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - name: Test-RunData
