@@ -111,10 +111,11 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
     private def log(real: Boolean, messages: LogType[String]): Unit = {
       import org.apache.logging.log4j.util.Supplier
-      if (real) {
-        FluidTank.LOGGER.debug((() => messages.mkString_(", ") + " Real"): Supplier[String])
+      val s = if (real) " Real" else " Simulate"
+      if (real && Utils.isInDev) {
+        FluidTank.LOGGER.debug(ModObjects.MARKER_Connection, (() => messages.mkString_(", ") + s): Supplier[String])
       } else {
-        FluidTank.LOGGER.trace((() => messages.mkString_(", ") + " Simulate"): Supplier[String])
+        FluidTank.LOGGER.trace(ModObjects.MARKER_Connection, (() => messages.mkString_(", ") + s): Supplier[String])
       }
     }
 
@@ -271,7 +272,7 @@ object Connection {
   def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
     val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
       .toList.lastOption.getOrElse {
-      FluidTank.LOGGER.fatal("No lowest tank", new IllegalStateException("No lowest tank"))
+      FluidTank.LOGGER.fatal(ModObjects.MARKER_Connection, "No lowest tank", new IllegalStateException("No lowest tank"))
       pos
     }
     val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])

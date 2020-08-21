@@ -2,6 +2,7 @@ package com.kotori316.fluidtank;
 
 import java.util.Optional;
 
+import net.minecraftforge.fml.loading.FMLLoader;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
 
@@ -17,6 +18,10 @@ public class Utils {
 
     public static <T> Optional<T> toJava(Option<T> option) {
         return OptionConverters.toJava(option);
+    }
+
+    public static boolean isInDev() {
+        return !FMLLoader.isProduction();
     }
 
     @SuppressWarnings({"unused", "SpellCheckingInspection"})

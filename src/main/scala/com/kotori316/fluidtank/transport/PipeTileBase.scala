@@ -51,7 +51,8 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
       poses.foldl(getEmptyConnection)(PipeConnection2.add)
     }
     applyToAllPipe(tile => tile.connection = lastConnection, c = lastConnection)
-    FluidTank.LOGGER.debug(s"PipeConnection2 by ${getClass.getName}, fromPos: $pos, made: $lastConnection")
+    if (Utils.isInDev)
+      FluidTank.LOGGER.debug(ModObjects.MARKER_PipeTileBase, s"PipeConnection2 by ${getClass.getName}, fromPos: $pos, made: $lastConnection")
   }
 
   def connectorUpdate(): Unit =

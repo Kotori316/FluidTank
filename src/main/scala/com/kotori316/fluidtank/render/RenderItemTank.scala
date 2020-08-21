@@ -45,7 +45,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
 
-      case _ => FluidTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)
+      case _ => FluidTank.LOGGER.info(ModObjects.MARKER_RenderItemTank, "RenderItemTank is called for " + stack.getItem)
     }
   }
 

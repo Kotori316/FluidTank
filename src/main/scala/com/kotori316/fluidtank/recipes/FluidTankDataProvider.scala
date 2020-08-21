@@ -21,9 +21,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
+import org.apache.logging.log4j.MarkerManager
 
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
+  private final val MARKER = MarkerManager.getMarker("FluidTankDataProvider")
+
   @SubscribeEvent
   def gatherData(event: GatherDataEvent): Unit = {
     if (event.includeServer()) {
@@ -82,7 +85,7 @@ object FluidTankDataProvider {
         try {
           IDataProvider.save(GSON, cache, advancement.build, out)
         } catch {
-          case e: IOException => FluidTank.LOGGER.error(s"Failed to save advancement ${advancement.location}.", e)
+          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save advancement ${advancement.location}.", e)
         }
       }
     }
@@ -185,7 +188,7 @@ object FluidTankDataProvider {
         try {
           IDataProvider.save(GSON, cache, recipe.build, out)
         } catch {
-          case e: IOException => FluidTank.LOGGER.error(s"Failed to save recipe ${recipe.location}.", e)
+          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}.", e)
         }
       }
     }

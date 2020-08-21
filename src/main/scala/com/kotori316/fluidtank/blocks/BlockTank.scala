@@ -57,7 +57,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
         } else {
           ActionResultType.PASS
         }
-      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); ActionResultType.PASS
+      case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile); ActionResultType.PASS
     }
   }
 
@@ -70,7 +70,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
     super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
     worldIn.getTileEntity(pos) match {
       case tank: TileTankNoDisplay => if (!worldIn.isRemote) tank.onBlockPlacedBy()
-      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+      case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
     }
   }
 
@@ -81,7 +81,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   override final def getComparatorInputOverride(blockState: BlockState, worldIn: World, pos: BlockPos): Int = {
     worldIn.getTileEntity(pos) match {
       case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
-      case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile); 0
+      case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile); 0
     }
   }
 
@@ -90,7 +90,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
     if (!state.isIn(newState.getBlock)) {
       worldIn.getTileEntity(pos) match {
         case tank: TileTankNoDisplay => tank.onDestroy()
-        case tile => FluidTank.LOGGER.error("There is not TileTank at the pos : " + pos + " but " + tile)
+        case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
       }
       worldIn.removeTileEntity(pos)
     }

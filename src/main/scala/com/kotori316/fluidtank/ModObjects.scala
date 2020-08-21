@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.shapes.VoxelShapes
 import net.minecraft.util.registry.Registry
+import org.apache.logging.log4j.MarkerManager
 
 import scala.reflect.ClassTag
 
@@ -80,4 +81,11 @@ object ModObjects {
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
     new ResourceLocation(FluidTank.modID, "content_tank"),
     new LootFunctionType(new ContentTankSerializer))
+
+  // ---------- Markers ----------
+  final val MARKER_DynamicSerializable = MarkerManager.getMarker("DynamicSerializable")
+  final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
+  final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
+  final val MARKER_Connection = MarkerManager.getMarker("Connection")
+  final val MARKER_PipeTileBase = MarkerManager.getMarker("PipeTileBase")
 }
