@@ -43,7 +43,7 @@ object FluidTankDataProvider {
 
   private def tag(name: ResourceLocation): ITag.INamedTag[Item] = TagCollectionManager.func_242178_a().func_241836_b().func_241834_b(name) match {
     case tag: ITag.INamedTag[_] => tag.asInstanceOf[ITag.INamedTag[Item]]
-    case _ => ItemTags.makeWrapperTag(name.toString)
+    case _ => ItemTags.createOptional(name)
   }
 
   class AdvancementProvider(generatorIn: DataGenerator) extends IDataProvider {
