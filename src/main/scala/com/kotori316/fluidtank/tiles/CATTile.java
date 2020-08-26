@@ -26,14 +26,13 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.EmptyHandler;
 import scala.Option;
 
 import com.kotori316.fluidtank.FluidAmount;
@@ -66,13 +65,12 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         if (entity == null) {
             return LazyOptional.empty();
         } else {
-            LazyOptional<IItemHandler> capability = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
-            if (capability.isPresent()) {
-                IItemHandlerModifiable inventory = capability.filter(i -> i instanceof IItemHandlerModifiable).<IItemHandlerModifiable>cast().orElseGet(EmptyHandler::new);
-                return LazyOptional.of(() -> new FluidHandlerWrapper(inventory));
-            } else {
-                return LazyOptional.empty();
-            }
+            return entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())
+                .resolve()
+                .flatMap(i -> i instanceof IItemHandlerModifiable ? Optional.of((IItemHandlerModifiable) i) : Optional.empty())
+                .map(i -> ((NonNullSupplier<FluidHandlerWrapper>) () -> new FluidHandlerWrapper(i)))
+                .map(LazyOptional::of)
+                .orElse(LazyOptional.empty());
         }
     }
 
