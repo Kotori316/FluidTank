@@ -14,7 +14,7 @@ import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher,
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -125,7 +125,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   val handler: FluidAmount.Tank = new TankHandler
-  private[tiles] final val lazyOptional: LazyOptional[IFluidHandler] = LazyOptional.of(() => handler)
+  private[tiles] final var isValid = true
 
   val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
@@ -164,13 +164,11 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     val s1Connection = Connection.create(s1)
     val s2Connection = Connection.create(s2.tail)
     // Connection updated
-    this.lazyOptional.invalidate()
+    this.isValid = false
     s1.foreach { t =>
-      t.connection.lazyOptional.invalidate()
       t.connection = s1Connection
     }
     s2.tail.foreach { t =>
-      t.connection.lazyOptional.invalidate()
       t.connection = s2Connection
     }
   }
@@ -186,14 +184,12 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-      lazyOptional.cast()
-    else
-      Cap.asJava(
-        Cap.empty[T]
-          .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
-          .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
-      )
+    Cap.asJava(
+      Cap.empty[T]
+        .orElse(if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) OptionT(Eval.always(Option.when(isValid)(handler.asInstanceOf[T]))) else Cap.empty)
+        .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
+        .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
+    )
   }
 
   override def toString: String = {
@@ -236,7 +232,7 @@ object Connection {
       val connection = Connection.create(s1)
       connection.handler.fill(content, doFill = true)
       s1.foreach { t =>
-        t.connection.lazyOptional.invalidate()
+        t.connection.isValid = false
         t.connection = connection
       }
       if (s2.nonEmpty) createAndInit(s2)
