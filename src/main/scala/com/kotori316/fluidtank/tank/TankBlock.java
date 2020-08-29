@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -40,13 +40,13 @@ public class TankBlock extends Block implements BlockEntityProvider {
 
     @Override
     @SuppressWarnings("deprecation")
-    public VoxelShape getCollisionShape(BlockState state, BlockView view, BlockPos pos, EntityContext ePos) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ePos) {
         return ModTank.TANK_SHAPE;
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, EntityContext ePos) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ePos) {
         return ModTank.TANK_SHAPE;
     }
 
@@ -69,7 +69,7 @@ public class TankBlock extends Block implements BlockEntityProvider {
             ItemStack stack = playerIn.getStackInHand(handIn);
             if (playerIn.getMainHandStack().isEmpty()) {
                 if (!world.isClient) {
-                    playerIn.addChatMessage(tileTank.connection().getTextComponent(), true);
+                    playerIn.sendMessage(tileTank.connection().getTextComponent(), true);
                 }
                 return ActionResult.SUCCESS;
             } else if (!(stack.getItem() instanceof TankBlockItem)) {
@@ -104,12 +104,14 @@ public class TankBlock extends Block implements BlockEntityProvider {
 
     @Override
     @SuppressWarnings("deprecation")
-    public void onBlockRemoved(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        Optional.ofNullable(world.getBlockEntity(pos))
-            .filter(e -> e instanceof TileTank)
-            .map(e -> (TileTank) e)
-            .ifPresent(TileTank::onDestroy);
-        world.removeBlockEntity(pos);
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.isOf(newState.getBlock())) {
+            Optional.ofNullable(world.getBlockEntity(pos))
+                .filter(e -> e instanceof TileTank)
+                .map(e -> (TileTank) e)
+                .ifPresent(TileTank::onDestroy);
+            super.onStateReplaced(state, world, pos, newState, moved);
+        }
     }
 
     @Override

@@ -73,10 +73,10 @@ object BucketEventHandler {
   }
 
   private def getEmptySound(fluidStack: FluidAmount): SoundEvent = {
-    if (fluidStack.fluid matches FluidTags.LAVA) SoundEvents.ITEM_BUCKET_EMPTY_LAVA else SoundEvents.ITEM_BUCKET_EMPTY
+    if (fluidStack.fluid isIn FluidTags.LAVA) SoundEvents.ITEM_BUCKET_EMPTY_LAVA else SoundEvents.ITEM_BUCKET_EMPTY
   }
 
   private def getFillSound(fluidStack: FluidAmount): SoundEvent = {
-    if (fluidStack.fluid.matches(FluidTags.LAVA)) SoundEvents.ITEM_BUCKET_FILL_LAVA else SoundEvents.ITEM_BUCKET_FILL
+    if (fluidStack.fluid.isIn(FluidTags.LAVA)) SoundEvents.ITEM_BUCKET_FILL_LAVA else SoundEvents.ITEM_BUCKET_FILL
   }
 }

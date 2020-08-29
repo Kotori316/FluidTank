@@ -3,8 +3,8 @@ package com.kotori316.fluidtank.tank
 import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.{FluidAmount, ModTank, Utils}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
+import net.minecraft.block.BlockState
 import net.minecraft.block.entity.{BlockEntity, BlockEntityType}
-import net.minecraft.client.network.packet.BlockEntityUpdateS2CPacket
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.{LiteralText, Text}
 import net.minecraft.util.{Nameable, Tickable}
@@ -42,8 +42,8 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     nbt
   }
 
-  override def fromTag(compound: CompoundTag): Unit = {
-    super.fromTag(compound)
+  override def fromTag(state: BlockState, compound: CompoundTag): Unit = {
+    super.fromTag(state, compound)
     tank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
@@ -242,7 +242,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     }
   }
 
-  override def fromClientTag(tag: CompoundTag): Unit = fromTag(tag)
+  override def fromClientTag(tag: CompoundTag): Unit = fromTag(null, tag)
 
   override def toClientTag(tag: CompoundTag): CompoundTag = toTag(tag)
 }

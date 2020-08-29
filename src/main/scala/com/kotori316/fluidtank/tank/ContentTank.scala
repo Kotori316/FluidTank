@@ -5,8 +5,7 @@ import com.kotori316.fluidtank.ModTank
 import net.minecraft.item.ItemStack
 import net.minecraft.loot.condition.LootCondition
 import net.minecraft.loot.context.{LootContext, LootContextParameters}
-import net.minecraft.loot.function.ConditionalLootFunction
-import net.minecraft.util.Identifier
+import net.minecraft.loot.function.{ConditionalLootFunction, LootFunctionType}
 
 class ContentTank(cond: Array[LootCondition]) extends ConditionalLootFunction(cond) {
   override def process(stack: ItemStack, context: LootContext): ItemStack = {
@@ -17,11 +16,11 @@ class ContentTank(cond: Array[LootCondition]) extends ConditionalLootFunction(co
     }
     stack
   }
+
+  override def getType: LootFunctionType = ModTank.Entries.CONTENT_LOOT_FUNCTION_TYPE
 }
 
-class ContentTankSerializer extends ConditionalLootFunction.Factory[ContentTank](
-  new Identifier(ModTank.modID, "content_tank"),
-  classOf[ContentTank]
-) {
-  override def fromJson(json: JsonObject, context: JsonDeserializationContext, conditions: Array[LootCondition]) = new ContentTank(conditions)
+class ContentTankSerializer extends ConditionalLootFunction.Serializer[ContentTank] {
+  override def fromJson(json: JsonObject, context: JsonDeserializationContext, conditions: Array[LootCondition]): ContentTank =
+    new ContentTank(conditions)
 }

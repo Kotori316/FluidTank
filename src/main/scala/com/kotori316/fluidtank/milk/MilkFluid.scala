@@ -11,7 +11,7 @@ class MilkFluid extends Fluid {
 
   override def getBucketItem: Item = Items.MILK_BUCKET
 
-  override def method_15777(fluidState: FluidState, blockView: BlockView, blockPos: BlockPos, fluid: Fluid, direction: Direction): Boolean = false
+  override def canBeReplacedWith(state: FluidState, world: BlockView, pos: BlockPos, fluid: Fluid, direction: Direction): Boolean = false
 
   override def getVelocity(world: BlockView, pos: BlockPos, state: FluidState): Vec3d = Vec3d.ZERO
 

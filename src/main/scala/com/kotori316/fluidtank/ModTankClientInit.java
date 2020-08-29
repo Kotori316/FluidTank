@@ -11,7 +11,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.container.PlayerContainer;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Identifier;
 
 import com.kotori316.fluidtank.render.RenderTank;
@@ -20,8 +20,8 @@ import com.kotori316.fluidtank.tank.TileTankCreative;
 @SuppressWarnings("unused")
 public class ModTankClientInit implements ClientModInitializer {
 
-    public static final SpriteIdentifier STILL_IDENTIFIER = new SpriteIdentifier(PlayerContainer.BLOCK_ATLAS_TEXTURE, new Identifier(ModTank.modID, "blocks/milk_still"));
-    public static final SpriteIdentifier FLOW_IDENTIFIER = new SpriteIdentifier(PlayerContainer.BLOCK_ATLAS_TEXTURE, new Identifier(ModTank.modID, "blocks/milk_flow"));
+    public static final SpriteIdentifier STILL_IDENTIFIER = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, new Identifier(ModTank.modID, "blocks/milk_still"));
+    public static final SpriteIdentifier FLOW_IDENTIFIER = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, new Identifier(ModTank.modID, "blocks/milk_flow"));
 
     @SuppressWarnings("unchecked")
     @Override

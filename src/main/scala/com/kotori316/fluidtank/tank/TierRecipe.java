@@ -12,14 +12,14 @@ import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.tag.ItemTags;
-import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -47,7 +47,7 @@ public class TierRecipe implements CraftingRecipe {
         Set<TankBlock> tanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
         Set<TankBlock> invTanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
         tankItems = Ingredient.ofStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
-        subItems = Optional.ofNullable(ItemTags.getContainer().get(new Identifier(tier.tagName)))
+        subItems = Optional.ofNullable(ItemTags.getTagGroup().getTag(new Identifier(tier.tagName)))
             .map(Ingredient::fromTag)
             .orElse(tier.getAlternative());
         isEmptyRecipe = subItems.isEmpty();
@@ -56,9 +56,9 @@ public class TierRecipe implements CraftingRecipe {
     @Override
     public boolean matches(CraftingInventory inv, World worldIn) {
         if (isEmptyRecipe) return false;
-        if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getInvStack).allMatch(subItems)) return false;
-        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getInvStack).allMatch(tankItems)) return false;
-        return IntStream.of(TANK_SLOTS).mapToObj(inv::getInvStack)
+        if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStack).allMatch(subItems)) return false;
+        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStack).allMatch(tankItems)) return false;
+        return IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
             .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
@@ -71,7 +71,7 @@ public class TierRecipe implements CraftingRecipe {
     @Override
     public ItemStack craft(CraftingInventory inv) {
         ItemStack result = getOutput();
-        FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getInvStack)
+        FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
             .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))

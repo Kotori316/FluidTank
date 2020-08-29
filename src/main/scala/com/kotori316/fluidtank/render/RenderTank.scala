@@ -53,7 +53,7 @@ object RenderTank {
     val world = if (tile.hasWorld) tile.getWorld else MinecraftClient.getInstance().world
     val pos = if (tile.hasWorld) tile.getPos else MinecraftClient.getInstance().player.getBlockPos
     val c = FluidRenderHandlerRegistry.INSTANCE.get(fluidAmount.fluid).getFluidColor(world, pos, fluidAmount.fluid.getDefaultState)
-    if (fluidAmount.fluid.matches(FluidTags.WATER)) {
+    if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
       c | 0xFF000000
     } else {
       c

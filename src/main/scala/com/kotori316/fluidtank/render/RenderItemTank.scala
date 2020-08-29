@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
 import net.minecraft.client.render.item.{BuiltinModelItemRenderer, ItemRenderer}
 import net.minecraft.client.render.model.BakedModel
+import net.minecraft.client.render.model.json.ModelTransformation
 import net.minecraft.client.render.{DiffuseLighting, RenderLayers, VertexConsumer, VertexConsumerProvider}
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
@@ -19,7 +20,7 @@ class RenderItemTank extends BuiltinModelItemRenderer {
 
   lazy val tileTank = new TileTank()
 
-  override def render(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, mode: ModelTransformation.Mode, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: TankBlockItem =>
 
@@ -27,7 +28,7 @@ class RenderItemTank extends BuiltinModelItemRenderer {
         val model = MinecraftClient.getInstance.getBlockRenderManager.getModel(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
-        val renderType = RenderLayers.getItemLayer(stack)
+        val renderType = RenderLayers.getItemLayer(stack, true)
         val b = renderTypeBuffer.getBuffer(renderType)
         renderItemModel(MinecraftClient.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
 
@@ -52,11 +53,11 @@ class RenderItemTank extends BuiltinModelItemRenderer {
 
     for (direction <- Direction.values) {
       random.setSeed(seed)
-//      renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, direction, random), stack, light, otherLight)
+      //      renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, direction, random), stack, light, otherLight)
     }
 
     random.setSeed(seed)
-//    renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, null, random), stack, light, otherLight)
+    //    renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, null, random), stack, light, otherLight)
 
   }
 
