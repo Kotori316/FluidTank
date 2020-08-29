@@ -1,5 +1,9 @@
 package com.kotori316.fluidtank.tank
 
+import alexiil.mc.lib.attributes.{AttributeList, AttributeProviderBlockEntity, ListenerRemovalToken, ListenerToken, Simulation}
+import alexiil.mc.lib.attributes.fluid.FluidInvTankChangeListener
+import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
+import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
 import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.{FluidAmount, ModTank, Utils}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
@@ -13,7 +17,8 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   extends BlockEntity(t)
     with Nameable
     with Tickable
-    with BlockEntityClientSerializable {
+    with BlockEntityClientSerializable
+    with AttributeProviderBlockEntity {
   self =>
 
   def this() {
@@ -25,7 +30,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   }
 
   val tank = new Tank
-  var connection = Connection.invalid
+  var connection: Connection = Connection.invalid
   var loading = false
   var stackName: Text = _
 
@@ -94,16 +99,17 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   override def getName: Text = getStackName
     .getOrElse(new LiteralText(tier.toString + " Tank"))
 
-  override def hasCustomName = stackName != null
+  override def hasCustomName: Boolean = stackName != null
 
   override def getCustomName: Text = getStackName.orNull
 
   class Tank extends FluidAmount.Tank {
     var box: Box = _
-    var fluid = FluidAmount.EMPTY
-    var capacity = Utils.toInt(tier.amount)
+    var fluid: FluidAmount = FluidAmount.EMPTY
+    var capacity: Int = Utils.toInt(tier.amount)
+    var listeners = Map.empty[FluidInvTankChangeListener, ListenerRemovalToken]
 
-    def onContentsChanged(): Unit = {
+    def onContentsChanged(previous: FluidAmount): Unit = {
       sendPacket()
       if (!loading)
         connection.updateNeighbors()
@@ -126,13 +132,14 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
           box = null
         }
       }
+      listeners.keys.foreach(_.onChange(this, 0, previous.fluidVolume, fluid.fluidVolume))
     }
 
-    def readFromNBT(nbt: CompoundTag) = {
+    def readFromNBT(nbt: CompoundTag): Tank = {
       capacity = nbt.getInt(TileTank.NBT_Capacity)
       val fluid = FluidAmount.fromNBT(nbt)
       setFluid(fluid)
-      onContentsChanged()
+      onContentsChanged(FluidAmount.EMPTY)
       this
     }
 
@@ -169,11 +176,12 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
      */
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Long = 0): FluidAmount = {
       if (canFillFluidType(fluidAmount) && fluidAmount.nonEmpty) {
+        val previous = fluid
         val newAmount = fluid.amount + fluidAmount.amount
         if (capacity >= newAmount) {
           if (doFill) {
             fluid = fluidAmount.setAmount(newAmount)
-            onContentsChanged()
+            onContentsChanged(previous)
           }
           fluidAmount
         } else {
@@ -181,7 +189,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
           if (accept >= min) {
             if (doFill) {
               fluid = fluidAmount.setAmount(capacity)
-              onContentsChanged()
+              onContentsChanged(previous)
             }
             fluidAmount.setAmount(accept)
           } else {
@@ -202,12 +210,13 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
      */
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount = {
       if (canFillFluidType(fluidAmount) || FluidAmount.EMPTY.fluidEqual(fluidAmount)) {
+        val previous = fluid
         val drain = math.min(fluid.amount, fluidAmount.amount)
         if (drain >= min) {
           val newAmount = fluid.amount - drain
           if (doDrain) {
             fluid = fluid.setAmount(newAmount)
-            onContentsChanged()
+            onContentsChanged(previous)
           }
           fluid.setAmount(drain)
         } else {
@@ -217,6 +226,31 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
         FluidAmount.EMPTY
       }
     }
+
+    override def isFluidValidForTank(tank: Int, fluid: FluidKey): Boolean = canFillFluidType(FluidAmount(fluid.withAmount(BCAmount.BUCKET)))
+
+    override def setInvFluid(tank: Int, to: FluidVolume, simulation: Simulation): Boolean = {
+      if (simulation.isAction) {
+        setFluid(FluidAmount(to))
+      }
+      true
+    }
+
+    override def getInvFluid(tank: Int): FluidVolume = getFluid.fluidVolume
+
+    override def addListener(listener: FluidInvTankChangeListener, removalToken: ListenerRemovalToken): ListenerToken = {
+      this.listeners = this.listeners + ((listener, removalToken))
+      /*return*/ () => {
+        this.listeners.get(listener).filter(_ == removalToken) match {
+          case Some(value) =>
+            this.listeners = this.listeners.removed(listener)
+            value.onListenerRemoved()
+          case None =>
+        }
+      }
+    }
+
+    override def getMaxAmount_F(tank: Int): BCAmount = BCAmount.of(capacity, 1000)
   }
 
   /*@Optional.Method(modid = TileTankNoDisplay.bcId)
@@ -245,6 +279,10 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   override def fromClientTag(tag: CompoundTag): Unit = fromTag(null, tag)
 
   override def toClientTag(tag: CompoundTag): CompoundTag = toTag(tag)
+
+  override def addAllAttributes(to: AttributeList[_]): Unit = {
+    to.offer(this)
+  }
 }
 
 object TileTank {

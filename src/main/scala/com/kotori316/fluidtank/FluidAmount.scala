@@ -1,8 +1,10 @@
 package com.kotori316.fluidtank
 
-import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil
+import alexiil.mc.lib.attributes.{ListenerRemovalToken, ListenerToken, Simulation}
+import alexiil.mc.lib.attributes.fluid.{FixedFluidInv, FluidInvTankChangeListener, FluidItemUtil, FluidVolumeUtil}
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
-import alexiil.mc.lib.attributes.fluid.volume.{FluidKeys, FluidVolume}
+import alexiil.mc.lib.attributes.fluid.impl.EmptyFixedFluidInv
+import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidKeys, FluidVolume}
 import com.kotori316.fluidtank.ModTank.Entries
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
@@ -59,10 +61,10 @@ object FluidAmount {
       case Items.WATER_BUCKET => BUCKET_WATER
       case Items.MILK_BUCKET => BUCKET_MILK
       case Items.BUCKET => EMPTY
-      case bucket: BucketItem =>
-        BUCKET_WATER
-      //bucket.pure[Id].map(_.getFluid).map(FluidAmount(_, AMOUNT_BUCKET, None))
-      case _ => EMPTY
+      case _ =>
+        val key = FluidItemUtil.getContainedFluid(stack)
+        if (key.isEmpty) EMPTY
+        else FluidAmount(key.withAmount(BCAmount.BUCKET))
     }
   }
 
@@ -77,7 +79,7 @@ object FluidAmount {
 
   def registry: DefaultedRegistry[Fluid] = Registry.FLUID
 
-  trait Tank {
+  trait Tank extends FixedFluidInv {
     /**
      * @return Fluid that was accepted by the tank.
      */
@@ -92,6 +94,19 @@ object FluidAmount {
      */
     def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount
 
+    override def isFluidValidForTank(tank: Int, fluid: FluidKey): Boolean = true
+
+    override def setInvFluid(tank: Int, to: FluidVolume, simulation: Simulation): Boolean = {
+      drain(FluidAmount.EMPTY, simulation.isAction)
+      fill(FluidAmount(to), simulation.isAction).nonEmpty
+    }
+
+    override def getTankCount: Int = 1
+
+    override def getInvFluid(tank: Int): FluidVolume = drain(FluidAmount.EMPTY, doDrain = false).fluidVolume
+
+    override def addListener(listener: FluidInvTankChangeListener, removalToken: ListenerRemovalToken): ListenerToken =
+      EmptyFixedFluidInv.INSTANCE.addListener(listener, removalToken)
   }
 
 }

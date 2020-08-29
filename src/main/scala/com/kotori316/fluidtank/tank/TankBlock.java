@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.tank;
 
 import java.util.Optional;
 
+import alexiil.mc.lib.attributes.fluid.FluidInvUtil;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -19,9 +20,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
-import com.kotori316.fluidtank.Utils;
 
 public class TankBlock extends Block implements BlockEntityProvider {
     public static final String NBT_Tank = "tank";
@@ -73,18 +72,15 @@ public class TankBlock extends Block implements BlockEntityProvider {
                 }
                 return ActionResult.SUCCESS;
             } else if (!(stack.getItem() instanceof TankBlockItem)) {
-                ItemStack copiedStack = stack.getCount() == 1 ? stack : stack.copy();
-                copiedStack.setCount(1);
-                if (!stack.isEmpty() && FluidAmount.isFluidContainer(stack)) {
-                    if (!world.isClient) {
-                        FluidAmount.Tank handler = tileTank.connection().handler();
-                        BucketEventHandler.transferFluid(world, pos, playerIn, handIn,
-                            () -> Utils.toJava(tileTank.connection().getFluidStack()).map(p -> p.setAmount(Integer.MAX_VALUE)).orElse(FluidAmount.EMPTY()),
-                            stack, handler);
+                if (!world.isClient) {
+                    if (FluidInvUtil.interactHandWithTank(tileTank.connection().handler(), playerIn, handIn)
+                        .didMoveAny()) {
+                        return ActionResult.SUCCESS;
+                    } else {
+                        return ActionResult.PASS;
                     }
-                    return ActionResult.SUCCESS;
                 } else {
-                    return ActionResult.PASS;
+                    return ActionResult.SUCCESS;
                 }
             } else {
                 return ActionResult.PASS;

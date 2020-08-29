@@ -1,7 +1,14 @@
 package com.kotori316.fluidtank.tank
 
+import java.util
+import java.util.Collections
+
+import alexiil.mc.lib.attributes.Simulation
+import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
+import alexiil.mc.lib.attributes.fluid.filter.FluidFilter
+import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
+import alexiil.mc.lib.attributes.fluid.{FluidVolumeUtil, GroupedFluidInv, GroupedFluidInvView}
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.tank.CapabilityFluidTank.EmptyTank
 import net.minecraft.text.{LiteralText, Text, TranslatableText}
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.world.BlockView
@@ -15,13 +22,13 @@ sealed class Connection(s: Seq[TileTank]) {
     () => seq.foreach(_.markDirty())
   )
 
-  class TankHandler extends FluidAmount.Tank {
+  class TankHandler extends GroupedFluidInv {
     type LogType[A] = List[A]
 
     /**
      * @return Fluid that was accepted by the tank.
      */
-    override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Long): FluidAmount = {
+    def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Long = 0): FluidAmount = {
       if (hasCreative) {
         val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
         val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
@@ -57,7 +64,7 @@ sealed class Connection(s: Seq[TileTank]) {
      * @param min         minimum amount to drain.
      * @return the fluid and amount that is (or will be) drained.
      */
-    override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long): FluidAmount = {
+    def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount = {
       if (fluidAmount.amount < min || fluidType.isEmpty) return FluidAmount.EMPTY
       if (hasCreative) {
         if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidType.fluidEqual(fluidAmount)) {
@@ -95,9 +102,35 @@ sealed class Connection(s: Seq[TileTank]) {
       }
     }
 
+    override def attemptInsertion(fluidVolume: FluidVolume, simulation: Simulation): FluidVolume = {
+      val filled = fill(FluidAmount(fluidVolume), simulation.isAction).fluidVolume
+      filled.withAmount(fluidVolume.amount() sub filled.amount())
+    }
+
+    override def attemptExtraction(filter: FluidFilter, maxAmount: BCAmount, simulation: Simulation): FluidVolume = {
+      if (fluidType.nonEmpty && filter.matches(fluidType.fluidVolume.getFluidKey)) {
+        drain(FluidAmount(fluidType.fluidVolume.withAmount(maxAmount)), simulation.isAction).fluidVolume
+      } else {
+        FluidVolumeUtil.EMPTY
+      }
+    }
+
+    override def getStoredFluids: util.Set[FluidKey] = Collections.singleton(fluidType.fluidVolume.fluidKey)
+
+    override def getStatistics(fluidFilter: FluidFilter): GroupedFluidInvView.FluidInvStatistic = {
+      if (fluidFilter.matches(fluidType.fluidVolume.fluidKey)) {
+        val cap = BCAmount.of(capacity, 1000L)
+        val am = BCAmount.of(amount, 1000L)
+        val rest = cap sub am
+        new GroupedFluidInvView.FluidInvStatistic(fluidFilter, am, rest, cap)
+      } else {
+        GroupedFluidInvView.FluidInvStatistic.emptyOf(fluidFilter)
+      }
+    }
+
   }
 
-  val handler: FluidAmount.Tank = new TankHandler
+  val handler = new TankHandler
 
   protected def fluidType: FluidAmount = {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
@@ -188,7 +221,6 @@ object Connection {
 
     override def amount: Long = 0
 
-    override val handler: FluidAmount.Tank = EmptyTank.INSTANCE
     override val toString: String = "Connection.Invalid"
 
     override def getComparatorLevel: Int = 0

@@ -13,7 +13,7 @@ class TileTankCreative extends TileTank(Tiers.CREATIVE, Entries.CREATIVE_BLOCK_E
         if (doFill) {
           if (fluid.isEmpty) {
             fluid = fluidAmount.setAmount(capacity)
-            onContentsChanged()
+            onContentsChanged(FluidAmount.EMPTY)
             fluidAmount
           } else {
             FluidAmount.EMPTY
@@ -32,8 +32,9 @@ class TileTankCreative extends TileTank(Tiers.CREATIVE, Entries.CREATIVE_BLOCK_E
     }
 
     def drainAll(): Unit = {
+      val previous = fluid
       fluid = FluidAmount.EMPTY
-      onContentsChanged()
+      onContentsChanged(previous)
     }
   }
 
