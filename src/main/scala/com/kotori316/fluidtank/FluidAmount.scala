@@ -1,44 +1,46 @@
 package com.kotori316.fluidtank
 
+import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil
+import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
+import alexiil.mc.lib.attributes.fluid.volume.{FluidKeys, FluidVolume}
 import com.kotori316.fluidtank.ModTank.Entries
-import net.fabricmc.fabric.api.util.NbtType
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
+import net.minecraft.util.registry.{DefaultedRegistry, Registry}
 
-case class FluidAmount(fluid: Fluid, amount: Long, nbt: Option[CompoundTag]) {
+/**
+ * Just a wrapper of [[FluidVolume]]
+ */
+case class FluidAmount(fluidVolume: FluidVolume) {
+  val amount: Long = fluidVolume.amount().asLong(1000L)
+  val fluid: Fluid = fluidVolume.getRawFluid
+
   def setAmount(newAmount: Long): FluidAmount = {
-    if (newAmount == this.amount) this // No need to create new instance.
-    else FluidAmount(fluid, newAmount, nbt)
+    if (newAmount == amount) this // No need to create new instance.
+    else FluidAmount(fluidVolume.fluidKey.withAmount(BCAmount.of(newAmount, 1000L)))
   }
 
-  def write(tag: CompoundTag): CompoundTag = {
-    tag.putString(FluidAmount.NBT_fluid, FluidAmount.registry.getId(fluid).toString)
-    tag.putLong(FluidAmount.NBT_amount, amount)
-    nbt.foreach(n => tag.put(FluidAmount.NBT_tag, n))
-    tag
-  }
+  def write(tag: CompoundTag): CompoundTag = fluidVolume.toTag(tag)
 
-  def nonEmpty: Boolean = fluid != Fluids.EMPTY && amount > 0
+  def nonEmpty: Boolean = !isEmpty
 
-  def isEmpty: Boolean = !nonEmpty
+  def isEmpty: Boolean = fluidVolume.isEmpty
 
-  def isGaseous: Boolean = false //fluid.getAttributes.isGaseous
+  def isGaseous: Boolean = fluidVolume.fluidKey.gaseous
 
   def getLocalizedName: String = String.valueOf(FluidAmount.registry.getId(fluid))
 
   def +(that: FluidAmount): FluidAmount = {
-    if (fluid == Fluids.EMPTY) that
-    else setAmount(this.amount + that.amount)
+    if (fluidVolume.getRawFluid == Fluids.EMPTY) that
+    else FluidAmount(fluidVolume.withAmount(fluidVolume.amount().add(that.fluidVolume.amount())))
   }
 
-  def -(that: FluidAmount): FluidAmount = setAmount(this.amount - that.amount)
+  def -(that: FluidAmount): FluidAmount = FluidAmount(fluidVolume.withAmount(fluidVolume.amount().sub(that.fluidVolume.amount())))
 
-  def fluidEqual(that: FluidAmount): Boolean = this.fluid == that.fluid && this.nbt == that.nbt
+  def fluidEqual(that: FluidAmount): Boolean = FluidVolume.areEqualExceptAmounts(this.fluidVolume, that.fluidVolume)
 
-  override def toString = FluidAmount.registry.getId(fluid).getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
+  override def toString: String = FluidAmount.registry.getId(fluidVolume.getRawFluid).getPath + "@" + fluidVolume.amount() + "mB"
 }
 
 object FluidAmount {
@@ -46,10 +48,10 @@ object FluidAmount {
   final val NBT_amount = "amount"
   final val NBT_tag = "tag"
   final val AMOUNT_BUCKET = 1000 //FluidAttributes.BUCKET_VOLUME
-  val EMPTY = FluidAmount(Fluids.EMPTY, 0, None)
-  val BUCKET_LAVA = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
-  val BUCKET_WATER = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
-  val BUCKET_MILK = FluidAmount(Entries.MILK_FLUID, AMOUNT_BUCKET, None)
+  val EMPTY: FluidAmount = FluidAmount(FluidVolumeUtil.EMPTY)
+  val BUCKET_LAVA: FluidAmount = FluidAmount(FluidKeys.LAVA.withAmount(BCAmount.BUCKET))
+  val BUCKET_WATER: FluidAmount = FluidAmount(FluidKeys.WATER.withAmount(BCAmount.BUCKET))
+  val BUCKET_MILK: FluidAmount = FluidAmount(FluidKeys.get(Entries.MILK_FLUID).withAmount(BCAmount.BUCKET))
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
@@ -69,17 +71,11 @@ object FluidAmount {
   }
 
   def fromNBT(tag: CompoundTag): FluidAmount = {
-    val fluid = registry.get(new Identifier(Option(tag).map(_.getString(NBT_fluid)).getOrElse(registry.getId(Fluids.EMPTY).toString)))
-    if (fluid == null || fluid == EMPTY.fluid) {
-      EMPTY
-    } else {
-      val amount = tag.getLong(NBT_amount)
-      val nbt = if (tag.contains(NBT_tag, NbtType.COMPOUND)) Option(tag.getCompound(NBT_tag)).filterNot(_.isEmpty) else None
-      FluidAmount(fluid, amount, nbt)
-    }
+    val volume = FluidVolume.fromTag(tag)
+    FluidAmount(volume)
   }
 
-  def registry = Registry.FLUID
+  def registry: DefaultedRegistry[Fluid] = Registry.FLUID
 
   trait Tank {
     /**

@@ -96,10 +96,11 @@ public class TankBlock extends Block implements BlockEntityProvider {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        Optional.ofNullable(world.getBlockEntity(pos))
-            .filter(e -> e instanceof TileTank)
-            .map(e -> (TileTank) e)
-            .ifPresent(TileTank::onBlockPlacedBy);
+        if (!world.isClient)
+            Optional.ofNullable(world.getBlockEntity(pos))
+                .filter(e -> e instanceof TileTank)
+                .map(e -> (TileTank) e)
+                .ifPresent(TileTank::onBlockPlacedBy);
     }
 
     @Override

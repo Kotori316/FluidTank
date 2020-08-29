@@ -10,7 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 
 sealed class Connection(s: Seq[TileTank]) {
   val seq: Seq[TileTank] = s.sortBy(_.getPos.getY)
-  val hasCreative = seq.exists(_.isInstanceOf[TileTankCreative])
+  val hasCreative: Boolean = seq.exists(_.isInstanceOf[TileTankCreative])
   val updateActions: ArrayBuffer[() => Unit] = ArrayBuffer(
     () => seq.foreach(_.markDirty())
   )
@@ -198,7 +198,7 @@ object Connection {
     override def getTextComponent = new LiteralText(toString)
   }
 
-  val stackFromTile = (t: TileTank) => Option(t.tank.getFluid).filter(_.nonEmpty)
+  val stackFromTile: TileTank => Option[FluidAmount] = (t: TileTank) => Option(t.tank.getFluid).filter(_.nonEmpty)
 
   def load(iBlockReader: BlockView, pos: BlockPos): Unit = {
     val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getBlockEntity(p).isInstanceOf[TileTank])

@@ -39,6 +39,11 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
+
+    // Test Dependencies.
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')
+    testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2')
+    testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.6.2')
 }
 
 processResources {
@@ -71,6 +76,10 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
     from "LICENSE"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // configure the maven publication
