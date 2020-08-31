@@ -1,26 +1,26 @@
 package com.kotori316.fluidtank.render
 
-import java.util.Random
-
 import com.kotori316.fluidtank.ModTank
 import com.kotori316.fluidtank.tank.{TankBlock, TankBlockItem, TileTank}
 import net.fabricmc.api.{EnvType, Environment}
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRenderer
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
-import net.minecraft.client.render.item.{BuiltinModelItemRenderer, ItemRenderer}
+import net.minecraft.client.render.item.ItemRenderer
 import net.minecraft.client.render.model.BakedModel
-import net.minecraft.client.render.model.json.ModelTransformation
 import net.minecraft.client.render.{DiffuseLighting, RenderLayers, VertexConsumer, VertexConsumerProvider}
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
-import net.minecraft.util.math.Direction
 
 @Environment(EnvType.CLIENT)
-class RenderItemTank extends BuiltinModelItemRenderer {
+class RenderItemTank extends BuiltinItemRenderer {
 
   lazy val tileTank = new TileTank()
+  private final val renderBakedItemModel = classOf[ItemRenderer].getDeclaredMethod("renderBakedItemModel",
+    classOf[BakedModel], classOf[ItemStack], Integer.TYPE, Integer.TYPE, classOf[MatrixStack], classOf[VertexConsumer])
+  renderBakedItemModel.setAccessible(true)
 
-  override def render(stack: ItemStack, mode: ModelTransformation.Mode, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: TankBlockItem =>
 
@@ -48,17 +48,8 @@ class RenderItemTank extends BuiltinModelItemRenderer {
 
   // copy of ItemRenderer#func_229114_a_()
   def renderItemModel(renderer: ItemRenderer, model: BakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, builder: VertexConsumer): Unit = {
-    val random = new Random
-    val seed = 42L
-
-    for (direction <- Direction.values) {
-      random.setSeed(seed)
-      //      renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, direction, random), stack, light, otherLight)
-    }
-
-    random.setSeed(seed)
-    //    renderer.renderBakedItemQuads(matrixStack, builder, model.getQuads(null, null, random), stack, light, otherLight)
-
+    renderBakedItemModel.invoke(renderer,
+      model, stack, light, otherLight, matrixStack, builder)
   }
 
 }
