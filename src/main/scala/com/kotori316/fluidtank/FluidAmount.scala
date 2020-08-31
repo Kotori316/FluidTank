@@ -1,10 +1,10 @@
 package com.kotori316.fluidtank
 
-import alexiil.mc.lib.attributes.{ListenerRemovalToken, ListenerToken, Simulation}
-import alexiil.mc.lib.attributes.fluid.{FixedFluidInv, FluidInvTankChangeListener, FluidItemUtil, FluidVolumeUtil}
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.impl.EmptyFixedFluidInv
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidKeys, FluidVolume}
+import alexiil.mc.lib.attributes.fluid.{FixedFluidInv, FluidInvTankChangeListener, FluidItemUtil, FluidVolumeUtil}
+import alexiil.mc.lib.attributes.{ListenerRemovalToken, ListenerToken, Simulation}
 import com.kotori316.fluidtank.ModTank.Entries
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
@@ -19,7 +19,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
   val fluid: Fluid = fluidVolume.getRawFluid
 
   def setAmount(newAmount: Long): FluidAmount = {
-    if (newAmount == amount) this // No need to create new instance.
+    if (fluidVolume.fluidKey.isEmpty || newAmount == amount) this // No need to create new instance.
     else FluidAmount(fluidVolume.fluidKey.withAmount(BCAmount.of(newAmount, 1000L)))
   }
 
