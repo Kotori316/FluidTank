@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:nether_stars"
+            "item": "minecraft:nether_star"
           }
         ]
       }
@@ -28,14 +28,5 @@
       "has_the_recipe",
       "has_nether_stars"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:nether_stars",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }

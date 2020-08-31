@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/iron"
+            "item": "minecraft:iron_ingot"
           }
         ]
       }
@@ -28,14 +28,5 @@
       "has_the_recipe",
       "has_ingots/iron"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:ingots/iron",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }

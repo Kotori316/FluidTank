@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:gems/diamond"
+            "item": "minecraft:diamond"
           }
         ]
       }
@@ -28,14 +28,5 @@
       "has_the_recipe",
       "has_gems/diamond"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:gems/diamond",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }

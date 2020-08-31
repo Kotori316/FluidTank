@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:stone"
+            "item": "minecraft:stone"
           }
         ]
       }
@@ -28,14 +28,5 @@
       "has_the_recipe",
       "has_stone"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:stone",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }

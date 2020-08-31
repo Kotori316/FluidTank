@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/gold"
+            "item": "minecraft:gold_ingot"
           }
         ]
       }
@@ -28,14 +28,5 @@
       "has_the_recipe",
       "has_ingots/gold"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:ingots/gold",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }

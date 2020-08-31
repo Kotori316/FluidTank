@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:gems/emerald"
+            "item": "minecraft:emerald"
           }
         ]
       }
@@ -28,14 +28,5 @@
       "has_the_recipe",
       "has_gems/emerald"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:gems/emerald",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }

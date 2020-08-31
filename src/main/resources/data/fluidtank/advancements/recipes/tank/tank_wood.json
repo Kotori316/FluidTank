@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:glass"
+            "item": "minecraft:glass"
           }
         ]
       }
@@ -37,14 +37,5 @@
       "has_glass",
       "has_bucket"
     ]
-  ],
-  "conditions": [
-    {
-      "value": {
-        "tag": "forge:glass",
-        "type": "forge:tag_empty"
-      },
-      "type": "forge:not"
-    }
   ]
 }
