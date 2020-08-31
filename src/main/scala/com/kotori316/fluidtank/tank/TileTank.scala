@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.tank
 
+import alexiil.mc.lib.attributes._
 import alexiil.mc.lib.attributes.fluid.FluidInvTankChangeListener
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
-import alexiil.mc.lib.attributes._
 import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.{FluidAmount, ModTank, Utils}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
@@ -12,6 +12,8 @@ import net.minecraft.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.text.{LiteralText, Text}
 import net.minecraft.util.{Nameable, Tickable}
+
+import scala.math.Ordering.Implicits.infixOrderingOps
 
 class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   extends BlockEntity(t)
@@ -161,7 +163,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     }
 
     // Util methods
-    def getFluidAmount: Long = fluid.amount
+    def getFluidAmount: Long = fluid.fluidVolume.amount().asLong(1000L)
 
     def getFluid: FluidAmount = fluid
 
@@ -177,16 +179,16 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Long = 0): FluidAmount = {
       if (canFillFluidType(fluidAmount) && fluidAmount.nonEmpty) {
         val previous = fluid
-        val newAmount = fluid.amount + fluidAmount.amount
-        if (capacity >= newAmount) {
+        val newAmount = fluid.fluidVolume.amount() add fluidAmount.fluidVolume.amount()
+        if (BCAmount.of(capacity, 1000L) >= newAmount) {
           if (doFill) {
             fluid = fluidAmount.setAmount(newAmount)
             onContentsChanged(previous)
           }
           fluidAmount
         } else {
-          val accept = capacity - fluid.amount
-          if (accept >= min) {
+          val accept = BCAmount.of(capacity, 1000L) sub fluid.fluidVolume.amount()
+          if (accept >= BCAmount.of(min, 1000L)) {
             if (doFill) {
               fluid = fluidAmount.setAmount(capacity)
               onContentsChanged(previous)
@@ -211,9 +213,9 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount = {
       if (canFillFluidType(fluidAmount) || FluidAmount.EMPTY.fluidEqual(fluidAmount)) {
         val previous = fluid
-        val drain = math.min(fluid.amount, fluidAmount.amount)
-        if (drain >= min) {
-          val newAmount = fluid.amount - drain
+        val drain = fluid.fluidVolume.amount() min fluidAmount.fluidVolume.amount()
+        if (drain >= BCAmount.of(min, 1000L)) {
+          val newAmount = fluid.fluidVolume.amount() sub drain
           if (doDrain) {
             fluid = fluid.setAmount(newAmount)
             onContentsChanged(previous)

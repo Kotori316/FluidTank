@@ -9,6 +9,8 @@ import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
+import scala.math.Ordering.Implicits._
+
 object BucketEventHandler {
 
   def transferFluid(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidAmount, stack: ItemStack, tankHandler: FluidAmount.Tank): Unit = {
@@ -18,7 +20,7 @@ object BucketEventHandler {
       // Transfer milk
       val drained = FluidAmount.BUCKET_MILK
       val filledSimulation = tankHandler.fill(drained, doFill = false)
-      if (filledSimulation.amount >= drained.amount) {
+      if (filledSimulation.fluidVolume.amount() >= drained.fluidVolume.amount()) {
         // Tank can be filled with 1000 mB of milk.
         tankHandler.fill(drained, doFill = true)
         val soundEvent = getFillSound(drained)
@@ -42,7 +44,7 @@ object BucketEventHandler {
 
   private def transferFluid_internal(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidAmount, stack: ItemStack, tankHandler: FluidAmount.Tank): Unit = {
     val drain = FluidAmount.fromItem(stack)
-    val drainAmount = drain.amount
+    val drainAmount = drain.fluidVolume.amount().asLong(1000L)
     val resultFill = tankHandler.fill(drain, doFill = true, min = drainAmount)
     if (drain.nonEmpty && resultFill == drain) { // Accepted all fluid
       val soundEvent = getFillSound(drain)
@@ -57,7 +59,7 @@ object BucketEventHandler {
       if (stack.getItem == Items.BUCKET) {
         val fill = toFill
         val fillAmount = fill.setAmount(FluidAmount.AMOUNT_BUCKET) // Limited to bucket
-        val drainedFromTank = tankHandler.drain(fillAmount, doDrain = true, fillAmount.amount)
+        val drainedFromTank = tankHandler.drain(fillAmount, doDrain = true, fillAmount.fluidVolume.amount().asLong(1000L))
         if (fill.nonEmpty && drainedFromTank == fillAmount) {
           val soundEvent = getEmptySound(fill)
           worldIn.playSound(null, pos, soundEvent, SoundCategory.BLOCKS, 1f, 1f)

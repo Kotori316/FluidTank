@@ -30,13 +30,15 @@ sealed class Connection(s: Seq[TileTank]) {
      */
     def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Long = 0): FluidAmount = {
       if (hasCreative) {
-        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
-        val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
+        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill))
+          .map(_.fluidVolume.amount())
+          .reduce(_ add _)
+        val total = totalLong min fluidAmount.fluidVolume.amount()
         return fluidAmount.setAmount(total)
       }
       val rest = capacity - amount
       if (rest == 0) return FluidAmount.EMPTY
-      if (fluidAmount.isEmpty || fluidAmount.amount < min || rest < min) return FluidAmount.EMPTY
+      if (fluidAmount.isEmpty || fluidAmount.fluidVolume.amount().asLong(1000L) < min || rest < min) return FluidAmount.EMPTY
       if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
 
       @scala.annotation.tailrec
@@ -65,12 +67,12 @@ sealed class Connection(s: Seq[TileTank]) {
      * @return the fluid and amount that is (or will be) drained.
      */
     def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount = {
-      if (fluidAmount.amount < min || fluidType.isEmpty) return FluidAmount.EMPTY
+      if (fluidAmount.fluidVolume.amount().asLong(1000L) < min || fluidType.isEmpty) return FluidAmount.EMPTY
       if (hasCreative) {
         if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidType.fluidEqual(fluidAmount)) {
           val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos} in creative connection."
           log(doDrain, List(m))
-          return fluidType.setAmount(fluidAmount.amount)
+          return fluidType.setAmount(fluidAmount.fluidVolume.amount())
         } else {
           return FluidAmount.EMPTY
         }
@@ -78,11 +80,14 @@ sealed class Connection(s: Seq[TileTank]) {
 
       @scala.annotation.tailrec
       def internal(tanks: List[TileTank], toDrain: FluidAmount, drained: FluidAmount): FluidAmount = {
-        if (toDrain.amount <= 0) {
+        if (toDrain.fluidVolume.amount().asLong(1000L) <= 0) {
+          log(doDrain, List(s"Drained $drained"))
           drained
         } else {
           tanks match {
-            case Nil => drained
+            case Nil =>
+              log(doDrain, List(s"Drained $drained, rest $toDrain"))
+              drained
             case ::(head, tl) =>
               val drain = head.tank.drain(toDrain, doDrain)
               internal(tl, toDrain - drain, drained + drain)
@@ -109,7 +114,8 @@ sealed class Connection(s: Seq[TileTank]) {
 
     override def attemptExtraction(filter: FluidFilter, maxAmount: BCAmount, simulation: Simulation): FluidVolume = {
       if (fluidType.nonEmpty && filter.matches(fluidType.fluidVolume.getFluidKey)) {
-        drain(FluidAmount(fluidType.fluidVolume.withAmount(maxAmount)), simulation.isAction).fluidVolume
+        val volume = drain(FluidAmount(fluidType.fluidVolume.withAmount(maxAmount)), simulation.isAction).fluidVolume
+        volume
       } else {
         FluidVolumeUtil.EMPTY
       }

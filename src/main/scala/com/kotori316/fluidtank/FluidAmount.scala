@@ -15,12 +15,13 @@ import net.minecraft.util.registry.{DefaultedRegistry, Registry}
  * Just a wrapper of [[FluidVolume]]
  */
 case class FluidAmount(fluidVolume: FluidVolume) {
-  val amount: Long = fluidVolume.amount().asLong(1000L)
   val fluid: Fluid = fluidVolume.getRawFluid
 
-  def setAmount(newAmount: Long): FluidAmount = {
-    if (fluidVolume.fluidKey.isEmpty || newAmount == amount) this // No need to create new instance.
-    else FluidAmount(fluidVolume.fluidKey.withAmount(BCAmount.of(newAmount, 1000L)))
+  def setAmount(newAmount: Long): FluidAmount = setAmount(BCAmount.of(newAmount, 1000L))
+
+  def setAmount(amount: BCAmount): FluidAmount = {
+    if (fluidVolume.fluidKey.isEmpty) this // No need to create new instance.
+    else FluidAmount(fluidVolume.copy().withAmount(amount))
   }
 
   def write(tag: CompoundTag): CompoundTag = fluidVolume.toTag(tag)

@@ -49,7 +49,7 @@ public class TankBlockItem extends BlockItem {
             CompoundTag tankNBT = nbt.getCompound(TankBlock.NBT_Tank);
             FluidAmount fluid = FluidAmount.fromNBT(tankNBT);
             long c = tankNBT.getInt(TankBlock.NBT_Capacity);
-            tooltip.add(new LiteralText(fluid.getLocalizedName() + " : " + fluid.amount() + " mB / " + c + " mB"));
+            tooltip.add(new LiteralText(fluid.getLocalizedName() + " : " + fluid.fluidVolume().amount().asLong(1000L) + " mB / " + c + " mB"));
         } else {
             tooltip.add(new LiteralText("Capacity : " + blockTank.tiers.amount() + "mB"));
         }

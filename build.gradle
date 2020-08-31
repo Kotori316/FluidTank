@@ -34,8 +34,13 @@ dependencies {
     // library
     implementation "org.scala-lang:scala-library:2.13.0"
     implementation "com.google.code.findbugs:jsr305:3.0.1"
-	//noinspection SpellCheckingInspection
-	modCompile "alexiil.mc.lib:libblockattributes-all:0.8.1"
+    //noinspection SpellCheckingInspection
+    modCompile "alexiil.mc.lib:libblockattributes-all:0.8.1"
+
+    //noinspection SpellCheckingInspection
+    modRuntime("alexiil.mc.mod:simplepipes-all:0.4.1")
+    //noinspection SpellCheckingInspection
+    modRuntime("me.shedaniel:RoughlyEnoughItems:5.2.10")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
