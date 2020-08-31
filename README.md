@@ -2,8 +2,6 @@
 
 For Minecraft 1.16.2 (1.16.2-fabric branch)
 
-**Work in progress.**
-
 LICENSE: MIT License  
 Copyright (c) 2019-2020 Kotori316
 
@@ -23,5 +21,10 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.0
-  * Licenced under the Apache License 2.0
+  * Licensed under the [Apache License 2.0](https://github.com/scala/scala/blob/2.13.x/LICENSE)
   * FOR USERS install https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala
+
+* **REQUIRED** [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)
+  * Version 0.8.1
+  * Licensed under the [MPL-2.0](https://github.com/AlexIIL/LibBlockAttributes/blob/0.8.x-1.16.x/LICENSE)
+  * For Users, install https://www.curseforge.com/minecraft/mc-mods/libblockattributes
