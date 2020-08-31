@@ -13,9 +13,9 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -27,7 +27,7 @@ import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.Utils;
 
-public class TierRecipe implements CraftingRecipe {
+public class TierRecipe extends ShapedRecipe {
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
@@ -39,6 +39,7 @@ public class TierRecipe implements CraftingRecipe {
     private final boolean isEmptyRecipe;
 
     public TierRecipe(Identifier idIn, Tiers tier) {
+        super(idIn, "", 3, 3, DefaultedList.of(), ItemStack.EMPTY);
         id = idIn;
         this.tier = tier;
 
