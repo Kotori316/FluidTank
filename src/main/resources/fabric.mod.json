@@ -23,13 +23,11 @@
       "com.kotori316.fluidtank.ModTankClientInit"
     ]
   },
-  "requires": {
-    "fabric-language-scala": ">=0.3.0"
-  },
   "depends": {
     "fabricloader": ">=0.9.1",
     "fabric": "*",
     "minecraft": "1.16.x",
+    "fabric-language-scala": ">=0.3.0",
     "libblockattributes": ">=0.8.1",
     "libblockattributes_items": ">=0.8.1",
     "libblockattributes_fluids": ">=0.8.1"
