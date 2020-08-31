@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.tank
 
-import alexiil.mc.lib.attributes.{AttributeList, AttributeProviderBlockEntity, ListenerRemovalToken, ListenerToken, Simulation}
 import alexiil.mc.lib.attributes.fluid.FluidInvTankChangeListener
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
+import alexiil.mc.lib.attributes._
 import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.{FluidAmount, ModTank, Utils}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
@@ -281,7 +281,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   override def toClientTag(tag: CompoundTag): CompoundTag = toTag(tag)
 
   override def addAllAttributes(to: AttributeList[_]): Unit = {
-    to.offer(this)
+    to.offer(this.connection.handler)
   }
 }
 
