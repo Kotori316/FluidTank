@@ -1,39 +1,36 @@
 package com.kotori316.fluidtank.render
 
-import java.util.Random
-
-import cats.syntax.eq._
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.mojang.blaze3d.matrix.MatrixStack
-import com.mojang.blaze3d.vertex.IVertexBuilder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.{IBakedModel, ItemCameraTransforms}
 import net.minecraft.client.renderer.tileentity.{ItemStackTileEntityRenderer, TileEntityRendererDispatcher}
-import net.minecraft.client.renderer.{IRenderTypeBuffer, ItemRenderer, RenderHelper, RenderTypeLookup}
+import net.minecraft.client.renderer.{IRenderTypeBuffer, ItemRenderer, RenderHelper}
 import net.minecraft.item.ItemStack
-import net.minecraft.util.Direction
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.model.data.EmptyModelData
+
+import scala.collection.mutable
 
 @OnlyIn(Dist.CLIENT)
 class RenderItemTank extends ItemStackTileEntityRenderer {
 
   lazy val tileTank = new TileTank()
+  private final val modelWrapperMap = mutable.Map.empty[IBakedModel, TankModelWrapper]
 
   override def func_239207_a_(stack: ItemStack, cameraType: ItemCameraTransforms.TransformType, matrixStack: MatrixStack,
                               renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: ItemBlockTank =>
 
-        val state = ModObjects.blockTanksInvisible.find(_.tier === tankItem.blockTank.tier).map(_.getDefaultState).getOrElse(tankItem.blockTank.getDefaultState)
+        val state = tankItem.blockTank.getDefaultState
         val model = Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
-        val renderType = RenderTypeLookup.func_239219_a_(stack, true)
-        val b = ItemRenderer.getBuffer(renderTypeBuffer, renderType, true, stack.hasEffect)
-        renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, b)
+        //val renderType = RenderTypeLookup.func_239219_a_(stack, true)
+        //val b = ItemRenderer.getBuffer(renderTypeBuffer, renderType, true, stack.hasEffect)
+        renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
 
         tileTank.tier = tankItem.blockTank.tier
         tileTank.tank.setFluid(null)
@@ -50,18 +47,12 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
   }
 
   // copy of ItemRenderer#func_229114_a_()
-  def renderItemModel(renderer: ItemRenderer, model: IBakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, builder: IVertexBuilder): Unit = {
-    val random = new Random
-    val seed = 42L
-
-    for (direction <- Direction.values) {
-      random.setSeed(seed)
-      renderer.renderQuads(matrixStack, builder, model.getQuads(null, direction, random, EmptyModelData.INSTANCE), stack, light, otherLight)
-    }
-
-    random.setSeed(seed)
-    renderer.renderQuads(matrixStack, builder, model.getQuads(null, null, random, EmptyModelData.INSTANCE), stack, light, otherLight)
-
+  def renderItemModel(renderer: ItemRenderer, model: IBakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer): Unit = {
+    val tankModelWrapper = modelWrapperMap.getOrElseUpdate(model, new TankModelWrapper(model))
+    matrixStack.push()
+    matrixStack.translate(0.5D, 0.5D, 0.5D)
+    renderer.renderItem(stack, ItemCameraTransforms.TransformType.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, tankModelWrapper)
+    matrixStack.pop()
   }
 
 }

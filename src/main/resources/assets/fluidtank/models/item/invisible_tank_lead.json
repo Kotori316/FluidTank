@@ -1,3 +1,7 @@
 {
-  "parent": "fluidtank:item/tank_lead"
+  "parent": "fluidtank:item/item_tank_invisible",
+  "textures": {
+    "1": "fluidtank:blocks/lead1",
+    "2": "fluidtank:blocks/lead2"
+  }
 }

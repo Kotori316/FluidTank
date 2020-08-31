@@ -1,12 +1,10 @@
 package com.kotori316.fluidtank.network;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.inventory.container.PlayerContainer;
@@ -32,9 +30,7 @@ import scala.jdk.javaapi.OptionConverters;
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
-import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.FluidSourceBlock;
-import com.kotori316.fluidtank.render.ItemModelTank;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderPipe;
 import com.kotori316.fluidtank.render.RenderTank;
@@ -46,9 +42,6 @@ public class ClientProxy extends SideProxy {
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
     //    public static final RenderTank RENDER_TANK = new RenderTank();
     //    public static final RenderPipe RENDER_PIPE = new RenderPipe();
-    private static final ItemModelTank MODEL_TANK = new ItemModelTank();
-    private static final ModelResourceLocation MESH_MODEL =
-        new ModelResourceLocation(FluidTank.modID + ":render.fluidtank.item", "inventory");
     public static TextureAtlasSprite whiteTexture;
 
     @Override
@@ -103,12 +96,12 @@ public class ClientProxy extends SideProxy {
 
         @SubscribeEvent
         public static void onBake(ModelBakeEvent event) {
-            event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
+            /*event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
             CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
                 ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
 //            IBakedModel model = event.getModelManager().getModel(modelLocation);
                 event.getModelRegistry().put(modelLocation, MODEL_TANK);
-            });
+            });*/
         }
 
         @SubscribeEvent
