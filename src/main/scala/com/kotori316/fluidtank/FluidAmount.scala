@@ -21,7 +21,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
 
   def setAmount(amount: BCAmount): FluidAmount = {
     if (fluidVolume.fluidKey.isEmpty) this // No need to create new instance.
-    else FluidAmount(fluidVolume.copy().withAmount(amount))
+    else FluidAmount(fluidVolume.fluidKey.withAmount(amount))
   }
 
   def write(tag: CompoundTag): CompoundTag = fluidVolume.toTag(tag)
