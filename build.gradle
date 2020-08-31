@@ -2,6 +2,8 @@ plugins {
     id "scala"
     id 'fabric-loom' version '0.5.22'
     id 'maven-publish'
+    id "com.github.breadmoirai.github-release" version "2.2.12"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
@@ -75,7 +77,7 @@ tasks.withType(ScalaCompile) {
 // if it is present.
 // If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from sourceSets.main.allSource
 }
 
@@ -85,6 +87,55 @@ jar {
 
 test {
     useJUnitPlatform()
+}
+
+// PUBLISH
+def joinedLog = String.join("\n",
+        "Fluid Tank for 1.16.2 and Fabric.",
+        "",
+        "Requires:",
+        "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
+        "* [LibBlockAttributes](https://www.curseforge.com/minecraft/mc-mods/libblockattributes)",
+        "",
+        "See https://github.com/Kotori316/FluidTank/tree/1.16.2-fabric to get all change log."
+)
+
+githubRelease {
+    repo.set('FluidTank')
+    token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
+    targetCommitish.set('1.16.2-fabric')
+
+    body.set(joinedLog)
+    releaseAssets = files(
+            jar.getArchiveFile().get(),
+            sourcesJar.getArchiveFile().get(),
+            remapJar.getArchiveFile().get()
+    )
+}
+
+curseforge {
+    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
+    project {
+        id = '291006'
+        changelogType = 'markdown'
+        addGameVersion 'Fabric'
+        addGameVersion '1.16.2'
+        changelog = joinedLog
+        releaseType = 'beta'
+        mainArtifact jar
+        addArtifact remapJar
+        addArtifact sourcesJar
+        relations {
+            requiredDependency 'fabric-language-scala'
+            //noinspection SpellCheckingInspection
+            requiredDependency 'libblockattributes'
+        }
+    }
+    options {
+        curseGradleOptions.debug = false
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
+    }
 }
 
 // configure the maven publication
