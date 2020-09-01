@@ -124,7 +124,6 @@ curseforge {
         releaseType = 'beta'
         mainArtifact remapJar
         addArtifact jar
-        addArtifact sourcesJar
         relations {
             requiredDependency 'fabric-language-scala'
             //noinspection SpellCheckingInspection
