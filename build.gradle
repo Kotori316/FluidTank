@@ -117,12 +117,16 @@ repositories {
         url = "https://dvs1.progwml6.com/files/maven/"
         content {
             includeGroup("mezz.jei")
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
         }
     }
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
+        content {
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
+        }
     }
     if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
         maven {
@@ -130,12 +134,16 @@ repositories {
             url "https://maven.tehnut.info"
             content {
                 includeModule("mcp.mobius.waila", "Hwyla")
+                excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
             }
         }
     }
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
+        content {
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
+        }
     }
     if (hasGitHubToken()) {
         maven {
@@ -147,6 +155,7 @@ repositories {
             }
             content {
                 includeModule("com.kotori316", "ScalableCatsForce")
+                excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
             }
         }
     } else {
@@ -156,6 +165,7 @@ repositories {
             url 'https://minecraft.curseforge.com/api/maven/'
             content {
                 includeModule("scalable-cats-force", "ScalableCatsForce-2.13.3-build")
+                excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
             }
         }
     }
