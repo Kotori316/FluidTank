@@ -25,6 +25,8 @@ jobs:
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
       - id: check-parameter
         run: chmod +x ./gradlew && ./gradlew checkMethod --no-daemon
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - name: Test-JUnit
         run: chmod +x ./gradlew && ./gradlew --no-daemon test
         env:

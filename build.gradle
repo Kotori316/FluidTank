@@ -387,6 +387,7 @@ task makeChangeLog() {
 
 task checkMethod() {
     doLast {
+        System.out.println("Is In CI ${Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))}")
         System.out.println("FilePath ${jar.getArchiveFile().get()}")
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
         System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
@@ -412,6 +413,11 @@ task checkMethod() {
         println("*" * 20)
         println("Repository")
         getProject().getRepositories().stream().forEach { n -> println("${n.name} $n ${n instanceof MavenArtifactRepository ? n.getUrl() : "Not maven"}") }
+        println("Dependency" + System.lineSeparator() + "*" * 20)
+        getProject().getConfigurations().each { config ->
+            println(config.getName())
+            config.getAllDependencies().each { println(it) }
+        }
     }
 }
 
