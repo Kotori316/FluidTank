@@ -106,7 +106,6 @@ minecraft {
 }
 
 repositories {
-    mavenCentral()
 //    maven {
 //        name "BuildCraft"
 //        url = "https://mod-buildcraft.com/maven"
@@ -117,16 +116,12 @@ repositories {
         url = "https://dvs1.progwml6.com/files/maven/"
         content {
             includeGroup("mezz.jei")
-            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
         }
     }
     maven {
         // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
+        name = "modmaven.k-4u.nl"
         url = "https://modmaven.k-4u.nl"
-        content {
-            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
-        }
     }
     if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
         maven {
@@ -134,20 +129,16 @@ repositories {
             url "https://maven.tehnut.info"
             content {
                 includeModule("mcp.mobius.waila", "Hwyla")
-                excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
             }
         }
     }
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
-        content {
-            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
-        }
     }
     if (hasGitHubToken()) {
         maven {
-            name = "GitHubPackages"
+            name = "GitHubPackages-SLP"
             url = uri("https://maven.pkg.github.com/Kotori316/SLP")
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
@@ -155,7 +146,6 @@ repositories {
             }
             content {
                 includeModule("com.kotori316", "ScalableCatsForce")
-                excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
             }
         }
     } else {
@@ -165,8 +155,12 @@ repositories {
             url 'https://minecraft.curseforge.com/api/maven/'
             content {
                 includeModule("scalable-cats-force", "ScalableCatsForce-2.13.3-build")
-                excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
             }
+        }
+    }
+    repositories.forEach { repo ->
+        repo.content {
+            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
         }
     }
 }
@@ -415,6 +409,9 @@ task checkMethod() {
         println("FindProperty of gpr.user ${project.findProperty("gpr.user")}")
         println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}")
 //        println("Property of gpr.user ${project.property("gpr.user")}") // FAILED
+        println("*" * 20)
+        println("Repository")
+        getProject().getRepositories().stream().forEach { n -> println("${n.name} $n ${n instanceof MavenArtifactRepository}") }
     }
 }
 
