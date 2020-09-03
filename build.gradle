@@ -158,7 +158,7 @@ repositories {
             }
         }
     }
-    repositories.forEach { repo ->
+    repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
         repo.content {
             excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
         }
@@ -392,8 +392,8 @@ task checkMethod() {
         System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
         System.out.println("Name $project.name")
         System.out.println("BaseName $archivesBaseName")
-        System.out.println("ModVersion ${getProperty("modVersion")}")
-        System.out.println("ModVersion ${project.version}")
+        System.out.println("ModVersion-fromProperty ${getProperty("modVersion")}")
+        System.out.println("ModVersion-fromProject ${project.version}")
         println("*" * 20)
         println("changes.md")
         println(getLatestChangeLog())
@@ -411,7 +411,7 @@ task checkMethod() {
 //        println("Property of gpr.user ${project.property("gpr.user")}") // FAILED
         println("*" * 20)
         println("Repository")
-        getProject().getRepositories().stream().forEach { n -> println("${n.name} $n ${n instanceof MavenArtifactRepository}") }
+        getProject().getRepositories().stream().forEach { n -> println("${n.name} $n ${n instanceof MavenArtifactRepository ? n.getUrl() : "Not maven"}") }
     }
 }
 
