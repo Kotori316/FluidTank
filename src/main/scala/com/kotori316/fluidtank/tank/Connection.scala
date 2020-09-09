@@ -109,7 +109,7 @@ sealed class Connection(s: Seq[TileTank]) {
 
     override def attemptInsertion(fluidVolume: FluidVolume, simulation: Simulation): FluidVolume = {
       val filled = fill(FluidAmount(fluidVolume), simulation.isAction).fluidVolume
-      filled.withAmount(fluidVolume.amount() sub filled.amount())
+      fluidVolume.withAmount(fluidVolume.amount() sub filled.amount())
     }
 
     override def attemptExtraction(filter: FluidFilter, maxAmount: BCAmount, simulation: Simulation): FluidVolume = {

@@ -36,7 +36,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
 
   def +(that: FluidAmount): FluidAmount = {
     if (fluidVolume.getRawFluid == Fluids.EMPTY) that
-    else FluidAmount(fluidVolume.withAmount(fluidVolume.amount().add(that.fluidVolume.amount())))
+    else FluidAmount(fluidVolume.fluidKey.withAmount(fluidVolume.amount() add that.fluidVolume.amount()))
   }
 
   def -(that: FluidAmount): FluidAmount = FluidAmount(fluidVolume.withAmount(fluidVolume.amount().sub(that.fluidVolume.amount())))
