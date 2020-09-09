@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.render
 import com.kotori316.fluidtank.ModTank
 import com.kotori316.fluidtank.tank.{TankBlock, TankBlockItem, TileTank}
 import net.fabricmc.api.{EnvType, Environment}
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRenderer
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
@@ -15,12 +15,12 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
 
 @Environment(EnvType.CLIENT)
-class RenderItemTank extends BuiltinItemRenderer {
+class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
   lazy val tileTank = new TileTank()
   private val internalModel = new RenderItemTank.Model
 
-  override def render(stack: ItemStack, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, mode: ModelTransformation.Mode, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: TankBlockItem =>
 
@@ -42,12 +42,13 @@ class RenderItemTank extends BuiltinItemRenderer {
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
 
-      case _ => ModTank.LOGGER.info("RenderItemTank is called for " + stack.getItem)
+      case _ => ModTank.LOGGER.warn("RenderItemTank is called for " + stack.getItem)
     }
   }
 
   // copy of ItemRenderer#func_229114_a_()
-  def renderItemModel(renderer: ItemRenderer, model: BakedModel, stack: ItemStack, light: Int, otherLight: Int, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider): Unit = {
+  def renderItemModel(renderer: ItemRenderer, model: BakedModel, stack: ItemStack, light: Int, otherLight: Int,
+                      matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider): Unit = {
     //    renderBakedItemModel.invoke(renderer,
     //      model, stack, light, otherLight, matrixStack, builder)
     internalModel.setModel(model)
