@@ -22,6 +22,10 @@ repositories {
         name = "BuildCraft"
         url = "https://mod-buildcraft.com/maven"
     }
+    maven {
+        name = "TechReborn"
+        url = "https://modmaven.k-4u.nl/"
+    }
 }
 
 dependencies {
@@ -44,6 +48,8 @@ dependencies {
     modRuntime("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
     //noinspection SpellCheckingInspection
     modRuntime("me.shedaniel:RoughlyEnoughItems:${project.rei_version}")
+    modRuntime("RebornCore:RebornCore-1.16:${project.RebornCore_version}")
+    //modRuntime("TechReborn:TechReborn-1.16:${project.TechReborn_version}")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

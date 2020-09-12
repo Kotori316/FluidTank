@@ -28,11 +28,11 @@ public enum Tiers {
             return Long.MAX_VALUE;
         }
     },
-    COPPER(2, 1 << 5, "Copper", "forge:ingots/copper", true),
-    TIN(2, 1 << 6, "Tin", "forge:ingots/tin", true),
-    BRONZE(3, 1 << 9, "Bronze", "forge:ingots/bronze", true),
-    LEAD(3, 1 << 8, "Lead", "forge:ingots/lead", true),
-    SILVER(3, 1 << 10, "Silver", "forge:ingots/silver", true),
+    COPPER(2, 1 << 5, "Copper", "c:copper_ingots", true),
+    TIN(2, 1 << 6, "Tin", "c:tin_ingots", true),
+    BRONZE(3, 1 << 9, "Bronze", "c:bronze_ingots", true),
+    LEAD(3, 1 << 8, "Lead", "c:lead_ingots", true),
+    SILVER(3, 1 << 10, "Silver", "c:silver_ingots", true),
     ;
     public static final Map<String, Tiers> TIERS_MAP;
 

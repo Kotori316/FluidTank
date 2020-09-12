@@ -16,7 +16,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.collection.DefaultedList;
@@ -48,10 +48,12 @@ public class TierRecipe extends ShapedRecipe {
         Set<TankBlock> tanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
         Set<TankBlock> invTanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
         tankItems = Ingredient.method_26964(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new)); // OfStacks
-        subItems = Optional.ofNullable(ItemTags.getTagGroup().getTag(new Identifier(tier.tagName)))
+        subItems = Optional.ofNullable(ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tier.tagName)))
             .map(Ingredient::fromTag)
             .orElse(tier.getAlternative());
         isEmptyRecipe = subItems.isEmpty();
+//        if (isEmptyRecipe)
+//            throw new IllegalArgumentException(String.format("Mod 'FluidTank' Recipe for %s is disabled.", tier));
     }
 
     @Override
