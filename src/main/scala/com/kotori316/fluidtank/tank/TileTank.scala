@@ -211,7 +211,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
      * @return the fluid and amount that is (or will be) drained.
      */
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount = {
-      if (canFillFluidType(fluidAmount) || FluidAmount.EMPTY.fluidEqual(fluidAmount)) {
+      if ((canFillFluidType(fluidAmount) || FluidAmount.EMPTY.fluidEqual(fluidAmount)) && fluid.nonEmpty) {
         val previous = fluid
         val drain = fluid.fluidVolume.amount() min fluidAmount.fluidVolume.amount()
         if (drain >= BCAmount.of(min, 1000L)) {

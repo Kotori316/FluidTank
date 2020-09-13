@@ -3,7 +3,7 @@ package com.kotori316.fluidtank
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.impl.EmptyFixedFluidInv
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidKeys, FluidVolume}
-import alexiil.mc.lib.attributes.fluid.{FixedFluidInv, FluidInvTankChangeListener, FluidItemUtil, FluidVolumeUtil}
+import alexiil.mc.lib.attributes.fluid._
 import alexiil.mc.lib.attributes.{ListenerRemovalToken, ListenerToken, Simulation}
 import com.kotori316.fluidtank.ModTank.Entries
 import net.minecraft.fluid.{Fluid, Fluids}
@@ -15,6 +15,7 @@ import net.minecraft.util.registry.{DefaultedRegistry, Registry}
  * Just a wrapper of [[FluidVolume]]
  */
 case class FluidAmount(fluidVolume: FluidVolume) {
+  // Nullable
   val fluid: Fluid = fluidVolume.getRawFluid
 
   def setAmount(newAmount: Long): FluidAmount = setAmount(BCAmount.of(newAmount, 1000L))
@@ -36,6 +37,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
 
   def +(that: FluidAmount): FluidAmount = {
     if (fluidVolume.getRawFluid == Fluids.EMPTY) that
+    else if (that.isEmpty) this
     else FluidAmount(fluidVolume.fluidKey.withAmount(fluidVolume.amount() add that.fluidVolume.amount()))
   }
 
@@ -63,9 +65,10 @@ object FluidAmount {
       case Items.MILK_BUCKET => BUCKET_MILK
       case Items.BUCKET => EMPTY
       case _ =>
+        val view = FluidAttributes.GROUPED_INV_VIEW.get(stack)
         val key = FluidItemUtil.getContainedFluid(stack)
         if (key.isEmpty) EMPTY
-        else FluidAmount(key.withAmount(BCAmount.BUCKET))
+        else FluidAmount(key.withAmount(view.getAmount_F(key)))
     }
   }
 
