@@ -179,9 +179,9 @@ sealed class Connection(s: Seq[TileTank]) {
   override def toString: String = {
     val name = getFluidStack.fold("null")(_.getLocalizedName)
     if (!hasCreative)
-      s"Connection of $name : $amount / $capacity mB, Comparator outputs $getComparatorLevel."
+      s"$name : $amount / $capacity mB, Comparator outputs $getComparatorLevel."
     else
-      s"Connection of $name in creative. Comparator outputs $getComparatorLevel."
+      s"$name in creative. Comparator outputs $getComparatorLevel."
   }
 
   def getTextComponent: Text = {

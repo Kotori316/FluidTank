@@ -29,11 +29,11 @@
   "block.fluidtank.milk": "Milk",
   "block.fluidtank.fluid_source": "Infinite Fluid Supplier",
   "block.fluidtank.water_source": "Infinite Water Supplier",
-  "chat.fluidtank.connection": "Connection of %1$s : %2$s / %3$s mB, Comparator outputs %4$s.",
-  "chat.fluidtank.connection_creative": "Connection of %1$s in creative, Comparator outputs %2$s.",
+  "chat.fluidtank.connection": "%1$s : %2$s / %3$s mB, Comparator outputs %4$s.",
+  "chat.fluidtank.connection_creative": "%1$s in creative, Comparator outputs %2$s.",
   "chat.fluidtank.empty": "null",
   "chat.fluidtank.change_source": "Fluid was changed to %s.",
-  "chat.fluidtank.interval": "Interval was changed to %s.",
+  "chat.fluidtank.change_interval": "Interval was changed to %s.",
   "itemGroup.FluidTank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Рецепт резервуаров",
   "config.waila.plugin_fluidtank": "Fluidtank",
@@ -46,5 +46,6 @@
   "fluidtank.waila.comparator": "Компаратор: %s",
   "fluidtank.waila.short": "%1$s: %2$s/%3$s мВ",
   "tooltip.fluidtank.source": "Only water",
-  "tooltip.fluidtank.source_inf": "Infinite"
+  "tooltip.fluidtank.source_inf": "Infinite",
+  "itemGroup.fluidtank.fluidtank": "FluidTanks"
 }

@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank
 
+import alexiil.mc.lib.attributes.fluid._
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.impl.EmptyFixedFluidInv
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidKeys, FluidVolume}
-import alexiil.mc.lib.attributes.fluid._
 import alexiil.mc.lib.attributes.{ListenerRemovalToken, ListenerToken, Simulation}
 import com.kotori316.fluidtank.ModTank.Entries
 import net.minecraft.fluid.{Fluid, Fluids}
@@ -33,7 +33,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
 
   def isGaseous: Boolean = fluidVolume.fluidKey.gaseous
 
-  def getLocalizedName: String = String.valueOf(FluidAmount.registry.getId(fluid))
+  def getLocalizedName: String = fluidVolume.getName.getString
 
   def +(that: FluidAmount): FluidAmount = {
     if (fluidVolume.getRawFluid == Fluids.EMPTY) that
