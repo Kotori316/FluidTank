@@ -47,7 +47,7 @@ public class TierRecipe extends ShapedRecipe {
         Set<Tiers> tiersSet = Tiers.stream().filter(t -> t.rank == tier.rank - 1).collect(Collectors.toSet());
         Set<TankBlock> tanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
         Set<TankBlock> invTanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
-        tankItems = Ingredient.method_26964(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new)); // OfStacks
+        tankItems = Ingredient.ofStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new)); // OfStacks
         subItems = Optional.ofNullable(ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tier.tagName)))
             .map(Ingredient::fromTag)
             .orElse(tier.getAlternative());
