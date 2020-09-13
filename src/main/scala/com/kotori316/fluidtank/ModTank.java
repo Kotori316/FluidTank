@@ -1,10 +1,10 @@
 package com.kotori316.fluidtank;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.DSL;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -71,45 +71,15 @@ public class ModTank implements ModInitializer {
         public static final CreativeTankBlock CREATIVE_TANK = new CreativeTankBlock();
         public static final MilkFluid MILK_FLUID = new MilkFluid();
         public static final BlockEntityType<TileTank> TANK_BLOCK_ENTITY_TYPE = BlockEntityType.Builder.create(TileTank::new,
-            ListBuilder.of(WOOD_TANK).add(TANK_BLOCKS).build().toArray(new TankBlock[0])).build(DSL.emptyPartType());
+            ImmutableList.<TankBlock>builder().add(WOOD_TANK).addAll(TANK_BLOCKS).build().toArray(new TankBlock[0])).build(DSL.emptyPartType());
         public static final BlockEntityType<TileTankCreative> CREATIVE_BLOCK_ENTITY_TYPE = BlockEntityType.Builder.create(TileTankCreative::new, CREATIVE_TANK).build(DSL.emptyPartType());
         public static final LootFunctionType CONTENT_LOOT_FUNCTION_TYPE = new LootFunctionType(new ContentTankSerializer());
 
-        public static final List<TankBlock> ALL_TANK_BLOCKS = ListBuilder.<TankBlock>of()
+        public static final List<TankBlock> ALL_TANK_BLOCKS = ImmutableList.<TankBlock>builder()
             .add(WOOD_TANK)
-            .add(TANK_BLOCKS)
+            .addAll(TANK_BLOCKS)
             .add(CREATIVE_TANK)
             .build();
-
-        private static class ListBuilder<T> {
-            private final List<T> list;
-
-            public static <E> ListBuilder<E> of() {
-                return new ListBuilder<>();
-            }
-
-            public static <E> ListBuilder<E> of(E e) {
-                return new ListBuilder<E>().add(e);
-            }
-
-            private ListBuilder() {
-                this.list = new ArrayList<>();
-            }
-
-            public ListBuilder<T> add(T t) {
-                list.add(t);
-                return this;
-            }
-
-            public ListBuilder<T> add(List<T> ts) {
-                list.addAll(ts);
-                return this;
-            }
-
-            public List<T> build() {
-                return Collections.unmodifiableList(new ArrayList<>(this.list));
-            }
-        }
     }
 
 }
