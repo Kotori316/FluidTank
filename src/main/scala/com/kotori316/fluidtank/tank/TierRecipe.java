@@ -66,7 +66,7 @@ public class TierRecipe extends ShapedRecipe {
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
             .filter(FluidAmount::nonEmpty)
-            .map(FluidAmount::fluid)
+            .map(f -> f.fluidVolume().getFluidKey())
             .distinct()
             .count() <= 1;
     }
