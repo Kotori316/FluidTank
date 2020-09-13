@@ -72,7 +72,10 @@ sealed class Connection(s: Seq[TileTank]) {
         if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidType.fluidEqual(fluidAmount)) {
           val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos} in creative connection."
           log(doDrain, List(m))
-          return fluidType.setAmount(fluidAmount.fluidVolume.amount())
+          if (fluidAmount.fluidVolume.amount() == BCAmount.MAX_BUCKETS)
+            return fluidType.setAmount(fluidAmount.fluidVolume.amount().sub(1))
+          else
+            return fluidType.setAmount(fluidAmount.fluidVolume.amount())
         } else {
           return FluidAmount.EMPTY
         }
