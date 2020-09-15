@@ -6,10 +6,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
 import net.minecraft.client.renderer.{IRenderTypeBuffer, RenderType}
 import net.minecraft.inventory.container.PlayerContainer
-import net.minecraft.tags.FluidTags
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraft.world.biome.BiomeColors
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 @OnlyIn(Dist.CLIENT)
@@ -45,11 +43,7 @@ object RenderTank {
   private def color(tile: TileTank) = {
     val fluidAmount = tile.tank.fluid
     val (world, pos) = worldAndPos(tile)
-    if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
-      BiomeColors.getWaterColor(world, pos) | 0xFF000000
-    } else {
-      fluidAmount.fluid.getAttributes.getColor(world, pos)
-    }
+    fluidAmount.fluid.getAttributes.getColor(world, pos)
   }
 
   private[this] def worldAndPos(tileTank: TileTank): (World, BlockPos) = {
