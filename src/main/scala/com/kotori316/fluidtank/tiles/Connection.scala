@@ -45,7 +45,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 
       def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[LogType[String], FluidAmount] = {
         if (toFill.isEmpty) {
-          Writer.tell("Filled".pure[LogType]).map(_ => filled)
+          Writer.apply("Filled".pure[LogType], filled)
         } else {
           tanks match {
             case Nil =>
