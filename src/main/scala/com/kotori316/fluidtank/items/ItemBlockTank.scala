@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.blocks.BlockTank
+import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import com.kotori316.fluidtank.{FluidAmount, FluidTank}
 import net.minecraft.block.BlockState
@@ -10,7 +11,7 @@ import net.minecraft.item._
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.ActionResultType
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.{ITextComponent, StringTextComponent}
+import net.minecraft.util.text.{ITextComponent, TranslationTextComponent}
 import net.minecraft.world.World
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
@@ -31,11 +32,11 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     val nbt = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
     if (nbt != null) {
       val tankNBT = nbt.getCompound(TileTankNoDisplay.NBT_Tank)
-      val fluid = Option(FluidAmount.fromNBT(tankNBT))
+      val fluid = FluidAmount.fromNBT(tankNBT)
       val c = tankNBT.getInt(TileTankNoDisplay.NBT_Capacity)
-      tooltip.add(new StringTextComponent(fluid.fold("Empty")(_.getLocalizedName) + " : " + fluid.fold(0L)(_.amount) + " mB / " + c + " mB"))
+      tooltip.add(new TranslationTextComponent(Localize.TOOLTIP, fluid.toStack.getDisplayName, fluid.amount, c))
     } else {
-      tooltip.add(new StringTextComponent("Capacity : " + blockTank.tier.amount + "mB"))
+      tooltip.add(new TranslationTextComponent(Localize.CAPACITY, blockTank.tier.amount))
     }
   }
 

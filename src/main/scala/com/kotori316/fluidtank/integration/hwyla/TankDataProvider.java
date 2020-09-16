@@ -24,13 +24,13 @@ import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
 
+import static com.kotori316.fluidtank.integration.Localize.AMOUNT;
+import static com.kotori316.fluidtank.integration.Localize.CAPACITY;
+import static com.kotori316.fluidtank.integration.Localize.COMPARATOR;
+import static com.kotori316.fluidtank.integration.Localize.CONTENT;
 import static com.kotori316.fluidtank.integration.Localize.FLUID_NULL;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_AMOUNT;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_CAPACITY;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_COMPARATOR;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_CONTENT;
+import static com.kotori316.fluidtank.integration.Localize.TIER;
 import static com.kotori316.fluidtank.integration.Localize.WAILA_SHORT;
-import static com.kotori316.fluidtank.integration.Localize.WAILA_TIER;
 import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.KEY_SHORT_INFO;
 import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.KEY_TANK_INFO;
 import static com.kotori316.fluidtank.integration.hwyla.TankWailaPlugin.NBT_ConnectionAmount;
@@ -74,21 +74,21 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
             } else {
                 Tiers tier = tank.tier();
                 if (t instanceof TileTankVoid) {
-                    list = Collections.singletonList(new TranslationTextComponent(WAILA_TIER, tier.toString()));
+                    list = Collections.singletonList(new TranslationTextComponent(TIER, tier.toString()));
                 } else {
                     if (nbtData.getBoolean(NBT_NonCreative)) {
                         list = Arrays.asList(
-                            new TranslationTextComponent(WAILA_TIER, tier.toString()),
-                            new TranslationTextComponent(WAILA_CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
-                            new TranslationTextComponent(WAILA_AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
-                            new TranslationTextComponent(WAILA_CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
-                            new TranslationTextComponent(WAILA_COMPARATOR, nbtData.getInt(NBT_ConnectionComparator))
+                            new TranslationTextComponent(TIER, tier.toString()),
+                            new TranslationTextComponent(CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
+                            new TranslationTextComponent(AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
+                            new TranslationTextComponent(CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
+                            new TranslationTextComponent(COMPARATOR, nbtData.getInt(NBT_ConnectionComparator))
                         );
                     } else {
                         String fluidName = getCreativeFluidName(tank);
                         list = Arrays.asList(
-                            new TranslationTextComponent(WAILA_TIER, tier.toString()),
-                            new TranslationTextComponent(WAILA_CONTENT, fluidName)
+                            new TranslationTextComponent(TIER, tier.toString()),
+                            new TranslationTextComponent(CONTENT, fluidName)
                         );
                     }
                 }

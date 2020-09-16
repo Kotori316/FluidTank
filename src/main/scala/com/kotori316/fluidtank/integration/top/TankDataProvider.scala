@@ -20,15 +20,15 @@ class TankDataProvider extends IProbeInfoProvider {
     val entity = world.getTileEntity(data.getPos)
     entity match {
       case v: TileTankVoid =>
-        probeInfo.text(new TranslationTextComponent(WAILA_TIER, v.tier))
+        probeInfo.text(new TranslationTextComponent(TIER, v.tier))
       case tank: TileTankNoDisplay =>
-        val tier = new TranslationTextComponent(WAILA_TIER, tank.tier) //I18n.translateToLocalFormatted(WAILA_TIER, tank.tier.toString)
-        val fluid = new TranslationTextComponent(WAILA_CONTENT, tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL))
+        val tier = new TranslationTextComponent(TIER, tank.tier) //I18n.translateToLocalFormatted(WAILA_TIER, tank.tier.toString)
+        val fluid = new TranslationTextComponent(CONTENT, tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL))
         val list = if (tank.connection.hasCreative) Seq(tier, fluid)
         else {
-          val amount = new TranslationTextComponent(WAILA_AMOUNT, Long.box(tank.connection.amount))
-          val capacity = new TranslationTextComponent(WAILA_CAPACITY, Long.box(tank.connection.capacity))
-          val comparator = new TranslationTextComponent(WAILA_COMPARATOR, Int.box(tank.getComparatorLevel))
+          val amount = new TranslationTextComponent(AMOUNT, Long.box(tank.connection.amount))
+          val capacity = new TranslationTextComponent(CAPACITY, Long.box(tank.connection.capacity))
+          val comparator = new TranslationTextComponent(COMPARATOR, Int.box(tank.getComparatorLevel))
           Seq(tier, fluid, amount, capacity, comparator)
         }
         list.foreach(probeInfo.text)

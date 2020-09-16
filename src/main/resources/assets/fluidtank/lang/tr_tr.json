@@ -47,7 +47,7 @@
   "fluidtank.waila.amount": "İçinde: %s mB",
   "fluidtank.waila.capacity": "Limit: %s mB",
   "fluidtank.waila.comparator": "Karşılaştırıcı: %s",
-  "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
+  "fluidtank.waila.short": "%1$s : %2$s/%3$s mB",
   "fluidtank.waila.supplier": "%s",
   "tooltip.fluidtank.source": "Only water",
   "tooltip.fluidtank.source_inf": "Infinite",
