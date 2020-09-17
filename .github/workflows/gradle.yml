@@ -36,9 +36,6 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew --no-daemon test
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
-      - id: download_assets
-        run: chmod +x ./gradlew && ./gradlew downloadAssets && ./gradlew downloadAssets
-        continue-on-error: true
       - name: Test-RunData
         run: chmod +x ./gradlew && ./gradlew --no-daemon -Dfml.earlyprogresswindow=false runData
         continue-on-error: true
