@@ -4,16 +4,7 @@ import com.kotori316.fluidtank._
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
-class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
-  /**
-   * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-   *                    Empty Fluid means fluid type can be anything.
-   * @param doDrain     false means simulating.
-   * @param min         minimum amount to drain.
-   * @return the fluid and amount that is (or will be) drained.
-   */
-  override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = FluidAmount.EMPTY
-
+class PipeFluidHandler(pipeTile: PipeTileBase) extends IFluidHandler {
   override def getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
 
   override def getTankCapacity(tank: Int): Int = 0
@@ -26,12 +17,9 @@ class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
 
   override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = FluidStack.EMPTY
 
-  /**
-   * @return Fluid that was accepted by the tank.
-   */
-  override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
+  override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
     val pipePosIterator = pipeTile.connection.outputs(pipeTile.getPos).iterator
-    var rest = fluidAmount
+    val rest = resource.copy()
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
       val handlerIterator = directions.map(dir => pipePos.offset(dir) -> dir).iterator
@@ -41,25 +29,12 @@ class PipeFluidHandler(pipeTile: PipeTileBase) extends FluidAmount.Tank {
         }
       while (handlerIterator.hasNext) {
         val handler = handlerIterator.next()
-        rest -= rest.setAmount(handler.fill(rest.toStack, FluidAmount.b2a(doFill)))
+        rest.setAmount(rest.getAmount - handler.fill(rest, action))
         if (rest.isEmpty)
-          return fluidAmount
+          return 0
       }
     }
-    /*return*/ fluidAmount - rest
-    /*
-        val destinations = for {
-          p <- LazyList.from(pipeTile.connection.outputSorted(pipeTile.getPos))
-          (pos, direction) <- PipeTile.facings.map(dir => p.offset(dir) -> dir)
-          if pipeTile.getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-          dest <- OptionT.fromOption[Eval](Option(pipeTile.getWorld.getTileEntity(pos)))
-            .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala).value.value
-        } yield dest
-        val notFilled = destinations.foldLeft(fluidAmount) { case (rest, handler) =>
-          if (rest.isEmpty) rest
-          else rest - rest.setAmount(handler.fill(rest.toStack, FluidAmount.b2a(doFill)))
-        }
-        fluidAmount - notFilled*/
+    /*return*/ resource.getAmount - rest.getAmount
   }
 
 }
