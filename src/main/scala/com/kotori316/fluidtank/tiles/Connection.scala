@@ -4,7 +4,6 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.tiles.CapabilityFluidTank.EmptyTank
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}
@@ -187,7 +186,6 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     Cap.asJava(
       Cap.empty[T]
         .orElse(if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) OptionT(Eval.always(Option.when(isValid)(handler.asInstanceOf[T]))) else Cap.empty)
-        .orElse(CapabilityFluidTank.cap.make[T](capability, handler))
         .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
     )
   }
@@ -246,7 +244,6 @@ object Connection {
 
     override def amount: Long = 0
 
-    override val handler: FluidAmount.Tank = EmptyTank.INSTANCE
     override val toString: String = "Connection.Invalid"
 
     override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {

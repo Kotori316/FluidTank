@@ -30,7 +30,6 @@ import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.EasyCondition;
 import com.kotori316.fluidtank.recipes.TagCondition;
 import com.kotori316.fluidtank.recipes.TierRecipe;
-import com.kotori316.fluidtank.tiles.CapabilityFluidTank;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -50,7 +49,6 @@ public class FluidTank {
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
             PacketHandler.init();
-            CapabilityFluidTank.register();
             FluidTankTOPPlugin.sendIMC().apply(modID);
         }
 
