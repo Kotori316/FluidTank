@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.test
 
-import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
+import com.kotori316.fluidtank.fluids.{EmptyTankHandler, FluidAmount, Tank, TankHandler, VoidTankHandler}
 import net.minecraft.fluid.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
@@ -187,5 +187,55 @@ class TankHandlerTest {
     val drained = tank.drain(new FluidStack(Fluids.LAVA, 1000), IFluidHandler.FluidAction.EXECUTE)
     assertTrue(drained.isEmpty)
     assertEquals(before, tank.getTank)
+  }
+
+  @Test
+  def emptyHandler(): Unit = {
+    val h: TankHandler = EmptyTankHandler
+    locally {
+      val filled = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertEquals(0, filled)
+    }
+    locally {
+      val filled = h.fill(FluidAmount.BUCKET_LAVA.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertEquals(0, filled)
+    }
+    locally {
+      val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(drained.isEmpty)
+    }
+    locally {
+      val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(drained.isEmpty)
+    }
+    locally {
+      val drained = h.drain(1000, IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(drained.isEmpty)
+    }
+  }
+
+  @Test
+  def voidHandler(): Unit = {
+    val h: TankHandler = VoidTankHandler
+    locally {
+      val filled = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertEquals(1000, filled)
+    }
+    locally {
+      val filled = h.fill(FluidAmount.BUCKET_LAVA.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertEquals(1000, filled)
+    }
+    locally {
+      val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(drained.isEmpty)
+    }
+    locally {
+      val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(drained.isEmpty)
+    }
+    locally {
+      val drained = h.drain(1000, IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(drained.isEmpty)
+    }
   }
 }

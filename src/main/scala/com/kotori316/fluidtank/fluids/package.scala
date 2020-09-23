@@ -4,6 +4,7 @@ import cats.data.{Chain, ReaderWriterStateT}
 import cats.implicits.{catsSyntaxEq, catsSyntaxGroup, catsSyntaxSemigroup}
 import cats.{Foldable, Id, Monad, Monoid}
 import net.minecraft.fluid.Fluids
+import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
 package object fluids {
@@ -18,7 +19,7 @@ package object fluids {
       val filledAmount = (tank.capacity |-| tank.amount) min s.amount
       val filledStack = s.copy(amount = filledAmount)
       val newTank = tank.copy(tank.fluidAmount + filledStack)
-      (Chain(FluidTransferLog.FillFluid(s, filledStack, tank)), s - filledStack, newTank)
+      (Chain(FluidTransferLog.FillFluid(s, filledStack, tank, newTank)), s - filledStack, newTank)
     } else {
       (Chain(FluidTransferLog.FillFailed(s, tank)), s, tank)
     }
@@ -32,7 +33,7 @@ package object fluids {
       val drainAmount = tank.amount min s.amount
       val drainedStack = tank.fluidAmount.copy(amount = drainAmount)
       val newTank = tank.copy(tank.fluidAmount.copy(amount = tank.amount |-| drainAmount))
-      (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank)), s - drainedStack, newTank)
+      (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank, newTank)), s - drainedStack, newTank)
     } else {
       (Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
     }
@@ -55,7 +56,31 @@ package object fluids {
   final object EmptyTankHandler extends TankHandler {
     override def setTank(newTank: Tank): Unit = ()
 
+    override def getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
+
     override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = ()
+
+    override protected def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+      Monad[Id].pure(Chain(FluidTransferLog.FillFailed(s, tank)), s, tank)
+    }
+
+    override protected def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+      Monad[Id].pure(Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
+    }
+  }
+
+  final object VoidTankHandler extends TankHandler {
+    override def setTank(newTank: Tank): Unit = ()
+
+    override def getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
+
+    override protected def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+      Monad[Id].pure(Chain(FluidTransferLog.FillAll(s, tank)), FluidAmount.EMPTY, tank)
+    }
+
+    override protected def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+      Monad[Id].pure(Chain(FluidTransferLog.Empty(s, tank)), s, tank)
+    }
   }
 
 }
