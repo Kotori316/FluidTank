@@ -28,7 +28,7 @@ package object fluids {
   def drainOp(tank: Tank): TankOperation = ReaderWriterStateT { case (_, s) =>
     if (s.amount === 0L) {
       // Nothing to drain.
-      (Chain.empty, s, tank)
+      (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
     } else if (s.fluid === Fluids.EMPTY || (s fluidEqual tank.fluidAmount)) {
       val drainAmount = tank.amount min s.amount
       val drainedStack = tank.fluidAmount.copy(amount = drainAmount)
