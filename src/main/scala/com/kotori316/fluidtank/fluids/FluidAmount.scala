@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank
+package com.kotori316.fluidtank.fluids
 
 import java.lang
 import java.util.Optional
@@ -6,6 +6,7 @@ import java.util.Optional
 import cats._
 import cats.implicits._
 import com.kotori316.fluidtank.DynamicSerializable._
+import com.kotori316.fluidtank._
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import com.mojang.serialization.{Codec, DataResult, DynamicOps, Dynamic => SerializeDynamic}
 import javax.annotation.Nonnull
@@ -45,7 +46,15 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
     else setAmount(this.amount + that.amount)
   }
 
-  def -(that: FluidAmount): FluidAmount = setAmount(this.amount - that.amount)
+  def -(that: FluidAmount): FluidAmount = {
+    val subtracted = this.amount |-| that.amount
+    (this.fluid === Fluids.EMPTY, that.fluid === Fluids.EMPTY) match {
+      case (true, _) => that.copy(amount = subtracted)
+      case (false, true) => this.copy(amount = subtracted)
+      case (false, false) if this.fluid === that.fluid => this.copy(amount = subtracted)
+      case _ /*(false, false)*/ => FluidAmount.EMPTY
+    }
+  }
 
   def fluidEqual(that: FluidAmount): Boolean = this.fluid === that.fluid && this.nbt === that.nbt
 

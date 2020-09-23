@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 
-import com.kotori316.fluidtank.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 
 public class MilkBucketHandler extends FluidBucketWrapper {
 

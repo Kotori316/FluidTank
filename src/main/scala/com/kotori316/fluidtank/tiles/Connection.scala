@@ -4,6 +4,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.fluids.FluidAmount
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}

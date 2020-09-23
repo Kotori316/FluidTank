@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.test
 
 import cats.implicits._
-import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.fluids.FluidAmount
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.{ItemStack, Items}
 import net.minecraft.nbt.CompoundNBT

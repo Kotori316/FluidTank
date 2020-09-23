@@ -1,9 +1,10 @@
 package com.kotori316.fluidtank.items
 
+import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.blocks.BlockTank
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
-import com.kotori316.fluidtank.{FluidAmount, FluidTank}
 import net.minecraft.block.BlockState
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity

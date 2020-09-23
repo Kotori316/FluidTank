@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.blocks
 
-import com.kotori316.fluidtank.FluidAmount
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
 import net.minecraft.entity.player.PlayerEntity

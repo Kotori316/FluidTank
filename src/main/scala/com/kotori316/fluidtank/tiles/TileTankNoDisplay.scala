@@ -1,8 +1,9 @@
 package com.kotori316.fluidtank.tiles
 
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
-import com.kotori316.fluidtank.{FluidAmount, ModObjects, Utils}
+import com.kotori316.fluidtank.{ModObjects, Utils}
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager

@@ -14,8 +14,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 import scala.jdk.javaapi.OptionConverters;
 
-import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.CATTile;
 
 public class FluidCacheMessage {

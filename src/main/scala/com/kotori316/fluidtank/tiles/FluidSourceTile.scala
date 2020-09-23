@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.tiles
 
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.fluids.FluidAmount
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}

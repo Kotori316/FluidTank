@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import scala.Option;
 import scala.jdk.javaapi.FunctionConverters;
 
-import com.kotori316.fluidtank.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerReceiver<IAEFluidStack> {

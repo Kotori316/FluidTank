@@ -22,7 +22,7 @@ import net.minecraft.nbt.NBTDynamicOps;
 import org.junit.jupiter.api.Test;
 import scala.Option;
 
-import com.kotori316.fluidtank.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;

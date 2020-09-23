@@ -18,8 +18,8 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.Utils;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
