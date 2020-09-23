@@ -88,4 +88,6 @@ object ModObjects {
   final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
   final val MARKER_Connection = MarkerManager.getMarker("Connection")
   final val MARKER_PipeTileBase = MarkerManager.getMarker("PipeTileBase")
+  final val MARKER_TankHandler = MarkerManager.getMarker("TankHandler")
+  final val MARKER_ListTankHandler = MarkerManager.getMarker("ListTankHandler")
 }

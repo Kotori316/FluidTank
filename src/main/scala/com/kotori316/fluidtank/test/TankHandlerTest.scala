@@ -18,6 +18,24 @@ class TankHandlerTest {
   }
 
   @Test
+  def fillWaterToEmpty2(): Unit = {
+    val tank = TankHandler(Tank(FluidAmount.BUCKET_LAVA.setAmount(0), 4000L))
+    locally {
+      val filled = tank.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)
+      assertEquals(4000, filled)
+    }
+    locally {
+      val filled = tank.fill(new FluidStack(Fluids.LAVA, 4000), IFluidHandler.FluidAction.SIMULATE)
+      assertEquals(4000, filled)
+    }
+    locally {
+      val filled = tank.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.EXECUTE)
+      assertEquals(4000, filled)
+      assertEquals(FluidAmount.BUCKET_WATER.setAmount(4000), tank.getTank.fluidAmount)
+    }
+  }
+
+  @Test
   def fillLavaToEmpty(): Unit = {
     val tank = TankHandler(4000L)
     val filled = tank.fill(new FluidStack(Fluids.LAVA, 4000), IFluidHandler.FluidAction.EXECUTE)
