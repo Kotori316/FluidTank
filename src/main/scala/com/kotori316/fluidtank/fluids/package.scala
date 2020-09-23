@@ -4,7 +4,6 @@ import cats.data.{Chain, ReaderWriterStateT}
 import cats.implicits.{catsSyntaxEq, catsSyntaxGroup, catsSyntaxSemigroup}
 import cats.{Foldable, Id, Monad, Monoid}
 import net.minecraft.fluid.Fluids
-import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
 package object fluids {
@@ -55,10 +54,6 @@ package object fluids {
 
   final object EmptyTankHandler extends TankHandler {
     override def setTank(newTank: Tank): Unit = ()
-
-    override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = 0
-
-    override protected def drainInternal(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidStack = FluidStack.EMPTY
 
     override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = ()
   }

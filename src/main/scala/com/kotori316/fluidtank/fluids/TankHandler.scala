@@ -22,15 +22,19 @@ class TankHandler extends IFluidHandler {
   override def getTanks: Int = 1
 
   override def getFluidInTank(tank: Int): FluidStack =
-    drainOp(this.tank).runS((), FluidAmount.EMPTY.setAmount(this.tank.capacity)).toStack
+    getDrainOperation.runS((), FluidAmount.EMPTY.setAmount(this.tank.capacity)).toStack
 
   override def getTankCapacity(tank: Int): Int = Utils.toInt(this.tank.capacity)
 
   // Discards current state.
   override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
 
+  protected def getFillOperation: TankOperation = fillOp(this.tank)
+
+  protected def getDrainOperation: TankOperation = drainOp(this.tank)
+
   override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
-    val (log, left, newTank) = fillOp(this.tank).run((), FluidAmount.fromStack(resource))
+    val (log, left, newTank) = getFillOperation.run((), FluidAmount.fromStack(resource))
     val filledAmount: Int = Utils.toInt(resource.getAmount - left.amount)
     if (action.execute())
       setTank(newTank)
