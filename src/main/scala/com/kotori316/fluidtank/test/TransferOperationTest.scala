@@ -34,6 +34,18 @@ class TransferOperationTest {
     assertAll((x1 ++ x2).asJava)
   }
 
+  def fill2(): Unit = {
+    val fillAction = for {
+      a <- fillOp(waterTank)
+      b <- fillOp(waterTank)
+    } yield (a, b)
+
+    val (_, left, (a, b)) = fillAction.run((), FluidAmount.BUCKET_WATER.setAmount(20000))
+    assertTrue(left.isEmpty)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(16000), a.fluidAmount)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(4000), b.fluidAmount)
+  }
+
   @Test
   def drain1(): Unit = {
     val drainAction = drainOp(lavaTank)
