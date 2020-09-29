@@ -256,6 +256,10 @@ artifacts {
     archives srcJar, deobfJar
 }
 
+test {
+    useJUnitPlatform()
+}
+
 curseforge {
     apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
     project {
