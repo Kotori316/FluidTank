@@ -1,21 +1,27 @@
-package com.kotori316.fluidtank.test
+package com.kotori316.fluidtank.fluid
 
 import com.kotori316.fluidtank.items.{ItemBlockTank, TankItemFluidHandler}
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
-import com.kotori316.fluidtank.{FluidAmount, FluidTank}
+import com.kotori316.fluidtank.{BeforeAllTest, FluidAmount, FluidTank, ModObjects}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
-import net.minecraftforge.registries.ForgeRegistries
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 
 //noinspection DuplicatedCode It's a test.
-class ItemFluidHandlerTest {
+private[fluid] class ItemFluidHandlerTest extends BeforeAllTest {
+  private def woodTank = ModObjects.blockTanks.head
+
+  @Test
+  def woodTankIsWood(): Unit = {
+    assertEquals(new ResourceLocation(FluidTank.modID, "tank_wood"), woodTank.getRegistryName)
+  }
+
   @Test
   def emptyTank(): Unit = {
-    val stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(FluidTank.modID, "tank_wood")))
+    val stack = new ItemStack(woodTank)
     val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
 
     assertEquals(Tiers.WOOD, handler.tiers)
@@ -25,7 +31,7 @@ class ItemFluidHandlerTest {
 
   @Test
   def fillInEmpty(): Unit = {
-    val stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(FluidTank.modID, "tank_wood")))
+    val stack = new ItemStack(woodTank)
     val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
 
     handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
@@ -37,7 +43,7 @@ class ItemFluidHandlerTest {
 
   @Test
   def filledTag(): Unit = {
-    val stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(FluidTank.modID, "tank_wood")))
+    val stack = new ItemStack(woodTank)
     val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
 
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(2000L).toStack, IFluidHandler.FluidAction.EXECUTE)
@@ -53,7 +59,7 @@ class ItemFluidHandlerTest {
 
   @Test
   def stackedTankTest(): Unit = {
-    val stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(FluidTank.modID, "tank_wood")), 3)
+    val stack = new ItemStack(woodTank, 3)
     val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
 
     assertEquals(0, handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE))

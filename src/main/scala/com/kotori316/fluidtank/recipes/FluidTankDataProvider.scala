@@ -4,7 +4,6 @@ import java.io.IOException
 
 import cats.syntax.eq._
 import com.google.gson.{GsonBuilder, JsonArray}
-import com.kotori316.fluidtank.test.Starter
 import com.kotori316.fluidtank.tiles.Tiers
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.advancements.criterion._
@@ -33,9 +32,6 @@ object FluidTankDataProvider {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
       event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator))
-    }
-    if (event.includeDev) {
-      event.getGenerator.addProvider(Starter.getInstance())
     }
   }
 

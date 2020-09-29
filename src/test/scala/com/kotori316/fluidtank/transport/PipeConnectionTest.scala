@@ -1,11 +1,12 @@
 package com.kotori316.fluidtank.transport
 
+import com.kotori316.fluidtank.BeforeAllTest
 import com.kotori316.fluidtank.transport.PipeConnectionTest.Holder
 import net.minecraft.util.math.BlockPos
 import org.junit.jupiter.api.Assertions.{assertEquals, assertNotEquals, assertTrue}
 import org.junit.jupiter.api.Test
 
-class PipeConnectionTest {
+class PipeConnectionTest extends BeforeAllTest{
 
   @Test
   def dummy(): Unit = {

@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
 import net.minecraft.block.{AbstractBlock, Block, BlockState}
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.shapes.{ISelectionContext, VoxelShape}
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
@@ -24,6 +24,8 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
    */
   setRegistryName(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
   val itemBlock = new ItemBlockTank(this)
+
+  override final def asItem(): Item = itemBlock
 
   def namePrefix = "tank_"
 
