@@ -41,7 +41,7 @@ package object fluids {
 
   def opList[F[+_]](tanks: F[Tank], action: Tank => TankOperation)(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] = {
     val opList = Monad[F].map(tanks)(action)
-    val initialState: ListTankOperation[F] = ReaderWriterStateT((_, f) => Monad[Id].pure((Chain.empty, f, monoid.empty)))
+    val initialState: ListTankOperation[F] = ReaderWriterStateT.applyS(f => Monad[Id].pure((Chain.empty, f, monoid.empty)))
     Foldable[F].foldLeft(opList, initialState) { (s, op) =>
       s.flatMap(filledTankList => op.map(t => filledTankList |+| Monad[F].pure(t)))
     }
@@ -60,11 +60,11 @@ package object fluids {
 
     override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = ()
 
-    override protected def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+    override protected def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.FillFailed(s, tank)), s, tank)
     }
 
-    override protected def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+    override protected def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
     }
   }
@@ -74,11 +74,11 @@ package object fluids {
 
     override def getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
 
-    override protected def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+    override protected def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.FillAll(s, tank)), FluidAmount.EMPTY, tank)
     }
 
-    override protected def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT { (_, s) =>
+    override protected def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.Empty(s, tank)), s, tank)
     }
   }

@@ -6,11 +6,11 @@ class CreativeTankHandler extends TankHandler {
   setTank(Tank(FluidAmount.EMPTY, Long.MaxValue))
 
   override protected def getFillOperation(tank: Tank): TankOperation = {
-    if (getTank.fluidAmount.isEmpty) {
+    if (tank.fluidAmount.isEmpty) {
       // Fill tank.
       super.getFillOperation(tank).map(t => t.copy(t.fluidAmount.setAmount(t.capacity)))
     } else {
-      ReaderWriterStateT { (_, s) =>
+      ReaderWriterStateT.applyS { s =>
         if (tank.fluidAmount fluidEqual s) {
           (Chain(FluidTransferLog.FillAll(s, tank)), FluidAmount.EMPTY, tank)
         } else {
@@ -21,5 +21,15 @@ class CreativeTankHandler extends TankHandler {
   }
 
   override protected def getDrainOperation(tank: Tank): TankOperation =
-    super.getDrainOperation(tank).map(_ => tank)
+    if (tank.fluidAmount.isEmpty) {
+      super.getDrainOperation(tank).map(_ => tank)
+    } else {
+      ReaderWriterStateT.applyS { s =>
+        if ((tank.fluidAmount fluidEqual s) || (FluidAmount.EMPTY fluidEqual s)) {
+          (Chain(FluidTransferLog.DrainFluid(s, s, tank, tank)), FluidAmount.EMPTY, tank)
+        } else {
+          (Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
+        }
+      }
+    }
 }
