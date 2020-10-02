@@ -50,6 +50,19 @@ package object fluids {
   def fillList[F[+_]](tanks: F[Tank])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] =
     opList(tanks, fillOp)
 
+  def fillAll[F[+_]](tanks: F[Tank])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] = {
+    val op: Tank => TankOperation = t =>
+      for {
+        before <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
+        _ <- ReaderWriterStateT.modify[Id, Unit, Chain[FluidTransferLog], FluidAmount](f => f.setAmount(t.capacity))
+        y <- fillOp(t)
+        rest <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
+        r = if (rest.amount < t.capacity) rest.setAmount(0) else before
+        _ <- ReaderWriterStateT.set[Id, Unit, Chain[FluidTransferLog], FluidAmount](r)
+      } yield y
+    opList(tanks, op)
+  }
+
   def drainList[F[+_]](tanks: F[Tank])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] =
     opList(tanks, drainOp)
 

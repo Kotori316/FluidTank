@@ -34,6 +34,7 @@ class TransferOperationTest {
     assertAll((x1 ++ x2).asJava)
   }
 
+  @Test
   def fill2(): Unit = {
     val fillAction = for {
       a <- fillOp(waterTank)
@@ -44,6 +45,39 @@ class TransferOperationTest {
     assertTrue(left.isEmpty)
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(16000), a.fluidAmount)
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(4000), b.fluidAmount)
+  }
+
+  @Test
+  def fillAll1(): Unit = {
+    val fillAction = fillAll(List(waterTank, waterTank.copy(capacity = 32000)))
+    val (_, left, a :: b :: Nil) = fillAction.run((), FluidAmount.BUCKET_WATER.setAmount(1))
+    assertAll(
+      () => assertTrue(left.isEmpty),
+      () => assertEquals(waterTank.copy(fluidAmount = FluidAmount.BUCKET_WATER.setAmount(waterTank.capacity)), a),
+      () => assertEquals(waterTank.copy(fluidAmount = FluidAmount.BUCKET_WATER.setAmount(32000), capacity = 32000), b),
+    )
+  }
+
+  @Test
+  def fillAll2(): Unit = {
+    val fillAction = fillAll(List(waterTank, waterTank.copy(capacity = 32000)))
+    val (_, left, a :: b :: Nil) = fillAction.run((), FluidAmount.BUCKET_LAVA.setAmount(1))
+    assertAll(
+      () => assertEquals(FluidAmount.BUCKET_LAVA.setAmount(0), left),
+      () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(16000), 16000), a),
+      () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(32000), 32000), b),
+    )
+  }
+
+  @Test
+  def fillAll3(): Unit = {
+    val fillAction = fillAll(List(lavaTank, lavaTank.copy(capacity = 32000)))
+    val (_, left, List(a, b)) = fillAction.run((), FluidAmount.BUCKET_WATER.setAmount(1))
+    assertAll(
+      () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(1), left),
+      () => assertEquals(lavaTank, a),
+      () => assertEquals(lavaTank.copy(capacity = 32000), b),
+    )
   }
 
   @Test
