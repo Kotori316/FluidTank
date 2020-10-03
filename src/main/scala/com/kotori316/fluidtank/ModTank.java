@@ -25,10 +25,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.milk.MilkFluid;
+import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.ContentTankSerializer;
 import com.kotori316.fluidtank.tank.CreativeTankBlock;
 import com.kotori316.fluidtank.tank.TankBlock;
-import com.kotori316.fluidtank.tank.TierRecipe;
 import com.kotori316.fluidtank.tank.Tiers;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.kotori316.fluidtank.tank.TileTankCreative;

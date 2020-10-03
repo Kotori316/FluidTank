@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.tank;
+package com.kotori316.fluidtank.recipe;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -26,6 +26,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.Utils;
+import com.kotori316.fluidtank.tank.TankBlock;
+import com.kotori316.fluidtank.tank.Tiers;
 
 public class TierRecipe extends ShapedRecipe {
     public static final Serializer SERIALIZER = new Serializer();
