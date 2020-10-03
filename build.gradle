@@ -98,7 +98,7 @@ test {
 
 // PUBLISH
 def joinedLog = String.join("\n",
-        "Fluid Tank for 1.16.2 and Fabric.",
+        "Fluid Tank for 1.16.3 and Fabric.",
         "",
         "Requires:",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
