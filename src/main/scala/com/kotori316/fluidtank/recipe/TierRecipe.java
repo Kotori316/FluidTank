@@ -39,6 +39,7 @@ public class TierRecipe extends ShapedRecipe {
     private final Ingredient subItems;
     private final ItemStack result;
     private final boolean isEmptyRecipe;
+    private final Logic logic;
 
     public TierRecipe(Identifier idIn, Tiers tier) {
         super(idIn, "", 3, 3, DefaultedList.of(), ItemStack.EMPTY);
@@ -46,14 +47,10 @@ public class TierRecipe extends ShapedRecipe {
         this.tier = tier;
 
         result = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> b.tiers == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
-        Set<Tiers> tiersSet = Tiers.stream().filter(t -> t.rank == tier.rank - 1).collect(Collectors.toSet());
-        Set<TankBlock> tanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
-        Set<TankBlock> invTanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
-        tankItems = Ingredient.ofStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new)); // OfStacks
-        subItems = Optional.ofNullable(ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tier.tagName)))
-            .map(Ingredient::fromTag)
-            .orElse(tier.getAlternative());
+        tankItems = Logic.getTankItemIngredient(tier);
+        subItems = Logic.getSubItems(tier);
         isEmptyRecipe = subItems.isEmpty();
+        logic = new Logic(tier, tankItems, subItems, result);
 //        if (isEmptyRecipe)
 //            throw new IllegalArgumentException(String.format("Mod 'FluidTank' Recipe for %s is disabled.", tier));
     }
@@ -61,42 +58,12 @@ public class TierRecipe extends ShapedRecipe {
     @Override
     public boolean matches(CraftingInventory inv, World worldIn) {
         if (isEmptyRecipe) return false;
-        if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStack).allMatch(subItems)) return false;
-        if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStack).allMatch(tankItems)) return false;
-        return IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
-            .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
-            .filter(Objects::nonNull)
-            .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
-            .filter(FluidAmount::nonEmpty)
-            .map(f -> f.fluidVolume().getFluidKey())
-            .distinct()
-            .count() <= 1;
+        return logic.matches(inv);
     }
 
     @Override
     public ItemStack craft(CraftingInventory inv) {
-        ItemStack result = getOutput();
-        FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
-            .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
-            .filter(Objects::nonNull)
-            .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
-            .filter(FluidAmount::nonEmpty)
-            .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
-
-        if (fluidAmount.nonEmpty()) {
-            CompoundTag compound = new CompoundTag();
-
-            CompoundTag tankTag = new CompoundTag();
-            tankTag.putInt(TankBlock.NBT_Capacity, Utils.toInt(tier.amount()));
-            fluidAmount.write(tankTag);
-
-            compound.put(TankBlock.NBT_Tank, tankTag);
-            compound.put(TankBlock.NBT_Tier, tier.toNBTTag());
-
-            result.putSubTag(TankBlock.NBT_BlockTag, compound);
-        }
-
-        return result;
+        return logic.craft(inv);
     }
 
     @Override
@@ -176,4 +143,77 @@ public class TierRecipe extends ShapedRecipe {
         }
     }
 
+    static class Logic {
+        private final Tiers tier;
+        private final Ingredient tankItems;
+        private final Ingredient subItems;
+        private final ItemStack result;
+
+        Logic(Tiers tier, Ingredient tankItems, Ingredient subItems, ItemStack result) {
+            this.tier = tier;
+            this.tankItems = tankItems;
+            this.subItems = subItems;
+            this.result = result;
+        }
+
+        public Logic(Tiers tier) {
+            this(
+                tier,
+                getTankItemIngredient(tier),
+                getSubItems(tier),
+                ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> b.tiers == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY)
+            );
+        }
+
+        boolean matches(CraftingInventory inv) {
+            if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStack).allMatch(subItems)) return false;
+            if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStack).allMatch(tankItems)) return false;
+            return IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
+                .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
+                .filter(Objects::nonNull)
+                .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
+                .filter(FluidAmount::nonEmpty)
+                .map(f -> f.fluidVolume().getFluidKey())
+                .distinct()
+                .count() <= 1;
+        }
+
+        ItemStack craft(CraftingInventory inv) {
+            ItemStack result = this.result.copy();
+            FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
+                .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
+                .filter(Objects::nonNull)
+                .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
+                .filter(FluidAmount::nonEmpty)
+                .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
+
+            if (fluidAmount.nonEmpty()) {
+                CompoundTag compound = new CompoundTag();
+
+                CompoundTag tankTag = new CompoundTag();
+                tankTag.putInt(TankBlock.NBT_Capacity, Utils.toInt(tier.amount()));
+                fluidAmount.write(tankTag);
+
+                compound.put(TankBlock.NBT_Tank, tankTag);
+                compound.put(TankBlock.NBT_Tier, tier.toNBTTag());
+
+                result.putSubTag(TankBlock.NBT_BlockTag, compound);
+            }
+
+            return result;
+        }
+
+        static Ingredient getTankItemIngredient(Tiers resultTier) {
+            Set<Tiers> tiersSet = Tiers.stream().filter(t -> t.rank == resultTier.rank - 1).collect(Collectors.toSet());
+            Set<TankBlock> tanks = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> tiersSet.contains(b.tiers)).collect(Collectors.toSet());
+            return Ingredient.ofStacks(tanks.stream().map(ItemStack::new)); // OfStacks
+        }
+
+        private static Ingredient getSubItems(Tiers tier) {
+            return Optional.ofNullable(ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tier.tagName)))
+                .map(Ingredient::fromTag)
+                .orElse(tier.getAlternative());
+        }
+
+    }
 }

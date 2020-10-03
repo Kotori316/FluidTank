@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.milk.MilkFluid;
+import com.kotori316.fluidtank.recipe.TankRecipe;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.ContentTankSerializer;
 import com.kotori316.fluidtank.tank.CreativeTankBlock;
@@ -64,6 +65,7 @@ public class ModTank implements ModInitializer {
         Registry.register(Registry.LOOT_FUNCTION_TYPE, new Identifier(ModTank.modID, "content_tank"), Entries.CONTENT_LOOT_FUNCTION_TYPE);
 
         RecipeSerializer.register(TierRecipe.Serializer.LOCATION.toString(), TierRecipe.SERIALIZER);
+        RecipeSerializer.register(TankRecipe.LOCATION.toString(), TankRecipe.SERIALIZER);
     }
 
     public static class Entries {
