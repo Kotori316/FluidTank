@@ -35,6 +35,7 @@
   "chat.fluidtank.change_source": "Fluid was changed to %s.",
   "chat.fluidtank.change_interval": "Interval was changed to %s.",
   "itemGroup.FluidTank": "FluidTanks",
+  "itemGroup.fluidtank.fluidtank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Tankların Tarifleri",
   "config.waila.plugin_fluidtank": "Fluidtank",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "Tank Bilgisini Göster",
@@ -46,6 +47,5 @@
   "fluidtank.waila.comparator": "Karşılaştırıcı: %s",
   "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
   "tooltip.fluidtank.source": "Only water",
-  "tooltip.fluidtank.source_inf": "Infinite",
-  "itemGroup.fluidtank.fluidtank": "FluidTanks"
+  "tooltip.fluidtank.source_inf": "Infinite"
 }

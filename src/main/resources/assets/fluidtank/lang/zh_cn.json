@@ -35,6 +35,7 @@
   "chat.fluidtank.change_source": "Fluid was changed to %s.",
   "chat.fluidtank.change_interval": "Interval was changed to %s.",
   "itemGroup.FluidTank": "液体储罐",
+  "itemGroup.fluidtank.fluidtank": "液体储罐",
   "fluidtank.recipe.tooltip": "储罐合成配方",
   "config.waila.plugin_fluidtank": "液体储罐",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "显示储罐信息",
@@ -46,6 +47,5 @@
   "fluidtank.waila.comparator": "比较器： %s",
   "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
   "tooltip.fluidtank.source": "Only water",
-  "tooltip.fluidtank.source_inf": "Infinite",
-  "itemGroup.fluidtank.fluidtank": "FluidTanks"
+  "tooltip.fluidtank.source_inf": "Infinite"
 }

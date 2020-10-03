@@ -35,6 +35,7 @@
   "chat.fluidtank.change_source": "液体は%sに変更されました。",
   "chat.fluidtank.change_interval": "液体の搬出間隔は%sに変更されました。",
   "itemGroup.FluidTank": "FluidTanks",
+  "itemGroup.fluidtank.fluidtank": "FluidTanks",
   "fluidtank.recipe.tooltip": "タンクのレシピ",
   "config.waila.plugin_fluidtank": "Fluidtank",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "タンクの中身を表示する",
@@ -46,6 +47,5 @@
   "fluidtank.waila.comparator": "  コンパレータ: %s",
   "fluidtank.waila.short": "%1$s: %2$s/%3$s mB",
   "tooltip.fluidtank.source": "水のみ",
-  "tooltip.fluidtank.source_inf": "無限のソース",
-  "itemGroup.fluidtank.fluidtank": "FluidTanks"
+  "tooltip.fluidtank.source_inf": "無限のソース"
 }
