@@ -29,7 +29,7 @@ public class ModTankClientInit implements ClientModInitializer {
     @SuppressWarnings("unchecked")
     @Override
     public void onInitializeClient() {
-        System.out.println(ModTank.modID + " is called client init.");
+        ModTank.LOGGER.debug("Client init is called. {} ", ModTank.modID);
         ModTank.Entries.ALL_TANK_BLOCKS.forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, RenderLayer.getCutoutMipped()));
         BlockEntityRendererRegistry.INSTANCE.register(ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, RenderTank::new);
         BlockEntityRendererRegistry.INSTANCE.register(ModTank.Entries.CREATIVE_BLOCK_ENTITY_TYPE, d -> (BlockEntityRenderer<TileTankCreative>) ((BlockEntityRenderer<?>) new RenderTank(d)));

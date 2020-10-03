@@ -47,6 +47,7 @@ public class ModTank implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ModTank.LOGGER.debug("Universal init is called. {} ", ModTank.modID);
         Registry.register(Registry.BLOCK, new Identifier(modID, "tank_wood"), Entries.WOOD_TANK);
         Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.BLOCK, new Identifier(modID, "tank_" + block.tiers.toString().toLowerCase()), block));
         Registry.register(Registry.BLOCK, new Identifier(modID, "creative"), Entries.CREATIVE_TANK);
