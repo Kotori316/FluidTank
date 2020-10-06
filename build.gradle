@@ -123,12 +123,12 @@ githubRelease {
 curseforge {
     apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
     project {
-        id = '291006'
+        id = '411564'
         changelogType = 'markdown'
         addGameVersion 'Fabric'
-        addGameVersion '1.16.2'
+        addGameVersion '1.16.3'
         changelog = joinedLog
-        releaseType = 'beta'
+        releaseType = 'release'
         mainArtifact remapJar
         addArtifact jar
         relations {
