@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
@@ -45,5 +47,11 @@ public class TankRecipe extends SpecialCraftingRecipe {
     @Override
     public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public String getGroup() {
+        return TierRecipe.GROUP;
     }
 }

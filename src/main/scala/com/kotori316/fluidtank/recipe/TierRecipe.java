@@ -31,6 +31,7 @@ import com.kotori316.fluidtank.tank.Tiers;
 
 public class TierRecipe extends ShapedRecipe {
     public static final Serializer SERIALIZER = new Serializer();
+    public static final String GROUP = ModTank.modID + ":tank_recipes";
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
     private final Identifier id;
@@ -42,7 +43,7 @@ public class TierRecipe extends ShapedRecipe {
     private final Logic logic;
 
     public TierRecipe(Identifier idIn, Tiers tier) {
-        super(idIn, "", 3, 3, DefaultedList.of(), ItemStack.EMPTY);
+        super(idIn, GROUP, 3, 3, DefaultedList.of(), ItemStack.EMPTY);
         id = idIn;
         this.tier = tier;
 
