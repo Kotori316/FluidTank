@@ -265,7 +265,6 @@ curseforge {
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.16.2'
         changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar
@@ -276,18 +275,16 @@ curseforge {
         }
     }
     options {
-        debug = false // defaults to false
+        curseGradleOptions.debug = false // defaults to false
         javaVersionAutoDetect = false
     }
 }
 
 githubRelease {
-    repo = 'FluidTank'
+    repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish = '1.16'
-    body {
-        getLatestChangeLog()
-    }
+    targetCommitish.set('1.16')
+    body.set(getLatestChangeLog())
     releaseAssets = files(
             jar.getArchiveFile().get(),
             deobfJar.getArchiveFile().get(),
