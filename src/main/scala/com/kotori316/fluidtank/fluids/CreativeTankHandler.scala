@@ -5,7 +5,7 @@ import cats.data.{Chain, ReaderWriterStateT}
 class CreativeTankHandler extends TankHandler {
   setTank(Tank(FluidAmount.EMPTY, Long.MaxValue))
 
-  override protected def getFillOperation(tank: Tank): TankOperation = {
+  override def getFillOperation(tank: Tank): TankOperation = {
     if (tank.fluidAmount.isEmpty) {
       // Fill tank.
       super.getFillOperation(tank).map(t => t.copy(t.fluidAmount.setAmount(t.capacity)))
@@ -20,7 +20,7 @@ class CreativeTankHandler extends TankHandler {
     }
   }
 
-  override protected def getDrainOperation(tank: Tank): TankOperation =
+  override def getDrainOperation(tank: Tank): TankOperation =
     if (tank.fluidAmount.isEmpty) {
       super.getDrainOperation(tank).map(_ => tank)
     } else {
