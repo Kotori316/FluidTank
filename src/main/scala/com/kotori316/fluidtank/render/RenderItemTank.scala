@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.render
 
+import com.kotori316.fluidtank.fluids.Tank
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
@@ -33,7 +34,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
 
         tileTank.tier = tankItem.blockTank.tier
-        tileTank.tank.setFluid(null)
+        tileTank.internalTank.setTank(Tank.EMPTY)
         val compound = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)

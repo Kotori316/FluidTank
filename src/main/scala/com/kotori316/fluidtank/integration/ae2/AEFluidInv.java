@@ -43,7 +43,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
     @Override
     public IAEFluidStack injectItems(IAEFluidStack input, Actionable actionable, IActionSource src) {
         FluidAmount fluidAmount = fromAEStack(input);
-        FluidAmount filled = tank.connection().handler().fill(fluidAmount, actionable == Actionable.MODULATE, 0);
+        FluidAmount filled = tank.connection().handler().fill(fluidAmount, actionable.getFluidAction());
         return toAEStack(fluidAmount.$minus(filled));
     }
 
@@ -57,7 +57,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
     @Override
     public IAEFluidStack extractItems(IAEFluidStack request, Actionable actionable, IActionSource src) {
         FluidAmount fluidAmount = fromAEStack(request);
-        FluidAmount drained = tank.connection().handler().drain(fluidAmount, actionable == Actionable.MODULATE, 0);
+        FluidAmount drained = tank.connection().handler().drain(fluidAmount, actionable.getFluidAction());
         return toAEStack(drained);
     }
 

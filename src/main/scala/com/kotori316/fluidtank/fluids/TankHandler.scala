@@ -15,6 +15,12 @@ class TankHandler extends IFluidHandler {
     onContentsChanged()
   }
 
+  def initCapacity(capacity: Long): Unit = {
+    val newTank = getTank.copy(capacity = capacity)
+    // Not to use setter to avoid NPE of connection.
+    this.tank = newTank
+  }
+
   def getTank: Tank = tank
 
   def onContentsChanged(): Unit = ()
@@ -29,31 +35,34 @@ class TankHandler extends IFluidHandler {
   // Discards current state.
   override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
 
-  protected def getFillOperation(tank: Tank): TankOperation = fillOp(tank)
+   def getFillOperation(tank: Tank): TankOperation = fillOp(tank)
 
-  protected def getDrainOperation(tank: Tank): TankOperation = drainOp(tank)
+   def getDrainOperation(tank: Tank): TankOperation = drainOp(tank)
 
   override final def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
-    val (log, left, newTank) = getFillOperation(this.tank).run((), FluidAmount.fromStack(resource))
-    val filledAmount: Int = Utils.toInt(resource.getAmount - left.amount)
+    Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
+  }
+
+  private final def action(op: TankOperation, resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+    val (log, left, newTank) = op.run((), resource)
+    val moved: FluidAmount = resource - left
     if (action.execute())
       setTank(newTank)
     outputLog(log, action)
-    filledAmount
+    moved
   }
 
-  private final def drainInternal(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidStack = {
-    val (log, left, newTank) = getDrainOperation(this.tank).run((), toDrain)
-    val drained: FluidAmount = toDrain - left
-    if (action.execute())
-      setTank(newTank)
-    outputLog(log, action)
-    drained.toStack
+  final def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+    this.action(getFillOperation(this.tank), resource, action)
   }
 
-  override final def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drainInternal(FluidAmount.fromStack(resource), action)
+  final def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+    this.action(getDrainOperation(this.tank), toDrain, action)
+  }
 
-  override final def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drainInternal(FluidAmount.EMPTY.setAmount(maxDrain), action)
+  override final def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.fromStack(resource), action).toStack
+
+  override final def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.EMPTY.setAmount(maxDrain), action).toStack
 
   protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
     if (Utils.isInDev) {

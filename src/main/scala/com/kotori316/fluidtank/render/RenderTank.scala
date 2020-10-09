@@ -18,13 +18,13 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
     if (te.hasContent) {
       matrix.push()
       val b = buffer.getBuffer(RenderType.getCutout)
-      val tank = te.tank
+      val tank = te.internalTank
       if (tank.box != null) {
         val resource = RenderTank.textureName(te)
         val texture = Minecraft.getInstance.getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(resource)
         val color = RenderTank.color(te)
 
-        val value = Box.LightValue(light).overrideBlock(te.tank.fluid.fluid.getAttributes.getLuminosity(te.tank.fluid.toStack))
+        val value = Box.LightValue(light).overrideBlock(te.internalTank.getFluid.fluid.getAttributes.getLuminosity(te.internalTank.getFluid.toStack))
         tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
       }
       matrix.pop()
@@ -35,13 +35,13 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
 
 object RenderTank {
   private def textureName(tile: TileTank) = {
-    val tank: TileTank#Tank = tile.tank
+    val tank = tile.internalTank
     val (world, pos) = worldAndPos(tile)
-    tank.fluid.fluid.getAttributes.getStillTexture(world, pos)
+    tank.getFluid.fluid.getAttributes.getStillTexture(world, pos)
   }
 
   private def color(tile: TileTank) = {
-    val fluidAmount = tile.tank.fluid
+    val fluidAmount = tile.internalTank.getFluid
     val (world, pos) = worldAndPos(tile)
     fluidAmount.fluid.getAttributes.getColor(world, pos)
   }

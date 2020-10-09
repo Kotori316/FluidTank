@@ -217,7 +217,7 @@ class TankHandlerTest {
 
   @Test
   def voidHandler(): Unit = {
-    val h: TankHandler = VoidTankHandler
+    val h: TankHandler = new VoidTankHandler
     locally {
       val filled = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
       assertEquals(1000, filled)

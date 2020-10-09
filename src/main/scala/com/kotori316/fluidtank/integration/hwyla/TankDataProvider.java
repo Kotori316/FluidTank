@@ -100,7 +100,7 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
 
     @Nonnull
     private static String getCreativeFluidName(TileTankNoDisplay tank) {
-        return java.util.Optional.ofNullable(tank.tank().getFluid()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL);
+        return java.util.Optional.ofNullable(tank.internalTank().getTank().fluidAmount()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL);
     }
 
     @Override

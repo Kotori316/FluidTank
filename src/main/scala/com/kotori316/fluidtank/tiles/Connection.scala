@@ -4,7 +4,7 @@ import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.fluids.FluidAmount
+import com.kotori316.fluidtank.fluids.{FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}
@@ -13,8 +13,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -26,105 +25,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     () => seq.foreach(_.markDirty())
   )
 
-  class TankHandler extends FluidAmount.Tank {
-    type LogType[A] = Chain[A]
-
-    /**
-     * @return Fluid that was accepted by the tank.
-     */
-    override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = {
-      if (hasCreative) {
-        val totalLong = tankSeq(fluidAmount).map(_.tank.fill(fluidAmount.setAmount(Int.MaxValue), doFill).amount).sum
-        val total = Utils.toInt(Math.min(totalLong, fluidAmount.amount))
-        return fluidAmount.setAmount(total)
-      }
-      val rest = capacity - amount
-      if (rest == 0 && !hasVoid) return FluidAmount.EMPTY
-      if (fluidAmount.isEmpty || fluidAmount.amount < min || rest < min) return FluidAmount.EMPTY
-      if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
-
-      def internal(tanks: List[TileTankNoDisplay], toFill: FluidAmount, filled: FluidAmount): Writer[LogType[String], FluidAmount] = {
-        if (toFill.isEmpty) {
-          Writer.apply("Filled".pure[LogType], filled)
-        } else {
-          tanks match {
-            case Nil =>
-              val message = if (filled.isEmpty) s"Filling $toFill failed." else s"Filled, Amount: ${filled.show}"
-              Writer.apply(message.pure[LogType], filled)
-            case head :: tail =>
-              val fill = head.tank.fill(toFill, doFill)
-              Writer.tell(s"Filled ${fill.show} to ${head.getPos.show}".pure[LogType]) >>= { _ => internal(tail, toFill - fill, filled + fill) }
-          }
-        }
-      }
-
-      internal(tankSeq(fluidAmount).toList, fluidAmount, FluidAmount.EMPTY).run match {
-        case (messages, filled) =>
-          log(doFill, messages)
-          filled
-      }
-
-    }
-
-    /**
-     * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-     *                    Empty Fluid means fluid type can be anything.
-     * @param doDrain     false means simulating.
-     * @param min         minimum amount to drain.
-     * @return the fluid and amount that is (or will be) drained.
-     */
-    override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = {
-      if (fluidAmount.amount < min || fluidType.isEmpty) return FluidAmount.EMPTY
-      if (hasCreative) {
-        if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidType.fluidEqual(fluidAmount)) {
-          val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos.show} in creative connection."
-          log(doDrain, m.pure[LogType])
-          return fluidType.setAmount(fluidAmount.amount)
-        } else {
-          return FluidAmount.EMPTY
-        }
-      }
-
-      def internal(tanks: List[TileTankNoDisplay], toDrain: FluidAmount, drained: FluidAmount): Writer[LogType[String], FluidAmount] = {
-        if (toDrain.amount <= 0) {
-          val message = if (drained.isEmpty) "Drain failed." else "Drain Finished."
-          Writer.apply(message.pure[LogType], drained)
-        } else {
-          tanks match {
-            case Nil => for (_ <- Writer.tell(s"Drain Finished. Total amount is ${drained.show}".pure[LogType])) yield drained
-            case head :: tl =>
-              val drain = head.tank.drain(toDrain, doDrain)
-              for {
-                _ <- Writer.tell(s"Drained ${drain.show} from ${head.getPos.show}".pure[LogType])
-                fluid <- internal(tl, toDrain - drain, drained + drain)
-              } yield fluid
-          }
-        }
-      }
-
-      internal(tankSeq(fluidType).reverse.toList, fluidAmount, FluidAmount.EMPTY).run match {
-        case (messages, drained) =>
-          log(doDrain, messages)
-          drained
-      }
-    }
-
-    private def log(real: Boolean, messages: LogType[String]): Unit = {
-      import org.apache.logging.log4j.util.Supplier
-      val s = if (real) " Real" else " Simulate"
-      if (real && Utils.isInDev) {
-        FluidTank.LOGGER.debug(ModObjects.MARKER_Connection, (() => messages.mkString_(", ") + s): Supplier[String])
-      } else {
-        FluidTank.LOGGER.trace(ModObjects.MARKER_Connection, (() => messages.mkString_(", ") + s): Supplier[String])
-      }
-    }
-
-    override def getFluidInTank(tank: Int): FluidStack = fluidType.setAmount(Utils.toInt(amount)).toStack
-
-    override def getTankCapacity(tank: Int): Int = Utils.toInt(amount)
-  }
-
-  val handler: FluidAmount.Tank = new TankHandler
+  val handler: ListTankHandler = new Connection.ConnectionTankHandler(Chain.fromSeq(seq.map(_.internalTank)), hasCreative)
   private[tiles] final var isValid = true
 
   val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
@@ -143,9 +44,9 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
   }
 
-  def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else seq.map(_.tier.amount).sum
+  def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else handler.getSumOfCapacity
 
-  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tiers.CREATIVE.amount else seq.map(_.tank.getFluidAmount).sum
+  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tiers.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
 
   def tankSeq(fluid: FluidAmount): Seq[TileTankNoDisplay] = {
     if (fluid != null && fluid.isGaseous) {
@@ -223,13 +124,13 @@ object Connection {
   @scala.annotation.tailrec
   def createAndInit(s: Seq[TileTankNoDisplay]): Unit = {
     if (s.nonEmpty) {
-      val fluid = LazyList.from(s).map(_.tank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
-      val (s1, s2) = s.span(t => t.tank.getFluid.fluidEqual(fluid) || t.tank.getFluid.isEmpty)
+      val fluid = LazyList.from(s).map(_.internalTank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
+      val (s1, s2) = s.span(t => t.internalTank.getFluid.fluidEqual(fluid) || t.internalTank.getFluid.isEmpty)
       // Assert tanks in s1 have the same fluid.
-      require(s1.map(_.tank.getFluid).forall(f => f.isEmpty || f.fluidEqual(fluid)))
-      val content: FluidAmount = (for (t <- s1) yield t.tank.drain(t.tank.getFluid, doDrain = true)).reduce(_ + _)
+      require(s1.map(_.internalTank.getFluid).forall(f => f.isEmpty || f.fluidEqual(fluid)))
+      val content: FluidAmount = (for (t <- s1) yield t.internalTank.drain(t.internalTank.getFluid, IFluidHandler.FluidAction.EXECUTE)).reduce(_ + _)
       val connection = Connection.create(s1)
-      connection.handler.fill(content, doFill = true)
+      connection.handler.fill(content, IFluidHandler.FluidAction.EXECUTE)
       s1.foreach { t =>
         t.connection.isValid = false
         t.connection = connection
@@ -261,7 +162,26 @@ object Connection {
     override def getTextComponent = new StringTextComponent(toString)
   }
 
-  val stackFromTile: TileTankNoDisplay => Option[FluidAmount] = (t: TileTankNoDisplay) => Option(t.tank.getFluid).filter(_.nonEmpty)
+  val stackFromTile: TileTankNoDisplay => Option[FluidAmount] = (t: TileTankNoDisplay) => Option(t.internalTank.getFluid).filter(_.nonEmpty)
+
+  private class ConnectionTankHandler(tankHandlers: Chain[TankHandler], hasCreative: Boolean) extends ListTankHandler(tankHandlers) {
+
+    override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
+      import org.apache.logging.log4j.util.Supplier
+      val s = if (action.execute()) " Real" else " Simulate"
+      if (action.execute() && Utils.isInDev) {
+        FluidTank.LOGGER.debug(ModObjects.MARKER_Connection, (() => logs.mkString_(", ") + s): Supplier[String])
+      } else {
+        FluidTank.LOGGER.trace(ModObjects.MARKER_Connection, (() => logs.mkString_(", ") + s): Supplier[String])
+      }
+    }
+
+    override def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount =
+      if (hasCreative) super.action(fillAll(getTankList), resource, action) else super.fill(resource, action)
+
+    override def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount =
+      if (hasCreative) super.drain(toDrain, IFluidHandler.FluidAction.SIMULATE) else super.drain(toDrain, action)
+  }
 
   def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
     val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTankNoDisplay])

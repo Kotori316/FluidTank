@@ -31,9 +31,9 @@ object BucketEventHandler {
         // Filling tank.
         if (stackFluid.nonEmpty) {
           if (SideProxy.isServer(tileTank)) {
-            val fillAmount = tileTank.connection.handler.fill(stackFluid, doFill = false, min = FluidAmount.AMOUNT_BUCKET)
-            if (fillAmount.nonEmpty) {
-              tileTank.connection.handler.fill(stackFluid, doFill = true, min = FluidAmount.AMOUNT_BUCKET)
+            val fillAmount = tileTank.connection.handler.fill(stackFluid, IFluidHandler.FluidAction.SIMULATE)
+            if (fillAmount.amount == FluidAmount.AMOUNT_BUCKET) {
+              tileTank.connection.handler.fill(stackFluid, IFluidHandler.FluidAction.EXECUTE)
               event.setFilledBucket(getContainer(stack, event.getPlayer))
               event.setResult(Result.ALLOW)
             }
@@ -46,9 +46,9 @@ object BucketEventHandler {
 
         if (stack.getItem == Items.BUCKET) {
           if (SideProxy.isServer(tileTank)) {
-            val drained = tileTank.connection.handler.drain(FluidAmount.EMPTY.setAmount(FluidAmount.AMOUNT_BUCKET), doDrain = false)
+            val drained = tileTank.connection.handler.drain(FluidAmount.EMPTY.setAmount(FluidAmount.AMOUNT_BUCKET), IFluidHandler.FluidAction.SIMULATE)
             if (drained.nonEmpty) {
-              tileTank.connection.handler.drain(FluidAmount.EMPTY.setAmount(FluidAmount.AMOUNT_BUCKET), doDrain = true)
+              tileTank.connection.handler.drain(FluidAmount.EMPTY.setAmount(FluidAmount.AMOUNT_BUCKET), IFluidHandler.FluidAction.EXECUTE)
               event.setFilledBucket(new ItemStack(drained.fluid.getFilledBucket.asItem()))
               event.setResult(Result.ALLOW)
             }
