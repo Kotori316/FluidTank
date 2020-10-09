@@ -41,8 +41,8 @@ class ListTankHandler(tankHandlers: Chain[TankHandler]) extends IFluidHandler {
   }
 
   def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
-    val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
-    this.action(opList(drainOps), toDrain, action)
+    val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank)).reverse
+    this.action(opList(drainOps).map(_.reverse), toDrain, action)
   }
 
   override final def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.fromStack(resource), action).toStack

@@ -33,7 +33,8 @@ package object fluids {
       val drainAmount = tank.amount min s.amount
       val drainedStack = tank.fluidAmount.copy(amount = drainAmount)
       val newTank = tank.copy(tank.fluidAmount.copy(amount = tank.amount |-| drainAmount))
-      (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank, newTank)), s - drainedStack, newTank)
+      val subtracted = if (drainedStack.nonEmpty) s - drainedStack else s
+      (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank, newTank)), subtracted, newTank)
     } else {
       (Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
     }

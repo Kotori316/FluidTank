@@ -1,11 +1,12 @@
 package com.kotori316.fluidtank.test
 
 import cats.data.Chain
-import com.kotori316.fluidtank.fluids.{FluidAmount, ListTankHandler, Tank, TankHandler}
+import cats.implicits._
+import com.kotori316.fluidtank.fluids.{FluidAmount, ListTankHandler, Tank, TankHandler, VoidTankHandler}
 import net.minecraft.fluid.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
-import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
+import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
 import org.junit.jupiter.api.Test
 
 //noinspection DuplicatedCode
@@ -81,7 +82,7 @@ class ListTankHandlerTest {
     locally {
       val drained = h.drain(5000, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(FluidAmount.BUCKET_WATER.setAmount(5000), FluidAmount.fromStack(drained))
-      assertEquals(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(0), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(5000), STONE.capacity)), h.getTankList)
+      assertEquals(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(1000), STONE.capacity)), h.getTankList)
     }
   }
 
@@ -113,7 +114,7 @@ class ListTankHandlerTest {
     locally {
       val drained = h.drain(FluidAmount.BUCKET_WATER.setAmount(5000).toStack, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(FluidAmount.BUCKET_WATER.setAmount(5000), FluidAmount.fromStack(drained))
-      assertEquals(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(0), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(5000), STONE.capacity)), h.getTankList)
+      assertEquals(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(1000), STONE.capacity)), h.getTankList)
     }
   }
 
@@ -131,5 +132,19 @@ class ListTankHandlerTest {
       assertTrue(drained.isEmpty)
       assertEquals(before, h.getTankList)
     }
+  }
+
+  @Test
+  def fillVoidTank(): Unit = {
+    val value = Chain(TankHandler(Tank(FluidAmount.EMPTY, 4000)), new VoidTankHandler(), TankHandler(Tank(FluidAmount.EMPTY, 4000)))
+    val h = new ListTankHandler(value)
+    assertTrue(FluidAmount.BUCKET_WATER.setAmount(6000L) === h.fill(FluidAmount.BUCKET_WATER.setAmount(6000L), IFluidHandler.FluidAction.SIMULATE))
+
+    h.fill(FluidAmount.BUCKET_WATER.setAmount(6000L), IFluidHandler.FluidAction.EXECUTE)
+    assertAll(
+      () => assertTrue(Option(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), 4000)) === value.get(0).map(_.getTank)),
+      () => assertTrue(Option(Tank.EMPTY) === value.get(1).map(_.getTank)),
+      () => assertTrue(Option(Tank(FluidAmount.EMPTY, 4000)) === value.get(2).map(_.getTank)),
+    )
   }
 }
