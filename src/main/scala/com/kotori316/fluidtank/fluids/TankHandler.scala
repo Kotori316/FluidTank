@@ -35,9 +35,9 @@ class TankHandler extends IFluidHandler {
   // Discards current state.
   override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
 
-   def getFillOperation(tank: Tank): TankOperation = fillOp(tank)
+  def getFillOperation(tank: Tank): TankOperation = fillOp(tank)
 
-   def getDrainOperation(tank: Tank): TankOperation = drainOp(tank)
+  def getDrainOperation(tank: Tank): TankOperation = drainOp(tank)
 
   override final def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
     Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
@@ -69,6 +69,8 @@ class TankHandler extends IFluidHandler {
       FluidTank.LOGGER.debug(ModObjects.MARKER_TankHandler, logs.mkString_(action.toString + " ", ", ", ""))
     }
   }
+
+  override def toString: String = s"${getClass.getName} with $tank"
 }
 
 object TankHandler {

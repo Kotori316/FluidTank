@@ -80,6 +80,8 @@ package object fluids {
     override def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
     }
+
+    override def toString: String = "EmptyTankHandler"
   }
 
   class VoidTankHandler extends TankHandler {
@@ -94,6 +96,8 @@ package object fluids {
     override def getDrainOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.Empty(s, tank)), s, tank)
     }
+
+    override def toString: String = "VoidTankHandler"
   }
 
 }

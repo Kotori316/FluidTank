@@ -59,4 +59,6 @@ class ListTankHandler(tankHandlers: Chain[TankHandler]) extends IFluidHandler {
     Align[Chain].zipAll(tankHandlers, newTanks, EmptyTankHandler, Tank.EMPTY)
       .iterator.foreach { case (handler, tank) => handler.setTank(tank) }
   }
+
+  override def toString: String = s"${getClass.getName}{$tankHandlers}"
 }
