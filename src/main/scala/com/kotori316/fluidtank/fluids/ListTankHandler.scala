@@ -7,7 +7,10 @@ import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
-class ListTankHandler(tankHandlers: Chain[TankHandler]) extends IFluidHandler {
+class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) extends IFluidHandler {
+  def this(t: Chain[TankHandler]) = {
+    this(t, false)
+  }
 
   def getTankList: Chain[Tank] = tankHandlers.map(_.getTank)
 
@@ -36,6 +39,12 @@ class ListTankHandler(tankHandlers: Chain[TankHandler]) extends IFluidHandler {
   }
 
   def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+    if (limitOneFluid) {
+      val fluidInTank = tankHandlers.headOption.map(_.getTank.fluidAmount).filter(_.nonEmpty)
+      if (!fluidInTank.forall(_ fluidEqual resource)) {
+        return FluidAmount.EMPTY
+      }
+    }
     val fillOps: Chain[TankOperation] = tankHandlers.map(t => t.getFillOperation(t.getTank))
     this.action(opList(fillOps), resource, action)
   }

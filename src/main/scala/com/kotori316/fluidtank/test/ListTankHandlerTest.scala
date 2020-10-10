@@ -71,6 +71,53 @@ class ListTankHandlerTest {
   }
 
   @Test
+  def fillFluidLimited1(): Unit = {
+    val handlers = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 4000), Tank(FluidAmount.EMPTY, 6000))
+    val h = new ListTankHandler(handlers.map(TankHandler.apply), limitOneFluid = true)
+
+    {
+      val filled = h.fill(FluidAmount.BUCKET_WATER.setAmount(3000), IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(FluidAmount.BUCKET_WATER.setAmount(3000) === filled,
+        s"Filling Water to real connection. $filled")
+    }
+    {
+      val filled = h.fill(FluidAmount.BUCKET_WATER.setAmount(12000), IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(FluidAmount.BUCKET_WATER.setAmount(9000) === filled,
+        s"Filling Water to real connection. $filled")
+    }
+    val filled = h.fill(FluidAmount.BUCKET_WATER.setAmount(12000), IFluidHandler.FluidAction.EXECUTE)
+    assertTrue(FluidAmount.BUCKET_WATER.setAmount(9000) === filled, s"Filling Water to real connection. $filled")
+    assertTrue(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), 4000), Tank(FluidAmount.BUCKET_WATER.setAmount(6000), 6000)) === h.getTankList)
+  }
+
+  @Test
+  def fillFluidLimited2(): Unit = {
+    val handlers = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 4000), Tank(FluidAmount.EMPTY, 6000))
+    val h = new ListTankHandler(handlers.map(TankHandler.apply), limitOneFluid = true)
+
+    {
+      val filled = h.fill(FluidAmount.BUCKET_LAVA.setAmount(3000), IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(FluidAmount.EMPTY === filled,
+        s"Filling Lava to real connection. $filled")
+    }
+  }
+
+  @Test
+  def fillFluidLimited3(): Unit = {
+    val handlers = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(0), 4000), Tank(FluidAmount.EMPTY, 6000))
+    val h = new ListTankHandler(handlers.map(TankHandler.apply), limitOneFluid = true)
+
+    {
+      val filled = h.fill(FluidAmount.BUCKET_LAVA.setAmount(3000), IFluidHandler.FluidAction.SIMULATE)
+      assertTrue(FluidAmount.BUCKET_LAVA.setAmount(3000) === filled,
+        s"Filling Lava to real connection. $filled")
+    }
+    val filled = h.fill(FluidAmount.BUCKET_LAVA.setAmount(3000), IFluidHandler.FluidAction.EXECUTE)
+    assertTrue(FluidAmount.BUCKET_LAVA.setAmount(3000) === filled, s"Filling Lava to real connection. $filled")
+    assertTrue(Chain(Tank(FluidAmount.BUCKET_LAVA.setAmount(3000), 4000), Tank(FluidAmount.EMPTY, 6000)) === h.getTankList)
+  }
+
+  @Test
   def drainWater1(): Unit = {
     val before = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(6000), STONE.capacity))
     val h = new ListTankHandler(before.map(TankHandler.apply))
