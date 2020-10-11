@@ -8,6 +8,8 @@ case class Tank(fluidAmount: FluidAmount, capacity: Long) {
   def fluid: Fluid = fluidAmount.fluid
 
   def amount: Long = fluidAmount.amount
+
+  def isEmpty: Boolean = fluidAmount.isEmpty
 }
 
 object Tank {
