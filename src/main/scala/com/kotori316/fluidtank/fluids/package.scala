@@ -25,7 +25,8 @@ package object fluids {
     }
   }
 
-  def drainOp(tank: Tank): TankOperation = ReaderWriterStateT { case (_, s) =>
+  def drainOp(tank: Tank): TankOperation = if (tank.isEmpty) ReaderWriterStateT.applyS(s => Monad[Id].pure((Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)))
+  else ReaderWriterStateT { case (_, s) =>
     if (s.amount === 0L) {
       // Nothing to drain.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)

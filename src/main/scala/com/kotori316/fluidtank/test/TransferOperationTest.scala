@@ -1,12 +1,13 @@
 package com.kotori316.fluidtank.test
 
 import com.kotori316.fluidtank.fluids._
-import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
+import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, assertTrue}
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 
 import scala.jdk.CollectionConverters._
 
+//noinspection DuplicatedCode It's test!
 class TransferOperationTest {
   private[this] final val waterTank = Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000)
   private[this] final val lavaTank = Tank(FluidAmount.BUCKET_LAVA.setAmount(4000), 16000)
@@ -101,5 +102,59 @@ class TransferOperationTest {
     }
 
     assertAll((x1 ++ x2).asJava)
+  }
+
+  @Test
+  def drainFromEmptyTank(): Unit = {
+    val drainAction = drainOp(Tank.EMPTY)
+    val e1: Seq[Executable] = {
+      val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_WATER.setAmount(10000))
+      Seq(
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed]), s"Log=$log"),
+        () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(10000), left),
+        () => assertEquals(Tank.EMPTY, tank),
+      )
+    }
+    val e2: Seq[Executable] = {
+      val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_LAVA.setAmount(10000))
+      Seq(
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed]), s"Log=$log"),
+        () => assertEquals(FluidAmount.BUCKET_LAVA.setAmount(10000), left),
+        () => assertEquals(Tank.EMPTY, tank),
+      )
+    }
+    assertAll((e1 ++ e2).asJava)
+  }
+
+  @Test
+  def drainFromEmptyWaterTank(): Unit = {
+    val drainAction = drainOp(waterTank)
+    val e1: Seq[Executable] = {
+      val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_WATER.setAmount(10000))
+      Seq(
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed]), s"Log=$log"),
+        () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(10000), left),
+        () => assertEquals(waterTank, tank),
+      )
+    }
+    val e2: Seq[Executable] = {
+      val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_LAVA.setAmount(10000))
+      Seq(
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed]), s"Log=$log"),
+        () => assertEquals(FluidAmount.BUCKET_LAVA.setAmount(10000), left),
+        () => assertEquals(waterTank, tank),
+      )
+    }
+    assertAll((e1 ++ e2).asJava)
+  }
+
+  @Test
+  def tankIsEmpty(): Unit = {
+    assertAll(
+      () => assertTrue(waterTank.isEmpty),
+      () => assertFalse(lavaTank.isEmpty),
+      () => assertTrue(Tank.EMPTY.isEmpty),
+      () => assertFalse(Tank(FluidAmount.BUCKET_WATER, 2000L).isEmpty),
+    )
   }
 }
