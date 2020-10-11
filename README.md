@@ -1,6 +1,6 @@
 # FluidTank
 
-For Minecraft 1.16.2 (1.16 branch)
+For Minecraft 1.16.3 (1.16 branch)
 
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
 [![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
@@ -25,14 +25,14 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ### APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.16.2, newer than 1.16.2-33.0.0
+  * For Minecraft 1.16.3, newer than 1.16.3-34.1.0
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.3
   * Licenced under the Apache License 2.0
 
 * **REQUIRED** [Cats](https://github.com/typelevel/cats)
-  * Version 2.1.0
+  * Version 2.2.0
   * Licensed under the MIT License
 
 * ~[Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)~
