@@ -168,11 +168,10 @@ object Connection {
 
     override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
       import org.apache.logging.log4j.util.Supplier
-      val s = if (action.execute()) " Real" else " Simulate"
       if (action.execute() && Utils.isInDev) {
-        FluidTank.LOGGER.debug(ModObjects.MARKER_Connection, (() => logs.mkString_(", ") + s): Supplier[String])
+        FluidTank.LOGGER.debug(ModObjects.MARKER_Connection, (() => logs.mkString_(action.toString + " ", ", ", "")): Supplier[String])
       } else {
-        FluidTank.LOGGER.trace(ModObjects.MARKER_Connection, (() => logs.mkString_(", ") + s): Supplier[String])
+        FluidTank.LOGGER.trace(ModObjects.MARKER_Connection, (() => logs.mkString_(action.toString + " ", ", ", "")): Supplier[String])
       }
     }
 
