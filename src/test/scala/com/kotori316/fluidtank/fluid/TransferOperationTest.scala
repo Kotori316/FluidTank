@@ -50,6 +50,98 @@ private[fluid] class TransferOperationTest extends BeforeAllTest {
   }
 
   @Test
+  def fillListAllSuccess(): Unit = {
+    val tanks = List(Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000), Tank.EMPTY, Tank(FluidAmount.BUCKET_LAVA.setAmount(0), 16000))
+    val fillOperation = fillList(tanks)
+    locally {
+      val (_, left, a :: b :: c :: Nil) = fillOperation.run((), FluidAmount.BUCKET_WATER)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(0), 16000), c),
+      )
+    }
+    locally {
+      val (_, left, a :: b :: c :: Nil) = fillOperation.run((), FluidAmount.BUCKET_LAVA)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(0), 16000), c),
+      )
+    }
+  }
+
+  @Test
+  def fillListAllSuccess2(): Unit = {
+    val tanks = List(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), Tank.EMPTY, Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000))
+    val fillOperation = fillList(tanks)
+    locally {
+      val (_, left, a :: b :: c :: Nil) = fillOperation.run((), FluidAmount.BUCKET_WATER)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(2000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b, "Second tank isn't touched."),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000), c),
+      )
+    }
+    locally {
+      val (_, left, a :: b :: c :: Nil) = fillOperation.run((), FluidAmount.BUCKET_LAVA)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), a),
+        () => assertTrue(b.isEmpty, "Second tank was tried to fill lava."),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(2000), 16000), c),
+      )
+    }
+  }
+
+  @Test
+  def fillListWaterOnly(): Unit = {
+    val tanks = List(Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000), Tank.EMPTY)
+    val fillOperation = fillList(tanks)
+    locally {
+      val (_, left, a :: b :: Nil) = fillOperation.run((), FluidAmount.BUCKET_WATER)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+      )
+    }
+    locally {
+      val (_, left, a :: b :: Nil) = fillOperation.run((), FluidAmount.BUCKET_LAVA)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+      )
+    }
+  }
+
+  @Test
+  def fillListWaterOnly2(): Unit = {
+    val tanks = List(Tank(FluidAmount.BUCKET_WATER, 16000), Tank.EMPTY)
+    val fillOperation = fillList(tanks)
+    locally {
+      val (_, left, a :: b :: Nil) = fillOperation.run((), FluidAmount.BUCKET_WATER)
+      assertAll(
+        () => assertTrue(left.isEmpty, s"Left isEmpty, $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(2000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+      )
+    }
+    locally {
+      val (_, left, a :: b :: Nil) = fillOperation.run((), FluidAmount.BUCKET_LAVA)
+      assertAll(
+        () => assertEquals(FluidAmount.BUCKET_LAVA, left),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), a),
+        () => assertTrue(b.isEmpty),
+      )
+    }
+  }
+
+  @Test
   def fillAll1(): Unit = {
     val fillAction = fillAll(List(waterTank, waterTank.copy(capacity = 32000)))
     val (_, left, a :: b :: Nil) = fillAction.run((), FluidAmount.BUCKET_WATER.setAmount(1))
