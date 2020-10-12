@@ -1,7 +1,8 @@
-package com.kotori316.fluidtank.test
+package com.kotori316.fluidtank.fluid
 
 import cats.data.Chain
 import cats.implicits._
+import com.kotori316.fluidtank.BeforeAllTest
 import com.kotori316.fluidtank.fluids.{FluidAmount, ListTankHandler, Tank, TankHandler, VoidTankHandler}
 import net.minecraft.fluid.Fluids
 import net.minecraftforge.fluids.FluidStack
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
 import org.junit.jupiter.api.Test
 
 //noinspection DuplicatedCode
-class ListTankHandlerTest {
+private[fluid] class ListTankHandlerTest extends BeforeAllTest {
   private final val WOOD = Tank(FluidAmount.EMPTY, 4000L)
   private final val STONE = Tank(FluidAmount.EMPTY, 16000L)
 
