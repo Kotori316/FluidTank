@@ -1,12 +1,13 @@
 package com.kotori316.fluidtank.transport
 
+import com.kotori316.fluidtank.BeforeAllTest
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.{Assertions, Test}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.jdk.CollectionConverters._
 
-class NoBiasTest {
+class NoBiasTest extends BeforeAllTest {
   final val data = List(2, 6, 8, 5, 3, 8, 5, 4, 32, 5, 6)
 
   @Test

@@ -1,3 +1,11 @@
+## v16.0.5
+* The log is limited only in dev environment.
+* Update library, requesting ScalableCatsForce >= 2.13.3
+* Update forge.
+* Added lang file of pt_br and fr_fr.
+
+Build with net.minecraftforge:forge:1.16.3-34.1.0, Mapping: 20200723-1.16.1
+
 ## v16.0.4
 * Support HWYLA
 * Fixed a bug that Creative Tank fills normal tanks with empty fluid.

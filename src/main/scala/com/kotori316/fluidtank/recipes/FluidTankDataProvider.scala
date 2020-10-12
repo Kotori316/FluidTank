@@ -4,7 +4,6 @@ import java.io.IOException
 
 import cats.syntax.eq._
 import com.google.gson.{GsonBuilder, JsonArray}
-import com.kotori316.fluidtank.test.Starter
 import com.kotori316.fluidtank.tiles.Tiers
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.advancements.criterion._
@@ -17,6 +16,7 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition}
+import net.minecraftforge.common.data.ExistingFileHelper
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
@@ -32,10 +32,7 @@ object FluidTankDataProvider {
     if (event.includeServer()) {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
-      event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator))
-    }
-    if (event.includeDev) {
-      event.getGenerator.addProvider(Starter.getInstance())
+      event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator, event.getExistingFileHelper))
     }
   }
 
@@ -197,7 +194,7 @@ object FluidTankDataProvider {
 
   }
 
-  class FluidTagsProvider(g: DataGenerator) extends net.minecraft.data.FluidTagsProvider(g) {
+  class FluidTagsProvider(g: DataGenerator, e: ExistingFileHelper) extends net.minecraft.data.FluidTagsProvider(g, FluidTank.modID, e) {
     override def registerTags(): Unit = {
       getOrCreateBuilder(ModObjects.MILK_TAG).addItemEntry(ModObjects.MILK_FLUID)
     }

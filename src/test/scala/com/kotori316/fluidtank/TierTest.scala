@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 
-class TierTest {
+class TierTest extends BeforeAllTest {
   implicit val eqNBT: Eq[INBT] = Eq.fromUniversalEquals
   implicit val eqJson: Eq[JsonElement] = Eq.fromUniversalEquals
 

@@ -90,6 +90,7 @@ minecraft {
             workingDirectory project.file('run-server')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'info'
+            forceExit false
 
             if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS")))
                 args '--mod', "fluidtank", '--dev'
@@ -255,12 +256,15 @@ artifacts {
     archives srcJar, deobfJar
 }
 
+test {
+    useJUnitPlatform()
+}
+
 curseforge {
     apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
     project {
         id = '291006'
         changelogType = 'markdown'
-        addGameVersion '1.16.2'
         changelog = getAllChangeLog()
         releaseType = 'release'
         mainArtifact jar
@@ -271,18 +275,16 @@ curseforge {
         }
     }
     options {
-        debug = false // defaults to false
+        curseGradleOptions.debug = false // defaults to false
         javaVersionAutoDetect = false
     }
 }
 
 githubRelease {
-    repo = 'FluidTank'
+    repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish = '1.16'
-    body {
-        getLatestChangeLog()
-    }
+    targetCommitish.set('1.16')
+    body.set(getLatestChangeLog())
     releaseAssets = files(
             jar.getArchiveFile().get(),
             deobfJar.getArchiveFile().get(),

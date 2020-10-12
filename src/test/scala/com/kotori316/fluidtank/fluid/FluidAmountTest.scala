@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.test
+package com.kotori316.fluidtank.fluid
 
 import cats.implicits._
 import com.kotori316.fluidtank.fluids.FluidAmount
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.function.Executable
 
 import scala.util.chaining._
 
-class FluidAmountTest {
+private[fluid] class FluidAmountTest extends BeforeAllTest {
   @Test
   def equiv(): Unit = {
     val a = FluidAmount(Fluids.WATER, 1000, None)
