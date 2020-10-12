@@ -242,6 +242,43 @@ private[fluid] class TransferOperationTest extends BeforeAllTest {
   }
 
   @Test
+  def drainAll1(): Unit = {
+    val tanks = List(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), Tank.EMPTY, Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000))
+    val drainOp = drainList(tanks)
+    val x1: Seq[Executable] = {
+      val (_, left, a :: b :: c :: Nil) = drainOp.run((), FluidAmount.EMPTY.setAmount(1000))
+      Seq(
+        () => assertTrue(left.isEmpty, s"Left: $left"),
+        () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(0), left, s"Left: $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000), c),
+      )
+    }
+    val x2: Seq[Executable] = {
+      val (_, left, a :: b :: c :: Nil) = drainOp.run((), FluidAmount.BUCKET_WATER.setAmount(1000))
+      Seq(
+        () => assertTrue(left.isEmpty, s"Left: $left"),
+        () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(0), left, s"Left: $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(1000), 16000), c),
+      )
+    }
+    val x3: Seq[Executable] = {
+      val (_, left, a :: b :: c :: Nil) = drainOp.run((), FluidAmount.BUCKET_LAVA.setAmount(1000))
+      Seq(
+        () => assertTrue(left.isEmpty, s"Left: $left"),
+        () => assertEquals(FluidAmount.BUCKET_LAVA.setAmount(0), left, s"Left: $left"),
+        () => assertEquals(Tank(FluidAmount.BUCKET_WATER.setAmount(1000), 16000), a),
+        () => assertEquals(Tank.EMPTY, b),
+        () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(0), 16000), c),
+      )
+    }
+    assertAll((x1 ++ x2 ++ x3).asJava)
+  }
+
+  @Test
   def tankIsEmpty(): Unit = {
     assertAll(
       () => assertTrue(waterTank.isEmpty),

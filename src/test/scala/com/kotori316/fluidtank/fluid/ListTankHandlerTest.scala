@@ -9,6 +9,7 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
 
 //noinspection DuplicatedCode
 private[fluid] class ListTankHandlerTest extends BeforeAllTest {
@@ -194,5 +195,92 @@ private[fluid] class ListTankHandlerTest extends BeforeAllTest {
       () => assertTrue(Option(Tank.EMPTY) === value.get(1).map(_.getTank)),
       () => assertTrue(Option(Tank(FluidAmount.EMPTY, 4000)) === value.get(2).map(_.getTank)),
     )
+  }
+
+  @Test
+  def testGetSumOfCapacity(): Unit = {
+    {
+      val h = new ListTankHandler(createWoodStone)
+      assertEquals(20000L, h.getSumOfCapacity)
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank.EMPTY, Tank(FluidAmount.EMPTY, 3000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply))
+      assertEquals(5000, h.getSumOfCapacity)
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank.EMPTY).map(TankHandler.apply))
+      assertEquals(0, h.getSumOfCapacity)
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply))
+      assertEquals(2000, h.getSumOfCapacity)
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_LAVA, 3000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply))
+      assertEquals(5000, h.getSumOfCapacity)
+    }
+  }
+
+  @Test
+  def testGetFluidInTank(): Unit = {
+    var tests: Seq[Executable] = Nil
+    import scala.jdk.CollectionConverters._
+
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply))
+      val stack = h.getFluidInTank(0)
+      tests ++= Seq(
+        () => assertTrue(FluidAmount.BUCKET_WATER.toStack.isFluidStackIdentical(stack), s"Result: $stack"),
+        () => assertTrue(FluidAmount.BUCKET_WATER === FluidAmount.fromStack(stack), s"Result: ${FluidAmount.fromStack(stack)}"),
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_LAVA.setAmount(2000), 2000)).map(TankHandler.apply))
+      val stack = h.getFluidInTank(0)
+      tests ++= Seq(
+        () => assertTrue(FluidAmount.BUCKET_LAVA.setAmount(2000).toStack.isFluidStackIdentical(stack), s"Result: ${(stack.getRawFluid, stack.getAmount)}"),
+        () => assertTrue(FluidAmount.BUCKET_LAVA.setAmount(2000) === FluidAmount.fromStack(stack), s"Result: ${FluidAmount.fromStack(stack)}"),
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank.EMPTY).map(TankHandler.apply))
+      val stack = h.getFluidInTank(0)
+      tests ++= Seq(
+        () => assertTrue(stack.isEmpty, s"Result: $stack"),
+        () => assertTrue(FluidAmount.fromStack(stack).isEmpty, s"Result: ${FluidAmount.fromStack(stack)}"),
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(2000), 2000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply))
+      val stack = h.getFluidInTank(0)
+      tests ++= Seq(
+        () => assertTrue(FluidAmount.BUCKET_WATER.setAmount(3000).toStack.isFluidStackIdentical(stack), s"Result: ${(stack.getRawFluid, stack.getAmount)}"),
+        () => assertTrue(FluidAmount.BUCKET_WATER.setAmount(3000) === FluidAmount.fromStack(stack), s"Result: ${FluidAmount.fromStack(stack)}"),
+      )
+    }
+    assertAll(tests.asJava)
+  }
+
+  @Test
+  def testGetFluidInTank1(): Unit = {
+    var tests: Seq[Executable] = Nil
+    import scala.jdk.CollectionConverters._
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(2000), 2000), Tank(FluidAmount.BUCKET_LAVA, 2000)).map(TankHandler.apply))
+      val stack = h.getFluidInTank(0)
+      tests ++= Seq(
+        () => assertTrue(FluidAmount.BUCKET_WATER.setAmount(2000).toStack.isFluidStackIdentical(stack), s"Result: ${(stack.getRawFluid, stack.getAmount)}"),
+        () => assertTrue(FluidAmount.BUCKET_WATER.setAmount(2000) === FluidAmount.fromStack(stack), s"Result: ${FluidAmount.fromStack(stack)}"),
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.BUCKET_LAVA.setAmount(2000), 2000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply))
+      val stack = h.getFluidInTank(0)
+      tests ++= Seq(
+        () => assertTrue(FluidAmount.BUCKET_LAVA.setAmount(2000).toStack.isFluidStackIdentical(stack), s"Result: ${(stack.getRawFluid, stack.getAmount)}"),
+        () => assertTrue(FluidAmount.BUCKET_LAVA.setAmount(2000) === FluidAmount.fromStack(stack), s"Result: ${FluidAmount.fromStack(stack)}"),
+      )
+    }
+    assertAll(tests.asJava)
   }
 }
