@@ -443,7 +443,8 @@ publishing {
         }
     }
     publications {
-        gpr(MavenPublication) {
+        mavenJava(MavenPublication) {
+            artifactId = "fluidtank"
             artifact srcJar {
                 archiveClassifier.set('sources')
                 extension = 'jar'
