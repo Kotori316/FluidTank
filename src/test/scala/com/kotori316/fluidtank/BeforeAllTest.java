@@ -20,7 +20,7 @@ public class BeforeAllTest {
         BeforeAllTest.setup();
     }
 
-    public static void setup() {
+    public static synchronized void setup() {
         if (!INITIALIZED.getAndSet(true)) {
             changeDist();
             assertEquals(Dist.CLIENT, FMLEnvironment.dist);
