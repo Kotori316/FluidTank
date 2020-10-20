@@ -283,4 +283,62 @@ private[fluid] class ListTankHandlerTest extends BeforeAllTest {
     }
     assertAll(tests.asJava)
   }
+
+  @Test
+  def fillGas(): Unit = {
+    import com.kotori316.fluidtank.milk.MilkFluid
+    import net.minecraft.fluid.Fluid
+    import net.minecraft.util.ResourceLocation
+    import net.minecraftforge.fluids.FluidAttributes
+    import net.minecraftforge.fml.unsafe.UnsafeHacks
+    val fluid = new MilkFluid
+    val attribute = FluidAttributes.builder(new ResourceLocation("minecraft", "blocks/milk_still"),
+      new ResourceLocation("minecraft", "blocks/milk_still"))
+      .translationKey("key")
+      .gaseous()
+    UnsafeHacks.setField(classOf[Fluid].getDeclaredField("forgeFluidAttributes"), fluid, attribute.build(fluid))
+
+    val fa = FluidAmount(fluid, 1000L, None)
+
+    var tests: Seq[Executable] = Nil
+    import scala.jdk.CollectionConverters._
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.EMPTY, 2000), Tank(FluidAmount.EMPTY, 2000)).map(TankHandler.apply))
+      tests ++= Seq(
+        () => assertEquals(fa, h.fill(fa, IFluidHandler.FluidAction.SIMULATE)),
+        () => assertEquals(fa.setAmount(4000), h.fill(fa.setAmount(4000), IFluidHandler.FluidAction.SIMULATE)),
+        () => assertEquals(fa.setAmount(4000), h.fill(fa.setAmount(6000), IFluidHandler.FluidAction.SIMULATE)),
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.EMPTY, 2000), Tank(FluidAmount.EMPTY, 2000)).map(TankHandler.apply))
+      h.fill(fa, IFluidHandler.FluidAction.EXECUTE)
+      tests ++= Seq(
+        () => assertTrue(Chain(Tank(FluidAmount.EMPTY, 2000), Tank(fa, 2000)) === h.getTankList, s"Filled tank ${h.getTankList}")
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(FluidAmount.EMPTY, 2000), Tank(FluidAmount.EMPTY, 2000)).map(TankHandler.apply))
+      h.fill(fa.setAmount(3000), IFluidHandler.FluidAction.EXECUTE)
+      tests ++= Seq(
+        () => assertTrue(Chain(Tank(fa, 2000), Tank(fa.setAmount(2000), 2000)) === h.getTankList, s"Filled tank ${h.getTankList}")
+      )
+    }
+
+    {
+      val h = new ListTankHandler(Chain(Tank(fa.setAmount(2000), 2000), Tank(fa.setAmount(2000), 2000)).map(TankHandler.apply))
+      h.drain(1000, IFluidHandler.FluidAction.EXECUTE)
+      tests ++= Seq(
+        () => assertTrue(Chain(Tank(fa, 2000), Tank(fa.setAmount(2000), 2000)) === h.getTankList, s"Drained tank ${h.getTankList}")
+      )
+    }
+    {
+      val h = new ListTankHandler(Chain(Tank(fa.setAmount(2000), 2000), Tank(fa.setAmount(2000), 2000)).map(TankHandler.apply))
+      h.drain(3000, IFluidHandler.FluidAction.EXECUTE)
+      tests ++= Seq(
+        () => assertTrue(Chain(Tank(fa.setAmount(0), 2000), Tank(fa, 2000)) === h.getTankList, s"Drained tank ${h.getTankList}")
+      )
+    }
+    assertAll(tests.asJava)
+  }
 }

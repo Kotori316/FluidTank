@@ -49,14 +49,27 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
         return FluidAmount.EMPTY
       }
     }
-    val fillOps: Chain[TankOperation] = tankHandlers.map(t => t.getFillOperation(t.getTank))
-    this.action(opList(fillOps), resource, action)
+    if (resource.isGaseous) {
+      // Fill from upper
+      val fillOps: Chain[TankOperation] = tankHandlers.map(t => t.getFillOperation(t.getTank)).reverse
+      this.action(opList(fillOps).map(_.reverse), resource, action)
+    } else {
+      // Fill from bottom tank
+      val fillOps: Chain[TankOperation] = tankHandlers.map(t => t.getFillOperation(t.getTank))
+      this.action(opList(fillOps), resource, action)
+    }
   }
 
   def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
-    // Drain from upper tank.
-    val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank)).reverse
-    this.action(opList(drainOps).map(_.reverse), toDrain, action)
+    if (toDrain.isGaseous || getTankList.lastOption.exists(_.fluidAmount.isGaseous)) {
+      // Drain from bottom tank.
+      val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
+      this.action(opList(drainOps), toDrain, action)
+    } else {
+      // Drain from upper tank.
+      val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank)).reverse
+      this.action(opList(drainOps).map(_.reverse), toDrain, action)
+    }
   }
 
   override final def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.fromStack(resource), action).toStack
