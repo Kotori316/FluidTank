@@ -267,7 +267,7 @@ curseforge {
         changelogType = 'markdown'
         changelog = getAllChangeLog()
         releaseType = 'release'
-        addGameVersion "1.16.3"
+        addGameVersion '1.16.3'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
@@ -443,7 +443,8 @@ publishing {
         }
     }
     publications {
-        gpr(MavenPublication) {
+        mavenJava(MavenPublication) {
+            artifactId = "fluidtank"
             artifact srcJar {
                 archiveClassifier.set('sources')
                 extension = 'jar'
