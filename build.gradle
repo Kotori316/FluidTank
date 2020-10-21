@@ -159,6 +159,12 @@ repositories {
             }
         }
     }
+    maven {
+        url = "https://www.cursemaven.com"
+        content{
+            it.includeModule("curse.maven", "look-at-that")
+        }
+    }
     repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
         repo.content {
             excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
@@ -185,6 +191,7 @@ dependencies {
     implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19")
     implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.2-beta-5")
     compileOnly fg.deobf("appeng:appliedenergistics2:8.0.0-beta.1")
+    implementation fg.deobf("curse.maven:look-at-that:3035358")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.3-build-3:dev")
