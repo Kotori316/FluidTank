@@ -24,3 +24,4 @@ FILES
 /data
 run-server
 library
+logs/
