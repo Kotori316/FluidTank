@@ -70,7 +70,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
-      stackName = ITextComponent.Serializer.func_240643_a_(compound.getString(TileTankNoDisplay.NBT_StackName))
+      stackName = ITextComponent.Serializer.getComponentFromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
     }
     loading = true
   }
@@ -79,7 +79,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     tank.readFromNBT(compound.getCompound(TileTankNoDisplay.NBT_Tank))
     tier = Tiers.fromNBT(compound.get(TileTankNoDisplay.NBT_Tier))
     if (compound.contains(TileTankNoDisplay.NBT_StackName)) {
-      stackName = ITextComponent.Serializer.func_240643_a_(compound.getString(TileTankNoDisplay.NBT_StackName))
+      stackName = ITextComponent.Serializer.getComponentFromJson(compound.getString(TileTankNoDisplay.NBT_StackName))
     } else {
       stackName = null
     }

@@ -43,14 +43,14 @@ public class FluidCacheMessage {
     public static FluidCacheMessage apply(CATTile tile) {
         FluidCacheMessage message = new FluidCacheMessage();
         message.pos = tile.getPos();
-        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::func_234923_W_).orElse(World.field_234918_g_).func_240901_a_();
+        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::getDimensionKey).orElse(World.OVERWORLD).getLocation();
         message.amounts = tile.fluidAmountList();
         return message;
     }
 
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
         OptionConverters.toJava(FluidTank.proxy.getWorld(ctx.get()))
-            .filter(w -> w.func_234923_W_().func_240901_a_().equals(dimensionId))
+            .filter(w -> w.getDimensionKey().getLocation().equals(dimensionId))
             .map(w -> w.getTileEntity(pos))
             .filter(CATTile.class::isInstance)
             .map(CATTile.class::cast)

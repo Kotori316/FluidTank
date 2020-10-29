@@ -150,12 +150,12 @@ object FluidAmount {
 
   implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
     inst.group(
-      ResourceLocation.RESOURCE_LOCATION_CODEC.comapFlatMap[Fluid](
+      ResourceLocation.CODEC.comapFlatMap[Fluid](
         name => if (ForgeRegistries.FLUIDS.containsKey(name)) DataResult.success(ForgeRegistries.FLUIDS.getValue(name)) else DataResult.error(s"No fluid for $name."),
         fluid => ForgeRegistries.FLUIDS.getKey(fluid)
       ).fieldOf(NBT_fluid).forGetter(_.fluid),
       Codec.LONG.fieldOf(NBT_amount).forGetter(_.amount),
-      CompoundNBT.field_240597_a_.optionalFieldOf(NBT_tag).forGetter(_.nbt.toJava),
+      CompoundNBT.CODEC.optionalFieldOf(NBT_tag).forGetter(_.nbt.toJava),
     ).apply(inst, inst.stable[com.mojang.datafixers.util.Function3[Fluid, lang.Long, Optional[CompoundNBT], FluidAmount]](
       (f, l, o) => FluidAmount(f, l, o.toScala)
     ))
