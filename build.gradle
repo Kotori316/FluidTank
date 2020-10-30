@@ -161,7 +161,7 @@ repositories {
     }
     maven {
         url = "https://www.cursemaven.com"
-        content{
+        content {
             it.includeModule("curse.maven", "look-at-that")
         }
     }
@@ -199,9 +199,11 @@ dependencies {
         implementation("scalable-cats-force:ScalableCatsForce-2.13.3-build:3:dev")
     }
     // Test Dependencies.
-    implementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')
-    runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2')
-    implementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.6.2')
+    String JUPITER_VERSION = '5.7.0'
+    implementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
+    implementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
+    runtimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
+    implementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
