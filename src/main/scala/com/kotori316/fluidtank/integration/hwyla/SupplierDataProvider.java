@@ -13,7 +13,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-import com.kotori316.fluidtank.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.integration.Localize;
 import com.kotori316.fluidtank.tiles.FluidSourceTile;
 

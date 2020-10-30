@@ -1,8 +1,9 @@
 package com.kotori316.fluidtank.fluid
 
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.{ItemBlockTank, TankItemFluidHandler}
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
-import com.kotori316.fluidtank.{BeforeAllTest, FluidAmount, FluidTank, ModObjects}
+import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.FluidStack

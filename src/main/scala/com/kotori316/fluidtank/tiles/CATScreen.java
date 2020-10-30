@@ -9,8 +9,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 
 public class CATScreen extends ContainerScreen<CATContainer> {
 

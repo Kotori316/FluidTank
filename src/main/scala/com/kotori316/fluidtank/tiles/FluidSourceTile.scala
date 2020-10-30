@@ -1,10 +1,11 @@
 package com.kotori316.fluidtank.tiles
 
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.fluids.FluidAmount
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.tileentity.{ITickableTileEntity, TileEntity}
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
+import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
 class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
   with ITickableTileEntity {
@@ -21,21 +22,11 @@ class FluidSourceTile extends TileEntity(ModObjects.SOURCE_TYPE)
         tile <- Option(getWorld.getTileEntity(getPos.offset(direction)))
         cap <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala.value.value
       } yield {
-        cap match {
-          case tank: FluidAmount.Tank =>
-            val accepted = tank.fill(fluid, doFill = false)
-            if (accepted.nonEmpty) {
-              tank.fill(accepted, doFill = true).amount
-            } else {
-              0L
-            }
-          case _ =>
-            val accepted = cap.fill(fluid.toStack, FluidAmount.b2a(false))
-            if (accepted > 0) {
-              cap.fill(fluid.setAmount(accepted).toStack, FluidAmount.b2a(true))
-            } else {
-              0
-            }
+        val accepted = cap.fill(fluid.toStack, IFluidHandler.FluidAction.SIMULATE)
+        if (accepted > 0) {
+          cap.fill(fluid.setAmount(accepted).toStack, IFluidHandler.FluidAction.EXECUTE)
+        } else {
+          0
         }
       }
     }

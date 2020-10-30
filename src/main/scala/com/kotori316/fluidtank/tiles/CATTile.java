@@ -35,8 +35,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import scala.Option;
 
-import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.milk.MilkBucketHandler;
 
 public class CATTile extends TileEntity implements INamedContainerProvider {

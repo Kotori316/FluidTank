@@ -1,7 +1,8 @@
 package com.kotori316.fluidtank.items
 
+import com.kotori316.fluidtank.Utils
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
-import com.kotori316.fluidtank.{FluidAmount, Utils}
 import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundNBT

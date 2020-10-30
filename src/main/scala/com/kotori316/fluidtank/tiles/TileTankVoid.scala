@@ -1,16 +1,15 @@
 package com.kotori316.fluidtank.tiles
 
-import com.kotori316.fluidtank.{FluidAmount, ModObjects}
+import com.kotori316.fluidtank.ModObjects
+import com.kotori316.fluidtank.fluids.VoidTankHandler
 
 class TileTankVoid extends TileTankNoDisplay(Tiers.VOID, ModObjects.TANK_VOID_TYPE) {
-  override val tank = new VoidTank
+  override val internalTank = new VoidTank
 
-  class VoidTank extends Tank {
+  class VoidTank extends VoidTankHandler with TileTankNoDisplay.RealTank {
     override def toString = "Void Tank"
 
-    override def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int): FluidAmount = fluidAmount
-
-    override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int): FluidAmount = FluidAmount.EMPTY
+    override def tile: TileTankNoDisplay = TileTankVoid.this
   }
 
 }

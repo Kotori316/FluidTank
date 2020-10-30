@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
 import net.minecraft.block._

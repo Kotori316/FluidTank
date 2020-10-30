@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank
+package com.kotori316.fluidtank.fluids
 
 import java.lang
 import java.util.Optional
@@ -6,6 +6,7 @@ import java.util.Optional
 import cats._
 import cats.implicits._
 import com.kotori316.fluidtank.DynamicSerializable._
+import com.kotori316.fluidtank._
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import com.mojang.serialization.{Codec, DataResult, DynamicOps, Dynamic => SerializeDynamic}
 import javax.annotation.Nonnull
@@ -13,7 +14,6 @@ import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.nbt.{CompoundNBT, NBTDynamicOps}
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 
@@ -45,7 +45,15 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
     else setAmount(this.amount + that.amount)
   }
 
-  def -(that: FluidAmount): FluidAmount = setAmount(this.amount - that.amount)
+  def -(that: FluidAmount): FluidAmount = {
+    val subtracted = this.amount |-| that.amount
+    (this.fluid === Fluids.EMPTY, that.fluid === Fluids.EMPTY) match {
+      case (true, _) => that.copy(amount = subtracted)
+      case (false, true) => this.copy(amount = subtracted)
+      case (false, false) if this.fluid === that.fluid => this.copy(amount = subtracted)
+      case _ /*(false, false)*/ => FluidAmount.EMPTY
+    }
+  }
 
   def fluidEqual(that: FluidAmount): Boolean = this.fluid === that.fluid && this.nbt === that.nbt
 
@@ -87,36 +95,6 @@ object FluidAmount {
   }
 
   def registry: IForgeRegistry[Fluid] = ForgeRegistries.FLUIDS
-
-  trait Tank extends IFluidHandler {
-    /**
-     * @return Fluid that was accepted by the tank.
-     */
-    def fill(fluidAmount: FluidAmount, doFill: Boolean, min: Int = 0): FluidAmount
-
-    /**
-     * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-     *                    Empty Fluid means fluid type can be anything.
-     * @param doDrain     false means simulating.
-     * @param min         minimum amount to drain.
-     * @return the fluid and amount that is (or will be) drained.
-     */
-    def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Int = 0): FluidAmount
-
-    override def getTanks = 1
-
-    override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
-
-    override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = Utils.toInt(fill(FluidAmount.fromStack(resource), action.execute()).amount)
-
-    override def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drain(fromStack(resource), action.execute()).toStack
-
-    override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drain(fromStack(getFluidInTank(0)).setAmount(maxDrain), action.execute()).toStack
-  }
-
-  def b2a(doAction: Boolean): IFluidHandler.FluidAction =
-    if (doAction) IFluidHandler.FluidAction.EXECUTE
-    else IFluidHandler.FluidAction.SIMULATE
 
   implicit val showFA: Show[FluidAmount] = Show.fromToString
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
