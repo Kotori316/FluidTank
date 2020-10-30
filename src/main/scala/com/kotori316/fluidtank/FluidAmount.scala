@@ -21,7 +21,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
   def setAmount(newAmount: Long): FluidAmount = setAmount(BCAmount.of(newAmount, 1000L))
 
   def setAmount(amount: BCAmount): FluidAmount = {
-    if (fluidVolume.fluidKey.isEmpty) this // No need to create new instance.
+    if (fluidVolume.fluidKey.isEmpty) this // Changing tha amount of empty fluid isn't allowed.
     else FluidAmount(fluidVolume.fluidKey.withAmount(amount))
   }
 
@@ -56,7 +56,8 @@ object FluidAmount {
   val EMPTY: FluidAmount = FluidAmount(FluidVolumeUtil.EMPTY)
   val BUCKET_LAVA: FluidAmount = FluidAmount(FluidKeys.LAVA.withAmount(BCAmount.BUCKET))
   val BUCKET_WATER: FluidAmount = FluidAmount(FluidKeys.WATER.withAmount(BCAmount.BUCKET))
-  val BUCKET_MILK: FluidAmount = FluidAmount(FluidKeys.get(Entries.MILK_FLUID).withAmount(BCAmount.BUCKET))
+  // Lazy to avoid error in Test
+  lazy val BUCKET_MILK: FluidAmount = FluidAmount(FluidKeys.get(Entries.MILK_FLUID).withAmount(BCAmount.BUCKET))
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
