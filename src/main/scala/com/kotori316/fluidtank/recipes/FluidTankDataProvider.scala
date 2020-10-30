@@ -38,7 +38,7 @@ object FluidTankDataProvider {
 
   private[this] final val ID = (s: String) => new ResourceLocation(FluidTank.modID, s)
 
-  private def tag(name: ResourceLocation): ITag.INamedTag[Item] = TagCollectionManager.func_242178_a().func_241836_b().func_241834_b(name) match {
+  private def tag(name: ResourceLocation): ITag.INamedTag[Item] = TagCollectionManager.getManager.getItemTags.get(name) match {
     case tag: ITag.INamedTag[_] => tag.asInstanceOf[ITag.INamedTag[Item]]
     case _ => ItemTags.createOptional(name)
   }

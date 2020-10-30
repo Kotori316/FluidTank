@@ -25,7 +25,7 @@ class TileMessage {
   }
 
   def onReceive(supplier: Supplier[NetworkEvent.Context]): Unit = {
-    for (world <- FluidTank.proxy.getWorld(supplier.get()) if world.func_234923_W_().func_240901_a_() == dim;
+    for (world <- FluidTank.proxy.getWorld(supplier.get()) if world.getDimensionKey.getLocation == dim;
          tile <- Option(world.getTileEntity(pos))) {
       supplier.get().enqueueWork(() => tile.read(world.getBlockState(pos), nbt))
     }
@@ -45,7 +45,7 @@ object TileMessage {
   def apply(tile: TileEntity): TileMessage = {
     val m = new TileMessage()
     m.pos = tile.getPos
-    m.dim = Option(tile.getWorld).map(_.func_234923_W_()).getOrElse(World.field_234918_g_).func_240901_a_()
+    m.dim = Option(tile.getWorld).map(_.getDimensionKey()).getOrElse(World.OVERWORLD).getLocation
     m.nbt = tile.write(new CompoundNBT)
     m
   }

@@ -24,10 +24,10 @@ object PacketHandler {
   }
 
   def sendToClient(message: TileMessage, world: World): Unit = {
-    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.func_234923_W_), message)
+    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.getDimensionKey), message)
   }
 
   def sendToClient(message: FluidCacheMessage, world: World): Unit = {
-    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.func_234923_W_), message)
+    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.getDimensionKey), message)
   }
 }

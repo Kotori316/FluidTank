@@ -37,7 +37,7 @@ archivesBaseName = "LargeFluidTank"
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
-static String mappingVersion() { return '20200723-1.16.1' }
+static String mappingVersion() { return '20201028-1.16.3' }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
@@ -122,7 +122,7 @@ repositories {
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "modmaven.k-4u.nl"
-        url = "https://modmaven.k-4u.nl"
+        url = "https://modmaven.dev/"
     }
     if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
         maven {
@@ -159,6 +159,12 @@ repositories {
             }
         }
     }
+    maven {
+        url = "https://www.cursemaven.com"
+        content{
+            it.includeModule("curse.maven", "look-at-that")
+        }
+    }
     repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
         repo.content {
             excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
@@ -183,8 +189,9 @@ dependencies {
         implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
     }
     implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19")
-    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.2-beta-5")
+    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.4-beta-7")
     compileOnly fg.deobf("appeng:appliedenergistics2:8.0.0-beta.1")
+    compileOnly fg.deobf("curse.maven:look-at-that:3035358")
 
     if (hasGitHubToken()) {
         implementation("com.kotori316:ScalableCatsForce:2.13.3-build-3:dev")

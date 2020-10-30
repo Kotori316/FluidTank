@@ -17,7 +17,7 @@ class ContentTank(cond: Array[ILootCondition]) extends LootFunction(cond) {
     stack
   }
 
-  override def func_230425_b_(): LootFunctionType = ModObjects.TANK_CONTENT_LOOT
+  override def getFunctionType: LootFunctionType = ModObjects.TANK_CONTENT_LOOT
 }
 
 class ContentTankSerializer extends LootFunction.Serializer[ContentTank] {

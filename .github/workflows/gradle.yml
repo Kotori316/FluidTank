@@ -36,6 +36,12 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew --no-daemon test
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Upload failed test report
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/reports/tests/*
+          name: Test-Report-${{ matrix.java }}
       #- name: Test-RunData
       #  run: chmod +x ./gradlew && ./gradlew --no-daemon runData
       #  continue-on-error: true
@@ -54,7 +60,6 @@ jobs:
   build-publish:
     runs-on: ubuntu-latest
     needs: [ check ]
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -73,3 +78,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: build/libs/*
+          name: ${{ github.event.repository.name }}-${{ github.run_number }}

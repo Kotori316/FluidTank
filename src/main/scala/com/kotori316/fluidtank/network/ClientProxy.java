@@ -75,7 +75,7 @@ public class ClientProxy extends SideProxy {
             RenderTypeLookup.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
 
             // Item Properties Override
-            ItemModelsProperties.func_239418_a_(ModObjects.blockSource().itemBlock(),
+            ItemModelsProperties.registerProperty(ModObjects.blockSource().itemBlock(),
                 new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
         }
 
