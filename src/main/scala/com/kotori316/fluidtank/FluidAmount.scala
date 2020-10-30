@@ -45,7 +45,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
 
   def fluidEqual(that: FluidAmount): Boolean = FluidVolume.areEqualExceptAmounts(this.fluidVolume, that.fluidVolume)
 
-  override def toString: String = FluidAmount.registry.getId(fluidVolume.getRawFluid).getPath + "@" + fluidVolume.amount()
+  override def toString: String = fluidVolume.fluidKey.entry.getId.toString + "@" + fluidVolume.amount()
 }
 
 object FluidAmount {

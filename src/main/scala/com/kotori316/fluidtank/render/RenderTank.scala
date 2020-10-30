@@ -52,8 +52,7 @@ class RenderTank(d: BlockEntityRenderDispatcher) extends BlockEntityRenderer[Til
 object RenderTank {
   private def textureName(tile: TileTank) = {
     val tank: TileTank#Tank = tile.tank
-    val world = if (tile.hasWorld) tile.getWorld else MinecraftClient.getInstance().world
-    val pos = if (tile.hasWorld) tile.getPos else MinecraftClient.getInstance().player.getBlockPos
+    val (world, pos) = getWorldAndPos(tile)
     Objects.requireNonNull(tank, "Tank should not be null.")
     Objects.requireNonNull(tank.fluid, "Content of Tank should not be null.")
     Objects.requireNonNull(world, "World should not be null.")
@@ -65,8 +64,7 @@ object RenderTank {
 
   private def color(tile: TileTank) = {
     val fluidAmount = tile.tank.fluid
-    val world = if (tile.hasWorld) tile.getWorld else MinecraftClient.getInstance().world
-    val pos = if (tile.hasWorld) tile.getPos else MinecraftClient.getInstance().player.getBlockPos
+    val (world, pos) = getWorldAndPos(tile)
     val c = FluidRenderHandlerRegistry.INSTANCE.get(fluidAmount.fluid).getFluidColor(world, pos, fluidAmount.fluid.getDefaultState)
     if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
       c | 0xFF000000
@@ -75,4 +73,6 @@ object RenderTank {
     }
   }
 
+  private[this] def getWorldAndPos(tileTank: TileTank) =
+    if (tileTank.hasWorld) (tileTank.getWorld, tileTank.getPos) else (MinecraftClient.getInstance().world, MinecraftClient.getInstance().player.getBlockPos)
 }
