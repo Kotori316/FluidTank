@@ -43,6 +43,7 @@ dependencies {
 
     // library
     implementation "org.scala-lang:scala-library:2.13.0"
+    implementation "com.google.code.findbugs:jsr305:3.0.1"
     //noinspection SpellCheckingInspection
     modCompile "alexiil.mc.lib:libblockattributes-all:${project.bc_attribute_version}"
 
