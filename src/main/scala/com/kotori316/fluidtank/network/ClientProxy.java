@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemModelsProperties;
@@ -46,8 +47,10 @@ public class ClientProxy extends SideProxy {
 
     @Override
     public Option<World> getWorld(NetworkEvent.Context context) {
-        Optional<World> world = LogicalSidedProvider.CLIENTWORLD.get(context.getDirection().getReceptionSide());
-        return OptionConverters.toScala(world);
+        Optional<World> serverWorld = Optional.ofNullable(context.getSender()).map(Entity::getEntityWorld);
+        scala.Function0<Option<World>> clientWorldGetter = () ->
+            OptionConverters.toScala(LogicalSidedProvider.CLIENTWORLD.<Optional<World>>get(context.getDirection().getReceptionSide()));
+        return OptionConverters.toScala(serverWorld).orElse(clientWorldGetter);
     }
 
     @Override
