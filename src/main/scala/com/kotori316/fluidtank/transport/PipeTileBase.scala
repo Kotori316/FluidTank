@@ -76,8 +76,10 @@ abstract class PipeTileBase(t: TileEntityType[_ <: PipeTileBase]) extends TileEn
 
   override def getUpdateTag: CompoundNBT = super.serializeNBT()
 
-  def changeColor(color: DyeColor): Unit =
-    applyToAllPipe(_.setColor(color.getColorValue | 0xF0000000))
+  def changeColor(color: DyeColor): Unit = changeColor(colorInt = color.getColorValue)
+
+  def changeColor(colorInt: Int): Unit =
+    applyToAllPipe(_.setColor(colorInt | 0xF0000000))
 
   def setColor(c: Int): Unit = {
     this.color = c

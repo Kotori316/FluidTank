@@ -1,7 +1,11 @@
 package com.kotori316.fluidtank;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
+import net.minecraft.item.DyeColor;
+import net.minecraft.item.IDyeableArmorItem;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.loading.FMLLoader;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
@@ -37,4 +41,14 @@ public class Utils {
         */
     }
 
+    public static OptionalInt getItemColor(ItemStack stack) {
+        DyeColor color = DyeColor.getColor(stack);
+        if (color != null)
+            return OptionalInt.of(color.getColorValue());
+        if (stack.getItem() instanceof IDyeableArmorItem) {
+            IDyeableArmorItem item = (IDyeableArmorItem) stack.getItem();
+            return OptionalInt.of(item.getColor(stack));
+        }
+        return OptionalInt.empty();
+    }
 }

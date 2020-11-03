@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.transport;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -40,6 +41,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.Utils;
 
 public abstract class PipeBlock extends Block {
     public static final VoxelShape BOX_AABB = VoxelShapes.create(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
@@ -196,12 +198,15 @@ public abstract class PipeBlock extends Block {
         if (player.getHeldItem(handIn).getItem() instanceof BlockItem || player.isCrouching())
             return ActionResultType.PASS;
         // Dying pipe.
-        DyeColor color = DyeColor.getColor(player.getHeldItem(handIn));
-        if (color != null && !Config.content().enablePipeRainbowRenderer().get()) {
+        OptionalInt maybeColor = Utils.getItemColor(player.getHeldItem(handIn));
+        if (maybeColor.isPresent() && !Config.content().enablePipeRainbowRenderer().get()) {
             if (!worldIn.isRemote) {
-                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(color));
+                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(maybeColor.getAsInt()));
+                Object colorName = Stream.of(DyeColor.values()).filter(d -> d.getColorValue() == maybeColor.getAsInt()).findFirst()
+                    .map(c -> (Object) new TranslationTextComponent("color.minecraft." + c))
+                    .orElse(String.format("#%06x", maybeColor.getAsInt()));
                 player.sendStatusMessage(
-                    new TranslationTextComponent("chat.fluidtank.change_color", new TranslationTextComponent("color.minecraft." + color)),
+                    new TranslationTextComponent("chat.fluidtank.change_color", colorName),
                     false);
             }
             return ActionResultType.SUCCESS;
