@@ -22,10 +22,10 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - uses: actions/cache@v1
+        if: ${{ matrix.forge == 'latest' }}
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
-          if: ${{ matrix.forge == 'latest' }}
       #- name: download_assets
       #  run: |
       #    chmod +x ./gradlew

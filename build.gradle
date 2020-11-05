@@ -45,7 +45,7 @@ static String mappingVersion() { return '20201028-1.16.3' }
 
 String forgeVersion() {
     if (isInCI() && "latest" != System.getenv("CI_FORGE")) {
-        return System.getenv("CI_FORGE")
+        return "net.minecraftforge:forge:" + System.getenv("CI_FORGE")
     } else {
         // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
         // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
