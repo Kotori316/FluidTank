@@ -412,6 +412,7 @@ task makeChangeLog() {
 task checkMethod() {
     doLast {
         System.out.println("Forge: ${forgeVersion()}")
+        System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}")
         System.out.println("Is In CI ${isInCI()}")
         System.out.println("FilePath ${jar.getArchiveFile().get()}")
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
