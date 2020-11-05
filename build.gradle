@@ -26,9 +26,13 @@ apply plugin: "com.github.breadmoirai.github-release"
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 version = getProperty("modVersion")
-if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
+if (isInCI()) {
     // In remote CI/CD environment
     version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA").substring(0, 7))
+}
+
+private static boolean isInCI() {
+    return Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))
 }
 
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -38,6 +42,18 @@ sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse t
 compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
 static String mappingVersion() { return '20201028-1.16.3' }
+
+String forgeVersion() {
+    if (isInCI() && "latest" != System.getenv("CI_FORGE")) {
+        return System.getenv("CI_FORGE")
+    } else {
+        // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+        // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+        // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
+        def forge_prop = loadProperties("forge_version.properties")
+        return forge_prop.get("forge_version")
+    }
+}
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
@@ -92,7 +108,7 @@ minecraft {
             property 'forge.logging.console.level', 'info'
             forceExit false
 
-            if (Boolean.valueOf(System.getenv("GITHUB_ACTIONS")))
+            if (isInCI())
                 args '--mod', "fluidtank", '--dev'
             else
                 args '--mod', "fluidtank", '--all'
@@ -124,7 +140,7 @@ repositories {
         name = "modmaven.k-4u.nl"
         url = "https://modmaven.dev/"
     }
-    if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
+    if (!isInCI()) {
         maven {
             name = "Hwyla"
             url "https://maven.tehnut.info"
@@ -177,15 +193,11 @@ private boolean hasGitHubToken() {
 }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
-    def forge_prop = loadProperties("forge_version.properties")
-    minecraft(forge_prop.getProperty("forge_version"))
+    minecraft(forgeVersion())
     implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.3'
     implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.2.0'
 
-    if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
+    if (!isInCI()) {
         implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
     }
     implementation fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19")
@@ -330,7 +342,7 @@ task signJar2() {
     }
 }
 
-if (!Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))) {
+if (!isInCI()) {
     // Runs this task automatically when build is ran.
     assemble.dependsOn(signJar2)
 } else {
@@ -399,7 +411,8 @@ task makeChangeLog() {
 
 task checkMethod() {
     doLast {
-        System.out.println("Is In CI ${Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))}")
+        System.out.println("Forge: ${forgeVersion()}")
+        System.out.println("Is In CI ${isInCI()}")
         System.out.println("FilePath ${jar.getArchiveFile().get()}")
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
         System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
