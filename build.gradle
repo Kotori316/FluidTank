@@ -28,11 +28,11 @@ apply plugin: "com.github.breadmoirai.github-release"
 version = getProperty("modVersion")
 if (isInCI()) {
     // In remote CI/CD environment
-    version = (getProperty("modVersion") + "_" + System.getenv("GITHUB_SHA").substring(0, 7))
+    version = (getProperty("modVersion") + "_" + (System.getenv("GITHUB_SHA") ?: "NOT_GIT").substring(0, 7))
 }
 
 private static boolean isInCI() {
-    return Boolean.valueOf(System.getenv("GITHUB_ACTIONS"))
+    return Boolean.valueOf(System.getenv("GITHUB_ACTIONS")) || Boolean.valueOf(System.getenv("CI"))
 }
 
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -44,7 +44,7 @@ compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 static String mappingVersion() { return '20201028-1.16.3' }
 
 String forgeVersion() {
-    if (isInCI() && "latest" != System.getenv("CI_FORGE")) {
+    if (isInCI() && System.getenv("CI_FORGE") != null && "latest" != System.getenv("CI_FORGE")) {
         return "net.minecraftforge:forge:" + System.getenv("CI_FORGE")
     } else {
         // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
