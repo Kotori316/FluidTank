@@ -1,3 +1,5 @@
+import java.util.stream.Collectors
+
 plugins {
     id "scala"
     id 'fabric-loom' version '0.5.22'
@@ -144,5 +146,23 @@ curseforge {
         curseGradleOptions.debug = false
         javaVersionAutoDetect = false
         forgeGradleIntegration = false
+    }
+}
+
+task getCompileOptions() {
+    doLast {
+        List<String> strings = new ArrayList<>()
+        strings.add("archivesBaseName: $archivesBaseName")
+        strings.add("group: $group")
+        strings.add("version: $version")
+        strings.add("runDir: ${minecraft.runDir}")
+        strings.add("Absolute RunDir: ${project.projectDir.toPath().resolve(minecraft.runDir).toAbsolutePath()}")
+        strings.add("")
+        strings.add("Jar: ${jar.getArchiveFile().get()}")
+        strings.add("Remap Jar ${remapJar.getArchiveFile().get()}")
+        strings.add("Source Jar ${sourcesJar.getArchiveFile().get()}")
+        strings.add("RemapSource Jar ${remapSourcesJar.getOutput()}")
+
+        println(strings.stream().collect(Collectors.joining(System.lineSeparator())))
     }
 }

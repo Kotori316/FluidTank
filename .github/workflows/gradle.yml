@@ -24,6 +24,8 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/forge_version.properties') }}
+      - name: Check Paramater
+        run: chmod +x ./gradlew && ./gradlew gCO
       - name: Precompile
         run: chmod +x ./gradlew && ./gradlew compileScala
       - name: Build with Gradle
