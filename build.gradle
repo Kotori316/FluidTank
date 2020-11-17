@@ -165,6 +165,7 @@ repositories {
                 includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
             }
         }
+        // mavenLocal()
     } else {
         maven {
             // Curse Forge
@@ -206,9 +207,9 @@ dependencies {
     compileOnly fg.deobf("curse.maven:look-at-that:3035358")
 
     if (hasGitHubToken()) {
-        implementation("com.kotori316:ScalableCatsForce:2.13.3-build-5:dev".toLowerCase())
+        implementation("com.kotori316:ScalableCatsForce:2.13.3-build-6:dev".toLowerCase())
     } else {
-        implementation("scalable-cats-force:ScalableCatsForce-2.13.3-build:5:dev")
+        implementation("scalable-cats-force:ScalableCatsForce-2.13.3-build:6:dev")
     }
     // Test Dependencies.
     String JUPITER_VERSION = '5.7.0'
