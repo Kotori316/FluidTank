@@ -1,3 +1,20 @@
+## v16.0.8
+* Remove usage of unstable mixin. 
+The error of 
+"java.util.NoSuchElementException: Supplier is empty. Mixin system for `kotori_scala`(Scalable Cats Force) seems not working."
+is fixed.
+
+Build with net.minecraftforge:forge:1.16.4-35.0.18, Mapping: 20201028-1.16.3
+
+## v16.0.7
+* Update library, requires 2.13.3-build-6
+* Many internal changes.
+* Added support of mod "look".
+* Fixed a potential bug of sync.
+* Pipes can be dyed with leather armors.
+
+Build with net.minecraftforge:forge:1.16.4-35.0.18, Mapping: 20201028-1.16.3
+
 ## v16.0.6
 * Update Russian lang file.
 

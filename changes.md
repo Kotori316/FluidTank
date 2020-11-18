@@ -1,6 +1,5 @@
-## v16.0.7
-* Update library, requires 2.13.3-build-6
-* Many internal changes.
-* Added support of mod "look".
-* Fixed a potential bug of sync.
-* Pipes can be dyed with leather armors.
+## v16.0.8
+* Remove usage of unstable mixin. 
+The error of 
+"java.util.NoSuchElementException: Supplier is empty. Mixin system for `kotori_scala`(Scalable Cats Force) seems not working."
+is fixed.
