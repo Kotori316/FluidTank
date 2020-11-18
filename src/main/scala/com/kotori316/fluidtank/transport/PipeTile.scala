@@ -47,12 +47,22 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    Cap.asJava(
+    if (cap == CAP) {
+      if (side != null &&
+        (!hasWorld || getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
+        LazyOptional.of(() => handler.asInstanceOf[T])
+      } else {
+        LazyOptional.empty()
+      }
+    } else {
+      super.getCapability(cap, side)
+    }
+    /*Cap.asJava(
       Cap.make(handler.asInstanceOf[T])
         .filter(_ => cap == CAP)
         .filter(_ => side != null && getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))
         .orElse(super.getCapability(cap, side).asScala)
-    )
+    )*/
   }
 
 }

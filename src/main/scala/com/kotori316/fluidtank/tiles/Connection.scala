@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.tiles
 
-import cats._
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
@@ -26,7 +25,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   )
 
   val handler: ListTankHandler = new Connection.ConnectionTankHandler(Chain.fromSeq(seq.map(_.internalTank)), hasCreative)
-  private[tiles] final var isValid = true
+  private[tiles] final var mIsValid = true
 
   val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
@@ -84,12 +83,32 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
     updateActions.foreach(_.apply())
   }
 
+  // ----- START DEPRECATED REMOVE IN 1.17 -----
+  private[this] final val lazyOptional = LazyOptional.of(() => handler)
+
+  private[tiles] def isValid = mIsValid
+
+  //noinspection AccessorLikeMethodIsUnit
+  private[tiles] def isValid_=(newValue: Boolean): Unit = {
+    mIsValid = newValue
+    if (!newValue) lazyOptional.invalidate()
+  }
+
+  // ----- END DEPRECATED REMOVE IN 1.17 -----
+
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    Cap.asJava(
+    if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+      lazyOptional.cast()
+    } else {
+      capabilities.map(_.getCapability(capability, facing))
+        .getOrElse(LazyOptional.empty())
+        .value
+    }
+    /*Cap.asJava(
       Cap.empty[T]
         .orElse(if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) OptionT(Eval.always(Option.when(isValid)(handler.asInstanceOf[T]))) else Cap.empty)
         .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
-    )
+    )*/
   }
 
   override def toString: String = {
@@ -148,12 +167,12 @@ object Connection {
 
     override val toString: String = "Connection.Invalid"
 
-    override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
+    /*override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
       if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
         LazyOptional.of(() => handler).cast()
       else
         super.getCapability(capability, facing)
-    }
+    }*/
 
     override def getComparatorLevel: Int = 0
 

@@ -63,11 +63,21 @@ final class ItemPipeTile extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE) {
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    Cap.asJava(
+    if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+      if (side != null &&
+        (!hasWorld || getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
+        LazyOptional.of(() => handler.asInstanceOf[T])
+      } else {
+        LazyOptional.empty()
+      }
+    } else {
+      super.getCapability(cap, side)
+    }
+    /*Cap.asJava(
       CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.make[T](cap, handler)
         .filter(_ => side != null && getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))
         .orElse(super.getCapability(cap, side).asScala)
-    )
+    )*/
   }
 
   def findItemHandler(world: World, pos: BlockPos, direction: Direction): OptionT[Eval, (IItemHandler, BlockPos)] = {
