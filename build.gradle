@@ -103,7 +103,7 @@ test {
 
 // PUBLISH
 def joinedLog = String.join("\n",
-        "Fluid Tank for 1.16.3 and Fabric.",
+        "Fluid Tank for 1.16.4 and Fabric.",
         "",
         "Requires:",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
@@ -118,11 +118,7 @@ githubRelease {
     targetCommitish.set('1.16.2-fabric')
 
     body.set(joinedLog)
-    releaseAssets = files(
-            jar.getArchiveFile().get(),
-            sourcesJar.getArchiveFile().get(),
-            remapJar.getArchiveFile().get()
-    )
+    releaseAssets = fileTree("build/libs")
 }
 
 curseforge {
@@ -162,6 +158,7 @@ task getCompileOptions() {
         strings.add("Remap Jar ${remapJar.getArchiveFile().get()}")
         strings.add("Source Jar ${sourcesJar.getArchiveFile().get()}")
         strings.add("RemapSource Jar ${remapSourcesJar.getOutput()}")
+        strings.add(String.valueOf(fileTree("build/libs").getFiles()))
 
         println(strings.stream().collect(Collectors.joining(System.lineSeparator())))
     }
