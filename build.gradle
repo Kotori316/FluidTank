@@ -153,27 +153,11 @@ repositories {
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
-    if (hasGitHubToken()) {
-        maven {
-            name = "GitHubPackages-SLP"
-            url = uri("https://maven.pkg.github.com/Kotori316/SLP")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
-            }
-            content {
-                includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
-            }
-        }
-        // mavenLocal()
-    } else {
-        maven {
-            // Curse Forge
-            name 'Curse Forge'
-            url 'https://minecraft.curseforge.com/api/maven/'
-            content {
-                includeModule("scalable-cats-force", "ScalableCatsForce-2.13.3-build")
-            }
+    maven {
+        name = "Azure-SLP"
+        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+        content {
+            includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
         }
     }
     maven {
@@ -206,11 +190,7 @@ dependencies {
     compileOnly fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2")
     compileOnly fg.deobf("curse.maven:look-at-that-355304:3035358")
 
-    if (hasGitHubToken()) {
-        implementation("com.kotori316:ScalableCatsForce:2.13.3-build-6:dev".toLowerCase())
-    } else {
-        implementation("scalable-cats-force:ScalableCatsForce-2.13.3-build:6:dev")
-    }
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.4-build-1', classifier: 'dev')
     // Test Dependencies.
     String JUPITER_VERSION = '5.7.0'
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
