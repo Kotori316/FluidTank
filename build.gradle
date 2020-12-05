@@ -195,8 +195,8 @@ private boolean hasGitHubToken() {
 
 dependencies {
     minecraft(forgeVersion())
-    implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.3'
-    implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.2.0'
+    implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.4'
+    implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.3.0'
 
     if (!isInCI()) {
         implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
