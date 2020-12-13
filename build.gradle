@@ -19,7 +19,7 @@ apply plugin: "com.github.breadmoirai.github-release"
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = getProperty("modversion")
+version = getProperty("modVersion")
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LargeFluidTank"
 
@@ -65,13 +65,13 @@ repositories {
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
+        url = "https://modmaven.dev/"
     }
     maven {
         name = "Hwyla"
-        url "http://tehnut.info/maven"
+        url "https://maven.tehnut.info"
     }
-    maven { // TThe One Probe
+    maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
@@ -173,7 +173,7 @@ task checkMethod() << {
     System.out.println("FilePath $deobfJar.archivePath")
     System.out.println("Name $project.name")
     System.out.println("BaseName $archivesBaseName")
-    System.out.println("ModVersion ${getProperty("modversion")}")
+    System.out.println("ModVersion ${getProperty("modVersion")}")
     System.out.println("Commit: ${getCommit(branch)}")
 }
 
