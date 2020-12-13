@@ -78,8 +78,8 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "com.mod-buildcraft:buildcraft-main:7.99.24.6"
-    deobfCompile "mezz.jei:jei_1.12.2:4.15.0.294"
+    deobfCompile "com.mod-buildcraft:buildcraft-main:7.99.24.7"
+    deobfCompile "mezz.jei:jei_1.12.2:4.16.1.302"
     deobfCompile "appeng:appliedenergistics2:rv6-stable-7"
     deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
     deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
