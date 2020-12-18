@@ -12,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
 import scala.collection.mutable.ArrayBuffer
@@ -158,6 +159,7 @@ object Connection {
     }
   }
 
+  private[this] final val emptyFluidHandler = LazyOptional.of[IFluidHandler](() => EmptyFluidHandler.INSTANCE)
   val invalid: Connection = new Connection(Nil) {
     override def fluidType: FluidAmount = FluidAmount.EMPTY
 
@@ -167,12 +169,12 @@ object Connection {
 
     override val toString: String = "Connection.Invalid"
 
-    /*override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-      if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-        LazyOptional.of(() => handler).cast()
-      else
+    override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
+      if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+        emptyFluidHandler.cast() // For client side capability
+      } else
         super.getCapability(capability, facing)
-    }*/
+    }
 
     override def getComparatorLevel: Int = 0
 
