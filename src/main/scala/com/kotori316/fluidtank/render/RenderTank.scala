@@ -17,7 +17,7 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
     Minecraft.getInstance.getProfiler.startSection("RenderTank")
     if (te.hasContent) {
       matrix.push()
-      val b = buffer.getBuffer(RenderType.getCutout)
+      val b = buffer.getBuffer(RenderType.getTranslucent)
       val tank = te.internalTank
       if (tank.box != null) {
         val resource = RenderTank.textureName(te)
