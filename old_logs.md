@@ -1,3 +1,9 @@
+## v16.0.9
+* Fixed transparent texture not rendered correctly. #68
+* Fixed fluid pipe wasn't visually connected.
+
+Build with net.minecraftforge:forge:1.16.4-35.1.4, Mapping: 20201028-1.16.3
+
 ## v16.0.8
 * Remove usage of unstable mixin. 
 The error of 
