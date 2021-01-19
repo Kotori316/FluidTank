@@ -40,8 +40,7 @@ public class FluidTank {
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
-//        MinecraftForge.EVENT_BUS.addListener(BucketEventHandler::onBucketUsed);
-//        MinecraftForge.EVENT_BUS.addListener(TileTankNoDisplay::makeConnectionOnChunkLoad);
+        Utils.enableMilk();
     }
 
     @Mod.EventBusSubscriber(modid = modID, bus = Mod.EventBusSubscriber.Bus.MOD)

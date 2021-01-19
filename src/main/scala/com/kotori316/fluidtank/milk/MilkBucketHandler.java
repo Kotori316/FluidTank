@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.milk;
 
 import javax.annotation.Nonnull;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 
@@ -17,11 +16,7 @@ public class MilkBucketHandler extends FluidBucketWrapper {
     @Nonnull
     @Override
     public FluidStack getFluid() {
-        if (container.getItem() == Items.MILK_BUCKET) {
-            return FluidAmount.BUCKET_MILK().toStack();
-        } else {
-            return FluidStack.EMPTY;
-        }
+        return FluidAmount.fromItem(this.container).toStack();
     }
 
 }

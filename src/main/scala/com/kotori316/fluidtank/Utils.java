@@ -2,11 +2,13 @@ package com.kotori316.fluidtank;
 
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
 
@@ -50,5 +52,37 @@ public class Utils {
             return OptionalInt.of(item.getColor(stack));
         }
         return OptionalInt.empty();
+    }
+
+    private static final AtomicInteger VanillaMilkEnabled = new AtomicInteger(-1);
+
+    public static boolean isVanillaMilkEnabled() {
+        if (VanillaMilkEnabled.get() == -1) {
+            ComparableVersion currentForge = new ComparableVersion(net.minecraftforge.versions.forge.ForgeVersion.getVersion());
+            ComparableVersion milkImplemented = new ComparableVersion("36.0.1");
+            int compared = currentForge.compareTo(milkImplemented);
+            VanillaMilkEnabled.set(compared >= 0 ? 1 : 0);
+        }
+        return VanillaMilkEnabled.get() == 1;
+    }
+
+    public static net.minecraft.util.ResourceLocation mapMilkName(net.minecraft.util.ResourceLocation maybeOldMilk) {
+        if (isVanillaMilkEnabled() && maybeOldMilk.toString().equals(FluidTank.modID + ":vanilla_milk")) {
+            FluidTank.LOGGER.info("Converted {} to {}", maybeOldMilk, "minecraft:milk");
+            return new net.minecraft.util.ResourceLocation("minecraft", "milk");
+        } else {
+            return maybeOldMilk;
+        }
+    }
+
+    public static void enableMilk() {
+        if (isVanillaMilkEnabled())
+            VanillaMilkAccessor.enableMilk();
+    }
+
+    private static class VanillaMilkAccessor {
+        private static void enableMilk() {
+            net.minecraftforge.common.ForgeMod.enableMilkFluid();
+        }
     }
 }

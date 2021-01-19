@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.blocks
 
+import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay
@@ -73,7 +74,7 @@ object BucketEventHandler {
   }
 
   def transferFluid(worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, toFill: => FluidStack, stack: ItemStack, handlerItem: IFluidHandlerItem, tankHandler: IFluidHandler): Unit = {
-    if (stack.getItem != Items.MILK_BUCKET) {
+    if (Utils.isVanillaMilkEnabled || stack.getItem != Items.MILK_BUCKET) {
       transferFluid_internal(worldIn, pos, playerIn, handIn, toFill, stack, handlerItem, tankHandler)
     } else {
       // Transfer milk

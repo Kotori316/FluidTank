@@ -23,6 +23,8 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 
+import scala.util.Try
+
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
   private final val MARKER = MarkerManager.getMarker("FluidTankDataProvider")
@@ -196,7 +198,8 @@ object FluidTankDataProvider {
 
   class FluidTagsProvider(g: DataGenerator, e: ExistingFileHelper) extends net.minecraft.data.FluidTagsProvider(g, FluidTank.modID, e) {
     override def registerTags(): Unit = {
-      getOrCreateBuilder(ModObjects.MILK_TAG).addItemEntry(ModObjects.MILK_FLUID)
+      val tag = Try(Tags.Fluids.MILK).getOrElse(ModObjects.MILK_TAG)
+      getOrCreateBuilder(tag).addOptional(ModObjects.MILK_FLUID.getRegistryName)
     }
   }
 

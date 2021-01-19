@@ -76,7 +76,7 @@ object FluidAmount {
     stack.getItem match {
       case Items.LAVA_BUCKET => BUCKET_LAVA
       case Items.WATER_BUCKET => BUCKET_WATER
-      case Items.MILK_BUCKET => BUCKET_MILK
+      case Items.MILK_BUCKET if !Utils.isVanillaMilkEnabled => BUCKET_MILK
       case bucket: BucketItem =>
         bucket.pipe(_.getFluid).pipe(FluidAmount(_, AMOUNT_BUCKET, None))
       case _ => FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY).pipe(fromStack)
@@ -129,7 +129,10 @@ object FluidAmount {
   implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
     inst.group(
       ResourceLocation.CODEC.comapFlatMap[Fluid](
-        name => if (ForgeRegistries.FLUIDS.containsKey(name)) DataResult.success(ForgeRegistries.FLUIDS.getValue(name)) else DataResult.error(s"No fluid for $name."),
+        name => {
+          val mappedName = Utils.mapMilkName(name)
+          if (ForgeRegistries.FLUIDS.containsKey(mappedName)) DataResult.success(ForgeRegistries.FLUIDS.getValue(mappedName)) else DataResult.error(s"No fluid for $mappedName.")
+        },
         fluid => ForgeRegistries.FLUIDS.getKey(fluid)
       ).fieldOf(NBT_fluid).forGetter(_.fluid),
       Codec.LONG.fieldOf(NBT_amount).forGetter(_.amount),

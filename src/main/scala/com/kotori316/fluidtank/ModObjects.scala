@@ -75,7 +75,7 @@ object ModObjects {
 
   //---------- Fluids ----------
   final val MILK_FLUID = new MilkFluid
-  final val MILK_TAG = FluidTags.makeWrapperTag("minecraft:milk")
+  final val MILK_TAG = FluidTags.makeWrapperTag("forge:milk")
 
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
