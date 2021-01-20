@@ -204,7 +204,7 @@ dependencies {
     compileOnly fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2")
     compileOnly fg.deobf("curse.maven:look-at-that-355304:3035358")
 
-    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.4-build-1', classifier: 'dev')
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.4-build-2', classifier: 'dev')
     // Mixin
     annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
     // Test Dependencies.
