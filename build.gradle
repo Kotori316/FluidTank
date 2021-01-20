@@ -280,6 +280,7 @@ curseforge {
         changelog = getAllChangeLog()
         releaseType = 'release'
         addGameVersion '1.16.4'
+        addGameVersion '1.16.5'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
