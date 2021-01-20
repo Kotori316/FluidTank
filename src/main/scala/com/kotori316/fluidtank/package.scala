@@ -2,7 +2,7 @@ package com.kotori316
 
 import cats._
 import cats.data._
-import com.kotori316.scala_lib.util.{CapConverter, Neighbor}
+import com.kotori316.scala_lib.util.Neighbor
 import com.mojang.serialization.DataResult
 import net.minecraft.fluid.Fluid
 import net.minecraft.nbt.CompoundNBT
