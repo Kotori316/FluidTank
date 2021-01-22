@@ -89,11 +89,10 @@ jobs:
         java: [ 1.8, 11 ]
         forge: [ 1.16.4-35.1.4, 1.16.4-35.1.37 ]
     steps:
-      - name: Preparation
-        run: mkdir ../SLP-example && cd ../SLP-example
       - uses: actions/checkout@v2
         with:
           repository: "Kotori316/SLP-example"
+          path: "SLP-example"
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v1
         with:
@@ -104,7 +103,7 @@ jobs:
           name: ${{ github.event.repository.name }}-${{ github.run_number }}
           path: work/
       - name: move files
-        run: ls -al work && mkdir run/mods && mv work/*-deobf.jar run/mods/
+        run: ls -al work && mkdir --parents run/mods && mv work/*-deobf.jar run/mods/
       - name: download_assets
         run: ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets)
         continue-on-error: true
