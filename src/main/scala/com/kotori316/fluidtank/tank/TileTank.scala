@@ -116,9 +116,9 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
       if (!loading)
         connection.updateNeighbors()
       if ((!hasWorld || self.getWorld.isClient) && capacity != 0) {
-        val percent = getFluidAmount.toDouble / capacity.toDouble
         val a = 0.001
-        if (percent > a) {
+        val percent = a * 2.5 max (getFluidAmount.toDouble / capacity.toDouble)
+        if (getFluidAmount > 0) {
           val d = 1d / 16d
           var maxY = 0d
           var minY = 0d
