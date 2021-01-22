@@ -23,11 +23,11 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     with AttributeProviderBlockEntity {
   self =>
 
-  def this() {
+  def this() = {
     this(Tiers.Invalid, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE)
   }
 
-  def this(t: Tiers) {
+  def this(t: Tiers) = {
     this(t, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE)
   }
 

@@ -26,7 +26,7 @@ class RenderTank(d: BlockEntityRenderDispatcher) extends BlockEntityRenderer[Til
           //        val texture = MinecraftClient.getInstance.getSpriteAtlas(PlayerContainer.BLOCK_ATLAS_TEXTURE).apply(resource)
           val color = RenderTank.color(te)
 
-          val b = buffer.getBuffer(RenderLayer.getCutoutMipped)
+          val b = buffer.getBuffer(RenderLayer.getTranslucent)
           val value = Box.LightValue(light).overrideBlock(0 /*te.tank.fluid.fluid.getAttributes.getLuminosity(te.tank.fluid.toStack)*/)
           tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
         } else {

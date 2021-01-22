@@ -33,7 +33,7 @@ package object render {
 
   private def getPosVector(x: Float, y: Float, z: Float, matrix: MatrixStack): Vector4f = {
     val vec3i = Direction.UP.getVector
-    vector3f.set(vec3i.getX, vec3i.getY, vec3i.getZ)
+    vector3f.set(vec3i.getX.toFloat, vec3i.getY.toFloat, vec3i.getZ.toFloat)
     val matrix4f = matrix.peek().getModel
     vector3f.transform(matrix.peek().getNormal)
 
