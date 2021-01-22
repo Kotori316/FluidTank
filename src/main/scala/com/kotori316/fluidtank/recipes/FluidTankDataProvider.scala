@@ -198,7 +198,10 @@ object FluidTankDataProvider {
 
   class FluidTagsProvider(g: DataGenerator, e: ExistingFileHelper) extends net.minecraft.data.FluidTagsProvider(g, FluidTank.modID, e) {
     override def registerTags(): Unit = {
-      val tag = Try(Tags.Fluids.MILK).getOrElse(ModObjects.MILK_TAG)
+      val tag = Try {
+        val f = Class.forName("net.minecraftforge.common.Tags$Fluids").getField("MILK")
+        f.get(null).asInstanceOf[ITag.INamedTag[net.minecraft.fluid.Fluid]]
+      }.getOrElse(ModObjects.MILK_TAG)
       getOrCreateBuilder(tag).addOptional(ModObjects.MILK_FLUID.getRegistryName)
     }
   }

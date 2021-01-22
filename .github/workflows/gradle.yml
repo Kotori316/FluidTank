@@ -104,7 +104,7 @@ jobs:
       - name: move files
         run: ls -al work && mkdir --parents run/mods && mv work/*-deobf.jar run/mods/
       - name: download_assets
-        run: ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets)
+        run: chmod +x ./gradlew && ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
         continue-on-error: true
       - name: Test with runData
         run: chmod +x ./gradlew && ./gradlew --no-daemon runData
