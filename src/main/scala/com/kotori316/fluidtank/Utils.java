@@ -61,6 +61,8 @@ public class Utils {
             ComparableVersion currentForge = new ComparableVersion(net.minecraftforge.versions.forge.ForgeVersion.getVersion());
             ComparableVersion milkImplemented = new ComparableVersion("36.0.1");
             int compared = currentForge.compareTo(milkImplemented);
+            if (System.getenv().containsKey("CI_FORGE"))
+                FluidTank.LOGGER.warn("Current {}, milk in forge is not available.", currentForge);
             VanillaMilkEnabled.set(compared >= 0 ? 1 : 0);
         }
         return VanillaMilkEnabled.get() == 1;

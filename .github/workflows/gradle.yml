@@ -112,12 +112,3 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
           CI_FORGE: ${{ matrix.forge }}
           CI_MODS: "fluidtank"
-      - id: check-test-started
-        run: |
-          [ -f test_started.txt ]
-      - id: check-error
-        run: |
-          ! [ -f error-trace.txt ]
-      - id: show-failure-log
-        if: failure()
-        run: cat error-trace.txt
