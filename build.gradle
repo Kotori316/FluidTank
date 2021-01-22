@@ -2,7 +2,8 @@ import java.util.stream.Collectors
 
 plugins {
     id "scala"
-    id 'fabric-loom' version '0.5.22'
+    // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
+    id 'fabric-loom' version "0.6.29"
     // id 'maven-publish'
     //noinspection SpellCheckingInspection
     id "com.github.breadmoirai.github-release" version "2.2.12"
@@ -41,10 +42,10 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     //noinspection SpellCheckingInspection
-    modImplementation "net.fabricmc:fabric-language-scala:0.3.0.+"
+    modImplementation "net.fabricmc:fabric-language-scala:1.0.0"
 
     // library
-    implementation "org.scala-lang:scala-library:2.13.0"
+    implementation "org.scala-lang:scala-library:2.13.4"
     implementation "com.google.code.findbugs:jsr305:3.0.1"
     //noinspection SpellCheckingInspection
     modCompile "alexiil.mc.lib:libblockattributes-all:${project.bc_attribute_version}"
@@ -103,7 +104,7 @@ test {
 
 // PUBLISH
 def joinedLog = String.join("\n",
-        "Fluid Tank for 1.16.4 and Fabric.",
+        "Fluid Tank for 1.16.5 and Fabric.",
         "",
         "Requires:",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
@@ -127,7 +128,7 @@ curseforge {
         id = '411564'
         changelogType = 'markdown'
         addGameVersion 'Fabric'
-        addGameVersion '1.16.4'
+        addGameVersion '1.16.5'
         changelog = joinedLog
         releaseType = 'release'
         mainArtifact remapJar
