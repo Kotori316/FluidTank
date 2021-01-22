@@ -23,7 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
@@ -201,8 +201,11 @@ object FluidTankDataProvider {
       val tag = Try {
         val f = Class.forName("net.minecraftforge.common.Tags$Fluids").getField("MILK")
         f.get(null).asInstanceOf[ITag.INamedTag[net.minecraft.fluid.Fluid]]
-      }.getOrElse(ModObjects.MILK_TAG)
-      getOrCreateBuilder(tag).addOptional(ModObjects.MILK_FLUID.getRegistryName)
+      }
+      tag match {
+        case Failure(exception) => println("Skipped Fluid Tag provider " + exception.toString)
+        case Success(t) => getOrCreateBuilder(t).addOptional(ModObjects.MILK_FLUID.getRegistryName)
+      }
     }
   }
 
