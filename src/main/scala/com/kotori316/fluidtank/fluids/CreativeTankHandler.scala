@@ -26,7 +26,7 @@ class CreativeTankHandler extends TankHandler {
     } else {
       ReaderWriterStateT.applyS { s =>
         if ((tank.fluidAmount fluidEqual s) || (FluidAmount.EMPTY fluidEqual s)) {
-          (Chain(FluidTransferLog.DrainFluid(s, s, tank, tank)), FluidAmount.EMPTY, tank)
+          (Chain(FluidTransferLog.DrainFluid(s, s, tank, tank)), tank.fluidAmount.setAmount(0L), tank)
         } else {
           (Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
         }
