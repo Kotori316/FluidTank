@@ -207,16 +207,15 @@ object TileTankNoDisplay {
       if (!SideProxy.isServer(tile) && capacity != 0) {
         val percent = getFluidAmount.toDouble / capacity.toDouble
         val a = 0.001
-        if (percent > a) {
+        if (getFluidAmount > 0) {
           val d = 1d / 16d
-          var maxY = 0d
-          var minY = 0d
-          if (this.getFluid.isGaseous) {
-            maxY = 1d - a
-            minY = 1d - percent + a
-          } else {
-            minY = a
-            maxY = percent - a
+          val (minY, maxY) = {
+            val p = percent max a * 3
+            if (this.getFluid.isGaseous) {
+              (1d - p + a, 1d - a)
+            } else {
+              (a, p - a)
+            }
           }
           box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
         } else {
