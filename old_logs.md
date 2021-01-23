@@ -1,3 +1,10 @@
+## v16.1.1
+* Show tank content even if it has less than 1% of its capacity. #69
+* Stopped log spam of converting message.
+* Fixed that pipe didn't drain from Creative Tank.
+
+Build with net.minecraftforge:forge:1.16.5-36.0.1, Mapping: 20201028-1.16.3
+
 ## v16.1.0
 * Update for Minecraft 1.16.5
 * Support Milk provided by Forge.
@@ -55,7 +62,7 @@ Build with net.minecraftforge:forge:1.16.2-33.0.0, Mapping: 20200723-1.16.1
 
 ## v16.0.1
 * Fixed CAT got fluid from empty inventory.
-* Fixed the pipe didn't have dummy bounding box when pipe wasn't connected to tank.
+* Fixed the pipe didn't have dummy bounding box when pipe was not connected to tank.
 * Remove shadow from text in CAT tile.
 
 Build with net.minecraftforge:forge:1.16.1-32.0.23, Mapping: 20200514-1.16
