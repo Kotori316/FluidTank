@@ -6,8 +6,8 @@ import net.minecraft.fluid.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.{DisplayName, Test}
 
 //noinspection DuplicatedCode It's a test!
 private[fluid] class TankHandlerTest extends BeforeAllTest {
@@ -275,6 +275,15 @@ private[fluid] class TankHandlerTest extends BeforeAllTest {
       Range(1, 10).map(i => Math.pow(10, i).toLong).map(FluidAmount.BUCKET_LAVA.setAmount)
         .map[Executable](f => () => assertTrue(FluidAmount.fromStack(h.drain(f.toStack, IFluidHandler.FluidAction.SIMULATE)).isEmpty, s"Drain $f Simulation")): _*
     )
+  }
+
+  @Test
+  @DisplayName("Drain Empty from Creative")
+  def drainEmptyFromCreativeHandler(): Unit = {
+    val h = new CreativeTankHandler
+    h.fill(FluidAmount.BUCKET_WATER, IFluidHandler.FluidAction.EXECUTE)
+    assertEquals(FluidAmount.BUCKET_WATER, h.drain(FluidAmount.EMPTY.setAmount(1000L), IFluidHandler.FluidAction.SIMULATE))
+    assertTrue(h.getTank.amount > 0)
   }
 
   @Test

@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.fluid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import cats.data.Chain;
@@ -18,6 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import scala.Option;
 
 import com.kotori316.fluidtank.BeforeAllTest;
+import com.kotori316.fluidtank.fluids.CreativeTankHandler;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.ListTankHandler;
 import com.kotori316.fluidtank.fluids.Tank;
@@ -100,6 +102,33 @@ class ListTankHandlerTestJava extends BeforeAllTest {
             }
         }
 
+    }
+
+    static class FillCreative {
+        static Object[] fluids() {
+            return Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA()).flatMap(f ->
+                LongStream.of(1, 1000, 2000, 5500, 10000, 84000, Integer.MAX_VALUE, Integer.MAX_VALUE + 1L, Long.MAX_VALUE - 1L).mapToObj(l ->
+                    new Object[]{f, l})).toArray();
+        }
+
+        @ParameterizedTest
+        @MethodSource("fluids")
+        void fillCreativeTank(FluidAmount fluid, long amount) {
+            ListTankHandler handler = new ListTankHandler(Chain.fromSeq(asList(new CreativeTankHandler(), TankHandler.apply(EMPTY_TANK))));
+            FluidAmount toFill = fluid.setAmount(amount);
+            {
+                // Simulate
+                FluidAmount filled = handler.fill(toFill, IFluidHandler.FluidAction.SIMULATE);
+                assertEquals(toFill, filled, String.format("Fill of %s and got %s", toFill, filled));
+            }
+            {
+                // Execute
+                FluidAmount filled = handler.fill(toFill, IFluidHandler.FluidAction.EXECUTE);
+                assertEquals(toFill, filled, String.format("Fill of %s and got %s", toFill, filled));
+                assertEquals(asList(new Tank(FluidAmount.apply(fluid.fluid(), Long.MAX_VALUE, Option.empty()), Long.MAX_VALUE),
+                    new Tank(FluidAmount.EMPTY(), 4000)), handler.getTankList().toList());
+            }
+        }
     }
 
     @ParameterizedTest
@@ -199,6 +228,26 @@ class ListTankHandlerTestJava extends BeforeAllTest {
                 () -> assertEquals(FluidAmount.EMPTY(), FluidAmount.fromStack(handler.drain(FluidStack.EMPTY, IFluidHandler.FluidAction.SIMULATE)),
                     String.format("Drained 0 from %s tank", filled))
             );
+        }
+    }
+
+    static class DrainEmptyFluidAmount {
+        static List<FluidAmount> tankContents() {
+            return Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA())
+                .flatMap(f -> IntStream.of(1000, 4000, 8000, Integer.MAX_VALUE).mapToObj(f::setAmount))
+                .collect(Collectors.toList());
+        }
+
+        @ParameterizedTest
+        @MethodSource("tankContents")
+        void drainFromFilledTank(FluidAmount filled) {
+            ListTankHandler handler = new ListTankHandler(Chain.fromSeq(asList(
+                new Tank(filled, 4000),
+                new Tank(filled, 4000)
+            )).map(TankHandler::apply));
+
+            assertEquals(filled.setAmount(1000), handler.drain(FluidAmount.EMPTY().setAmount(1000), IFluidHandler.FluidAction.SIMULATE),
+                String.format("Drained 0 from %s tank", filled));
         }
     }
 
