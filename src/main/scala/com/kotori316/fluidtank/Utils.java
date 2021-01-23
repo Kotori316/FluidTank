@@ -55,6 +55,7 @@ public class Utils {
     }
 
     private static final AtomicInteger VanillaMilkEnabled = new AtomicInteger(-1);
+    private static final AtomicInteger LogCount = new AtomicInteger(0);
 
     public static boolean isVanillaMilkEnabled() {
         if (VanillaMilkEnabled.get() == -1) {
@@ -70,7 +71,10 @@ public class Utils {
 
     public static net.minecraft.util.ResourceLocation mapMilkName(net.minecraft.util.ResourceLocation maybeOldMilk) {
         if (isVanillaMilkEnabled() && maybeOldMilk.toString().equals(FluidTank.modID + ":vanilla_milk")) {
-            FluidTank.LOGGER.info("Converted {} to {}", maybeOldMilk, "minecraft:milk");
+            if (LogCount.get() < 15) {
+                LogCount.incrementAndGet();
+                FluidTank.LOGGER.info("Converted {} to {}", maybeOldMilk, "minecraft:milk");
+            }
             return new net.minecraft.util.ResourceLocation("minecraft", "milk");
         } else {
             return maybeOldMilk;
