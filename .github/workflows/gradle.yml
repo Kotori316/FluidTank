@@ -87,7 +87,7 @@ jobs:
       fail-fast: false
       matrix:
         java: [ 1.8, 11 ]
-        forge: [ 1.16.4-35.1.4, 1.16.4-35.1.37 ]
+        forge: [ 1.16.4-35.1.4, 1.16.4-35.1.37, latest ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -104,10 +104,22 @@ jobs:
       - name: move files
         run: ls -al work && mkdir --parents run/mods && mv work/*-deobf.jar run/mods/
       - name: download_assets
-        run: chmod +x ./gradlew && ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
+        run: |
+          if [ $CI_FORGE = "latest" ]; then
+            version = $(python get_latest_forge.py "1.16.5-latest")
+            export CI_FORGE=$version
+          fi
+          chmod +x ./gradlew && ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
         continue-on-error: true
+        env:
+          CI_FORGE: ${{ matrix.forge }}
       - name: Test with runData
-        run: chmod +x ./gradlew && ./gradlew --no-daemon runData
+        run: |
+          if [ $CI_FORGE = "latest" ]; then
+            version = $(python get_latest_forge.py "1.16.5-latest")
+            export CI_FORGE=$version
+          fi
+          chmod +x ./gradlew && ./gradlew --no-daemon runData
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
           CI_FORGE: ${{ matrix.forge }}
