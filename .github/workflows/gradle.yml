@@ -107,7 +107,7 @@ jobs:
         run: |
           if [ $CI_FORGE = "latest" ]; then
             version=$(python3 get_latest_forge.py "1.16.5-latest")
-            export CI_FORGE=$version
+            export CI_FORGE="1.16.5-$version"
           fi
           chmod +x ./gradlew && ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
         continue-on-error: true
@@ -117,7 +117,7 @@ jobs:
         run: |
           if [ $CI_FORGE = "latest" ]; then
             version=$(python3 get_latest_forge.py "1.16.5-latest")
-            export CI_FORGE=$version
+            export CI_FORGE="1.16.5-$version"
           fi
           chmod +x ./gradlew && ./gradlew --no-daemon runData
         env:
