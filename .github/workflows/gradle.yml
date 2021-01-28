@@ -116,7 +116,7 @@ jobs:
       - name: Test with runData
         run: |
           if [ $CI_FORGE = "latest" ]; then
-            version = $(python get_latest_forge.py "1.16.5-latest")
+            version = $(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE=$version
           fi
           chmod +x ./gradlew && ./gradlew --no-daemon runData
