@@ -29,7 +29,7 @@ public class ModTankClientInit implements ClientModInitializer {
     @SuppressWarnings("unchecked")
     @Override
     public void onInitializeClient() {
-        ModTank.LOGGER.debug("Client init is called. {} ", ModTank.modID);
+        ModTank.LOGGER.info("Client init is called. {} ", ModTank.modID);
         ModTank.Entries.ALL_TANK_BLOCKS.forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, RenderLayer.getCutoutMipped()));
         BlockEntityRendererRegistry.INSTANCE.register(ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, RenderTank::new);
         BlockEntityRendererRegistry.INSTANCE.register(ModTank.Entries.CREATIVE_BLOCK_ENTITY_TYPE, d -> (BlockEntityRenderer<TileTankCreative>) ((BlockEntityRenderer<?>) new RenderTank(d)));
@@ -37,5 +37,6 @@ public class ModTankClientInit implements ClientModInitializer {
             ClientSpriteRegistryCallback.event(si.getAtlasId()).register((atlasTexture, registry) -> registry.register(si.getTextureId())));
         FluidRenderHandlerRegistry.INSTANCE.register(ModTank.Entries.MILK_FLUID, (view, pos, state) -> new Sprite[]{STILL_IDENTIFIER.getSprite(), FLOW_IDENTIFIER.getSprite()});
         ModTank.Entries.ALL_TANK_BLOCKS.forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, RENDER_ITEM_TANK));
+        ModTank.LOGGER.info("Client init is finished. {} ", ModTank.modID);
     }
 }
