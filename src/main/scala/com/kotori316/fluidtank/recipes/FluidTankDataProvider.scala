@@ -102,6 +102,7 @@ object FluidTankDataProvider {
       val woodTanks = Ingredient.fromItems(ModObjects.blockTanks.filter(_.tier === Tiers.WOOD) ::: ModObjects.blockTanksInvisible.filter(_.tier === Tiers.WOOD): _*)
       val configCondition = new FluidTankConditions.ConfigCondition()
       val easyCondition = new FluidTankConditions.EasyCondition()
+      val invisibleCondition = new FluidTankConditions.InvisibleCondition()
       val WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(tankWoodItem)
           .key('x', Tags.Items.GLASS).key('p', ItemTags.LOGS)
@@ -182,8 +183,10 @@ object FluidTankDataProvider {
           .key('g', Tags.Items.INGOTS_GOLD)
           .key('I', Tags.Items.STORAGE_BLOCKS_IRON)
           .key('d', Blocks.DIRT))
+      val CONVERT_INVISIBLE = RecipeSerializeHelper.bySpecial(ConvertInvisibleRecipe.SERIALIZER, ConvertInvisibleRecipe.LOCATION)
+        .addCondition(invisibleCondition)
 
-      val recipes = FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
+      val recipes = CONVERT_INVISIBLE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")

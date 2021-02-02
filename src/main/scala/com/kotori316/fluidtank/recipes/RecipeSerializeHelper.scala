@@ -6,8 +6,8 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.Tiers
 import com.mojang.serialization.{DynamicOps, JsonOps, Dynamic => SerializeDynamic}
 import net.minecraft.advancements.criterion.RecipeUnlockedTrigger
-import net.minecraft.data.{IFinishedRecipe, ShapedRecipeBuilder}
-import net.minecraft.item.crafting.Ingredient
+import net.minecraft.data.{CustomRecipeBuilder, IFinishedRecipe, ShapedRecipeBuilder}
+import net.minecraft.item.crafting.{Ingredient, SpecialRecipeSerializer}
 import net.minecraft.tags.ITag
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.crafting.conditions.ICondition
@@ -40,6 +40,13 @@ case class RecipeSerializeHelper(recipe: IFinishedRecipe,
 
 object RecipeSerializeHelper {
   def by(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
+
+  def bySpecial(serializer: SpecialRecipeSerializer[_], recipeId: String, saveName: ResourceLocation = null): RecipeSerializeHelper = {
+    val c = CustomRecipeBuilder.customRecipe(serializer)
+    var t: IFinishedRecipe = null
+    c.build(p => t = p, recipeId)
+    new RecipeSerializeHelper(t, Nil, saveName)
+  }
 
   private def getConsumeValue(c: ShapedRecipeBuilder): IFinishedRecipe = {
     c.addCriterion("dummy", RecipeUnlockedTrigger.create(new ResourceLocation("dummy:dummy")))

@@ -28,7 +28,7 @@ import com.kotori316.fluidtank.tiles.Tiers;
 public class ConvertInvisibleRecipe extends SpecialRecipe {
     private static final Logger LOGGER = LogManager.getLogger(ConvertInvisibleRecipe.class);
     public static final String LOCATION = "fluidtank:crafting_convert_invisible";
-    public static final IRecipeSerializer<ConvertInvisibleRecipe> SERIALIZER =
+    public static final SpecialRecipeSerializer<ConvertInvisibleRecipe> SERIALIZER =
         new SpecialRecipeSerializer<>(ConvertInvisibleRecipe::new);
     public static final Predicate<ItemStack> NON_EMPTY = ((Predicate<ItemStack>) ItemStack::isEmpty).negate();
 
