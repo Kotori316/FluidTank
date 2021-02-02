@@ -100,8 +100,6 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16
-          restore_keys:  |
-            ${{ runner.os }}-gradle16-
       - name: Download Mod Jar
         uses: actions/download-artifact@v2
         with:
@@ -115,9 +113,9 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew
+          chmod +x ./gradlew && ./gradlew clean
           ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
-          ( ./gradlew compileScala || ./gradlew compileScala || (sleep 30s && ./gradlew compileScala) )
+          ( (./gradlew compileScala || ./gradlew clean) || (./gradlew compileScala || ./gradlew clean) || (sleep 10s && ./gradlew compileScala) )
         continue-on-error: true
         env:
           CI_FORGE: ${{ matrix.forge }}
@@ -127,7 +125,7 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew && ./gradlew --no-daemon runData
+          chmod +x ./gradlew && (./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
           CI_FORGE: ${{ matrix.forge }}
