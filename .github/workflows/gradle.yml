@@ -113,8 +113,8 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew && ./gradlew clean
-          ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
+          chmod +x ./gradlew && (./gradlew clean || true)
+          ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) || true)
           ( (./gradlew compileScala || ./gradlew clean) || (./gradlew compileScala || ./gradlew clean) || (sleep 10s && ./gradlew compileScala) )
         continue-on-error: true
         env:
