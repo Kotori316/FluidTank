@@ -1,11 +1,13 @@
 package com.kotori316.fluidtank.fluid
 
+import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.{ItemBlockTank, TankItemFluidHandler}
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
-import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
+import com.kotori316.fluidtank.{BeforeAllTest, DynamicSerializable, FluidTank, ModObjects}
+import com.mojang.serialization.{Dynamic, JsonOps}
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
+import net.minecraft.util.{JSONUtils, ResourceLocation}
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions._
@@ -67,5 +69,17 @@ private[fluid] class ItemFluidHandlerTest extends BeforeAllTest {
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
     assertEquals(FluidStack.EMPTY, handler.drain(1000, IFluidHandler.FluidAction.EXECUTE))
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
+  }
+
+  @Test
+  def serializeTest(): Unit = {
+    val stack = new ItemStack(woodTank)
+    val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
+    handler.fill(FluidAmount.BUCKET_WATER.setAmount(4000L).toStack, IFluidHandler.FluidAction.EXECUTE)
+
+    val stackTagJson = handler.createTag.toJson
+    assertEquals(Tiers.WOOD.toString.toLowerCase, JSONUtils.getString(stackTagJson.getAsJsonObject, "tier"))
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(4000L),
+      DynamicSerializable[FluidAmount].deserialize(new Dynamic(JsonOps.INSTANCE, stackTagJson.getAsJsonObject.get("tank"))))
   }
 }

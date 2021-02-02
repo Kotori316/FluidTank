@@ -70,7 +70,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, World worldIn) {
+    public boolean matches(CraftingInventory inv, @Nullable World worldIn) {
         return checkInv(inv);
     }
 
@@ -196,7 +196,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
     public Ingredient getTankItems() {
         Stream<BlockTank> tankStream;
-        if (!Config.content().usableInvisibleInRecipe().get()) {
+        if (Config.content() != null && !Config.content().usableInvisibleInRecipe().get()) {
             tankStream = this.normalTankSet.stream();
         } else {
             tankStream = Stream.concat(this.normalTankSet.stream(), this.invisibleTankSet.stream());
@@ -213,7 +213,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     private static boolean filterTier(BlockTank blockTank) {
-        if (Config.content().usableUnavailableTankInRecipe().get())
+        if (Config.content() == null || Config.content().usableUnavailableTankInRecipe().get())
             return true;
         else
             return blockTank.tier().hasWayToCreate();

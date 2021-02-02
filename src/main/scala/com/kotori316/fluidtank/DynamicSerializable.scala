@@ -3,7 +3,7 @@ package com.kotori316.fluidtank
 import com.google.gson.JsonElement
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization._
-import net.minecraft.nbt.{INBT, NBTDynamicOps}
+import net.minecraft.nbt.{CompoundNBT, INBT, NBTDynamicOps}
 
 trait DynamicSerializable[T] {
   def serialize[DataType](t: T)(ops: DynamicOps[DataType]): Dynamic[DataType]
@@ -46,6 +46,15 @@ object DynamicSerializable {
     override def deserialize[DataType](d: Dynamic[DataType]): T = d.read(codec).resultOrPartial(FluidTank.LOGGER.error(MARKER, _)).orElse(empty)
 
     override def asCodec: Codec[T] = codec
+  }
+
+  implicit object NBTDynamicSerialize extends DynamicSerializable[CompoundNBT] {
+    override def deserializeFromNBT(nbt: INBT): CompoundNBT = super.deserializeFromNBT(nbt)
+
+    override def serialize[DataType](t: CompoundNBT)(ops: DynamicOps[DataType]): Dynamic[DataType] =
+      new Dynamic(NBTDynamicOps.INSTANCE, t).convert(ops)
+
+    override def deserialize[DataType](d: Dynamic[DataType]): CompoundNBT = d.convert(NBTDynamicOps.INSTANCE).getValue.asInstanceOf[CompoundNBT]
   }
 
 }
