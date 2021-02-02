@@ -1,3 +1,9 @@
+## v16.1.2
+* Add a config option to disable convert invisible recipe.
+* Add a config option to hide non-creatable tanks from high tier tank recipe.
+
+Build with net.minecraftforge:forge:1.16.5-36.0.1, Mapping: 20201028-1.16.3
+
 ## v16.1.1
 * Show tank content even if it has less than 1% of its capacity. #69
 * Stopped log spam of converting message.

@@ -401,10 +401,12 @@ task makeChangeLog() {
     }
 }
 
+def minecraftVersion = forgeVersion().substring(forgeVersion().lastIndexOf(":") + 1).split("-")[0]
 task checkMethod() {
     doLast {
         System.out.println("Forge: ${forgeVersion()}")
         System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}")
+        System.out.println("Minecraft $minecraftVersion")
         System.out.println("Is In CI ${isInCI()}")
         System.out.println("FilePath ${jar.getArchiveFile().get()}")
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
@@ -474,16 +476,13 @@ publishing {
                 extension = 'jar'
             }
             artifact reobfArtifact
-//            publishing.publications {
-//                target(MavenPublication) {
-//                    pom.withXml {
-//                        Node pomNode = asNode()
-//                        pomNode.dependencies.'*'.findAll() {
-//                            it.parent().remove(it)
-//                        }
-//                    }
-//                }
-//            }
+            pom {
+                def v = forgeVersion()
+                name = archivesBaseName
+                description = "FluidTank for Minecraft $minecraftVersion, build with forge $v"
+                url = 'https://github.com/Kotori316/FluidTank'
+                packaging = "jar"
+            }
         }
     }
 }
