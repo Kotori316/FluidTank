@@ -109,7 +109,8 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew && ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) )
+          chmod +x ./gradlew && ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) ) \
+          && ( ./gradlew compileScala || ./gradlew compileScala || (sleep 30s && ./gradlew compileScala) )
         continue-on-error: true
         env:
           CI_FORGE: ${{ matrix.forge }}
