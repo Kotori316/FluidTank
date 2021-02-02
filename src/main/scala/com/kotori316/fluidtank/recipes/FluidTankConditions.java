@@ -72,7 +72,7 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
 
         @Override
         public boolean test() {
-            return !Config.content().unusableInvisibleInRecipe().get();
+            return Config.content().usableInvisibleInRecipe().get();
         }
     }
 }

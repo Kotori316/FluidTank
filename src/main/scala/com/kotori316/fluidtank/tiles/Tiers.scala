@@ -6,6 +6,7 @@ import cats._
 import cats.data._
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.recipes.TagCondition
 import com.mojang.serialization.Codec
 import net.minecraft.nbt.INBT
 
@@ -26,6 +27,8 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
   }
 
   def toNBTTag: INBT = this.asInstanceOf[Tiers].toNBT
+
+  def hasWayToCreate: Boolean = !hasTagRecipe || new TagCondition(tagName).test()
 }
 
 object Tiers {
