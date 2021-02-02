@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
@@ -47,12 +48,12 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
     private final ResourceLocation id;
     private final Tiers tier;
-    private final Ingredient tankItems;
+    private final Set<BlockTank> normalTankSet;
+    private final Set<BlockTank> invisibleTankSet;
     private final Ingredient subItems;
     private final ItemStack result;
     private static final int recipeWidth = 3;
     private static final int recipeHeight = 3;
-    private final List<Ingredient> recipeItems;
 
     public TierRecipe(ResourceLocation idIn, Tiers tier, Ingredient subItems) {
         id = idIn;
@@ -61,11 +62,11 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
         Set<Tiers> tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
-        Set<BlockTank> tanks = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
-        Set<BlockTank> invTanks = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier())).collect(Collectors.toSet());
-        tankItems = Ingredient.fromStacks(Stream.concat(tanks.stream(), invTanks.stream()).map(ItemStack::new).toArray(ItemStack[]::new));
+        normalTankSet = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier()))
+            .filter(TierRecipe::filterTier).collect(Collectors.toSet());
+        invisibleTankSet = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier()))
+            .filter(TierRecipe::filterTier).collect(Collectors.toSet());
         LOGGER.debug("Recipe instance({}) created for Tier {}.", idIn, tier);
-        recipeItems = getIngredients();
     }
 
     @Override
@@ -89,13 +90,14 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
      * <p>Copied from {@link net.minecraft.item.crafting.ShapedRecipe}</p>
      */
     public boolean checkMatch(CraftingInventory craftingInventory, int w, int h) {
+        NonNullList<Ingredient> ingredients = this.getIngredients();
         for (int i = 0; i < craftingInventory.getWidth(); ++i) {
             for (int j = 0; j < craftingInventory.getHeight(); ++j) {
                 int k = i - w;
                 int l = j - h;
                 Ingredient ingredient;
                 if (k >= 0 && l >= 0 && k < recipeWidth && l < recipeHeight) {
-                    ingredient = this.recipeItems.get(recipeWidth - k - 1 + l * recipeWidth);
+                    ingredient = ingredients.get(recipeWidth - k - 1 + l * recipeWidth);
                 } else {
                     ingredient = Ingredient.EMPTY;
                 }
@@ -193,7 +195,13 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     public Ingredient getTankItems() {
-        return tankItems;
+        Stream<BlockTank> tankStream;
+        if (!Config.content().usableInvisibleInRecipe().get()) {
+            tankStream = this.normalTankSet.stream();
+        } else {
+            tankStream = Stream.concat(this.normalTankSet.stream(), this.invisibleTankSet.stream());
+        }
+        return Ingredient.fromStacks(tankStream.map(ItemStack::new).toArray(ItemStack[]::new));
     }
 
     public Ingredient getSubItems() {
@@ -202,6 +210,13 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
     public Tiers getTier() {
         return tier;
+    }
+
+    private static boolean filterTier(BlockTank blockTank) {
+        if (Config.content().usableUnavailableTankInRecipe().get())
+            return true;
+        else
+            return blockTank.tier().hasWayToCreate();
     }
 
     public Stream<Pair<Integer, Ingredient>> tankItemWithSlot() {

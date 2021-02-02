@@ -29,6 +29,10 @@ object Config {
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
     val easyRecipe: ForgeConfigSpec.BooleanValue = builder.comment("True to use easy recipe.").define("easyRecipe", false)
+    val usableInvisibleInRecipe: ForgeConfigSpec.BooleanValue = builder.comment("False to prohibit invisible tanks to be used in recipes")
+      .define("usableInvisibleInRecipe", true)
+    val usableUnavailableTankInRecipe: ForgeConfigSpec.BooleanValue = builder.comment("False to prohibit tanks with no recipe to be used in recipes of other tanks")
+      .define("usableUnavailableTankInRecipe", true)
 
     builder.pop()
 

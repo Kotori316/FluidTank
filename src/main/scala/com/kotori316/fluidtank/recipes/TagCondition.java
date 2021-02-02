@@ -21,6 +21,10 @@ public class TagCondition implements ICondition {
         condition = new TagEmptyCondition(tag_name);
     }
 
+    public TagCondition(String tagName) {
+        this(new ResourceLocation(tagName));
+    }
+
     @Override
     public ResourceLocation getID() {
         return LOCATION;
@@ -61,7 +65,7 @@ public class TagCondition implements ICondition {
 
         @Override
         public TagCondition read(JsonObject json) {
-            return new TagCondition(new ResourceLocation(JSONUtils.getString(json, "tag")));
+            return new TagCondition(JSONUtils.getString(json, "tag"));
         }
 
         @Override

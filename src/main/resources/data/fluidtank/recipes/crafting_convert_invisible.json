@@ -1,3 +1,6 @@
 {
-  "type": "fluidtank:crafting_convert_invisible"
+  "type": "fluidtank:crafting_convert_invisible",
+  "conditions": [
+    {"type": "fluidtank:invisible_ok"}
+  ]
 }
