@@ -25,13 +25,14 @@ object Config {
     builder.comment("Settings for FluidTank.").push("common")
     val removeRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipe to make tanks.")
       .define("RemoveRecipe", false)
+    val debug: ForgeConfigSpec.BooleanValue = builder.comment("Debug Mode").define("debug", false)
 
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
-    val easyRecipe: ForgeConfigSpec.BooleanValue = builder.comment("True to use easy recipe.").define("easyRecipe", false)
-    val usableInvisibleInRecipe: ForgeConfigSpec.BooleanValue = builder.comment("False to prohibit invisible tanks to be used in recipes")
+    val easyRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("True to use easy recipe.").define("easyRecipe", false)
+    val usableInvisibleInRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("False to prohibit invisible tanks to be used in recipes")
       .define("usableInvisibleInRecipe", true)
-    val usableUnavailableTankInRecipe: ForgeConfigSpec.BooleanValue = builder.comment("False to prohibit tanks with no recipe to be used in recipes of other tanks")
+    val usableUnavailableTankInRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("False to prohibit tanks with no recipe to be used in recipes of other tanks")
       .define("usableUnavailableTankInRecipe", true)
 
     builder.pop()

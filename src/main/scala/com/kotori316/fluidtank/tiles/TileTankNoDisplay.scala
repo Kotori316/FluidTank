@@ -8,11 +8,14 @@ import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SUpdateTileEntityPacket
-import net.minecraft.tileentity.{ITickableTileEntity, TileEntity, TileEntityType}
+import net.minecraft.server.MinecraftServer
+import net.minecraft.tileentity.{TileEntity, TileEntityType}
+import net.minecraft.util.concurrent.TickDelayedTask
 import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.util.{Direction, INameable}
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.fml.{LogicalSide, LogicalSidedProvider}
 
 import scala.collection.mutable.ArrayBuffer
 //import net.minecraftforge.fml.common.Optional
@@ -22,7 +25,6 @@ import scala.collection.mutable.ArrayBuffer
 class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDisplay])
   extends TileEntity(t)
     with INameable
-    with ITickableTileEntity
     /*with ICustomPipeConnection
     with IDebuggable*/ {
   self =>
@@ -86,6 +88,21 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   }
 
   override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = () //handleUpdateTag(pkt.getNbtCompound) // No way to get state
+  override def onLoad(): Unit = {
+    super.onLoad()
+    if (loading) {
+      loading = false
+      if (SideProxy.isServer(this)) {
+        val executor: MinecraftServer = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
+        executor.enqueue(new TickDelayedTask(executor.getTickCounter, () => {
+          getWorld.getProfiler.startSection("Connection Loading")
+          if (this.connection.isDummy)
+            Connection.load(getWorld, getPos)
+          getWorld.getProfiler.endSection()
+        }))
+      }
+    }
+  }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     val c = connection.getCapability(capability, facing)
@@ -150,17 +167,6 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
     left.add("Tier : " + tier)
     left add tank.toString
   }*/
-  override def tick(): Unit = {
-    if (loading) {
-      loading = false
-      if (SideProxy.isServer(this)) {
-        getWorld.getProfiler.startSection("Connection Loading")
-        if (this.connection == Connection.invalid)
-          Connection.load(getWorld, getPos)
-        getWorld.getProfiler.endSection()
-      }
-    }
-  }
 }
 
 object TileTankNoDisplay {
