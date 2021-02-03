@@ -155,7 +155,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
       loading = false
       if (SideProxy.isServer(this)) {
         getWorld.getProfiler.startSection("Connection Loading")
-        if (this.connection == Connection.invalid)
+        if (this.connection.isDummy)
           Connection.load(getWorld, getPos)
         getWorld.getProfiler.endSection()
       }

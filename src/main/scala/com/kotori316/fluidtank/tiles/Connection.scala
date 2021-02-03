@@ -26,6 +26,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   )
 
   val handler: ListTankHandler = new Connection.ConnectionTankHandler(Chain.fromSeq(seq.map(_.internalTank)), hasCreative)
+  val isDummy: Boolean = false
   private[tiles] final var mIsValid = true
 
   val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
@@ -85,7 +86,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   // ----- START DEPRECATED REMOVE IN 1.17 -----
-  private[this] final val lazyOptional = LazyOptional.of(() => handler)
+  private[this] final val lazyOptional = LazyOptional.of(() => if (seq.nonEmpty) handler else EmptyFluidHandler.INSTANCE)
 
   private[tiles] def isValid = mIsValid
 
@@ -144,7 +145,7 @@ object Connection {
   @scala.annotation.tailrec
   def createAndInit(s: Seq[TileTankNoDisplay]): Unit = {
     if (s.nonEmpty) {
-      val fluid = LazyList.from(s).map(_.internalTank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
+      val fluid = s.map(_.internalTank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
       val (s1, s2) = s.span(t => t.internalTank.getFluid.fluidEqual(fluid) || t.internalTank.getFluid.isEmpty)
       // Assert tanks in s1 have the same fluid.
       require(s1.map(_.internalTank.getFluid).forall(f => f.isEmpty || f.fluidEqual(fluid)))
@@ -159,8 +160,11 @@ object Connection {
     }
   }
 
-  private[this] final val emptyFluidHandler = LazyOptional.of[IFluidHandler](() => EmptyFluidHandler.INSTANCE)
-  val invalid: Connection = new Connection(Nil) {
+  def invalid: Connection = new InvalidConnection
+
+  private class InvalidConnection extends Connection(Nil) {
+    override val isDummy: Boolean = true
+
     override def fluidType: FluidAmount = FluidAmount.EMPTY
 
     override def capacity: Long = 0
@@ -168,13 +172,6 @@ object Connection {
     override def amount: Long = 0
 
     override val toString: String = "Connection.Invalid"
-
-    override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-      if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-        emptyFluidHandler.cast() // For client side capability
-      } else
-        super.getCapability(capability, facing)
-    }
 
     override def getComparatorLevel: Int = 0
 
