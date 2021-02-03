@@ -116,6 +116,29 @@ class AccessRecipeTest extends BeforeAllTest {
         assertEquals(amount, filled.getFluid());
     }
 
+    @ParameterizedTest
+    @MethodSource("fluids1")
+    void combine2FluidTest(FluidAmount amount) {
+        {
+            ItemStack stack = new ItemStack(woodTank);
+            new TankItemFluidHandler((ItemBlockTank) stack.getItem(), stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
+            inventory.setInventorySlotContents(0, stack);
+            inventory.setInventorySlotContents(2, stack);
+        }
+        ItemStack stack = new ItemStack(woodTank);
+        for (int i : new int[]{6, 8}) {
+            inventory.setInventorySlotContents(i, stack);
+        }
+        for (int i : new int[]{1, 3, 5, 7}) {
+            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+        }
+        assertTrue(recipe.matches(inventory, null));
+        ItemStack result = recipe.getCraftingResult(inventory);
+        TankItemFluidHandler filled = new TankItemFluidHandler((ItemBlockTank) result.getItem(), result);
+        filled.init();
+        assertEquals(amount.setAmount(amount.amount() * 2), filled.getFluid());
+    }
+
     private static final class DummyContainer extends Container {
 
         private DummyContainer() {
