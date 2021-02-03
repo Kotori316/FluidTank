@@ -26,8 +26,15 @@ public class Utils {
         return OptionConverters.toJava(option);
     }
 
+    private static final AtomicInteger inDev = new AtomicInteger(-1);
+
     public static boolean isInDev() {
-        return !FMLLoader.isProduction();
+        int i = inDev.get();
+        if (i == -1) {
+            inDev.set(!FMLLoader.isProduction() || Config.content().debug().get() ? 1 : 0);
+            return inDev.get() == 1;
+        }
+        return i == 1;
     }
 
     @SuppressWarnings({"unused", "SpellCheckingInspection"})

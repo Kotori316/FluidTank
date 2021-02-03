@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.tiles
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.fluids.{FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
+import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}
@@ -86,7 +86,8 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   }
 
   // ----- START DEPRECATED REMOVE IN 1.17 -----
-  private[this] final val lazyOptional = LazyOptional.of(() => if (seq.nonEmpty) handler else EmptyFluidHandler.INSTANCE)
+  private[this] final val lazyOptional = LazyOptional.of(() => if (seq.nonEmpty) handler
+  else if (Utils.isInDev) DebugFluidHandler.INSTANCE else EmptyFluidHandler.INSTANCE)
 
   private[tiles] def isValid = mIsValid
 
