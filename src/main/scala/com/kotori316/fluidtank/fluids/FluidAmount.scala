@@ -111,18 +111,17 @@ object FluidAmount {
     }
 
     override def deserialize[DataType](d: SerializeDynamic[DataType]): FluidAmount = {
-      val fluidName = d.get(NBT_fluid).asString().result().toScala
-        .map(s => new ResourceLocation(s))
-        .getOrElse(Fluids.EMPTY.getRegistryName)
-      val fluid = registry.getValue(fluidName)
-      if (fluid == null || fluid == EMPTY.fluid) {
-        EMPTY
-      } else {
-        val amount = d.get(NBT_amount).asLong(0L)
-        val nbt = d.getElement(NBT_tag).result().toScala.map(c => SerializeDynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
+      val fA = for {
+        name <- d.get(NBT_fluid).asString().result().toScala
+        registryName = new ResourceLocation(name)
+        fluid <- Option(registry.getValue(registryName))
+        if fluid != EMPTY.fluid
+        amount = d.get(NBT_amount).asLong(0L)
+        nbt = d.getElement(NBT_tag).result().toScala
+          .map(c => SerializeDynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
           .collect { case t: CompoundNBT if !t.isEmpty => t }
-        FluidAmount(fluid, amount, nbt)
-      }
+      } yield FluidAmount(fluid, amount, nbt)
+      fA.getOrElse(EMPTY)
     }
   }
 
@@ -133,7 +132,7 @@ object FluidAmount {
           val mappedName = Utils.mapMilkName(name)
           if (ForgeRegistries.FLUIDS.containsKey(mappedName)) DataResult.success(ForgeRegistries.FLUIDS.getValue(mappedName)) else DataResult.error(s"No fluid for $mappedName.")
         },
-        fluid => ForgeRegistries.FLUIDS.getKey(fluid)
+        fluid => fluid.getRegistryName
       ).fieldOf(NBT_fluid).forGetter(_.fluid),
       Codec.LONG.fieldOf(NBT_amount).forGetter(_.amount),
       CompoundNBT.CODEC.optionalFieldOf(NBT_tag).forGetter(_.nbt.toJava),
