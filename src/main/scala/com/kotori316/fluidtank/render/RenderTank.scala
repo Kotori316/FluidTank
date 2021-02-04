@@ -9,6 +9,7 @@ import net.minecraft.inventory.container.PlayerContainer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
+import net.minecraftforge.fluids.FluidAttributes
 
 @OnlyIn(Dist.CLIENT)
 class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[TileTank](d) {
@@ -43,8 +44,20 @@ object RenderTank {
 
   private def color(tile: TileTank) = {
     val fluidAmount = tile.internalTank.getFluid
-    val (world, pos) = worldAndPos(tile)
-    fluidAmount.fluid.getAttributes.getColor(world, pos)
+    val attributes = fluidAmount.fluid.getAttributes
+    val normal = attributes.getColor
+    if (attributes.getClass == classOf[FluidAttributes]) {
+      normal
+    } else {
+      val (world, pos) = worldAndPos(tile)
+      val worldColor = attributes.getColor(world, pos)
+      val stackColor = attributes.getColor(fluidAmount.toStack)
+      if (normal == stackColor) {
+        worldColor
+      } else {
+        stackColor
+      }
+    }
   }
 
   private[this] def worldAndPos(tileTank: TileTank): (World, BlockPos) = {
