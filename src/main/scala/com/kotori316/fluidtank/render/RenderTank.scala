@@ -48,7 +48,10 @@ object RenderTank {
     if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
       BiomeColors.getWaterColor(world, pos) | 0xFF000000
     } else {
-      fluidAmount.fluid.getAttributes.getColor(world, pos)
+      val worldColor = fluidAmount.fluid.getAttributes.getColor(world, pos)
+      val normalColor = fluidAmount.fluid.getAttributes.getColor()
+      if (worldColor == normalColor) fluidAmount.fluid.getAttributes.getColor(fluidAmount.toStack)
+      else worldColor
     }
   }
 
