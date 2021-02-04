@@ -9,6 +9,7 @@ import net.minecraft.inventory.container.PlayerContainer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
+import net.minecraftforge.fluids.FluidAttributes
 
 @OnlyIn(Dist.CLIENT)
 class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[TileTank](d) {
@@ -25,7 +26,8 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
         val color = RenderTank.color(te)
 
         val value = Box.LightValue(light).overrideBlock(te.internalTank.getFluid.fluid.getAttributes.getLuminosity(te.internalTank.getFluid.toStack))
-        tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
+        val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
+        tank.box.render(b, matrix, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
       }
       matrix.pop()
     }
@@ -42,8 +44,20 @@ object RenderTank {
 
   private def color(tile: TileTank) = {
     val fluidAmount = tile.internalTank.getFluid
-    val (world, pos) = worldAndPos(tile)
-    fluidAmount.fluid.getAttributes.getColor(world, pos)
+    val attributes = fluidAmount.fluid.getAttributes
+    val normal = attributes.getColor
+    if (attributes.getClass == classOf[FluidAttributes]) {
+      normal
+    } else {
+      val (world, pos) = worldAndPos(tile)
+      val worldColor = attributes.getColor(world, pos)
+      val stackColor = attributes.getColor(fluidAmount.toStack)
+      if (normal == stackColor) {
+        worldColor
+      } else {
+        stackColor
+      }
+    }
   }
 
   private[this] def worldAndPos(tileTank: TileTank): (World, BlockPos) = {

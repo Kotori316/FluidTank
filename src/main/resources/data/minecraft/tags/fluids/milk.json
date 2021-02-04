@@ -1,9 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    {
-      "id": "fluidtank:vanilla_milk",
-      "required": false
-    }
-  ]
-}

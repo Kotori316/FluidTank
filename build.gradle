@@ -137,7 +137,9 @@ repositories {
         name = "Progwml6 maven"
         url = "https://dvs1.progwml6.com/files/maven/"
         content {
-            includeGroup("mezz.jei")
+            it.includeGroup("mezz.jei")
+            it.includeModule("knightminer", "Inspirations")
+            it.includeModule("slimeknights.mantle", "Mantle")
         }
     }
     maven {
@@ -157,6 +159,9 @@ repositories {
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
+        content {
+            it.includeModule("mcjty.theoneprobe", "TheOneProbe-1.16")
+        }
     }
     maven {
         name = "Azure-SLP"
@@ -198,6 +203,9 @@ dependencies {
 
     if (!isInCI()) {
         implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+        runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
+        runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
+        runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }
     implementation fg.deobf("mezz.jei:jei-1.16.4:7.6.0.58")
     implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")

@@ -40,6 +40,28 @@ private[fluid] class FluidAmountTest extends BeforeAllTest {
   }
 
   @Test
+  def convertStackWithNBT(): Unit = {
+    val nbt1 = new CompoundNBT()
+    nbt1.putBoolean("b", true)
+    nbt1.putString("name", "name")
+    val a = FluidAmount(Fluids.WATER, 1000, Some(nbt1))
+
+    assertTrue(a === FluidAmount.fromStack(a.toStack), s"NBT data${a -> FluidAmount.fromStack(a.toStack)}")
+  }
+
+  @Test
+  def convertStack(): Unit = {
+    val fa = for {
+      f <- List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)
+      amount <- Iterator.iterate(1L)(_ * 10).take(10).filter(l => l < Int.MaxValue)
+    } yield f.setAmount(amount)
+
+    assertAll(fa.map[Executable] { f =>
+      () => assertTrue(f === FluidAmount.fromStack(f.toStack), s"Reconvert $f, ${f.toStack}")
+    }: _*)
+  }
+
+  @Test
   def empty(): Unit = {
     val tag = Some {
       val a = new CompoundNBT()
