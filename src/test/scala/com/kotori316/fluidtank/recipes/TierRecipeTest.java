@@ -1,14 +1,10 @@
-package com.kotori316.fluidtank.recipe;
+package com.kotori316.fluidtank.recipes;
 
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
@@ -18,37 +14,29 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
-import com.kotori316.fluidtank.recipes.TierRecipe;
 import com.kotori316.fluidtank.tiles.Tiers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AccessRecipeTest extends BeforeAllTest {
+class TierRecipeTest {
+
     private static final BlockTank woodTank = ModObjects.blockTanks().head();
+
     TierRecipe recipe;
     CraftingInventory inventory;
 
     @BeforeEach
     void setupEach() {
         recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tiers.STONE(), Ingredient.fromItems(Blocks.STONE));
-        inventory = new CraftingInventory(new DummyContainer(), 3, 3);
-    }
-
-    @Test
-    void createInstance() {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_1"), Tiers.STONE(), Ingredient.fromItems(Blocks.STONE));
-        assertNotNull(recipe);
-        assertNotNull(this.recipe);
+        inventory = new CraftingInventory(new AccessRecipeTest.DummyContainer(), 3, 3);
     }
 
     @Test
@@ -137,21 +125,5 @@ class AccessRecipeTest extends BeforeAllTest {
         TankItemFluidHandler filled = new TankItemFluidHandler((ItemBlockTank) result.getItem(), result);
         filled.init();
         assertEquals(amount.setAmount(amount.amount() * 2), filled.getFluid());
-    }
-
-    private static final class DummyContainer extends Container {
-
-        private DummyContainer() {
-            super(null, 35);
-            Inventory inventory = new Inventory(9);
-            for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                addSlot(new Slot(inventory, i, 0, 0));
-            }
-        }
-
-        @Override
-        public boolean canInteractWith(PlayerEntity playerIn) {
-            return false;
-        }
     }
 }
