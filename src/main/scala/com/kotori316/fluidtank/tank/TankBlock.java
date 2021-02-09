@@ -118,6 +118,23 @@ public class TankBlock extends Block implements BlockEntityProvider {
         return new TileTank(tiers);
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        BlockEntity e = world.getBlockEntity(pos);
+        if (e instanceof TileTank) {
+            TileTank tank = (TileTank) e;
+            return tank.getComparatorLevel();
+        }
+        return super.getComparatorOutput(state, world, pos);
+    }
+
     public TankBlockItem blockItem() {
         return blockItem;
     }
