@@ -80,6 +80,7 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
+    if (capability == null) return LazyOptional.of(() => this).cast() // Cap is null when testing with JUnit and Data gen.
     CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.orEmpty(capability, LazyOptional.of(() => this))
   }
 

@@ -2,8 +2,8 @@ package com.kotori316.fluidtank.tiles
 
 import java.util.Collections
 
-import cats._
-import cats.data._
+import cats.Hash
+import cats.data.Ior
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.recipes.TagCondition
@@ -29,6 +29,8 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
   def toNBTTag: INBT = this.asInstanceOf[Tiers].toNBT
 
   def hasWayToCreate: Boolean = !hasTagRecipe || new TagCondition(tagName).test()
+
+  def isNormalTier: Boolean = 0 < this.rank && this.rank < Tiers.CREATIVE.rank
 }
 
 object Tiers {

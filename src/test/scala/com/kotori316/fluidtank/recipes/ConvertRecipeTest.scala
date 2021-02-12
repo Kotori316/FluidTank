@@ -4,7 +4,7 @@ import cats.implicits._
 import com.kotori316.fluidtank.blocks.BlockInvisibleTank
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.{FluidTank, ModObjects}
+import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction._
@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource
 
 import scala.util.chaining._
 
-private[recipes] final class ConvertRecipeTest {
+private[recipes] final class ConvertRecipeTest extends BeforeAllTest {
   private final val woodTank = ModObjects.blockTanks.head
   private final val woodInvisible = ModObjects.blockTanksInvisible.head
 
