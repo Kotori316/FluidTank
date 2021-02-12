@@ -4,10 +4,13 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,5 +128,37 @@ class TierRecipeTest {
         TankItemFluidHandler filled = new TankItemFluidHandler((ItemBlockTank) result.getItem(), result);
         filled.init();
         assertEquals(amount.setAmount(amount.amount() * 2), filled.getFluid());
+    }
+
+    @Test
+    void mixNBTFluid() {
+        FluidStack a = new FluidStack(Fluids.WATER, 1000);
+        {
+            CompoundNBT nbt = new CompoundNBT();
+            nbt.putString("name", "a");
+            nbt.putInt("amount", 1000);
+            a.setTag(nbt);
+        }
+        FluidStack b = new FluidStack(Fluids.WATER, 2000);
+        {
+            CompoundNBT nbt = new CompoundNBT();
+            nbt.putString("name", "b");
+            nbt.putInt("amount", 2000);
+            b.setTag(nbt);
+        }
+        ItemStack stack1 = new ItemStack(woodTank);
+        RecipeInventoryUtil.getFluidHandler(stack1).fill(a, IFluidHandler.FluidAction.EXECUTE);
+        ItemStack stack2 = new ItemStack(woodTank);
+        RecipeInventoryUtil.getFluidHandler(stack2).fill(b, IFluidHandler.FluidAction.EXECUTE);
+        ItemStack stack = new ItemStack(woodTank);
+        inventory.setInventorySlotContents(0, stack1);
+        inventory.setInventorySlotContents(2, stack2);
+        inventory.setInventorySlotContents(6, stack);
+        inventory.setInventorySlotContents(8, stack);
+        for (int i : new int[]{1, 3, 5, 7}) {
+            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+        }
+
+        assertFalse(recipe.matches(inventory, null));
     }
 }

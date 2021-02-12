@@ -37,6 +37,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidKey;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
@@ -118,7 +119,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
                 .filter(FluidAmount::nonEmpty)
-                .map(FluidAmount::fluid)
+                .map(FluidKey::from)
                 .distinct()
                 .count() <= 1;
     }
