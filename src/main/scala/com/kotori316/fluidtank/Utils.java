@@ -95,7 +95,11 @@ public class Utils {
 
     private static class VanillaMilkAccessor {
         private static void enableMilk() {
-            net.minecraftforge.common.ForgeMod.enableMilkFluid();
+            try {
+                net.minecraftforge.common.ForgeMod.class.getMethod("enableMilkFluid")
+                    .invoke(null);
+            } catch (ReflectiveOperationException ignore) {
+            }
         }
     }
 }
