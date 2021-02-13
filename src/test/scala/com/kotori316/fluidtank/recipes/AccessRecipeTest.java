@@ -17,7 +17,7 @@ import com.kotori316.fluidtank.tiles.Tiers;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class AccessRecipeTest extends BeforeAllTest {
+final class AccessRecipeTest extends BeforeAllTest {
     static Tiers[] tiers() {
         return Tiers.jList().stream().filter(Tiers::hasTagRecipe).toArray(Tiers[]::new);
     }

@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 
 //noinspection DuplicatedCode
-private[fluid] class ListTankHandlerTest extends BeforeAllTest {
+private[fluid] final class ListTankHandlerTest extends BeforeAllTest {
   private final val WOOD = Tank(FluidAmount.EMPTY, 4000L)
   private final val STONE = Tank(FluidAmount.EMPTY, 16000L)
 
-  private final def createWoodStone: Chain[TankHandler] = Chain(TankHandler(WOOD), TankHandler(STONE))
+  private def createWoodStone: Chain[TankHandler] = Chain(TankHandler(WOOD), TankHandler(STONE))
 
   @Test
   def fillWater1(): Unit = {

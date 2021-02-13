@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class AccessTest extends BeforeAllTest {
+final class AccessTest extends BeforeAllTest {
     @Test
     void fluid() {
         assertNotNull(ForgeRegistries.FLUIDS.getValue(new ResourceLocation("water")), "Water");

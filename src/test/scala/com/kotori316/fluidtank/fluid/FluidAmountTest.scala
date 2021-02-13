@@ -12,7 +12,7 @@ import org.junit.jupiter.api.function.Executable
 
 import scala.util.chaining._
 
-private[fluid] class FluidAmountTest extends BeforeAllTest {
+private[fluid] final class FluidAmountTest extends BeforeAllTest {
   @Test
   def equiv(): Unit = {
     val a = FluidAmount(Fluids.WATER, 1000, None)

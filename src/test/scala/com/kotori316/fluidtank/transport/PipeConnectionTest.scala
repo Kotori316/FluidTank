@@ -6,11 +6,11 @@ import net.minecraft.util.math.BlockPos
 import org.junit.jupiter.api.Assertions.{assertEquals, assertNotEquals, assertTrue}
 import org.junit.jupiter.api.Test
 
-class PipeConnectionTest extends BeforeAllTest{
+private[transport] final class PipeConnectionTest extends BeforeAllTest {
 
   @Test
   def dummy(): Unit = {
-//    assertEquals(Math.sqrt(3), new BlockPos(1, 1, 1).norm)
+    //    assertEquals(Math.sqrt(3), new BlockPos(1, 1, 1).norm)
     assertTrue(PipeConnection.empty[BlockPos]({ case (_, _) => () }, _ => false).isEmpty)
   }
 
@@ -57,7 +57,7 @@ class PipeConnectionTest extends BeforeAllTest{
   }
 }
 
-object PipeConnectionTest {
+private object PipeConnectionTest {
 
   class Holder {
     var connection: PipeConnection[(Int, Int)] = _

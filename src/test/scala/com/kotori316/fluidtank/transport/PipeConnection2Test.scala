@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 
-class PipeConnection2Test extends BeforeAllTest {
+private[transport] final class PipeConnection2Test extends BeforeAllTest {
 
   @Test
   def dummy(): Unit = {
@@ -53,7 +53,7 @@ class PipeConnection2Test extends BeforeAllTest {
 }
 
 
-object PipeConnection2Test {
+private object PipeConnection2Test {
 
   class Holder {
     var connection: PipeConnection2[(Int, Int)] = _

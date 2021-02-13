@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TierRecipeTest {
+final class TierRecipeTest {
 
     private static final BlockTank woodTank = ModObjects.blockTanks().head();
 

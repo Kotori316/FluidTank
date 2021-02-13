@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * This test calls {@link ListTankHandler} from Java.
  */
-class ListTankHandlerTestJava extends BeforeAllTest {
+final class ListTankHandlerTestJava extends BeforeAllTest {
     static final Tank EMPTY_TANK = new Tank(FluidAmount.EMPTY(), 4000L);
 
     //-------------------- PARAMETER PROVIDERS --------------------

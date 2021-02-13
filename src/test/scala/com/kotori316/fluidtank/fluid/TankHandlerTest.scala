@@ -10,7 +10,7 @@ import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.{DisplayName, Test}
 
 //noinspection DuplicatedCode It's a test!
-private[fluid] class TankHandlerTest extends BeforeAllTest {
+private[fluid]final  class TankHandlerTest extends BeforeAllTest {
   @Test
   def fillWaterToEmpty(): Unit = {
     val tank = TankHandler(4000L)

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 
 //noinspection DuplicatedCode It's a test.
-private[fluid] class ItemFluidHandlerTest extends BeforeAllTest {
+private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
   private def woodTank = ModObjects.blockTanks.head
 
   @Test
