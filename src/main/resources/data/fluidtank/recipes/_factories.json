@@ -1,7 +1,8 @@
 {
   "conditions": {
-    "config": "com.kotori316.fluidtank.recipes.ConfigCondition",
-    "easy": "com.kotori316.fluidtank.recipes.EasyCondition",
+    "config": "com.kotori316.fluidtank.recipes.FluidTankConditions$ConfigCondition",
+    "easy": "com.kotori316.fluidtank.recipes.FluidTankConditions$EasyCondition",
+    "invisible_ok": "com.kotori316.fluidtank.recipes.FluidTankConditions$InvisibleCondition",
     "tag": "com.kotori316.fluidtank.recipes.TagCondition"
   }
 }

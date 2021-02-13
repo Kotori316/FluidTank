@@ -102,9 +102,7 @@ class TierRecipeTest {
         }
         assertTrue(recipe.matches(inventory, null));
         ItemStack result = recipe.getCraftingResult(inventory);
-        TankItemFluidHandler filled = new TankItemFluidHandler((ItemBlockTank) result.getItem(), result);
-        filled.init();
-        assertEquals(amount, filled.getFluid());
+        assertEquals(amount, RecipeInventoryUtil.getFluidHandler(result).getFluid());
     }
 
     @ParameterizedTest
@@ -125,9 +123,7 @@ class TierRecipeTest {
         }
         assertTrue(recipe.matches(inventory, null));
         ItemStack result = recipe.getCraftingResult(inventory);
-        TankItemFluidHandler filled = new TankItemFluidHandler((ItemBlockTank) result.getItem(), result);
-        filled.init();
-        assertEquals(amount.setAmount(amount.amount() * 2), filled.getFluid());
+        assertEquals(amount.setAmount(amount.amount() * 2), RecipeInventoryUtil.getFluidHandler(result).getFluid());
     }
 
     @Test

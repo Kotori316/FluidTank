@@ -84,14 +84,14 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
     CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.orEmpty(capability, LazyOptional.of(() => this))
   }
 
-  def init(): Unit = {
+  private def init(): Unit = {
     if (!initialized) {
       initialized = true
       fluid = FluidAmount.fromNBT(tankNbt).toStack
     }
   }
 
-  def updateTag(): Unit = {
+  private def updateTag(): Unit = {
     if (stack.getCount > 1) {
       return
     }
@@ -116,6 +116,11 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
 
   override def getTanks = 1
 
+  /**
+   * Get the content of tank. If the stack has 2 or more items, returns empty.
+   *
+   * @return The content if stack size = 1, else empty fluid.
+   */
   @Nonnull
   override def getFluidInTank(tank: Int): FluidStack = {
     init()
@@ -126,7 +131,15 @@ class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluid
 
   override def isFluidValid(tank: Int, stack: FluidStack) = true
 
-  def getFluid: FluidAmount = FluidAmount.fromStack(fluid)
+  /**
+   * Get the fluid, ignoring the stack size.
+   *
+   * @return the fluid in the tank.
+   */
+  def getFluid: FluidAmount = {
+    init()
+    FluidAmount.fromStack(fluid)
+  }
 
   def getCapacity: Long = if (tankNbt == null) tiers.amount else tankNbt.getLong(TileTankNoDisplay.NBT_Capacity)
 }

@@ -31,11 +31,7 @@ private[recipes] final class ConvertRecipeTest extends BeforeAllTest {
     val result = recipe.getCraftingResult(inv)
     assertEquals(classOf[BlockInvisibleTank], result.getItem.asInstanceOf[ItemBlockTank].blockTank.getClass)
     assertFalse(result.hasTag)
-    locally {
-      val handler = RecipeInventoryUtil.getFluidHandler(result)
-      handler.init()
-      assertTrue(handler.getFluid.isEmpty)
-    }
+    assertTrue(RecipeInventoryUtil.getFluidHandler(result).getFluid.isEmpty)
   }
 
   @Test
@@ -61,11 +57,7 @@ private[recipes] final class ConvertRecipeTest extends BeforeAllTest {
     val result = recipe.getCraftingResult(inv)
     assertEquals(classOf[BlockInvisibleTank], result.getItem.asInstanceOf[ItemBlockTank].blockTank.getClass)
     assertEquals(woodInvisible, result.getItem.asInstanceOf[ItemBlockTank].blockTank)
-    locally {
-      val handler = RecipeInventoryUtil.getFluidHandler(result)
-      handler.init()
-      assertTrue(fluidAmount === handler.getFluid, s"${handler.getFluid}")
-    }
+    assertTrue(fluidAmount === RecipeInventoryUtil.getFluidHandler(result).getFluid, s"Tag: ${result.getTag}")
   }
 
   @ParameterizedTest
@@ -77,10 +69,6 @@ private[recipes] final class ConvertRecipeTest extends BeforeAllTest {
     assertTrue(recipe.matches(inv, null))
     val result = recipe.getCraftingResult(inv)
     assertEquals(woodTank, result.getItem.asInstanceOf[ItemBlockTank].blockTank)
-    locally {
-      val handler = RecipeInventoryUtil.getFluidHandler(result)
-      handler.init()
-      assertTrue(fluid === handler.getFluid, s"${handler.getFluid}")
-    }
+    assertTrue(fluid === RecipeInventoryUtil.getFluidHandler(result).getFluid, s"Tag: ${result.getTag}")
   }
 }

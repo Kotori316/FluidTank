@@ -25,6 +25,7 @@ import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
+import com.kotori316.fluidtank.recipes.CombineRecipe;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.FluidTankConditions;
 import com.kotori316.fluidtank.recipes.TagCondition;
@@ -83,6 +84,7 @@ public class FluidTank {
         @SubscribeEvent
         public static void registerSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
             event.getRegistry().register(ConvertInvisibleRecipe.SERIALIZER.setRegistryName(new ResourceLocation(ConvertInvisibleRecipe.LOCATION)));
+            event.getRegistry().register(CombineRecipe.SERIALIZER.setRegistryName(new ResourceLocation(CombineRecipe.LOCATION)));
             event.getRegistry().register(TierRecipe.SERIALIZER);
             CraftingHelper.register(new FluidTankConditions.ConfigCondition().serializer);
             CraftingHelper.register(new FluidTankConditions.EasyCondition().serializer);

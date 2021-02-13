@@ -185,8 +185,10 @@ object FluidTankDataProvider {
           .key('d', Blocks.DIRT))
       val CONVERT_INVISIBLE = RecipeSerializeHelper.bySpecial(ConvertInvisibleRecipe.SERIALIZER, ConvertInvisibleRecipe.LOCATION)
         .addCondition(invisibleCondition)
+      val COMBINE = RecipeSerializeHelper.bySpecial(CombineRecipe.SERIALIZER, CombineRecipe.LOCATION)
+        .addCondition(configCondition)
 
-      val recipes = CONVERT_INVISIBLE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
+      val recipes = COMBINE :: CONVERT_INVISIBLE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
@@ -194,6 +196,7 @@ object FluidTankDataProvider {
           IDataProvider.save(GSON, cache, recipe.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}.", e)
+          case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}. Check the serializer registered.", e)
         }
       }
     }

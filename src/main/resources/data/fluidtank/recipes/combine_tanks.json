@@ -1,0 +1,8 @@
+{
+  "type": "fluidtank:combine_tanks",
+  "conditions": [
+    {
+      "type": "fluidtank:config"
+    }
+  ]
+}
