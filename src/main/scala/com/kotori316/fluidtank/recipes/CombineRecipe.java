@@ -111,7 +111,7 @@ public class CombineRecipe extends SpecialRecipe {
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus);
         Optional<ItemStack> tank = getMaxCapacityTank(inv)
-            .flatMap(p -> p.getLeft().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve()
+            .flatMap(p -> ItemHandlerHelper.copyStackWithSize(p.getLeft(), 1).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve()
                 .flatMap(h ->
                     fluid.map(f -> {
                         h.drain(h.getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE);

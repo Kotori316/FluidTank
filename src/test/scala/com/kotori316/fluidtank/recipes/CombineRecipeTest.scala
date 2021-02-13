@@ -23,17 +23,22 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
   private final val emeraldTank = ModObjects.blockTanks.find(_.tier === Tiers.EMERALD).get
   private final val recipe = new CombineRecipe(new ResourceLocation(FluidTank.modID, "CombineRecipeTest".toLowerCase))
 
-  @Test
-  def combine2Stone(): Unit = {
+  @ParameterizedTest
+  @ValueSource(ints = Array(1, 2, 5, 10, 64))
+  def combine2Stone(stackSize: Int): Unit = {
     val wood = new ItemStack(woodTank)
     val stone = new ItemStack(stoneTank)
     RecipeInventoryUtil.getFluidHandler(wood).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
     RecipeInventoryUtil.getFluidHandler(stone).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
+    wood.setCount(stackSize)
+    stone.setCount(stackSize)
 
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> stone, 'w' -> wood))
     assertTrue(recipe.matches(inventory, null))
 
     val result = recipe.getCraftingResult(inventory)
+    assertEquals(1, result.getCount)
+    assertFalse(result.isEmpty)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
     assertTrue(tankItem.blockTank.tier === Tiers.STONE, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
@@ -79,6 +84,8 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     assertTrue(recipe.matches(inventory, null))
 
     val result = recipe.getCraftingResult(inventory)
+    assertEquals(1, result.getCount)
+    assertFalse(result.isEmpty)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
     assertTrue(tankItem.blockTank.tier === Tiers.EMERALD, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
@@ -102,12 +109,15 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     assertTrue(RecipeInventoryUtil.getFluidHandler(result).getFluid === FluidAmount.BUCKET_WATER.setAmount(5000L), s"Tag: ${result.getTag}")
   }
 
-  @Test
-  def combine2SameLeftTest(): Unit = {
+  @ParameterizedTest
+  @ValueSource(ints = Array(1, 2, 5, 10, 64))
+  def combine2SameLeftTest(stackSize: Int): Unit = {
     val emerald0 = new ItemStack(emeraldTank)
     val emerald = new ItemStack(emeraldTank)
     RecipeInventoryUtil.getFluidHandler(emerald0).fill(FluidAmount.BUCKET_WATER.setAmount(4000L).toStack, EXECUTE)
     RecipeInventoryUtil.getFluidHandler(emerald).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
+    emerald.setCount(stackSize)
+    emerald0.setCount(stackSize)
 
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> emerald, 'w' -> emerald0))
     assertTrue(recipe.matches(inventory, null))
