@@ -52,7 +52,7 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
       - name: Build with Gradle
-        run: chmod +x ./gradlew && ./gradlew build --no-daemon --continue
+        run: chmod +x ./gradlew && ./gradlew assemble --no-daemon --continue
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
@@ -87,7 +87,7 @@ jobs:
           name: ${{ github.event.repository.name }}-${{ github.run_number }}
           path: work/
       - name: move files
-        run: ls -al work && mkdir --parents run/mods && mv work/*-deobf.jar run/mods/
+        run: ls -al work && mkdir --parents run/mods && mv work/*-deobf.jar run/mods/ && ls -al run/mods
       - name: download_assets
         run: |
           if [ $CI_FORGE = "latest" ]; then
@@ -106,7 +106,7 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew && ./gradlew --no-daemon test && (./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
+          chmod +x ./gradlew && ( ./gradlew --no-daemon test runData || ./gradlew --no-daemon runData)
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI_FORGE: ${{ matrix.forge }}
