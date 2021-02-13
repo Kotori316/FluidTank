@@ -71,9 +71,9 @@ jobs:
         forge: [ 1.16.4-35.1.37, latest ]
     steps:
       - uses: actions/checkout@v2
-          if: ${{ matrix.forge == 'latest' }}
-          with:
-            repository: "Kotori316/SLP-example"
+        if: ${{ matrix.forge == 'latest' }}
+        with:
+          repository: "Kotori316/SLP-example"
       - name: Get latest version
         if: ${{ matrix.forge == 'latest' }}
         run: |
