@@ -150,15 +150,8 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew && ( ./gradlew --no-daemon test runData || ./gradlew --no-daemon runData)
+          chmod +x ./gradlew && ( ./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CI_FORGE: ${{ matrix.forge }}
           CI_MODS: "fluidtank"
-      - name: Upload failed test report
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          path: build/reports/tests/*
-          name: Test-Report-${{ matrix.java }}
-          if-no-files-found: ignore
