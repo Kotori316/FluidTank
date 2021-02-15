@@ -27,6 +27,11 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew checkMethod --no-daemon
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Download Assets for Cache
+        run: |
+          chmod +x ./gradlew && (./gradlew clean || true)
+          ( ./gradlew downloadAssets extractNatives || ./gradlew downloadAssets extractNatives || \
+          (sleep 30s && ./gradlew downloadAssets extractNatives) || true)
       - name: Test-JUnit
         run: chmod +x ./gradlew && ./gradlew --no-daemon test
         env:
@@ -50,7 +55,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
+          key: ${{ runner.os }}-gradle16
       - name: Build with Gradle
         run: chmod +x ./gradlew && ./gradlew assemble --no-daemon --continue
         env:
@@ -138,8 +143,7 @@ jobs:
             version=$(python3 get_latest_forge.py "1.16.5-latest")
             export CI_FORGE="1.16.5-$version"
           fi
-          chmod +x ./gradlew && (./gradlew clean || true)
-          ( ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets) || true)
+          chmod +x ./gradlew && (./gradlew clean downloadAssets || true)
           ( (./gradlew compileScala || ./gradlew clean) || (./gradlew compileScala || ./gradlew clean) || (sleep 10s && ./gradlew compileScala) )
         continue-on-error: true
         env:
