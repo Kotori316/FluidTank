@@ -116,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 1.8 ]
+        java: [ 1.8, 11 ]
         forge: [ 1.16.4-35.1.37, latest ]
     steps:
       - uses: actions/checkout@v2
