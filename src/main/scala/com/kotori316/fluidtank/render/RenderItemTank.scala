@@ -5,6 +5,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.mojang.blaze3d.matrix.MatrixStack
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.{IBakedModel, ItemCameraTransforms}
 import net.minecraft.client.renderer.tileentity.{ItemStackTileEntityRenderer, TileEntityRendererDispatcher}
@@ -31,6 +32,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
         //          TransformType.FIXED, false)
         //val renderType = RenderTypeLookup.func_239219_a_(stack, true)
         //val b = ItemRenderer.getBuffer(renderTypeBuffer, renderType, true, stack.hasEffect)
+        RenderSystem.enableCull()
         renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
 
         tileTank.tier = tankItem.blockTank.tier
