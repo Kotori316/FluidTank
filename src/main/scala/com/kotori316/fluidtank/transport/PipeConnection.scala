@@ -24,4 +24,5 @@ object PipeConnection {
     extends PipeConnection[A](Set.empty, updateFunc, isOutput) {
     override def toString = "EmptyConnection"
   }
+
 }
