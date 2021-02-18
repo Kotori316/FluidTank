@@ -17,8 +17,6 @@ import net.minecraft.util.text.{ITextComponent, StringTextComponent, Translation
 import net.minecraft.util.{ActionResultType, Hand, NonNullList}
 import net.minecraft.world.{IBlockReader, World}
 
-import scala.util.Try
-
 class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
   setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   val itemBlock = new FluidSourceItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
@@ -123,7 +121,7 @@ class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Ma
   }
 
   override def addInformation(stack: ItemStack, worldIn: IBlockReader, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
-    if (Try(Config.content.enableFluidSupplier.get().booleanValue()).getOrElse(false)) {
+    if (Config.content.enableFluidSupplier.get()) {
       tooltip.add(
         if (FluidSourceBlock.isCheatStack(stack)) {
           new TranslationTextComponent(FluidSourceBlock.TOOLTIP_INF)

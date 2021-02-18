@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,6 +57,11 @@ final class AccessTest extends BeforeAllTest {
         fail("Fail Test");
     }
 
+    @Test
+    void configAccess() {
+        assertTrue(Config.content().debug());
+        assertFalse(Config.content().removeRecipe());
+    }
     /*void notCompile() {
         1 + 1;
     }*/

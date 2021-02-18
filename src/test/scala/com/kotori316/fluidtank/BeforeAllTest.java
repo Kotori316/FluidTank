@@ -2,6 +2,8 @@ package com.kotori316.fluidtank;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cpw.mods.modlauncher.Launcher;
@@ -10,6 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.junit.jupiter.api.BeforeAll;
+import scala.jdk.javaapi.CollectionConverters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -28,6 +31,9 @@ public abstract class BeforeAllTest {
             changeDist();
             assertEquals(Dist.CLIENT, FMLEnvironment.dist);
             Bootstrap.register();
+            Map<String, Object> map = new HashMap<>(CollectionConverters.asJava(Config.defaultConfig()));
+            map.put("debug", true);
+            Config.dummyContent_$eq(new Utils.TestConfig(map));
         }
     }
 
