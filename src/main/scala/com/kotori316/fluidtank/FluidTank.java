@@ -28,6 +28,7 @@ import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.CombineRecipe;
 import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.FluidTankConditions;
+import com.kotori316.fluidtank.recipes.ReservoirRecipe;
 import com.kotori316.fluidtank.recipes.TagCondition;
 import com.kotori316.fluidtank.recipes.TierRecipe;
 
@@ -69,6 +70,7 @@ public class FluidTank {
             event.getRegistry().register(ModObjects.blockFluidPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockItemPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockSource().itemBlock());
+            CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(event.getRegistry()::register);
         }
 
         @SubscribeEvent
@@ -86,6 +88,7 @@ public class FluidTank {
             event.getRegistry().register(ConvertInvisibleRecipe.SERIALIZER.setRegistryName(new ResourceLocation(ConvertInvisibleRecipe.LOCATION)));
             event.getRegistry().register(CombineRecipe.SERIALIZER.setRegistryName(new ResourceLocation(CombineRecipe.LOCATION)));
             event.getRegistry().register(TierRecipe.SERIALIZER);
+            event.getRegistry().register(ReservoirRecipe.SERIALIZER);
             CraftingHelper.register(new FluidTankConditions.ConfigCondition().serializer);
             CraftingHelper.register(new FluidTankConditions.EasyCondition().serializer);
             CraftingHelper.register(new FluidTankConditions.InvisibleCondition().serializer);
