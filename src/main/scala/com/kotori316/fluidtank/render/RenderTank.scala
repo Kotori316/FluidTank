@@ -49,10 +49,10 @@ object RenderTank {
     if (attributes.getClass == classOf[FluidAttributes]) {
       normal
     } else {
-      val (world, pos) = worldAndPos(tile)
-      val worldColor = attributes.getColor(world, pos)
       val stackColor = attributes.getColor(fluidAmount.toStack)
       if (normal == stackColor) {
+        val (world, pos) = worldAndPos(tile)
+        val worldColor = attributes.getColor(world, pos)
         worldColor
       } else {
         stackColor
