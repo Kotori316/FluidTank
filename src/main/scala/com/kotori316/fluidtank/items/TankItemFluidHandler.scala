@@ -12,8 +12,10 @@ import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
 
-class TankItemFluidHandler(item: ItemBlockTank, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
-  val tiers: Tiers = item.blockTank.tier
+class TankItemFluidHandler(val tiers: Tiers, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
+  def this(item: ItemBlockTank, stack: ItemStack) = {
+    this(item.blockTank.tier, stack)
+  }
 
   def nbt: CompoundNBT = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
 

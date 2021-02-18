@@ -187,8 +187,12 @@ object FluidTankDataProvider {
         .addCondition(invisibleCondition)
       val COMBINE = RecipeSerializeHelper.bySpecial(CombineRecipe.SERIALIZER, CombineRecipe.LOCATION)
         .addCondition(configCondition)
+      val RESERVOIRS = List(Tiers.WOOD, Tiers.STONE, Tiers.IRON)
+        .map(t => new ReservoirRecipe(ID("reservoir_" + t.lowerName), t))
+        .map(r => new ReservoirRecipe.FinishedRecipe(r))
+        .map(r => RecipeSerializeHelper(r))
 
-      val recipes = COMBINE :: CONVERT_INVISIBLE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
+      val recipes = RESERVOIRS ::: COMBINE :: CONVERT_INVISIBLE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")

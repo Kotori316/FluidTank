@@ -13,7 +13,7 @@ public class FluidSourceItem extends BlockItem {
 
     @Override
     public String getTranslationKey(ItemStack stack) {
-        if(!FluidSourceBlock.isCheatStack(stack)){
+        if (!FluidSourceBlock.isCheatStack(stack)) {
             return "block.fluidtank.water_source";
         }
         return super.getTranslationKey(stack);
