@@ -22,4 +22,9 @@ public class ServerProxy extends SideProxy {
     public Item.Properties getTankProperties() {
         return new Item.Properties().group(ModObjects.CREATIVE_TABS());
     }
+
+    @Override
+    public Item.Properties getReservoirProperties() {
+        return new Item.Properties().group(ModObjects.CREATIVE_TABS());
+    }
 }

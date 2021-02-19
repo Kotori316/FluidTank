@@ -17,4 +17,6 @@ public abstract class SideProxy {
 
     public abstract Item.Properties getTankProperties();
 
+    public abstract Item.Properties getReservoirProperties();
+
 }
