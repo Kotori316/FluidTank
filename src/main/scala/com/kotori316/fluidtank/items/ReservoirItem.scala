@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.items
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
-import com.kotori316.fluidtank.{FluidTank, ModObjects, _}
+import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.{Item, ItemStack, ItemUseContext, Rarity}
@@ -18,7 +18,7 @@ import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
-class ReservoirItem(val tier: Tiers) extends Item(new Item.Properties().group(ModObjects.CREATIVE_TABS).maxStackSize(1)) {
+class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirProperties.maxStackSize(1)) {
   setRegistryName(FluidTank.modID, "reservoir_" + tier.lowerName)
 
   // ---------- Fluid Interaction ----------
@@ -96,6 +96,7 @@ class ReservoirItem(val tier: Tiers) extends Item(new Item.Properties().group(Mo
       }
     }
   }
+
   override def getRarity(stack: ItemStack): Rarity =
     if (stack.hasTag && stack.getTag.contains(TileTankNoDisplay.NBT_BlockTag)) Rarity.RARE
     else Rarity.COMMON

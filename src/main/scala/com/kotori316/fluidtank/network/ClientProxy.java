@@ -1,10 +1,12 @@
 package com.kotori316.fluidtank.network;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
@@ -32,8 +34,10 @@ import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.FluidSourceBlock;
+import com.kotori316.fluidtank.render.ModelWrapper;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderPipe;
+import com.kotori316.fluidtank.render.RenderReservoirItem;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.CATScreen;
 
@@ -41,8 +45,7 @@ import com.kotori316.fluidtank.tiles.CATScreen;
 public class ClientProxy extends SideProxy {
 
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
-    //    public static final RenderTank RENDER_TANK = new RenderTank();
-    //    public static final RenderPipe RENDER_PIPE = new RenderPipe();
+    private static final RenderReservoirItem RENDER_ITEM_RESERVOIR = new RenderReservoirItem();
     public static TextureAtlasSprite whiteTexture;
 
     @Override
@@ -56,6 +59,11 @@ public class ClientProxy extends SideProxy {
     @Override
     public Item.Properties getTankProperties() {
         return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setISTER(() -> () -> RENDER_ITEM_TANK);
+    }
+
+    @Override
+    public Item.Properties getReservoirProperties() {
+        return new Item.Properties().group(ModObjects.CREATIVE_TABS()).setISTER(() -> () -> RENDER_ITEM_RESERVOIR);
     }
 
     @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -90,21 +98,15 @@ public class ClientProxy extends SideProxy {
 
         @SubscribeEvent
         public static void registerModels(ModelRegistryEvent event) {
-        /*if (!Config.content().enableOldRender().get()) {
-            FluidTank.BLOCK_TANKS.stream().map(AbstractTank::itemBlock).forEach(item ->
-                ModelLoader.setCustomMeshDefinition(item, stack -> MESH_MODEL)
-            );
-        }*/
         }
 
         @SubscribeEvent
         public static void onBake(ModelBakeEvent event) {
-            /*event.getModelRegistry().put(MESH_MODEL, MODEL_TANK);
-            CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(itemBlockTank -> {
-                ModelResourceLocation modelLocation = new ModelResourceLocation(Objects.toString(itemBlockTank.getRegistryName()), "inventory");
-//            IBakedModel model = event.getModelManager().getModel(modelLocation);
-                event.getModelRegistry().put(modelLocation, MODEL_TANK);
-            });*/
+            CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
+                .map(Item::getRegistryName)
+                .filter(Objects::nonNull)
+                .map(n -> new ModelResourceLocation(n, "inventory"))
+                .forEach(n -> event.getModelRegistry().put(n, new ModelWrapper(event.getModelManager().getModel(n))));
         }
 
         @SubscribeEvent
