@@ -21,8 +21,6 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.items.ItemBlockTank;
-import com.kotori316.fluidtank.items.TankItemFluidHandler;
 import com.kotori316.fluidtank.tiles.Tiers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,12 +59,12 @@ final class TierRecipeTest {
     void mixWaterLava() {
         {
             ItemStack stack = new ItemStack(woodTank);
-            new TankItemFluidHandler((ItemBlockTank) stack.getItem(), stack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
             inventory.setInventorySlotContents(0, stack);
         }
         {
             ItemStack stack = new ItemStack(woodTank);
-            new TankItemFluidHandler((ItemBlockTank) stack.getItem(), stack).fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
             inventory.setInventorySlotContents(2, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
@@ -90,7 +88,7 @@ final class TierRecipeTest {
     void combineFluidTest(FluidAmount amount) {
         {
             ItemStack stack = new ItemStack(woodTank);
-            new TankItemFluidHandler((ItemBlockTank) stack.getItem(), stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
             inventory.setInventorySlotContents(0, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
@@ -110,7 +108,7 @@ final class TierRecipeTest {
     void combine2FluidTest(FluidAmount amount) {
         {
             ItemStack stack = new ItemStack(woodTank);
-            new TankItemFluidHandler((ItemBlockTank) stack.getItem(), stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
             inventory.setInventorySlotContents(0, stack);
             inventory.setInventorySlotContents(2, stack);
         }

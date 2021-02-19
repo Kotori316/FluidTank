@@ -1,11 +1,11 @@
 package com.kotori316.fluidtank.recipes
 
-import com.kotori316.fluidtank.items.{ItemBlockTank, TankItemFluidHandler}
+import com.kotori316.fluidtank.items.{ItemBlockTank, ReservoirItem, TankItemFluidHandler}
 import com.kotori316.fluidtank.recipes.AccessRecipeTest.DummyContainer
 import net.minecraft.inventory.CraftingInventory
 import net.minecraft.item.ItemStack
 
-private[recipes] object RecipeInventoryUtil {
+object RecipeInventoryUtil {
 
   def getInv(s1: String = "", s2: String = "", s3: String = "", itemMap: Map[Char, ItemStack]): CraftingInventory = {
     val map = itemMap + (' ' -> ItemStack.EMPTY)
@@ -24,5 +24,9 @@ private[recipes] object RecipeInventoryUtil {
     cf
   }
 
-  def getFluidHandler(tankStack: ItemStack) = new TankItemFluidHandler(tankStack.getItem.asInstanceOf[ItemBlockTank], tankStack)
+  def getFluidHandler(stack: ItemStack): TankItemFluidHandler = stack.getItem match {
+    case tank: ItemBlockTank => new TankItemFluidHandler(tank.blockTank.tier, stack)
+    case reservoir: ReservoirItem => new TankItemFluidHandler(reservoir.tier, stack)
+    case _ => throw new IllegalArgumentException(s"Stack $stack has no valid handler")
+  }
 }
