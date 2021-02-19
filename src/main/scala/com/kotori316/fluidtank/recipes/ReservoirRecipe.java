@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
@@ -23,7 +25,9 @@ import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 
 public class ReservoirRecipe extends ShapelessRecipe {
     public static final IRecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
@@ -37,7 +41,21 @@ public class ReservoirRecipe extends ShapelessRecipe {
 
     @Override
     public ItemStack getCraftingResult(CraftingInventory inv) {
-        return super.getCraftingResult(inv);
+        ItemStack result = super.getCraftingResult(inv);
+        IntStream.range(0, inv.getSizeInventory())
+            .mapToObj(inv::getStackInSlot)
+            .filter(s -> s.getItem() instanceof ItemBlockTank)
+            .filter(ItemStack::hasTag)
+            .map(s -> s.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .ifPresent(nbt -> result.setTagInfo(TileTankNoDisplay.NBT_BlockTag(), nbt));
+        return result;
+    }
+
+    @Override
+    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+        return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 
     private static ItemStack findOutput(Tiers tier) {
