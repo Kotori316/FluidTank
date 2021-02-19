@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.fluid
 
 import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank.fluids.FluidAmount
-import com.kotori316.fluidtank.items.{ItemBlockTank, TankItemFluidHandler}
+import com.kotori316.fluidtank.recipes.RecipeInventoryUtil
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
 import com.kotori316.fluidtank.{BeforeAllTest, DynamicSerializable, FluidTank, ModObjects}
 import com.mojang.serialization.{Dynamic, JsonOps}
@@ -25,7 +25,7 @@ private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
   @Test
   def emptyTank(): Unit = {
     val stack = new ItemStack(woodTank)
-    val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
 
     assertEquals(Tiers.WOOD, handler.tiers)
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
@@ -35,7 +35,7 @@ private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
   @Test
   def fillInEmpty(): Unit = {
     val stack = new ItemStack(woodTank)
-    val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
 
     handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
     assertEquals(FluidAmount.BUCKET_WATER, handler.getFluid)
@@ -47,7 +47,7 @@ private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
   @Test
   def filledTag(): Unit = {
     val stack = new ItemStack(woodTank)
-    val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
 
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(2000L).toStack, IFluidHandler.FluidAction.EXECUTE)
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L), handler.getFluid)
@@ -63,7 +63,7 @@ private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
   @Test
   def stackedTankTest(): Unit = {
     val stack = new ItemStack(woodTank, 3)
-    val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
 
     assertEquals(0, handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE))
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
@@ -74,7 +74,7 @@ private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
   @Test
   def serializeTest(): Unit = {
     val stack = new ItemStack(woodTank)
-    val handler = new TankItemFluidHandler(stack.getItem.asInstanceOf[ItemBlockTank], stack)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(4000L).toStack, IFluidHandler.FluidAction.EXECUTE)
 
     val stackTagJson = handler.createTag.toJson
