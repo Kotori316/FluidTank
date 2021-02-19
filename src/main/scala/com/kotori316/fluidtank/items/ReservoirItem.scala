@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
 import com.kotori316.fluidtank.{FluidTank, ModObjects, _}
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.{Item, ItemStack, ItemUseContext}
+import net.minecraft.item.{Item, ItemStack, ItemUseContext, Rarity}
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.math.{BlockRayTraceResult, RayTraceContext, RayTraceResult}
 import net.minecraft.util.text.{ITextComponent, TranslationTextComponent}
@@ -96,4 +96,7 @@ class ReservoirItem(val tier: Tiers) extends Item(new Item.Properties().group(Mo
       }
     }
   }
+  override def getRarity(stack: ItemStack): Rarity =
+    if (stack.hasTag && stack.getTag.contains(TileTankNoDisplay.NBT_BlockTag)) Rarity.RARE
+    else Rarity.COMMON
 }
