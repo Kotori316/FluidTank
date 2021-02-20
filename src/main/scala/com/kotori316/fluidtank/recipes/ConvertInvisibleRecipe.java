@@ -18,9 +18,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.ModObjects;
-import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
@@ -77,7 +77,7 @@ public class ConvertInvisibleRecipe extends SpecialRecipe {
     }
 
     private static ItemStack getInvertedTank(Tiers tiers, CompoundNBT tag, scala.collection.immutable.List<BlockTank> list) {
-        return Utils.toJava(list.find(b -> b.tier() == tiers))
+        return OptionConverters.toJava(list.find(b -> b.tier() == tiers))
             .map(ItemStack::new)
             .map(i -> {
                 i.setTag(tag);

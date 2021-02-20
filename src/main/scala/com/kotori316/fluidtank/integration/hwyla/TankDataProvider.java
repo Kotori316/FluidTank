@@ -17,8 +17,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import scala.jdk.javaapi.OptionConverters;
 
-import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
@@ -111,7 +111,7 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
             tag.putString(NBT_Tier, tank.tier().toString());
             if (te instanceof TileTankVoid) return;
             tag.putString(NBT_ConnectionFluidName,
-                Utils.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL));
+                OptionConverters.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL));
             if (!tank.connection().hasCreative()) {
                 tag.putBoolean(NBT_NonCreative, true);
                 tag.putLong(NBT_ConnectionAmount, tank.connection().amount());

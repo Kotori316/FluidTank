@@ -27,9 +27,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tiers;
 import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
@@ -97,7 +97,7 @@ class LookAtThatCapabilityProvider implements ICapabilityProvider, IProvidesLATI
             if (!tank.connection().hasCreative()) {
                 list = Collections.singletonList(
                     new StringTextComponent(
-                        Utils.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL)
+                        OptionConverters.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL)
                             + ", " + tank.connection().amount() + "mB")
                 );
             } else {
@@ -124,7 +124,7 @@ class LookAtThatCapabilityProvider implements ICapabilityProvider, IProvidesLATI
                 list = Arrays.asList(
                     new TranslationTextComponent(TIER, tier.toString()),
                     new TranslationTextComponent(CONTENT,
-                        Utils.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL)),
+                        OptionConverters.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL)),
                     new TranslationTextComponent(AMOUNT, tank.connection().amount()),
                     new TranslationTextComponent(CAPACITY, tank.connection().capacity()),
                     new TranslationTextComponent(COMPARATOR, tank.connection().getComparatorLevel())

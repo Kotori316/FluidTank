@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -11,8 +10,6 @@ import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.maven.artifact.versioning.ComparableVersion;
-import scala.Option;
-import scala.jdk.javaapi.OptionConverters;
 
 public class Utils {
     public static int toInt(long l) {
@@ -22,10 +19,6 @@ public class Utils {
         } else {
             return l > 0 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         }
-    }
-
-    public static <T> Optional<T> toJava(Option<T> option) {
-        return OptionConverters.toJava(option);
     }
 
     private static final AtomicInteger inDev = new AtomicInteger(-1);
