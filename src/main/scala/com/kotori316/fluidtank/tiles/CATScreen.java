@@ -34,7 +34,6 @@ public class CATScreen extends ContainerScreen<CATContainer> {
     }
 
     @Override
-    @SuppressWarnings("NoTranslation")
     protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
         //Foreground
         super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);

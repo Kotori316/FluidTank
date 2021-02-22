@@ -3,7 +3,6 @@ package com.kotori316.fluidtank.tiles;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -13,12 +12,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -33,10 +30,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import scala.Option;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidKey;
 import com.kotori316.fluidtank.milk.MilkBucketHandler;
 
 public class CATTile extends TileEntity implements INamedContainerProvider {
@@ -181,7 +178,7 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         public Stream<FluidAmount> getFluidAmountStream() {
             return IntStream.range(0, this.getTanks())
                 .mapToObj(this::getFluidInTank)
-                .collect(Collectors.groupingBy(FluidKey::new, LinkedHashMap::new, Collectors.summingLong(FluidStack::getAmount)))
+                .collect(Collectors.groupingBy(FluidKey::from, LinkedHashMap::new, Collectors.summingLong(FluidStack::getAmount)))
                 .entrySet().stream()
                 .map(e -> e.getKey().toAmount(e.getValue()))
                 .filter(FluidAmount::nonEmpty);
@@ -194,32 +191,4 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
         return opt.map(FluidHandlerWrapper::fluidList).orElse(Collections.emptyList());
     }
 
-    private static class FluidKey {
-
-        private final Fluid fluid;
-        private final CompoundNBT tag;
-
-        public FluidKey(FluidStack stack) {
-            fluid = stack.getFluid();
-            tag = stack.getTag();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            FluidKey fluidKey = (FluidKey) o;
-            return fluid.equals(fluidKey.fluid) &&
-                Objects.equals(tag, fluidKey.tag);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(fluid, tag);
-        }
-
-        public FluidAmount toAmount(long amount) {
-            return new FluidAmount(this.fluid, amount, Option.apply(this.tag));
-        }
-    }
 }

@@ -70,27 +70,35 @@ object Config {
 
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
-    val easyRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("True to use easy recipe.").define("easyRecipe", false))
-    val usableInvisibleInRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("False to prohibit invisible tanks to be used in recipes")
+    val easyRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("True to use easy recipe.")
+      .define("easyRecipe", false))
+    val usableInvisibleInRecipe: BoolSupplier = asSupplier(builder.worldRestart()
+      .comment("False to prohibit invisible tanks from being used in recipes.")
       .define("usableInvisibleInRecipe", true))
-    val usableUnavailableTankInRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("False to prohibit tanks with no recipe to be used in recipes of other tanks")
+    val usableUnavailableTankInRecipe: BoolSupplier = asSupplier(builder.worldRestart()
+      .comment("False to prohibit tanks with no recipe from being used in recipes of other tanks.")
       .define("usableUnavailableTankInRecipe", true))
 
     builder.pop()
 
-    val showInvisibleTank: BoolSupplier = asSupplier(builder.worldRestart().comment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
+    val showInvisibleTank: BoolSupplier = asSupplier(builder.worldRestart()
+      .comment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
       .define("showInvisibleTankInTab", false))
 
-    val showTOP: BoolSupplier = asSupplier(builder.comment("Show tank info on TOP tooltip.").define("showTOP", true))
+    val showTOP: BoolSupplier = asSupplier(builder.comment("Show tank info on TOP tooltip.")
+      .define("showTOP", true))
 
-    val enableWailaAndTOP: BoolSupplier = asSupplier(builder.comment("True to enable waila and top to show tank info.").define("showToolTipOnMods", true))
+    val enableWailaAndTOP: BoolSupplier = asSupplier(builder.comment("True to enable waila and top to show tank info.")
+      .define("showToolTipOnMods", true))
 
-    val enableFluidSupplier: BoolSupplier = asSupplier(builder.comment("True to allow fluid supplier to work.").define("enableFluidSupplier", false))
+    val enableFluidSupplier: BoolSupplier = asSupplier(builder.comment("True to allow fluid supplier to work.")
+      .define("enableFluidSupplier", false))
 
     val enablePipeRainbowRenderer: BoolSupplier = asSupplier(builder.worldRestart()
       .comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false))
     val pipeColor: java.util.function.Supplier[Integer] = asSupplier(builder.worldRestart()
-      .comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.").define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF)))
+      .comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.")
+      .define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF)))
     builder.pop()
 
   }

@@ -25,8 +25,11 @@ class TileMessage {
   }
 
   def onReceive(supplier: Supplier[NetworkEvent.Context]): Unit = {
-    for (world <- FluidTank.proxy.getWorld(supplier.get()) if world.getDimensionKey.getLocation == dim;
-         tile <- Option(world.getTileEntity(pos))) {
+    for {
+      world <- FluidTank.proxy.getWorld(supplier.get())
+      if world.getDimensionKey.getLocation == dim
+      tile <- Option(world.getTileEntity(pos))
+    } {
       supplier.get().enqueueWork(() => tile.read(world.getBlockState(pos), nbt))
     }
     supplier.get().setPacketHandled(true)
