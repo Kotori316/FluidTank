@@ -55,7 +55,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle16
+          key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
       - name: Build with Gradle
         run: chmod +x ./gradlew && ./gradlew assemble --no-daemon --continue
         env:
@@ -92,7 +92,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle16
+          key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
       - name: Test-JUnit
         run: |
           if [ $CI_FORGE = "latest" ]; then
@@ -129,7 +129,7 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle16
+          key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
       - name: Download Mod Jar
         uses: actions/download-artifact@v2
         with:
@@ -148,7 +148,7 @@ jobs:
         continue-on-error: true
         env:
           CI_FORGE: ${{ matrix.forge }}
-      - name: Test with JUnit and runData
+      - name: Test with runData
         run: |
           if [ $CI_FORGE = "latest" ]; then
             version=$(python3 get_latest_forge.py "1.16.5-latest")
