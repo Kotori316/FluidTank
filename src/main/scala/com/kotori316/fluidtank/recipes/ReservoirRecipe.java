@@ -1,9 +1,14 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
@@ -16,8 +21,10 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -33,10 +40,17 @@ public class ReservoirRecipe extends ShapelessRecipe {
     public static final IRecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
     public static final String GROUP = "fluidtank:reservoirs";
     private final Tiers tier;
+    private final List<Ingredient> subIngredients;
 
-    public ReservoirRecipe(ResourceLocation idIn, Tiers tier) {
-        super(idIn, GROUP, findOutput(tier), findIngredients(tier));
+    public ReservoirRecipe(ResourceLocation idIn, Tiers tier, List<Ingredient> subIngredients) {
+        super(idIn, GROUP, findOutput(tier), findIngredients(tier, subIngredients));
         this.tier = tier;
+        this.subIngredients = subIngredients;
+    }
+
+    ReservoirRecipe(ResourceLocation idIn, Tiers tier) {
+        // Helper method for test.
+        this(idIn, tier, Collections.singletonList(Ingredient.fromItems(Items.BUCKET)));
     }
 
     @Override
@@ -64,7 +78,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         );
     }
 
-    private static NonNullList<Ingredient> findIngredients(Tiers tier) {
+    private static NonNullList<Ingredient> findIngredients(Tiers tier, List<Ingredient> subIngredients) {
         NonNullList<Ingredient> recipeItemsIn = NonNullList.create();
         Stream<BlockTank> tankStream = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier);
         Stream<BlockTank> invisibleStream = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> b.tier() == tier);
@@ -76,7 +90,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             tankIngredient = Ingredient.fromStacks(tankStream.map(ItemStack::new));
         }
         recipeItemsIn.add(tankIngredient);
-        recipeItemsIn.add(Ingredient.fromItems(Items.BUCKET));
+        recipeItemsIn.addAll(subIngredients);
         return recipeItemsIn;
     }
 
@@ -88,19 +102,36 @@ public class ReservoirRecipe extends ShapelessRecipe {
         @Override
         public ReservoirRecipe read(ResourceLocation recipeId, JsonObject json) {
             Tiers tier = Tiers.TierDynamicSerialize().deserialize(new Dynamic<>(JsonOps.INSTANCE, json.get("tier")));
-            return new ReservoirRecipe(recipeId, tier);
+            List<Ingredient> ingredientList;
+            if (json.has("sub"))
+                ingredientList = StreamSupport.stream(JSONUtils.getJsonArray(json, "sub").spliterator(), false)
+                    .map(CraftingHelper::getIngredient)
+                    .collect(Collectors.toList());
+            else
+                ingredientList = Collections.singletonList(Ingredient.fromItems(Items.BUCKET));
+            if (ingredientList.isEmpty() || ingredientList.size() > 8) {
+                FluidTank.LOGGER.error("Too many or too few items to craft reservoir. Size: {}, {}, Recipe: {}",
+                    ingredientList.size(), ingredientList, recipeId);
+            }
+            return new ReservoirRecipe(recipeId, tier, ingredientList);
         }
 
         @Override
         public ReservoirRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
             String tierName = buffer.readString();
             Tiers tier = Tiers.byName(tierName).get();
-            return new ReservoirRecipe(recipeId, tier);
+            int subIngredientCount = buffer.readVarInt();
+            List<Ingredient> ingredients = IntStream.range(0, subIngredientCount)
+                .mapToObj(i -> Ingredient.read(buffer))
+                .collect(Collectors.toList());
+            return new ReservoirRecipe(recipeId, tier, ingredients);
         }
 
         @Override
         public void write(PacketBuffer buffer, ReservoirRecipe recipe) {
             buffer.writeString(recipe.tier.toString());
+            buffer.writeVarInt(recipe.subIngredients.size());
+            recipe.subIngredients.forEach(i -> i.write(buffer));
         }
     }
 
@@ -114,6 +145,9 @@ public class ReservoirRecipe extends ShapelessRecipe {
         @Override
         public void serialize(JsonObject json) {
             json.add("tier", Tiers.TierDynamicSerialize().serialize(recipe.tier, JsonOps.INSTANCE).getValue());
+            JsonArray subIngredients = new JsonArray();
+            recipe.subIngredients.stream().map(Ingredient::serialize).forEach(subIngredients::add);
+            json.add("sub", subIngredients);
         }
 
         @Override
