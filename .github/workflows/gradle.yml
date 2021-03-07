@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "1.16"
+    paths:
+      - "src/main/**"
 
 jobs:
   check:
@@ -23,6 +25,8 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle16
       - id: check-parameter
         run: chmod +x ./gradlew && ./gradlew checkMethod --no-daemon
         env:
@@ -56,6 +60,8 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle16
       - name: Build with Gradle
         run: chmod +x ./gradlew && ./gradlew assemble --no-daemon --continue
         env:
@@ -93,6 +99,8 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle16
       - name: Test-JUnit
         run: |
           if [ $CI_FORGE = "latest" ]; then
@@ -130,6 +138,8 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle16
       - name: Download Mod Jar
         uses: actions/download-artifact@v2
         with:
