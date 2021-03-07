@@ -6,6 +6,7 @@ on:
       - "1.16"
     paths:
       - "src/main/**"
+      - "forge_version.properties"
 
 jobs:
   check:
