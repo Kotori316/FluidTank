@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
@@ -479,11 +479,11 @@ publishing {
             artifactId = "fluidtank"
             artifact srcJar {
                 archiveClassifier.set('sources')
-                extension = 'jar'
+                archiveExtension.set('jar')
             }
             artifact deobfJar {
                 archiveClassifier.set('deobf')
-                extension = 'jar'
+                archiveExtension.set('jar')
             }
             artifact reobfArtifact
             pom {
