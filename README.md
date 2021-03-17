@@ -24,14 +24,14 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ## APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-    * For Minecraft 1.16.5, newer than 1.16.5-36.0.1
+    * For Minecraft 1.16.5, newer than 1.16.5-36.1.0
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-    * Version 2.13.4
+    * Version 2.13.5
     * Licenced under the Apache License 2.0
 
 * **REQUIRED** [Cats](https://github.com/typelevel/cats)
-    * Version 2.3.0
+    * Version 2.4.2
     * Licensed under the MIT License
 
 * ~[Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)~
