@@ -30,8 +30,6 @@ jobs:
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle16
       - id: check-parameter
         run: chmod +x ./gradlew && ./gradlew checkMethod --no-daemon
         env:
