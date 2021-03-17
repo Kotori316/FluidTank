@@ -121,7 +121,7 @@ jobs:
 
   cross-check-runData:
     runs-on: ubuntu-latest
-    needs: [ build-publish ]
+    needs: [ check, build-publish ]
     strategy:
       fail-fast: false
       matrix:
