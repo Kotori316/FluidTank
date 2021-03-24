@@ -1,7 +1,6 @@
-package com.kotori316.fluidtank.fluid
+package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.BeforeAllTest
-import com.kotori316.fluidtank.fluids._
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, assertTrue}
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
@@ -9,7 +8,7 @@ import org.junit.jupiter.api.function.Executable
 import scala.jdk.CollectionConverters._
 
 //noinspection DuplicatedCode It's test!
-private[fluid] final class TransferOperationTest extends BeforeAllTest {
+private[fluids] final class TransferOperationTest extends BeforeAllTest {
   private[this] final val waterTank = Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000)
   private[this] final val lavaTank = Tank(FluidAmount.BUCKET_LAVA.setAmount(4000), 16000)
 

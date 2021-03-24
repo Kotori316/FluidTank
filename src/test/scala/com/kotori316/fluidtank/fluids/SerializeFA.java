@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.fluid;
+package com.kotori316.fluidtank.fluids;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import scala.Option;
 
 import com.kotori316.fluidtank.BeforeAllTest;
-import com.kotori316.fluidtank.fluids.FluidAmount;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;

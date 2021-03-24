@@ -1,4 +1,4 @@
-package com.kotori316.fluidtank.fluid;
+package com.kotori316.fluidtank.fluids;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,11 +19,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import scala.Option;
 
 import com.kotori316.fluidtank.BeforeAllTest;
-import com.kotori316.fluidtank.fluids.CreativeTankHandler;
-import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.fluids.ListTankHandler;
-import com.kotori316.fluidtank.fluids.Tank;
-import com.kotori316.fluidtank.fluids.TankHandler;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,7 +53,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         );
     }
 
-    static class FillSimulate {
+    static class FillSimulate extends BeforeAllTest {
 
         static Object[] fluidWithAmount8() {
             return Stream.of(fluids())
@@ -77,7 +72,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
 
     }
 
-    static class FillSimulateOver {
+    static class FillSimulateOver extends BeforeAllTest {
 
         static Object[] fluidWithAmount9to24() {
             return Stream.of(fluids())
@@ -104,7 +99,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
 
     }
 
-    static class FillCreative {
+    static class FillCreative extends BeforeAllTest {
         static Object[] fluids() {
             return Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA()).flatMap(f ->
                 LongStream.of(1, 1000, 2000, 5500, 10000, 84000, Integer.MAX_VALUE, Integer.MAX_VALUE + 1L, Long.MAX_VALUE - 1L).mapToObj(l ->
@@ -141,7 +136,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         assertEquals(FluidAmount.EMPTY(), filled, String.format("Test of %s, %d", FluidAmount.EMPTY(), amount));
     }
 
-    static class DrainInt {
+    static class DrainInt extends BeforeAllTest {
         static Object[] fluidWithAmount24() {
             return ListTankHandlerTestJava.fluidWithAmount24();
         }
@@ -159,7 +154,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         }
     }
 
-    static class DrainWater {
+    static class DrainWater extends BeforeAllTest {
         static Object[] fluidWithAmount24() {
             return ListTankHandlerTestJava.fluidWithAmount24();
         }
@@ -183,7 +178,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         }
     }
 
-    static class DrainLava {
+    static class DrainLava extends BeforeAllTest {
         static Object[] fluidWithAmount24() {
             return ListTankHandlerTestJava.fluidWithAmount24();
         }
@@ -207,7 +202,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         }
     }
 
-    static class DrainEmpty {
+    static class DrainEmpty extends BeforeAllTest {
         static List<FluidAmount> tankContents() {
             return Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA())
                 .flatMap(f -> IntStream.of(1000, 4000, 8000, Integer.MAX_VALUE).mapToObj(f::setAmount))
@@ -231,7 +226,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         }
     }
 
-    static class DrainEmptyFluidAmount {
+    static class DrainEmptyFluidAmount extends BeforeAllTest {
         static List<FluidAmount> tankContents() {
             return Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA())
                 .flatMap(f -> IntStream.of(1000, 4000, 8000, Integer.MAX_VALUE).mapToObj(f::setAmount))

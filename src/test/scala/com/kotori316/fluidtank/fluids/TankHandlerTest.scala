@@ -1,7 +1,6 @@
-package com.kotori316.fluidtank.fluid
+package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.BeforeAllTest
-import com.kotori316.fluidtank.fluids.{CreativeTankHandler, EmptyTankHandler, FluidAmount, Tank, TankHandler, VoidTankHandler}
 import net.minecraft.fluid.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.{DisplayName, Test}
 
 //noinspection DuplicatedCode It's a test!
-private[fluid]final  class TankHandlerTest extends BeforeAllTest {
+private[fluids] final class TankHandlerTest extends BeforeAllTest {
   @Test
   def fillWaterToEmpty(): Unit = {
     val tank = TankHandler(4000L)

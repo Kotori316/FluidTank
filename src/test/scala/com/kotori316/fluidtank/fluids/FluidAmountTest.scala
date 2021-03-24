@@ -1,8 +1,7 @@
-package com.kotori316.fluidtank.fluid
+package com.kotori316.fluidtank.fluids
 
 import cats.implicits._
 import com.kotori316.fluidtank.BeforeAllTest
-import com.kotori316.fluidtank.fluids.FluidAmount
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.{ItemStack, Items}
 import net.minecraft.nbt.CompoundNBT
@@ -12,7 +11,7 @@ import org.junit.jupiter.api.function.Executable
 
 import scala.util.chaining._
 
-private[fluid] final class FluidAmountTest extends BeforeAllTest {
+private[fluids] final class FluidAmountTest extends BeforeAllTest {
   @Test
   def equiv(): Unit = {
     val a = FluidAmount(Fluids.WATER, 1000, None)
@@ -22,6 +21,22 @@ private[fluid] final class FluidAmountTest extends BeforeAllTest {
     assertEquals(a, b, "Eq2")
     assertTrue(a fluidEqual b)
     assertTrue(b fluidEqual a)
+  }
+
+  @Test
+  def eq2(): Unit = {
+    val a = FluidAmount(Fluids.WATER, 1000, None)
+    val b = FluidAmount(Fluids.WATER, 2000, None)
+    assertNotEquals(a, b)
+  }
+
+  @Test
+  def eq3(): Unit = {
+    val a = FluidAmount.EMPTY
+    val b = FluidAmount(Fluids.WATER, 0, None)
+    val c = FluidAmount.EMPTY.setAmount(2000)
+    assertNotEquals(a, b)
+    assertNotEquals(a, c)
   }
 
   @Test
@@ -36,7 +51,11 @@ private[fluid] final class FluidAmountTest extends BeforeAllTest {
 
     val a = FluidAmount(Fluids.WATER, 1000, Some(nbt1))
     val b = FluidAmount.BUCKET_WATER
-    assertTrue(a =!= b, "Not eq due to nbt tag.")
+    val c = FluidAmount(Fluids.WATER, 1000, Some(nbt2))
+    assertAll(
+      () => assertTrue(a =!= b, s"Not eq due to nbt tag. $a, $b"),
+      () => assertTrue(a =!= c, s"Not eq due to nbt tag. $a, $c"),
+    )
   }
 
   @Test
@@ -103,6 +122,20 @@ private[fluid] final class FluidAmountTest extends BeforeAllTest {
   }
 
   @Test
+  def adder2(): Unit = {
+    {
+      val a = FluidAmount.BUCKET_LAVA
+      assertEquals(a.setAmount(2000), cats.Semigroup[FluidAmount].combine(a, a))
+      assertEquals(a.setAmount(3000), cats.Semigroup[FluidAmount].combineN(a, 3))
+      assertEquals(a.setAmount(5000), cats.Semigroup[FluidAmount].combineN(a, 5))
+    }
+    {
+      val wl = FluidAmount.BUCKET_WATER |+| FluidAmount.BUCKET_LAVA
+      assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000), wl)
+    }
+  }
+
+  @Test
   def adderEmpty(): Unit = {
     val tag = Option(new CompoundNBT().tap(_.putInt("a", 1)).tap(_.putBoolean("b", true)))
     locally {
@@ -122,7 +155,8 @@ private[fluid] final class FluidAmountTest extends BeforeAllTest {
 
   @Test
   def adder0Fluid(): Unit = {
-    val zeros = List(FluidAmount.EMPTY, FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_MILK.setAmount(0))
+    val zeros = List(FluidAmount.EMPTY, FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_MILK.setAmount(0),
+      cats.Monoid[FluidAmount].empty)
     assertTrue(zeros.forall(_.isEmpty))
 
     val nonZero = List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_MILK, FluidAmount.BUCKET_LAVA)

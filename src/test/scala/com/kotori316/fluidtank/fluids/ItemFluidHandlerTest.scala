@@ -1,7 +1,6 @@
-package com.kotori316.fluidtank.fluid
+package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.DynamicSerializable._
-import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
 import com.kotori316.fluidtank.{BeforeAllTest, DynamicSerializable, FluidTank, ModObjects}
@@ -14,7 +13,7 @@ import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 
 //noinspection DuplicatedCode It's a test.
-private[fluid] final class ItemFluidHandlerTest extends BeforeAllTest {
+private[fluids] final class ItemFluidHandlerTest extends BeforeAllTest {
   private def woodTank = ModObjects.blockTanks.head
 
   @Test

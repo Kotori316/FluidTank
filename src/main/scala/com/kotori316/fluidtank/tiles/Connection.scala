@@ -150,7 +150,7 @@ object Connection {
       val (s1, s2) = s.span(t => t.internalTank.getFluid.fluidEqual(fluid) || t.internalTank.getFluid.isEmpty)
       // Assert tanks in s1 have the same fluid.
       require(s1.map(_.internalTank.getFluid).forall(f => f.isEmpty || f.fluidEqual(fluid)))
-      val content: FluidAmount = (for (t <- s1) yield t.internalTank.drain(t.internalTank.getFluid, IFluidHandler.FluidAction.EXECUTE)).reduce(_ + _)
+      val content: FluidAmount = s1.foldMap(t => t.internalTank.drain(t.internalTank.getFluid, IFluidHandler.FluidAction.EXECUTE))
       val connection = Connection.create(s1)
       connection.handler.fill(content, IFluidHandler.FluidAction.EXECUTE)
       s1.foreach { t =>

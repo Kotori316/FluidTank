@@ -98,6 +98,11 @@ object FluidAmount {
 
   implicit val showFA: Show[FluidAmount] = Show.fromToString
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
+  implicit val monoidFA: Monoid[FluidAmount] = new Monoid[FluidAmount] {
+    override def empty: FluidAmount = FluidAmount.EMPTY
+
+    override def combine(x: FluidAmount, y: FluidAmount): FluidAmount = x + y
+  }
 
   val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
     override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
