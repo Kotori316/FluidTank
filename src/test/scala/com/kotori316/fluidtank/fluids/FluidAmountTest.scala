@@ -112,6 +112,19 @@ object FluidAmountTest {
         () => assertTrue(b =!= c, s"Not eq due to nbt tag. $b, $c"),
       )
     }
+
+    @Test
+    def keyEqual(): Unit = {
+      val tag1 = new CompoundNBT().tap(_.putInt("a", 1))
+      val tag2 = new CompoundNBT().tap(_.putInt("a", 1))
+      val key1 = FluidKey(Fluids.WATER, Some(tag1))
+      val key2 = FluidKey(Fluids.WATER, Some(tag2))
+      assertTrue(key1 === key2)
+      tag1.putString("b", "a")
+      assertNotEquals(tag1, tag2)
+      assertTrue(FluidKey(Fluids.WATER, Some(tag1)) =!= key1)
+      assertTrue(key1 === key2)
+    }
   }
 
   object Converts extends BeforeAllTest {
