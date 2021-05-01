@@ -8,6 +8,8 @@ import net.minecraftforge.fluids.FluidStack
 case class FluidKey(fluid: Fluid, tag: Option[CompoundNBT]) {
   def toAmount(amount: Long): FluidAmount = FluidAmount(fluid, amount, tag)
 
+  def createStack(amount: Int): FluidStack = new FluidStack(fluid, amount, tag.orNull)
+
   def isEmpty: Boolean = fluid == Fluids.EMPTY
 
   def isDefined: Boolean = !isEmpty
