@@ -77,6 +77,10 @@ public class ReservoirRecipe extends ShapelessRecipe {
         );
     }
 
+    Tiers getTier() { // For test
+        return tier;
+    }
+
     private static NonNullList<Ingredient> findIngredients(Tiers tier, List<Ingredient> subIngredients) {
         NonNullList<Ingredient> recipeItemsIn = NonNullList.create();
         Stream<BlockTank> tankStream = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier);

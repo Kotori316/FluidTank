@@ -3,16 +3,21 @@ package com.kotori316.fluidtank.recipes;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
+import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,8 +28,11 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tiers;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class TierRecipeTest {
@@ -154,5 +162,41 @@ final class TierRecipeTest {
         }
 
         assertFalse(recipe.matches(inventory, null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
+    @Disabled("Accessing tag before bounded is not allowed.")
+    void serializeJson(Tiers tier) {
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
+            tier, Ingredient.fromItems(Blocks.STONE));
+        JsonObject object = new JsonObject();
+        TierRecipe.FinishedRecipe finishedRecipe = new TierRecipe.FinishedRecipe(recipe.getId(), tier);
+        finishedRecipe.serialize(object);
+        TierRecipe read = TierRecipe.SERIALIZER.read(recipe.getId(), object);
+        assertNotNull(read);
+        assertAll(
+            () -> assertEquals(recipe.getTier(), read.getTier()),
+            () -> assertNotEquals(Items.AIR, read.getRecipeOutput().getItem()),
+            () -> assertEquals(recipe.getRecipeOutput().getItem(), read.getRecipeOutput().getItem()),
+            () -> assertEquals(recipe.getSubItems().serialize(), read.getSubItems().serialize())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
+    void serializePacket(Tiers tier) {
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
+            tier, Ingredient.fromItems(Blocks.STONE));
+        PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());
+        TierRecipe.SERIALIZER.write(buffer, recipe);
+        TierRecipe read = TierRecipe.SERIALIZER.read(recipe.getId(), buffer);
+        assertNotNull(read);
+        assertAll(
+            () -> assertEquals(recipe.getTier(), read.getTier()),
+            () -> assertNotEquals(Items.AIR, read.getRecipeOutput().getItem()),
+            () -> assertEquals(recipe.getRecipeOutput().getItem(), read.getRecipeOutput().getItem()),
+            () -> assertEquals(recipe.getSubItems().serialize(), read.getSubItems().serialize())
+        );
     }
 }
