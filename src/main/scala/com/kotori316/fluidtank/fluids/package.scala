@@ -1,8 +1,10 @@
 package com.kotori316.fluidtank
 
 import cats.data.{Chain, ReaderWriterStateT}
-import cats.implicits.{catsSyntaxEq, catsSyntaxGroup, catsSyntaxSemigroup}
-import cats.{Foldable, Id, Monad, Monoid}
+import cats.syntax.eq._
+import cats.syntax.group._
+import cats.syntax.semigroupk._
+import cats.{Applicative, Foldable, Id, Monad, MonoidK}
 import net.minecraft.fluid.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
@@ -41,17 +43,17 @@ package object fluids {
     }
   }
 
-  def opList[F[+_]](opList: F[TankOperation])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] = {
-    val initialState: ListTankOperation[F] = ReaderWriterStateT.applyS(f => Monad[Id].pure((Chain.empty, f, monoid.empty)))
-    Foldable[F].foldLeft(opList, initialState) { (s, op) =>
-      s.flatMap(filledTankList => op.map(t => filledTankList |+| Monad[F].pure(t)))
+  def opList[F[+_]](opList: F[TankOperation])(implicit applicative: Applicative[F], F: Foldable[F], monoidK: MonoidK[F]): ListTankOperation[F] = {
+    val initialState: ListTankOperation[F] = ReaderWriterStateT.applyS(f => Monad[Id].pure((Chain.empty, f, monoidK.empty)))
+    F.foldLeft(opList, initialState) { (s, op) =>
+      s.flatMap(filledTankList => op.map(t => filledTankList <+> applicative.pure(t)))
     }
   }
 
-  def fillList[F[+_]](tanks: F[Tank])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] =
-    opList(monad.map(tanks)(fillOp))
+  def fillList[F[+_]](tanks: F[Tank])(implicit applicative: Applicative[F], F: Foldable[F], monoidK: MonoidK[F]): ListTankOperation[F] =
+    opList(applicative.map(tanks)(fillOp))
 
-  def fillAll[F[+_]](tanks: F[Tank])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] = {
+  def fillAll[F[+_]](tanks: F[Tank])(implicit applicative: Applicative[F], F: Foldable[F], monoidK: MonoidK[F]): ListTankOperation[F] = {
     val op: Tank => TankOperation = t =>
       for {
         before <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
@@ -61,11 +63,11 @@ package object fluids {
         r = if (rest.amount < t.capacity) rest.setAmount(0) else before
         _ <- ReaderWriterStateT.set[Id, Unit, Chain[FluidTransferLog], FluidAmount](r)
       } yield y
-    opList(monad.map(tanks)(op))
+    opList(applicative.map(tanks)(op))
   }
 
-  def drainList[F[+_]](tanks: F[Tank])(implicit monad: Monad[F], F: Foldable[F], monoid: Monoid[F[Tank]]): ListTankOperation[F] =
-    opList(monad.map(tanks)(drainOp))
+  def drainList[F[+_]](tanks: F[Tank])(implicit applicative: Applicative[F], F: Foldable[F], monoidK: MonoidK[F]): ListTankOperation[F] =
+    opList(applicative.map(tanks)(drainOp))
 
   final object EmptyTankHandler extends TankHandler {
     override def setTank(newTank: Tank): Unit = ()
