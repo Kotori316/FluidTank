@@ -55,6 +55,12 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
     }
   }
 
+  def *(times: Long): FluidAmount = times match {
+    case 0 => this.setAmount(0)
+    case 1 => this
+    case _ => this.setAmount(this.amount * times)
+  }
+
   def fluidEqual(that: FluidAmount): Boolean = this.fluid === that.fluid && this.nbt === that.nbt
 
   def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount), nbt.orNull)

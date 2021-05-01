@@ -21,7 +21,7 @@ object ListTankHandlerTest {
 
   private def createWoodStone: Chain[TankHandler] = Chain(TankHandler(WOOD), TankHandler(STONE))
 
-  object NormalFill extends BeforeAllTest {
+  object Fill extends BeforeAllTest {
     @Test
     def fillWater1(): Unit = {
       val h = new ListTankHandler(createWoodStone)
@@ -126,7 +126,7 @@ object ListTankHandlerTest {
     }
   }
 
-  object NormalDrain extends BeforeAllTest {
+  object Drain extends BeforeAllTest {
     @Test
     def drainWater1(): Unit = {
       val before = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(6000), STONE.capacity))
