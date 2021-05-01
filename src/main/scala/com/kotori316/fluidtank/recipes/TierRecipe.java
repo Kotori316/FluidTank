@@ -9,8 +9,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
@@ -21,6 +19,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -30,6 +29,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -242,7 +242,6 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         return 3;
     }
 
-    public static final String KEY_ID = "recipeId";
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
@@ -255,9 +254,12 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, JsonObject json) {
-            json.addProperty(KEY_ID, recipeId.toString());
-            return RecipeSerializeHelper.TierRecipeSerializer()
-                .deserialize(new Dynamic<>(JsonOps.INSTANCE, json));
+            Tiers tier = OptionConverters.toJava(Tiers.byName(JSONUtils.getString(json, KEY_TIER))).orElse(Tiers.Invalid());
+            Ingredient subItem = Ingredient.deserialize(json.get(KEY_SUB_ITEM));
+            if (subItem == Ingredient.EMPTY)
+                LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, json);
+            LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, subItem);
+            return new TierRecipe(recipeId, tier, subItem);
         }
 
         @Override
@@ -267,7 +269,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
             Ingredient subItem = Ingredient.read(buffer);
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
-            LOGGER.debug("Serializer loaded {} from packet for tier {}.", recipeId, tier);
+            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}..", recipeId, tier, subItem);
             return new TierRecipe(recipeId, tier, subItem);
         }
 
@@ -292,9 +294,9 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         @Override
         public void serialize(JsonObject json) {
             Ingredient ingredient = Ingredient.fromTag(ItemTags.makeWrapperTag(this.tiers.tagName()));
-            JsonObject object = RecipeSerializeHelper.TierRecipeSerializer().serialize(new TierRecipe(this.recipeId, this.tiers, ingredient), JsonOps.INSTANCE)
-                .getValue().getAsJsonObject();
-            object.entrySet().forEach(e -> json.add(e.getKey(), e.getValue()));
+
+            json.addProperty(KEY_TIER, this.tiers.lowerName());
+            json.add(KEY_SUB_ITEM, ingredient.serialize());
         }
 
         @Override

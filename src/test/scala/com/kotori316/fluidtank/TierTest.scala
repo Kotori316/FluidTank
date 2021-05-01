@@ -3,34 +3,53 @@ package com.kotori316.fluidtank
 import cats._
 import cats.implicits._
 import com.google.gson.JsonElement
-import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank.tiles.Tiers
-import com.mojang.serialization.{JsonOps, Dynamic => SerializeDynamic}
-import net.minecraft.nbt.{INBT, NBTDynamicOps}
+import net.minecraft.nbt.INBT
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
+
+import scala.annotation.tailrec
 
 class TierTest extends BeforeAllTest {
   implicit val eqNBT: Eq[INBT] = Eq.fromUniversalEquals
   implicit val eqJson: Eq[JsonElement] = Eq.fromUniversalEquals
 
-  @Test def tierSerialize(): Unit = {
+  @tailrec
+  final def check(tiers: List[Tiers], deserialized: List[Option[Tiers]], names: List[String]): Unit = {
+    val t :: tRest = tiers
+    val d :: dRest = deserialized
+    val n :: nRest = names
+    assertEquals(Option(t), d, f"Tier $t, Actual $d, name=$n")
+    if (tRest.nonEmpty && dRest.nonEmpty && nRest.nonEmpty)
+      check(tRest, dRest, nRest)
+  }
+
+  @Test
+  def tierSerialize1(): Unit = {
     val tiers = Tiers.list.toList
-    val serializedJson = tiers.map(_.toJson)
+    val names = tiers.map(_.lowerName)
+    val deserialized = names.map(Tiers.byName)
 
-    val d = serializedJson
-      .map(new SerializeDynamic(JsonOps.INSTANCE, _))
-      .map(DynamicSerializable[Tiers].deserialize)
-    assertEquals(tiers, d)
+    check(tiers, deserialized, names)
+  }
 
-    val serializedNBT = tiers.map(_.toNBT)
-    val convertedToJson = serializedNBT.map(j => SerializeDynamic.convert(NBTDynamicOps.INSTANCE, JsonOps.INSTANCE, j))
-    val convertedToNBT = serializedJson.map(j => SerializeDynamic.convert(JsonOps.INSTANCE, NBTDynamicOps.INSTANCE, j))
-    assertTrue(serializedNBT === convertedToNBT)
-    assertTrue(serializedJson === convertedToJson)
-    assertEquals(serializedJson, convertedToJson)
-    assertEquals(serializedNBT, convertedToNBT)
+  @Test
+  def tierSerialize2(): Unit = {
+    val tiers = Tiers.list.toList
+    val names = tiers.map(_.toString)
+    val deserialized = names.map(Tiers.byName)
+
+    check(tiers, deserialized, names)
+  }
+
+  @Test
+  def tierSerialize3(): Unit = {
+    val tiers = Tiers.list.toList
+    val names = tiers.map(_.toString.toUpperCase)
+    val deserialized = names.map(Tiers.byName)
+
+    check(tiers, deserialized, names)
   }
 
   @Test
@@ -57,22 +76,11 @@ class TierTest extends BeforeAllTest {
   }
 
   @Test
-  def allInstanceIsNotSame(): Unit = {
-    val as = Tiers.list.toList.combinations(2).map[Executable] { buf =>
+  def allInstanceIsNotSame(): Unit = assertAll(
+    Tiers.list.toList.combinations(2).map[Executable] { buf =>
       val List(a, b) = buf
       () => assertTrue(a =!= b, s"$a =!= $b")
-    }.toSeq
-    assertAll(as: _*)
-  }
+    }.toSeq: _*
+  )
 
-  @Test
-  def codecAndSerialize(): Unit = {
-    val tiers = Tiers.list.toList
-    val tests = tiers.map[Executable] { t =>
-      () =>
-        assertEquals(java.util.Optional.of(Tiers.TierDynamicSerialize.serialize(t)(JsonOps.INSTANCE).getValue),
-          Tiers.TierCodec.encodeStart(JsonOps.INSTANCE, t).result())
-    }
-    assertAll(tests: _*)
-  }
 }

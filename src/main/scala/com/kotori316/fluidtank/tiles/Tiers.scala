@@ -3,12 +3,8 @@ package com.kotori316.fluidtank.tiles
 import java.util.Collections
 
 import cats.Hash
-import cats.data.Ior
-import com.kotori316.fluidtank.DynamicSerializable._
-import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.recipes.TagCondition
-import com.mojang.serialization.Codec
-import net.minecraft.nbt.INBT
+import net.minecraft.nbt.{INBT, StringNBT}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -26,7 +22,7 @@ class Tiers private(val rank: Int, buckets: Int, override val toString: String, 
     case _ => false
   }
 
-  def toNBTTag: INBT = this.asInstanceOf[Tiers].toNBT
+  def toNBTTag: StringNBT = StringNBT.valueOf(lowerName)
 
   def hasWayToCreate: Boolean = !hasTagRecipe || new TagCondition(tagName).test()
 
@@ -57,19 +53,13 @@ object Tiers {
 
   def jList: java.util.List[Tiers] = Collections.unmodifiableList(list.asJava)
 
-  def fromNBT(nbt: INBT): Tiers = TierDynamicSerialize.deserializeFromNBT(nbt)
+  def fromNBT(nbt: INBT): Tiers = nbt match {
+    case t: StringNBT => byName(t.getString).getOrElse(Invalid)
+    case _ => Invalid
+  }
 
   def byName(s: String): Option[Tiers] = list.find(_.toString.equalsIgnoreCase(s))
 
   implicit val EqTiers: Hash[Tiers] = Hash.fromUniversalHashCode
 
-  implicit val TierCodec: Codec[Tiers] = Codec.STRING.comapFlatMap[Tiers](
-    s => (byName(s) match {
-      case Some(value) => Ior.right(value)
-      case None => Ior.both(s"Invalid tier name, $s.", WOOD)
-    }).toResult,
-    tier => tier.lowerName
-  )
-
-  implicit val TierDynamicSerialize: DynamicSerializable[Tiers] = new DynamicSerializable.DynamicSerializableFromCodec[Tiers](TierCodec, WOOD)
 }

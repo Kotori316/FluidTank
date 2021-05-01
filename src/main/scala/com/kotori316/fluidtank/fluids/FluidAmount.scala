@@ -1,24 +1,16 @@
 package com.kotori316.fluidtank.fluids
 
-import java.lang
-import java.util.Optional
-
 import cats._
 import cats.implicits._
-import com.kotori316.fluidtank.DynamicSerializable._
 import com.kotori316.fluidtank._
-import com.mojang.serialization.codecs.RecordCodecBuilder
-import com.mojang.serialization.{Codec, DataResult, DynamicOps, Dynamic => SerializeDynamic}
-import javax.annotation.Nonnull
+import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
-import net.minecraft.nbt.{CompoundNBT, NBTDynamicOps}
+import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 
-import scala.jdk.CollectionConverters._
-import scala.jdk.OptionConverters._
 import scala.util.chaining._
 
 case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
@@ -28,7 +20,14 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
   }
 
   def write(tag: CompoundNBT): CompoundNBT = {
-    tag merge this.asInstanceOf[FluidAmount].toNBT.asInstanceOf[CompoundNBT]
+    import com.kotori316.fluidtank.fluids.FluidAmount._
+
+    val fluidNBT = new CompoundNBT()
+    fluidNBT.putString(NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
+    fluidNBT.putLong(NBT_amount, amount)
+    this.nbt.foreach(fluidNBT.put(NBT_tag, _))
+
+    tag merge fluidNBT
   }
 
   def nonEmpty: Boolean = fluid != Fluids.EMPTY && amount > 0
@@ -89,7 +88,16 @@ object FluidAmount {
     }
   }
 
-  def fromNBT(tag: CompoundNBT): FluidAmount = codecFA.parse(NBTDynamicOps.INSTANCE, tag).result().orElse(EMPTY)
+  def fromNBT(@Nullable tag: CompoundNBT): FluidAmount = {
+    if (tag == null) return FluidAmount.EMPTY
+    val name = new ResourceLocation(tag.getString(NBT_fluid))
+    val amount = tag.getLong(NBT_amount)
+    val nbt = if (tag.contains(NBT_tag)) Option(tag.getCompound(NBT_tag)) else None
+    val fluid =
+      if (!ForgeRegistries.FLUIDS.containsKey(name)) Fluids.EMPTY
+      else ForgeRegistries.FLUIDS.getValue(name)
+    FluidAmount(fluid, amount, nbt)
+  }
 
   def fromStack(stack: FluidStack): FluidAmount = {
     val fluid = stack.getRawFluid
@@ -109,50 +117,5 @@ object FluidAmount {
 
     override def combine(x: FluidAmount, y: FluidAmount): FluidAmount = x + y
   }
-
-  val dynamicSerializableFA: DynamicSerializable[FluidAmount] = new DynamicSerializable[FluidAmount] {
-    override def serialize[DataType](t: FluidAmount)(ops: DynamicOps[DataType]): SerializeDynamic[DataType] = {
-      val map = Map[String, DataType](
-        NBT_fluid -> ops.createString(FluidAmount.registry.getKey(t.fluid).toString),
-        NBT_amount -> ops.createLong(t.amount)
-      ) ++ t.nbt.map(c => NBT_tag -> SerializeDynamic.convert(NBTDynamicOps.INSTANCE, ops, c))
-
-      val data = map.map { case (key, data) => ops.createString(key) -> data }
-      new SerializeDynamic[DataType](ops, ops.createMap(data.asJava))
-    }
-
-    override def deserialize[DataType](d: SerializeDynamic[DataType]): FluidAmount = {
-      val fA = for {
-        name <- d.get(NBT_fluid).asString().result().toScala
-        registryName = new ResourceLocation(name)
-        fluid <- Option(registry.getValue(registryName))
-        if fluid != EMPTY.fluid
-        amount = d.get(NBT_amount).asLong(0L)
-        nbt = d.getElement(NBT_tag).result().toScala
-          .map(c => SerializeDynamic.convert(d.getOps, NBTDynamicOps.INSTANCE, c))
-          .collect { case t: CompoundNBT if !t.isEmpty => t }
-      } yield FluidAmount(fluid, amount, nbt)
-      fA.getOrElse(EMPTY)
-    }
-  }
-
-  implicit val codecFA: Codec[FluidAmount] = RecordCodecBuilder.create[FluidAmount] { inst =>
-    inst.group(
-      ResourceLocation.CODEC.comapFlatMap[Fluid](
-        name => {
-          val mappedName = Utils.mapMilkName(name)
-          if (ForgeRegistries.FLUIDS.containsKey(mappedName)) DataResult.success(ForgeRegistries.FLUIDS.getValue(mappedName)) else DataResult.error(s"No fluid for $mappedName.")
-        },
-        fluid => fluid.getRegistryName
-      ).fieldOf(NBT_fluid).forGetter(_.fluid),
-      Codec.LONG.fieldOf(NBT_amount).forGetter(_.amount),
-      CompoundNBT.CODEC.optionalFieldOf(NBT_tag).forGetter(_.nbt.toJava),
-    ).apply(inst, inst.stable[com.mojang.datafixers.util.Function3[Fluid, lang.Long, Optional[CompoundNBT], FluidAmount]](
-      (f, l, o) => FluidAmount(f, l, o.toScala)
-    ))
-  }
-
-  implicit val dynamicSerializableFromCodecFA: DynamicSerializable[FluidAmount] =
-    new DynamicSerializable.DynamicSerializableFromCodec(codecFA, EMPTY)
 
 }

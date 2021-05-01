@@ -87,7 +87,6 @@ object ModObjects {
     new LootFunctionType(new ContentTankSerializer))
 
   // ---------- Markers ----------
-  final val MARKER_DynamicSerializable = MarkerManager.getMarker("DynamicSerializable")
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
   final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
   final val MARKER_Connection = MarkerManager.getMarker("Connection")

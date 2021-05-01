@@ -12,6 +12,7 @@ import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fluids.FluidStack
 
+import scala.jdk.OptionConverters._
 import scala.util.chaining._
 
 package object fluidtank extends CapConverter {
@@ -56,4 +57,12 @@ package object fluidtank extends CapConverter {
     }
   }
 
+  implicit final class ResultToOther[A](private val dataResult: DataResult[A]) extends AnyVal {
+    def toEither: Either[String, A] = {
+      dataResult.result().toScala match {
+        case Some(value) => Right(value)
+        case None => Left(dataResult.error().toScala.map(_.message()).get)
+      }
+    }
+  }
 }

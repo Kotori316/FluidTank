@@ -10,8 +10,6 @@ import java.util.stream.StreamSupport;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import javax.annotation.Nullable;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
@@ -27,6 +25,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import scala.jdk.javaapi.CollectionConverters;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -101,7 +100,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
 
         @Override
         public ReservoirRecipe read(ResourceLocation recipeId, JsonObject json) {
-            Tiers tier = Tiers.TierDynamicSerialize().deserialize(new Dynamic<>(JsonOps.INSTANCE, json.get("tier")));
+            Tiers tier = OptionConverters.toJava(Tiers.byName(JSONUtils.getString(json, "tier"))).orElse(Tiers.Invalid());
             List<Ingredient> ingredientList;
             if (json.has("sub"))
                 ingredientList = StreamSupport.stream(JSONUtils.getJsonArray(json, "sub").spliterator(), false)
@@ -144,7 +143,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
 
         @Override
         public void serialize(JsonObject json) {
-            json.add("tier", Tiers.TierDynamicSerialize().serialize(recipe.tier, JsonOps.INSTANCE).getValue());
+            json.addProperty("tier", recipe.tier.lowerName());
             JsonArray subIngredients = new JsonArray();
             recipe.subIngredients.stream().map(Ingredient::serialize).forEach(subIngredients::add);
             json.add("sub", subIngredients);
