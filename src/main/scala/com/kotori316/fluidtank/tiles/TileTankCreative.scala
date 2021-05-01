@@ -7,8 +7,8 @@ class TileTankCreative extends TileTank(Tiers.CREATIVE, ModObjects.TANK_CREATIVE
 
   override val internalTank = new CreativeTank
 
-  class CreativeTank extends CreativeTankHandler with TileTankNoDisplay.RealTank {
-    override def tile: TileTankNoDisplay = TileTankCreative.this
+  class CreativeTank extends CreativeTankHandler with TileTank.RealTank {
+    override def tile: TileTank = TileTankCreative.this
   }
 
 }

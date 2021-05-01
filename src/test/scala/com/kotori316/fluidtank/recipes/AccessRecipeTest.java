@@ -42,12 +42,6 @@ final class AccessRecipeTest extends BeforeAllTest {
     }
 
     @Test
-    void createConvertRecipeInstance() {
-        ConvertInvisibleRecipe recipe = new ConvertInvisibleRecipe(new ResourceLocation(FluidTank.modID, "test_convert"));
-        assertNotNull(recipe);
-    }
-
-    @Test
     void dummy() {
         assertTrue(tiers().length > 0);
         assertTrue(TierRecipeTest.fluids1().length > 0);

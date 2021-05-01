@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil
-import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -53,7 +53,7 @@ private[fluids] final class ItemFluidHandlerTest extends BeforeAllTest {
     assertNotNull(tag)
     val childTag = tag.getCompound("BlockEntityTag")
     assertFalse(childTag.isEmpty)
-    val fluidInTank = FluidAmount.fromNBT(childTag.getCompound(TileTankNoDisplay.NBT_Tank))
+    val fluidInTank = FluidAmount.fromNBT(childTag.getCompound(TileTank.NBT_Tank))
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L), fluidInTank)
   }
 

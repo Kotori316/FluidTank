@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.network.SideProxy
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay
+import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.{BucketItem, ItemStack, Items}
 import net.minecraft.tags.FluidTags
@@ -25,7 +25,7 @@ object BucketEventHandler {
     if (ray == null || ray.getType != RayTraceResult.Type.BLOCK) return
 
     event.getWorld.getTileEntity(ray.asInstanceOf[BlockRayTraceResult].getPos) match {
-      case tileTank: TileTankNoDisplay =>
+      case tileTank: TileTank =>
         val stack = event.getEmptyBucket
         //1.13.2 code
         val stackFluid = FluidAmount.fromItem(stack)

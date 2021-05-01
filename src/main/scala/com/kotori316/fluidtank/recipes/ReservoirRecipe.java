@@ -27,13 +27,12 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import scala.jdk.javaapi.CollectionConverters;
 import scala.jdk.javaapi.OptionConverters;
 
-import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 public class ReservoirRecipe extends ShapelessRecipe {
     public static final IRecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
@@ -59,10 +58,10 @@ public class ReservoirRecipe extends ShapelessRecipe {
             .mapToObj(inv::getStackInSlot)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .filter(ItemStack::hasTag)
-            .map(s -> s.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
+            .map(s -> s.getChildTag(TileTank.NBT_BlockTag()))
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(nbt -> result.setTagInfo(TileTankNoDisplay.NBT_BlockTag(), nbt));
+            .ifPresent(nbt -> result.setTagInfo(TileTank.NBT_BlockTag(), nbt));
         return result;
     }
 
@@ -84,14 +83,8 @@ public class ReservoirRecipe extends ShapelessRecipe {
     private static NonNullList<Ingredient> findIngredients(Tiers tier, List<Ingredient> subIngredients) {
         NonNullList<Ingredient> recipeItemsIn = NonNullList.create();
         Stream<BlockTank> tankStream = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier);
-        Stream<BlockTank> invisibleStream = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> b.tier() == tier);
 
-        Ingredient tankIngredient;
-        if (Config.content().usableInvisibleInRecipe().get()) {
-            tankIngredient = Ingredient.fromStacks(Stream.concat(tankStream, invisibleStream).map(ItemStack::new));
-        } else {
-            tankIngredient = Ingredient.fromStacks(tankStream.map(ItemStack::new));
-        }
+        Ingredient tankIngredient = Ingredient.fromStacks(tankStream.map(ItemStack::new));
         recipeItemsIn.add(tankIngredient);
         recipeItemsIn.addAll(subIngredients);
         return recipeItemsIn;

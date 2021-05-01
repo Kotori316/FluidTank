@@ -136,11 +136,6 @@ public class Utils {
         }
 
         @Override
-        public Config.BoolSupplier usableInvisibleInRecipe() {
-            return createBool();
-        }
-
-        @Override
         public Config.BoolSupplier usableUnavailableTankInRecipe() {
             return createBool();
         }

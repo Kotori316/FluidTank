@@ -40,7 +40,7 @@ import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tiers;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInventory> {
     private static final Logger LOGGER = LogManager.getLogger(TierRecipe.class);
@@ -50,7 +50,6 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     private final ResourceLocation id;
     private final Tiers tier;
     private final Set<BlockTank> normalTankSet;
-    private final Set<BlockTank> invisibleTankSet;
     private final Ingredient subItems;
     private final ItemStack result;
     private static final int recipeWidth = 3;
@@ -64,8 +63,6 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
         Set<Tiers> tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
         normalTankSet = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier()))
-            .filter(TierRecipe::filterTier).collect(Collectors.toSet());
-        invisibleTankSet = CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().filter(b -> tiersSet.contains(b.tier()))
             .filter(TierRecipe::filterTier).collect(Collectors.toSet());
         LOGGER.debug("Recipe instance({}) created for Tier {}.", idIn, tier);
     }
@@ -115,9 +112,9 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
             .filter(this.getTankItems())
             .collect(Collectors.toList());
         return tankStacks.size() == 4 &&
-            tankStacks.stream().map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
+            tankStacks.stream().map(stack -> stack.getChildTag(TileTank.NBT_BlockTag()))
                 .filter(Objects::nonNull)
-                .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
+                .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
                 .filter(FluidAmount::nonEmpty)
                 .map(FluidKey::from)
                 .distinct()
@@ -134,9 +131,9 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         ItemStack result = getRecipeOutput();
         FluidAmount fluidAmount = IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
-            .map(stack -> stack.getChildTag(TileTankNoDisplay.NBT_BlockTag()))
+            .map(stack -> stack.getChildTag(TileTank.NBT_BlockTag()))
             .filter(Objects::nonNull)
-            .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTankNoDisplay.NBT_Tank())))
+            .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
 
@@ -144,13 +141,13 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
             CompoundNBT compound = new CompoundNBT();
 
             CompoundNBT tankTag = new CompoundNBT();
-            tankTag.putInt(TileTankNoDisplay.NBT_Capacity(), Utils.toInt(tier.amount()));
+            tankTag.putInt(TileTank.NBT_Capacity(), Utils.toInt(tier.amount()));
             fluidAmount.write(tankTag);
 
-            compound.put(TileTankNoDisplay.NBT_Tank(), tankTag);
-            compound.put(TileTankNoDisplay.NBT_Tier(), tier.toNBTTag());
+            compound.put(TileTank.NBT_Tank(), tankTag);
+            compound.put(TileTank.NBT_Tier(), tier.toNBTTag());
 
-            result.setTagInfo(TileTankNoDisplay.NBT_BlockTag(), compound);
+            result.setTagInfo(TileTank.NBT_BlockTag(), compound);
         }
 
         return result;
@@ -196,12 +193,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     public Ingredient getTankItems() {
-        Stream<BlockTank> tankStream;
-        if (!Config.content().usableInvisibleInRecipe().get()) {
-            tankStream = this.normalTankSet.stream();
-        } else {
-            tankStream = Stream.concat(this.normalTankSet.stream(), this.invisibleTankSet.stream());
-        }
+        Stream<BlockTank> tankStream = this.normalTankSet.stream();
         return Ingredient.fromStacks(tankStream.map(ItemStack::new).toArray(ItemStack[]::new));
     }
 

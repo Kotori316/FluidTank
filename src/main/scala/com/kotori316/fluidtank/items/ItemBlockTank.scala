@@ -4,7 +4,7 @@ import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay
+import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.block.BlockState
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
@@ -23,18 +23,18 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
   setRegistryName(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
 
   override def getRarity(stack: ItemStack): Rarity =
-    if (stack.hasTag && stack.getTag.contains(TileTankNoDisplay.NBT_BlockTag)) Rarity.RARE
+    if (stack.hasTag && stack.getTag.contains(TileTank.NBT_BlockTag)) Rarity.RARE
     else Rarity.COMMON
 
   def hasRecipe = true
 
   @OnlyIn(Dist.CLIENT)
   override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
-    val nbt = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+    val nbt = stack.getChildTag(TileTank.NBT_BlockTag)
     if (nbt != null) {
-      val tankNBT = nbt.getCompound(TileTankNoDisplay.NBT_Tank)
+      val tankNBT = nbt.getCompound(TileTank.NBT_Tank)
       val fluid = FluidAmount.fromNBT(tankNBT)
-      val c = tankNBT.getInt(TileTankNoDisplay.NBT_Capacity)
+      val c = tankNBT.getInt(TileTank.NBT_Capacity)
       tooltip.add(new TranslationTextComponent(Localize.TOOLTIP, fluid.toStack.getDisplayName, fluid.amount, c))
     } else {
       tooltip.add(new TranslationTextComponent(Localize.CAPACITY, blockTank.tier.amount))
@@ -49,7 +49,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     if (worldIn.getServer != null) {
       val tileentity = worldIn.getTileEntity(pos)
       if (tileentity != null) {
-        val subTag = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+        val subTag = stack.getChildTag(TileTank.NBT_BlockTag)
         if (subTag != null) {
           if (!(!worldIn.isRemote && tileentity.onlyOpsCanSetNbt) || !(player == null || !player.canUseCommandBlock)) {
             val nbt = tileentity.write(new CompoundNBT)
@@ -63,7 +63,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
         }
         if (stack.hasDisplayName) {
           tileentity match {
-            case tank: TileTankNoDisplay => tank.stackName = stack.getDisplayName
+            case tank: TileTank => tank.stackName = stack.getDisplayName
             case _ =>
           }
         }
@@ -92,5 +92,5 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
       .value
   }
 
-  override def hasContainerItem(stack: ItemStack): Boolean = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag) != null
+  override def hasContainerItem(stack: ItemStack): Boolean = stack.getChildTag(TileTank.NBT_BlockTag) != null
 }

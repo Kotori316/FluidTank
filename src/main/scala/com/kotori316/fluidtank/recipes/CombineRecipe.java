@@ -71,14 +71,7 @@ public class CombineRecipe extends SpecialRecipe {
     }
 
     private static Ingredient tankList() {
-        Stream<BlockTank> tankStream;
-        if (!Config.content().usableInvisibleInRecipe().get()) {
-            // Normal tanks only
-            tankStream = StreamConverters.asJavaSeqStream(ModObjects.blockTanks());
-        } else {
-            tankStream = Stream.of(ModObjects.blockTanks(), ModObjects.blockTanksInvisible())
-                .flatMap(StreamConverters::asJavaSeqStream);
-        }
+        Stream<BlockTank> tankStream = StreamConverters.asJavaSeqStream(ModObjects.blockTanks());
         Predicate<BlockTank> filter = t -> t.tier().isNormalTier();
         if (!Config.content().usableUnavailableTankInRecipe().get()) {
             filter = filter.and(t -> t.tier().hasWayToCreate());

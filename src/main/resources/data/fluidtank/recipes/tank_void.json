@@ -9,14 +9,9 @@
     "o": {
       "tag": "forge:obsidian"
     },
-    "t": [
-      {
-        "item": "fluidtank:tank_wood"
-      },
-      {
-        "item": "fluidtank:invisible_tank_wood"
-      }
-    ]
+    "t": {
+      "item": "fluidtank:tank_wood"
+    }
   },
   "result": {
     "item": "fluidtank:tank_void"

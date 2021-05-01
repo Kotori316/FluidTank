@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.fluids.FluidAmount
-import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
 import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundNBT
@@ -14,10 +14,10 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 
 class TankItemFluidHandler(val tiers: Tiers, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
-  def nbt: CompoundNBT = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+  def nbt: CompoundNBT = stack.getChildTag(TileTank.NBT_BlockTag)
 
   @Nullable
-  def tankNbt: CompoundNBT = if (nbt == null) null else nbt.getCompound(TileTankNoDisplay.NBT_Tank)
+  def tankNbt: CompoundNBT = if (nbt == null) null else nbt.getCompound(TileTank.NBT_Tank)
 
   private[this] var initialized = false
   @Nonnull
@@ -96,20 +96,20 @@ class TankItemFluidHandler(val tiers: Tiers, stack: ItemStack) extends IFluidHan
     }
     if (!fluid.isEmpty) {
       val compound = stack.getOrCreateTag()
-      compound.put(TileTankNoDisplay.NBT_BlockTag, createTag)
+      compound.put(TileTank.NBT_BlockTag, createTag)
       stack.setTag(compound)
     } else {
-      stack.removeChildTag(TileTankNoDisplay.NBT_BlockTag)
+      stack.removeChildTag(TileTank.NBT_BlockTag)
     }
   }
 
   def createTag: CompoundNBT = {
     val tag = new CompoundNBT
-    tag.put(TileTankNoDisplay.NBT_Tier, tiers.toNBTTag)
+    tag.put(TileTank.NBT_Tier, tiers.toNBTTag)
     val tankTag = new CompoundNBT
-    tankTag.putInt(TileTankNoDisplay.NBT_Capacity, Utils.toInt(getCapacity))
+    tankTag.putInt(TileTank.NBT_Capacity, Utils.toInt(getCapacity))
     getFluid.write(tankTag)
-    tag.put(TileTankNoDisplay.NBT_Tank, tankTag)
+    tag.put(TileTank.NBT_Tank, tankTag)
     tag
   }
 
@@ -140,5 +140,5 @@ class TankItemFluidHandler(val tiers: Tiers, stack: ItemStack) extends IFluidHan
     FluidAmount.fromStack(fluid)
   }
 
-  def getCapacity: Long = if (tankNbt == null) tiers.amount else tankNbt.getLong(TileTankNoDisplay.NBT_Capacity)
+  def getCapacity: Long = if (tankNbt == null) tiers.amount else tankNbt.getLong(TileTank.NBT_Capacity)
 }

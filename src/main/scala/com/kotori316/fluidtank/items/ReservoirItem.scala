@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
-import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
 import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
@@ -81,12 +81,12 @@ class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirPr
       .value
   }
 
-  override def hasContainerItem(stack: ItemStack): Boolean = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag) != null
+  override def hasContainerItem(stack: ItemStack): Boolean = stack.getChildTag(TileTank.NBT_BlockTag) != null
 
   // ---------- Information ----------
   @OnlyIn(Dist.CLIENT)
   override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
-    val nbt = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+    val nbt = stack.getChildTag(TileTank.NBT_BlockTag)
     if (nbt != null) {
       val fluid = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).asScala
         .collect { case h: TankItemFluidHandler => h.getFluid -> h.getCapacity }
@@ -98,6 +98,6 @@ class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirPr
   }
 
   override def getRarity(stack: ItemStack): Rarity =
-    if (stack.hasTag && stack.getTag.contains(TileTankNoDisplay.NBT_BlockTag)) Rarity.RARE
+    if (stack.hasTag && stack.getTag.contains(TileTank.NBT_BlockTag)) Rarity.RARE
     else Rarity.COMMON
 }
