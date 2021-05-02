@@ -22,6 +22,8 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 
+import scala.jdk.javaapi.CollectionConverters
+
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
   private final val MARKER = MarkerManager.getMarker("FluidTankDataProvider")
@@ -207,6 +209,6 @@ object FluidTankDataProvider {
   }
 
   def ingredientArray(i1: Ingredient, is: Ingredient*): Ingredient = {
-    Ingredient.merge(java.util.Arrays.asList(i1 +: is: _*))
+    Ingredient.merge(CollectionConverters.asJava(i1 +: is))
   }
 }
