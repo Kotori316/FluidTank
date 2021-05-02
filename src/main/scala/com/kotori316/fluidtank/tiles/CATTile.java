@@ -15,7 +15,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -34,7 +33,6 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
-import com.kotori316.fluidtank.milk.MilkBucketHandler;
 
 public class CATTile extends TileEntity implements INamedContainerProvider {
     // The direction of FACING is facing to you, people expect to use itemBlock targeting an inventory so the chest exists on the opposite side of FACING.
@@ -92,8 +90,6 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
             ItemStack stackInSlot = inventory.getStackInSlot(tank);
             if (stackInSlot.isEmpty())
                 return LazyOptional.empty();
-            else if (stackInSlot.getItem() == Items.MILK_BUCKET)
-                return LazyOptional.of(() -> new MilkBucketHandler(stackInSlot));
             else
                 return net.minecraftforge.fluids.FluidUtil.getFluidHandler(stackInSlot);
         }

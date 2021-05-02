@@ -1,12 +1,12 @@
 package com.kotori316.fluidtank;
 
 import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -40,7 +40,7 @@ public class FluidTank {
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
-        Utils.enableMilk();
+        ForgeMod.enableMilkFluid();
     }
 
     @Mod.EventBusSubscriber(modid = modID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -68,11 +68,6 @@ public class FluidTank {
             event.getRegistry().register(ModObjects.blockItemPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockSource().itemBlock());
             CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(event.getRegistry()::register);
-        }
-
-        @SubscribeEvent
-        public static void registerFluids(RegistryEvent.Register<Fluid> event) {
-            event.getRegistry().register(ModObjects.MILK_FLUID());
         }
 
         @SubscribeEvent

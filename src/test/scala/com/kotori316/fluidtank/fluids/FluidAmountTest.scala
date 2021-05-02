@@ -264,13 +264,13 @@ object FluidAmountTest {
 
     @Test
     def adder0Fluid(): Unit = {
-      val zeros = List(FluidAmount.EMPTY, FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_MILK.setAmount(0),
-        cats.Monoid[FluidAmount].empty)
+      val zeros = fluidKeys().toSeq.map(_.toAmount(0)) :+ cats.Monoid[FluidAmount].empty
+
       assertTrue(zeros.forall(_.isEmpty))
 
-      val nonZero = List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_MILK, FluidAmount.BUCKET_LAVA)
+      val nonZero = fluidKeysNonEmpty().toSeq.map(_.toAmount(1000))
 
-      val assertions: List[Executable] = for {
+      val assertions: Seq[Executable] = for {
         zero <- zeros
         hasContent <- nonZero
         d <- List(true, false)

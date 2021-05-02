@@ -2,7 +2,6 @@ package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.items.ReservoirItem
-import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
@@ -10,7 +9,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
 import net.minecraft.loot.LootFunctionType
-import net.minecraft.tags.FluidTags
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
@@ -72,10 +70,6 @@ object ModObjects {
   //---------- Containers ----------
 
   final val CAT_CONTAINER_TYPE = CATContainer.makeType()
-
-  //---------- Fluids ----------
-  final val MILK_FLUID = new MilkFluid
-  final val MILK_TAG = FluidTags.makeWrapperTag("forge:milk")
 
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,

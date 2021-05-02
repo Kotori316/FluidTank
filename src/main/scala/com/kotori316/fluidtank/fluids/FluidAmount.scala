@@ -75,13 +75,11 @@ object FluidAmount {
   val EMPTY: FluidAmount = FluidAmount(Fluids.EMPTY, 0, None)
   val BUCKET_LAVA: FluidAmount = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
   val BUCKET_WATER: FluidAmount = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
-  val BUCKET_MILK: FluidAmount = FluidAmount(ModObjects.MILK_FLUID, AMOUNT_BUCKET, None)
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
       case Items.LAVA_BUCKET => BUCKET_LAVA
       case Items.WATER_BUCKET => BUCKET_WATER
-      case Items.MILK_BUCKET if !Utils.isVanillaMilkEnabled => BUCKET_MILK
       case bucket: BucketItem =>
         bucket.pipe(_.getFluid).pipe(FluidAmount(_, AMOUNT_BUCKET, None))
       case _ => FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY).pipe(fromStack)

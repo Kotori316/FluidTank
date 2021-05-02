@@ -16,14 +16,11 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition}
-import net.minecraftforge.common.data.ExistingFileHelper
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
-
-import scala.util.{Failure, Success, Try}
 
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
@@ -34,7 +31,6 @@ object FluidTankDataProvider {
     if (event.includeServer()) {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
-      event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator, event.getExistingFileHelper))
     }
   }
 
@@ -204,19 +200,6 @@ object FluidTankDataProvider {
 
     override def getName = "Recipe of FluidTank"
 
-  }
-
-  class FluidTagsProvider(g: DataGenerator, e: ExistingFileHelper) extends net.minecraft.data.FluidTagsProvider(g, FluidTank.modID, e) {
-    override def registerTags(): Unit = {
-      val tag = Try {
-        val f = Class.forName("net.minecraftforge.common.Tags$Fluids").getField("MILK")
-        f.get(null).asInstanceOf[ITag.INamedTag[net.minecraft.fluid.Fluid]]
-      }
-      tag match {
-        case Failure(exception) => println("Skipped Fluid Tag provider " + exception.toString)
-        case Success(t) => getOrCreateBuilder(t).addOptional(ModObjects.MILK_FLUID.getRegistryName)
-      }
-    }
   }
 
   def makeConditionArray(conditions: List[ICondition]): JsonArray = {
