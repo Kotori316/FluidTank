@@ -87,13 +87,11 @@ object FluidAmount {
   }
 
   def fromNBT(@Nullable tag: CompoundNBT): FluidAmount = {
-    if (tag == null) return FluidAmount.EMPTY
+    if (tag == null || tag.isEmpty) return FluidAmount.EMPTY
     val name = new ResourceLocation(tag.getString(NBT_fluid))
     val amount = tag.getLong(NBT_amount)
     val nbt = if (tag.contains(NBT_tag)) Option(tag.getCompound(NBT_tag)) else None
-    val fluid =
-      if (!ForgeRegistries.FLUIDS.containsKey(name)) Fluids.EMPTY
-      else ForgeRegistries.FLUIDS.getValue(name)
+    val fluid = ForgeRegistries.FLUIDS.getValue(name)
     FluidAmount(fluid, amount, nbt)
   }
 

@@ -2,9 +2,13 @@ package com.kotori316.fluidtank.fluids;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,6 +16,7 @@ import scala.Option;
 
 import com.kotori316.fluidtank.BeforeAllTest;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,5 +49,17 @@ final class SerializeFA extends BeforeAllTest {
     void deserialize(FluidAmount amount) {
         FluidAmount deserialized = FluidAmount.fromNBT(amount.write(new CompoundNBT()));
         assertEquals(amount, deserialized);
+    }
+
+    @Test
+    void nonNullCheck() {
+        Stream<ResourceLocation> locationStream = Stream.of(
+            "minecraft:empty",
+            "what_am_i"
+        ).map(ResourceLocation::tryCreate).filter(Objects::nonNull);
+        assertAll(locationStream
+            .map(ForgeRegistries.FLUIDS::getValue)
+            .map(f -> () -> assertEquals(Fluids.EMPTY, f))
+        );
     }
 }
