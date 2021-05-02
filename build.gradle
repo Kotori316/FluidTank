@@ -201,7 +201,8 @@ private boolean hasGitHubToken() {
 dependencies {
     minecraft(forgeVersion())
     implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.5'
-    implementation group: 'org.typelevel', name: "cats-core_2.13", version: '2.4.2'
+    String CATS_VERSION = '2.4.2'
+    implementation group: 'org.typelevel', name: "cats-core_2.13", version: CATS_VERSION
 
     if (!isInCI()) {
         implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
@@ -223,6 +224,7 @@ dependencies {
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
+    testImplementation(group: 'org.typelevel', name: 'cats-kernel-laws_2.13', version: CATS_VERSION)
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

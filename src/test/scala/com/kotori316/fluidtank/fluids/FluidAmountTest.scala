@@ -25,6 +25,18 @@ object FluidAmountTest {
     )
   }
 
+  def fluidKeysNonEmpty(): Array[FluidKey] = {
+    val nbt1 = Option(new CompoundNBT().tap(_.putInt("b", 6)))
+    val nbt2 = Option(new CompoundNBT().tap(_.putString("v", "a")))
+    val nbt3 = for {a <- nbt1; aa = a.copy(); b <- nbt2} yield aa merge b
+    Array(
+      FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None),
+      FluidKey(Fluids.WATER, nbt1), FluidKey(Fluids.LAVA, nbt1),
+      FluidKey(Fluids.WATER, nbt2), FluidKey(Fluids.LAVA, nbt2),
+      FluidKey(Fluids.WATER, nbt3), FluidKey(Fluids.LAVA, nbt3),
+    )
+  }
+
   def fluidKeys2(): Array[Array[FluidKey]] = fluidKeys()
     .combinations(2)
     .map(_.toArray)
@@ -180,73 +192,91 @@ object FluidAmountTest {
     }
   }
 
-  @Test
-  def adder(): Unit = {
-    {
-      val a = FluidAmount.BUCKET_WATER
-      assertEquals(FluidAmount.AMOUNT_BUCKET, a.amount)
-      assertEquals(FluidAmount.AMOUNT_BUCKET * 2, (a + a).amount)
-      assertEquals(FluidAmount.AMOUNT_BUCKET * 3, (a + a + a).amount)
-      assertEquals(FluidAmount.AMOUNT_BUCKET, a.amount)
+  object Monoid extends BeforeAllTest {
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
+    def times1(key: FluidKey): Unit = {
+      val a = key.toAmount(FluidAmount.AMOUNT_BUCKET)
+      assertAll(
+        () => assertEquals(FluidAmount.AMOUNT_BUCKET, a.amount),
+        () => assertEquals(FluidAmount.AMOUNT_BUCKET * 2, (a + a).amount),
+        () => assertEquals(FluidAmount.AMOUNT_BUCKET * 2, (a * 2).amount),
+        () => assertTrue((a |+| a) === a * 2, "a * 2"),
+        () => assertEquals(FluidAmount.AMOUNT_BUCKET * 3, (a + a + a).amount),
+        () => assertEquals(FluidAmount.AMOUNT_BUCKET * 3, (a * 3).amount),
+        () => assertTrue((a |+| a |+| a) === a * 3, "a * 3"),
+        () => assertEquals(FluidAmount.AMOUNT_BUCKET, a.amount),
+      )
     }
-    locally {
-      val wl = FluidAmount.BUCKET_WATER + FluidAmount.BUCKET_LAVA
-      assertTrue(FluidAmount.BUCKET_WATER.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === wl)
-      assertEquals(Fluids.WATER, wl.fluid)
-    }
-    locally {
-      val lw = FluidAmount.BUCKET_LAVA + FluidAmount.BUCKET_WATER
-      assertTrue(FluidAmount.BUCKET_LAVA.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === lw)
-      assertEquals(Fluids.LAVA, lw.fluid)
-    }
-  }
 
-  @Test
-  def adder2(): Unit = {
-    {
-      val a = FluidAmount.BUCKET_LAVA
-      assertEquals(a.setAmount(2000), cats.Semigroup[FluidAmount].combine(a, a))
-      assertEquals(a.setAmount(3000), cats.Semigroup[FluidAmount].combineN(a, 3))
-      assertEquals(a.setAmount(5000), cats.Semigroup[FluidAmount].combineN(a, 5))
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
+    def times2(key: FluidKey): Unit = {
+      val a = key.toAmount(FluidAmount.AMOUNT_BUCKET)
+      assertAll(
+        () => assertEquals(a.setAmount(2000), cats.Semigroup[FluidAmount].combine(a, a)),
+        () => assertEquals(a * 2, cats.Semigroup[FluidAmount].combine(a, a)),
+        () => assertEquals(a.setAmount(3000), cats.Semigroup[FluidAmount].combineN(a, 3)),
+        () => assertEquals(a * 3, cats.Semigroup[FluidAmount].combineN(a, 3)),
+        () => assertEquals(a.setAmount(5000), cats.Semigroup[FluidAmount].combineN(a, 5)),
+        () => assertEquals(a * 5, cats.Semigroup[FluidAmount].combineN(a, 5)),
+      )
     }
-    {
+
+    @Test
+    def adder(): Unit = {
+      locally {
+        val wl = FluidAmount.BUCKET_WATER + FluidAmount.BUCKET_LAVA
+        assertTrue(FluidAmount.BUCKET_WATER.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === wl)
+        assertEquals(Fluids.WATER, wl.fluid)
+      }
+      locally {
+        val lw = FluidAmount.BUCKET_LAVA + FluidAmount.BUCKET_WATER
+        assertTrue(FluidAmount.BUCKET_LAVA.setAmount(FluidAmount.AMOUNT_BUCKET * 2) === lw)
+        assertEquals(Fluids.LAVA, lw.fluid)
+      }
+    }
+
+    @Test
+    def adder2(): Unit = {
       val wl = FluidAmount.BUCKET_WATER |+| FluidAmount.BUCKET_LAVA
       assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000), wl)
     }
-  }
 
-  @Test
-  def adderEmpty(): Unit = {
-    val tag = Option(new CompoundNBT().tap(_.putInt("a", 1)).tap(_.putBoolean("b", true)))
-    locally {
-      val a = FluidAmount.BUCKET_WATER.copy(nbt = tag, amount = 3000L)
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
+    def adderEmpty1(key: FluidKey): Unit = {
+      val a = key.toAmount(3000)
       assertEquals(a, a + FluidAmount.EMPTY)
       assertEquals(a, FluidAmount.EMPTY + a)
     }
-    locally {
-      val a = FluidAmount.BUCKET_LAVA.copy(nbt = tag, amount = 3000L)
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
+    def adderEmpty2(key: FluidKey): Unit = {
+      val a = key.toAmount(3000)
       val e = FluidAmount.EMPTY.copy(nbt = Option(new CompoundNBT()), amount = 2000L)
 
-      assertEquals(3000L, (e + a).amount)
-      assertEquals(a, a + e)
-      assertEquals(a, e + a)
+      assertEquals(3000L, (e |+| a).amount)
+      assertEquals(a, a |+| e)
+      assertEquals(a, e |+| a)
     }
-  }
 
-  @Test
-  def adder0Fluid(): Unit = {
-    val zeros = List(FluidAmount.EMPTY, FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_MILK.setAmount(0),
-      cats.Monoid[FluidAmount].empty)
-    assertTrue(zeros.forall(_.isEmpty))
+    @Test
+    def adder0Fluid(): Unit = {
+      val zeros = List(FluidAmount.EMPTY, FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_MILK.setAmount(0),
+        cats.Monoid[FluidAmount].empty)
+      assertTrue(zeros.forall(_.isEmpty))
 
-    val nonZero = List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_MILK, FluidAmount.BUCKET_LAVA)
+      val nonZero = List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_MILK, FluidAmount.BUCKET_LAVA)
 
-    val assertions: List[Executable] = for {
-      zero <- zeros
-      hasContent <- nonZero
-      d <- List(true, false)
-    } yield () => assertEquals(hasContent, if (d) zero + hasContent else hasContent + zero)
+      val assertions: List[Executable] = for {
+        zero <- zeros
+        hasContent <- nonZero
+        d <- List(true, false)
+      } yield () => assertEquals(hasContent, if (d) zero + hasContent else hasContent + zero)
 
-    assertAll(assertions: _*)
+      assertAll(assertions: _*)
+    }
   }
 }
