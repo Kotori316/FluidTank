@@ -2,10 +2,12 @@
 
 For Minecraft 1.16.5 (1.16 branch)
 
-[![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
-[![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank)
+[![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)][CurseForge]
+[![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)][CurseForge]
 
 [![](https://github.com/Kotori316/FluidTank/workflows/Java%20CI/badge.svg)](https://github.com/Kotori316/FluidTank/actions)
+
+[CurseForge]: [https://www.curseforge.com/minecraft/mc-mods/largefluidtank]
 
 LICENSE: MIT License  
 Copyright (c) 2019-2021 Kotori316
@@ -19,30 +21,36 @@ All tanks have Fluid Capability to transfer fluid, and their items also have Flu
 
 See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more information.
 
-Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidtank
+[Minecraft CurseForge][CurseForge] - https://www.curseforge.com/minecraft/mc-mods/largefluidtank
 
 ## APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-    * For Minecraft 1.16.5, newer than 1.16.5-36.1.0
+  * For Minecraft 1.16.5, newer than 1.16.5-36.1.0
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-    * Version 2.13.5
-    * Licenced under the Apache License 2.0
+  * Version 2.13.5
+  * Licenced under the Apache License 2.0
 
 * **REQUIRED** [Cats](https://github.com/typelevel/cats)
-    * Version 2.4.2
-    * Licensed under the MIT License
+  * Version 2.4.2
+  * Licensed under the MIT License
 
 * ~[Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)~
-    * Licensed under the MIT License
-    * Not used since 1.14.4
+  * Licensed under the MIT License
+  * Not used since 1.14.4
+
+* [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
+  * Licensed under [LGPLv3](https://github.com/AppliedEnergistics/Applied-Energistics-2#license)
 
 * [Hwyla](https://github.com/TehNut/HWYLA/tree/1.16_forge)
-    * Licensed under CC BY-NC-SA 4.0
+  * Licensed under CC BY-NC-SA 4.0
 
 * [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.16)
-    * Licensed under the MIT License Copyright © 2016 McJty
+  * Licensed under the MIT License Copyright © 2016 McJty
+
+* [LookAtThat](https://github.com/Geek202/LookAtThat)
+  * Licensed under the MIT License Copyright (c) 2019 Tom_The_Geek
 
 ## Maven repo
 
