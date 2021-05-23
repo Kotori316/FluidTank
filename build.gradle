@@ -6,26 +6,22 @@ import java.time.format.DateTimeFormatter
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = "https://plugins.gradle.org/m2/" }
         maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 
 plugins {
     id("maven-publish")
+    id("scala")
     id "com.github.breadmoirai.github-release" version "2.2.12"
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
-apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: "com.matthewprenger.cursegradle"
-apply plugin: "com.github.breadmoirai.github-release"
 apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
@@ -45,7 +41,7 @@ archivesBaseName = "LargeFluidTank"
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
 
-static String mappingVersion() { return '20201028-1.16.3' }
+static String projectMappingVersion() { return '20201028-1.16.3' }
 
 String forgeVersion() {
     if (isInCI() && System.getenv("CI_FORGE") != null && "default" != System.getenv("CI_FORGE")) {
@@ -67,7 +63,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: mappingVersion()
+    mappings channel: 'snapshot', version: projectMappingVersion()
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -76,13 +72,13 @@ minecraft {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
-            workingDirectory project.file('Minecraft')
+            workingDirectory file('Minecraft')
 
             // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'mixin.env.disableRefMap', 'true'
-            property "mixin.debug.export", "true"
-            property 'forge.logging.console.level', 'debug'
+            property('forge.logging.markers', 'REGISTRIES')
+            property('mixin.env.disableRefMap', 'true')
+            property("mixin.debug.export", "true")
+            property('forge.logging.console.level', 'debug')
 
             mods {
                 fluidtank {
@@ -92,13 +88,13 @@ minecraft {
         }
 
         server {
-            workingDirectory project.file('run-server')
+            workingDirectory file('run-server')
 
             // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'mixin.env.disableRefMap', 'true'
-            property "mixin.debug.export", "true"
-            property 'forge.logging.console.level', 'debug'
+            property('forge.logging.markers', 'REGISTRIES')
+            property('mixin.env.disableRefMap', 'true')
+            property("mixin.debug.export", "true")
+            property('forge.logging.console.level', 'debug')
 
             mods {
                 fluidtank {
@@ -107,17 +103,17 @@ minecraft {
             }
         }
         data {
-            workingDirectory project.file('run-server')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'mixin.env.disableRefMap', 'true'
-            property "mixin.debug.export", "true"
-            property 'forge.logging.console.level', 'info'
-            forceExit false
+            workingDirectory file('run-server')
+            property('forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP')
+            property('mixin.env.disableRefMap', 'true')
+            property("mixin.debug.export", "true")
+            property('forge.logging.console.level', 'info')
+            setForceExit(false)
 
             if (isInCI())
-                args '--mod', "fluidtank", '--dev'
+                args('--mod', "fluidtank", '--dev')
             else
-                args '--mod', "fluidtank", '--all'
+                args('--mod', "fluidtank", '--all')
 
             mods {
                 fluidtank {
@@ -199,20 +195,20 @@ private boolean hasGitHubToken() {
 
 dependencies {
     minecraft(forgeVersion())
-    implementation group: 'org.scala-lang', name: 'scala-library', version: '2.13.5'
-    String CATS_VERSION = '2.6.0'
-    implementation group: 'org.typelevel', name: "cats-core_2.13", version: CATS_VERSION
+    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.5')
+    final String CATS_VERSION = '2.6.0'
+    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: CATS_VERSION)
 
     if (!isInCI()) {
-        implementation fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2")
+        implementation(fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2"))
         runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }
-    implementation fg.deobf("mezz.jei:jei-1.16.4:7.6.0.58")
-    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.6-8")
-    implementation fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2")
-    compileOnly fg.deobf("curse.maven:look-at-that-355304:3035358")
+    implementation(fg.deobf("mezz.jei:jei-1.16.5:7.7.0.99"))
+    implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
+    implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
+    compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
     implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-2', classifier: 'dev')
     // Mixin
@@ -228,11 +224,11 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 def jarAttributeMap = [
-        "Specification-Title"     : project.name,
+        "Specification-Title"     : String.valueOf(project.name),
         "Specification-Vendor"    : "Kotori316",
         "Specification-Version"   : "1", // We are version 1 of ourselves
-        "Implementation-Title"    : project.name,
-        "Implementation-Version"  : "${project.version}",
+        "Implementation-Title"    : String.valueOf(project.name),
+        "Implementation-Version"  : String.valueOf(project.version),
         "Implementation-Vendor"   : "Kotori316",
         "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
         "MixinConfigs"            : "fluidtank.mixins.json"
@@ -374,7 +370,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${mappingVersion()}" +
+                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${projectMappingVersion()}" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)
@@ -401,14 +397,6 @@ String getLatestChangeLog() {
 task makeChangeLog() {
     doLast {
         moveOldLog()
-        // git commit and push to github
-
-//        ProcessBuilder committer = new ProcessBuilder("git", "commit", "-m", "v${project.version}")
-//        def process1 = committer.start()
-//        process1.waitFor(10L, TimeUnit.SECONDS)
-//        ProcessBuilder pusher = new ProcessBuilder("git", "push")
-//        def process2 = pusher.start()
-//        process2.waitFor(20L, TimeUnit.SECONDS)
     }
 }
 
@@ -418,6 +406,7 @@ task checkMethod() {
         System.out.println("Forge: ${forgeVersion()}")
         System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}")
         System.out.println("Minecraft $minecraftVersion")
+        System.out.println("Mapping ${projectMappingVersion()}")
         System.out.println("Is In CI ${isInCI()}")
         System.out.println("FilePath ${jar.getArchiveFile().get()}")
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
