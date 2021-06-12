@@ -167,6 +167,7 @@ public class TierRecipe extends ShapedRecipe {
         }
 
         boolean matches(CraftingInventory inv) {
+            if (!inv.getStack(4).isEmpty()) return false;
             if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStack).allMatch(subItems)) return false;
             if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStack).allMatch(tankItems)) return false;
             return IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)

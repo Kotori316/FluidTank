@@ -17,7 +17,7 @@ public enum Tiers {
     Invalid(0, 0, "Invalid", "Unknown", false),
     WOOD(1, 1 << 2, "Wood", "minecraft:logs", false),
     STONE(2, 1 << 4, "Stone", "forge:stone", true, () ->
-        Ingredient.ofItems(Blocks.STONE, Blocks.ANDESITE, Blocks.GRANITE, Blocks.DIORITE)),
+        Ingredient.ofItems(Blocks.STONE, Blocks.ANDESITE, Blocks.GRANITE, Blocks.DIORITE, Blocks.TUFF, Blocks.DEEPSLATE)),
     IRON(3, 1 << 8, "Iron", "forge:ingots/iron", true, () -> Ingredient.ofItems(Items.IRON_INGOT)),
     GOLD(4, 1 << 12, "Gold", "forge:ingots/gold", true, () -> Ingredient.ofItems(Items.GOLD_INGOT)),
     DIAMOND(5, 1 << 14, "Diamond", "forge:gems/diamond", true, () -> Ingredient.ofItems(Items.DIAMOND)),
@@ -29,7 +29,7 @@ public enum Tiers {
             return Long.MAX_VALUE;
         }
     },
-    COPPER(2, 1 << 5, "Copper", "c:copper_ingots", true),
+    COPPER(2, 1 << 5, "Copper", "c:copper_ingots", true, () -> Ingredient.ofItems(Items.COPPER_INGOT)),
     TIN(2, 1 << 6, "Tin", "c:tin_ingots", true),
     BRONZE(3, 1 << 9, "Bronze", "c:bronze_ingots", true),
     LEAD(3, 1 << 8, "Lead", "c:lead_ingots", true),

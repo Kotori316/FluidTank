@@ -25,7 +25,7 @@ public class TankRecipe extends SpecialCraftingRecipe {
 
     public TankRecipe(Identifier id) {
         super(id);
-        logics = Collections.unmodifiableList(Stream.of(Tiers.COPPER, Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
+        logics = Collections.unmodifiableList(Stream.of(Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
             .map(TierRecipe.Logic::new).collect(Collectors.toList()));
     }
 
