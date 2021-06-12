@@ -49,18 +49,18 @@ public class ItemModelTank /*implements IDynamicBakedModel*/ {
     @SuppressWarnings("deprecation")
     private static class Constant {
         private static final net.minecraft.client.renderer.model.ItemCameraTransforms transform = new net.minecraft.client.renderer.model.ItemCameraTransforms(
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f / 16, 0), vec(0.375)), //third person_leftIn,
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vector3f(75, 45, 0), new Vector3f(0, 2.5f / 16, 0), vec(0.375)), //third person_rightIn,
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vector3f(0, 45, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.4)), //first person_leftIn,
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vector3f(0, 225, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.4)), //first person_rightIn,
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vec3f(75, 45, 0), new Vec3f(0, 2.5f / 16, 0), vec(0.375)), //third person_leftIn,
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vec3f(75, 45, 0), new Vec3f(0, 2.5f / 16, 0), vec(0.375)), //third person_rightIn,
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vec3f(0, 45, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.4)), //first person_leftIn,
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vec3f(0, 225, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.4)), //first person_rightIn,
             net.minecraft.client.renderer.model.ItemTransformVec3f.DEFAULT, //headIn,
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vector3f(30, 135, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.625)), //guiIn,
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.ROTATION_DEFAULT, new Vector3f(0, 3f / 16, 0), vec(0.25)), //groundIn,
-            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vector3f(0, 90, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.5)) //fixedIn
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vec3f(30, 135, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.625)), //guiIn,
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.ROTATION_DEFAULT, new Vec3f(0, 3f / 16, 0), vec(0.25)), //groundIn,
+            new net.minecraft.client.renderer.model.ItemTransformVec3f(new Vec3f(0, 90, 0), net.minecraft.client.renderer.model.ItemTransformVec3f.Deserializer.TRANSLATION_DEFAULT, vec(0.5)) //fixedIn
         );
 
-        private static Vector3f vec(double d) {
-            return new Vector3f((float) d, (float) d, (float) d);
+        private static Vec3f vec(double d) {
+            return new Vec3f((float) d, (float) d, (float) d);
         }
     }*/
 }

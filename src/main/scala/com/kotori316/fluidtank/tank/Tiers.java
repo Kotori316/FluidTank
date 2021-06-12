@@ -8,7 +8,8 @@ import java.util.stream.Stream;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -70,13 +71,13 @@ public enum Tiers {
         return name;
     }
 
-    public CompoundTag toNBTTag() {
-        CompoundTag nbt = new CompoundTag();
+    public NbtCompound toNBTTag() {
+        NbtCompound nbt = new NbtCompound();
         nbt.putString("string", toString());
         return nbt;
     }
 
-    public static Tiers fromNBT(CompoundTag tag) {
+    public static Tiers fromNBT(NbtCompound tag) {
         if (tag == null) {
             return Invalid;
         }

@@ -304,8 +304,8 @@ private class BoxXZ(startX: Double, startZ: Double, endX: Double, y: Double, end
 
 object Box {
   def apply(axisAlignedBB: BlockBox, sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean): Box =
-    apply(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ,
-      axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ,
+    apply(axisAlignedBB.getMinX, axisAlignedBB.getMinY, axisAlignedBB.getMinZ,
+      axisAlignedBB.getMaxX, axisAlignedBB.getMaxY, axisAlignedBB.getMaxZ,
       sizeX, sizeY, sizeZ, firstSide, endSide)
 
   def apply(startX: Double, startY: Double, startZ: Double,

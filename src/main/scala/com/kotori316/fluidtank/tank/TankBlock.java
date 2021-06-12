@@ -3,11 +3,13 @@ package com.kotori316.fluidtank.tank;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -20,9 +22,8 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 import com.kotori316.fluidtank.ModTank;
-import com.kotori316.fluidtank.integration.FluidInteractions;
 
-public class TankBlock extends Block implements BlockEntityProvider {
+public class TankBlock extends BlockWithEntity {
     public static final String NBT_Tank = "tank";
     public static final String NBT_Tier = "tier";
     public static final String NBT_Capacity = "capacity";
@@ -49,6 +50,11 @@ public class TankBlock extends Block implements BlockEntityProvider {
         return ModTank.TANK_SHAPE;
     }
 
+    @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
+
     public void saveTankNBT(BlockEntity entity, ItemStack stack) {
         if (entity instanceof TileTank) {
             TileTank tank = (TileTank) entity;
@@ -73,7 +79,7 @@ public class TankBlock extends Block implements BlockEntityProvider {
                 return ActionResult.SUCCESS;
             } else if (!(stack.getItem() instanceof TankBlockItem)) {
                 if (!world.isClient) {
-                    return FluidInteractions.interact(tileTank.connection(), playerIn, handIn, stack);
+                    return com.kotori316.fluidtank.integration.FluidInteractions.interact(tileTank.connection(), playerIn, handIn, stack);
                 } else {
                     return ActionResult.SUCCESS;
                 }
@@ -114,11 +120,6 @@ public class TankBlock extends Block implements BlockEntityProvider {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView view) {
-        return new TileTank(tiers);
-    }
-
-    @Override
     @SuppressWarnings("deprecation")
     public boolean hasComparatorOutput(BlockState state) {
         return true;
@@ -137,5 +138,17 @@ public class TankBlock extends Block implements BlockEntityProvider {
 
     public TankBlockItem blockItem() {
         return blockItem;
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TileTank(tiers, pos, state);
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return world.isClient ? null : checkType(type, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, TileTank::tick);
     }
 }

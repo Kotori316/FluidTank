@@ -47,7 +47,7 @@ class TechRebornCellInteraction implements FluidInteraction {
                 ItemStack full = ((ItemFluidInfo) stack.getItem()).getFull(toFill.fluid());
                 stack.decrement(stackSize);
                 full.setCount(stackSize);
-                if (!player.inventory.insertStack(full)) {
+                if (!player.getInventory().insertStack(full)) {
                     player.dropStack(full);
                 }
                 connection.handler().drain(toFill, true, 0);
@@ -65,7 +65,7 @@ class TechRebornCellInteraction implements FluidInteraction {
                 ItemStack empty = ((ItemFluidInfo) stack.getItem()).getEmpty();
                 stack.decrement(stackSize);
                 empty.setCount(stackSize);
-                if (!player.inventory.insertStack(empty)) {
+                if (!player.getInventory().insertStack(empty)) {
                     player.dropStack(empty);
                 }
                 connection.handler().fill(fluidAmount.setAmount(a), true, 0);

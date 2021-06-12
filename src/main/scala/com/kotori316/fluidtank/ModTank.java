@@ -8,8 +8,9 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.DSL;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
-import net.minecraft.block.MaterialColor;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.ItemGroup;
@@ -25,8 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.milk.MilkFluid;
-import com.kotori316.fluidtank.recipe.TankRecipe;
 import com.kotori316.fluidtank.recipe.TierRecipe;
+import com.kotori316.fluidtank.recipe.TankRecipe;
 import com.kotori316.fluidtank.tank.ContentTankSerializer;
 import com.kotori316.fluidtank.tank.CreativeTankBlock;
 import com.kotori316.fluidtank.tank.TankBlock;
@@ -40,7 +41,7 @@ public class ModTank implements ModInitializer {
     public static final ItemGroup CREATIVE_TAB = FabricItemGroupBuilder.build(
         new Identifier(modID, modID), () -> new ItemStack(Entries.WOOD_TANK)
     );
-    public static final Material MATERIAL = new Material(MaterialColor.CLEAR, false, true, true, false,
+    public static final Material MATERIAL = new Material(MapColor.CLEAR, false, true, true, false,
         true, false, PistonBehavior.BLOCK);
     public static final double d = 1 / 16d;
     public static final Box BOUNDING_BOX = new Box(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d);
@@ -73,9 +74,9 @@ public class ModTank implements ModInitializer {
         public static final List<TankBlock> TANK_BLOCKS = Collections.unmodifiableList(Tiers.stream().filter(Tiers::hasTagRecipe).map(TankBlock::new).collect(Collectors.toList()));
         public static final CreativeTankBlock CREATIVE_TANK = new CreativeTankBlock();
         public static final MilkFluid MILK_FLUID = new MilkFluid();
-        public static final BlockEntityType<TileTank> TANK_BLOCK_ENTITY_TYPE = BlockEntityType.Builder.create(TileTank::new,
+        public static final BlockEntityType<TileTank> TANK_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTank::new,
             ImmutableList.<TankBlock>builder().add(WOOD_TANK).addAll(TANK_BLOCKS).build().toArray(new TankBlock[0])).build(DSL.emptyPartType());
-        public static final BlockEntityType<TileTankCreative> CREATIVE_BLOCK_ENTITY_TYPE = BlockEntityType.Builder.create(TileTankCreative::new, CREATIVE_TANK).build(DSL.emptyPartType());
+        public static final BlockEntityType<TileTankCreative> CREATIVE_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTankCreative::new, CREATIVE_TANK).build(DSL.emptyPartType());
         public static final LootFunctionType CONTENT_LOOT_FUNCTION_TYPE = new LootFunctionType(new ContentTankSerializer());
 
         public static final List<TankBlock> ALL_TANK_BLOCKS = ImmutableList.<TankBlock>builder()

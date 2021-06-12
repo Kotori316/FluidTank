@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
@@ -20,12 +20,12 @@ import net.minecraft.tag.ServerTagManagerHolder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
-import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.tank.TankBlock;
 import com.kotori316.fluidtank.tank.Tiers;
 
@@ -101,7 +101,7 @@ public class TierRecipe extends ShapedRecipe {
     }
 
     @Override
-    public DefaultedList<Ingredient> getPreviewInputs() {
+    public DefaultedList<Ingredient> getIngredients() {
         return allSlot().sorted(Comparator.comparing(Pair::getLeft)).map(Pair::getRight).collect(Collectors.toCollection(DefaultedList::of));
     }
 
@@ -133,14 +133,14 @@ public class TierRecipe extends ShapedRecipe {
         @Override
         public TierRecipe read(Identifier _id, PacketByteBuf buffer) {
             Identifier id = buffer.readIdentifier();
-            Tiers tier = Tiers.fromNBT(buffer.readCompoundTag());
+            Tiers tier = Tiers.fromNBT(buffer.readNbt());
             return new TierRecipe(id, tier);
         }
 
         @Override
         public void write(PacketByteBuf buffer, TierRecipe recipe) {
             buffer.writeIdentifier(recipe.getId());
-            buffer.writeCompoundTag(recipe.tier.toNBTTag());
+            buffer.writeNbt(recipe.tier.toNBTTag());
         }
     }
 
@@ -189,10 +189,10 @@ public class TierRecipe extends ShapedRecipe {
                 .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
 
             if (fluidAmount.nonEmpty()) {
-                CompoundTag compound = new CompoundTag();
+                NbtCompound compound = new NbtCompound();
 
-                CompoundTag tankTag = new CompoundTag();
-                tankTag.putInt(TankBlock.NBT_Capacity, Utils.toInt(tier.amount()));
+                NbtCompound tankTag = new NbtCompound();
+                tankTag.putInt(TankBlock.NBT_Capacity, com.kotori316.fluidtank.Utils.toInt(tier.amount()));
                 fluidAmount.write(tankTag);
 
                 compound.put(TankBlock.NBT_Tank, tankTag);
@@ -211,7 +211,7 @@ public class TierRecipe extends ShapedRecipe {
         }
 
         private static Ingredient getSubItems(Tiers tier) {
-            return Optional.ofNullable(ServerTagManagerHolder.getTagManager().getItems().getTag(new Identifier(tier.tagName)))
+            return Optional.ofNullable(ServerTagManagerHolder.getTagManager().getOrCreateTagGroup(Registry.ITEM_KEY).getTag(new Identifier(tier.tagName)))
                 .map(Ingredient::fromTag)
                 .orElse(tier.getAlternative());
         }

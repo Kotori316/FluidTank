@@ -4,31 +4,32 @@ import alexiil.mc.lib.attributes._
 import alexiil.mc.lib.attributes.fluid.FluidInvTankChangeListener
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
+import com.kotori316.fluidtank.{FluidAmount, ModTank}
 import com.kotori316.fluidtank.render.Box
-import com.kotori316.fluidtank.{FluidAmount, ModTank, Utils}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.{BlockEntity, BlockEntityType}
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.{LiteralText, Text}
-import net.minecraft.util.{Nameable, Tickable}
+import net.minecraft.util.Nameable
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 
 import scala.math.Ordering.Implicits.infixOrderingOps
 
-class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
-  extends BlockEntity(t)
+class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos, state: BlockState)
+  extends BlockEntity(t, pos, state)
     with Nameable
-    with Tickable
     with BlockEntityClientSerializable
     with AttributeProviderBlockEntity {
   self =>
 
-  def this() = {
-    this(Tiers.Invalid, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE)
+  def this(pos: BlockPos, state: BlockState) = {
+    this(Tiers.Invalid, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, pos, state)
   }
 
-  def this(t: Tiers) = {
-    this(t, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE)
+  def this(t: Tiers, pos: BlockPos, state: BlockState) = {
+    this(t, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, pos, state)
   }
 
   val tank = new Tank
@@ -36,21 +37,21 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   var loading = false
   var stackName: Text = _
 
-  override def toTag(compound: CompoundTag): CompoundTag = {
-    compound.put(TileTank.NBT_Tank, tank.writeToNBT(new CompoundTag))
+  override def writeNbt(compound: NbtCompound): NbtCompound = {
+    compound.put(TileTank.NBT_Tank, tank.writeToNBT(new NbtCompound))
     compound.put(TileTank.NBT_Tier, tier.toNBTTag)
     getStackName.foreach(t => compound.putString(TileTank.NBT_StackName, Text.Serializer.toJson(t)))
-    super.toTag(compound)
+    super.writeNbt(compound)
   }
 
-  def getBlockTag: CompoundTag = {
-    val nbt = toTag(new CompoundTag)
+  def getBlockTag: NbtCompound = {
+    val nbt = writeNbt(new NbtCompound)
     Seq("x", "y", "z", "id").foreach(nbt.remove)
     nbt
   }
 
-  override def fromTag(state: BlockState, compound: CompoundTag): Unit = {
-    super.fromTag(state, compound)
+  override def readNbt(compound: NbtCompound): Unit = {
+    super.readNbt(compound)
     tank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
@@ -59,7 +60,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     loading = true
   }
 
-  def readNBTClient(compound: CompoundTag): Unit = {
+  def readNBTClient(compound: NbtCompound): Unit = {
     tank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
@@ -108,7 +109,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
   class Tank extends FluidAmount.Tank {
     var box: Box = _
     var fluid: FluidAmount = FluidAmount.EMPTY
-    var capacity: Int = Utils.toInt(tier.amount)
+    var capacity: Int = com.kotori316.fluidtank.Utils.toInt(tier.amount)
     var listeners = Map.empty[FluidInvTankChangeListener, ListenerRemovalToken]
 
     def onContentsChanged(previous: FluidAmount): Unit = {
@@ -137,7 +138,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
       listeners.keys.foreach(_.onChange(this, 0, previous.fluidVolume, fluid.fluidVolume))
     }
 
-    def readFromNBT(nbt: CompoundTag): Tank = {
+    def readFromNBT(nbt: NbtCompound): Tank = {
       capacity = nbt.getInt(TileTank.NBT_Capacity)
       val fluid = FluidAmount.fromNBT(nbt)
       setFluid(fluid)
@@ -145,7 +146,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
       this
     }
 
-    def writeToNBT(nbt: CompoundTag): CompoundTag = {
+    def writeToNBT(nbt: NbtCompound): NbtCompound = {
       fluid.write(nbt)
       nbt.putInt(TileTank.NBT_Capacity, capacity)
       nbt
@@ -173,6 +174,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     }
 
     // Change content
+
     /**
      * @return Fluid that was accepted by the tank.
      */
@@ -255,32 +257,9 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank])
     override def getMaxAmount_F(tank: Int): BCAmount = BCAmount.of(capacity, 1000)
   }
 
-  /*@Optional.Method(modid = TileTankNoDisplay.bcId)
-  override def getExtension(world: World, pos: BlockPos, face: Direction, state: IBlockState): Float =
-    if (face.getAxis == Axis.Y) 0 else 2 / 16f
+  override def fromClientTag(tag: NbtCompound): Unit = readNbt(tag)
 
-  @Optional.Method(modid = TileTankNoDisplay.bcId)
-  override def getDebugInfo(left: util.List[String], right: util.List[String], side: Direction): Unit = {
-    if (SideProxy.isServer(this)) {
-      left add getClass.getName
-      left add connection.toString
-    }
-    left.add("Tier : " + tier)
-    left add tank.toString
-  }*/
-  override def tick(): Unit = {
-    if (loading && !getWorld.isClient) {
-      getWorld.getProfiler.push("Connection Loading")
-      if (this.connection == Connection.invalid)
-        Connection.load(getWorld, getPos)
-      loading = false
-      getWorld.getProfiler.pop()
-    }
-  }
-
-  override def fromClientTag(tag: CompoundTag): Unit = fromTag(null, tag)
-
-  override def toClientTag(tag: CompoundTag): CompoundTag = toTag(tag)
+  override def toClientTag(tag: NbtCompound): NbtCompound = writeNbt(tag)
 
   override def addAllAttributes(to: AttributeList[_]): Unit = {
     to.offer(this.connection.handler)
@@ -296,18 +275,13 @@ object TileTank {
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
 
-  /*import net.minecraftforge.event.world.ChunkEvent
-
-  def makeConnectionOnChunkLoad(event: ChunkEvent.Load): Unit = {
-    val chunk = event.getChunk
-    if (event.getWorld != null && !event.getWorld.isRemote && !chunk.getTileEntitiesPos.isEmpty) {
-      import scala.jdk.CollectionConverters
-      val poses = JavaConverters.asScalaSet(chunk.getTileEntitiesPos)
-      val tanks = poses.map(chunk.getBlockEntity).collect { case tank: TileTankNoDisplay => tank }
-      // Getting tiles via world IS NOT AVAILABLE.
-      tanks.foreach { t => Connection.load(chunk, t.getPos) }
-      // Loading finished. Don't turn off the flag with above call.
-      tanks.foreach(_.loading = false)
+  def tick(world: World, pos: BlockPos, state: BlockState, tile: TileTank): Unit = {
+    if (tile.loading && !world.isClient) {
+      world.getProfiler.push("Connection Loading")
+      if (tile.connection == Connection.invalid)
+        Connection.load(world, pos)
+      tile.loading = false
+      world.getProfiler.pop()
     }
-  }*/
+  }
 }

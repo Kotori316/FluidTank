@@ -13,11 +13,12 @@ import net.minecraft.client.render.model.json.ModelTransformation
 import net.minecraft.client.render.{DiffuseLighting, VertexConsumerProvider}
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
+import net.minecraft.util.math.BlockPos
 
 @Environment(EnvType.CLIENT)
 class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
-  lazy val tileTank = new TileTank()
+  lazy val tileTank = new TileTank(BlockPos.ORIGIN, ModTank.Entries.WOOD_TANK.getDefaultState)
   private val internalModel = new RenderItemTank.Model
 
   override def render(stack: ItemStack, mode: ModelTransformation.Mode, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
@@ -37,8 +38,8 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
         val compound = stack.getSubTag(TankBlock.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
-        DiffuseLighting.disable()
-        BlockEntityRenderDispatcher.INSTANCE.renderEntity(
+        DiffuseLighting.disableGuiDepthLighting()
+        MinecraftClient.getInstance.getBlockEntityRenderDispatcher.renderEntity(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
 

@@ -2,8 +2,10 @@ package com.kotori316.fluidtank.tank
 
 import com.kotori316.fluidtank.ModTank.Entries
 import com.kotori316.fluidtank._
+import net.minecraft.block.BlockState
+import net.minecraft.util.math.BlockPos
 
-class TileTankCreative extends TileTank(Tiers.CREATIVE, Entries.CREATIVE_BLOCK_ENTITY_TYPE) {
+class TileTankCreative(pos: BlockPos, state: BlockState) extends TileTank(Tiers.CREATIVE, Entries.CREATIVE_BLOCK_ENTITY_TYPE, pos, state) {
 
   override val tank = new CreativeTank
 

@@ -9,7 +9,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Rarity;
@@ -44,9 +44,9 @@ public class TankBlockItem extends BlockItem {
     @Environment(EnvType.CLIENT)
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        CompoundTag nbt = stack.getSubTag(TankBlock.NBT_BlockTag);
+        NbtCompound nbt = stack.getSubTag(TankBlock.NBT_BlockTag);
         if (nbt != null) {
-            CompoundTag tankNBT = nbt.getCompound(TankBlock.NBT_Tank);
+            NbtCompound tankNBT = nbt.getCompound(TankBlock.NBT_Tank);
             FluidAmount fluid = FluidAmount.fromNBT(tankNBT);
             long c = tankNBT.getInt(TankBlock.NBT_Capacity);
             tooltip.add(new LiteralText(fluid.getLocalizedName() + " : " + fluid.fluidVolume().amount().asLong(1000L) + " mB / " + c + " mB"));

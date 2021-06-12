@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank
 
 import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.util.math.{MatrixStack, Vector3f, Vector4f}
-import net.minecraft.util.math.Direction
+import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.util.math.{Direction, Vec3f, Vector4f}
 
 package object render {
 
@@ -28,7 +28,7 @@ package object render {
     }
   }
 
-  private[this] final val vector3f = new Vector3f()
+  private[this] final val vector3f = new Vec3f()
   private[this] final val vector4f = new Vector4f()
 
   private def getPosVector(x: Float, y: Float, z: Float, matrix: MatrixStack): Vector4f = {

@@ -8,7 +8,7 @@ import alexiil.mc.lib.attributes.{ListenerRemovalToken, ListenerToken, Simulatio
 import com.kotori316.fluidtank.ModTank.Entries
 import net.minecraft.fluid.{Fluid, Fluids}
 import net.minecraft.item.{BucketItem, ItemStack, Items}
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.registry.{DefaultedRegistry, Registry}
 
 /**
@@ -25,7 +25,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
     else FluidAmount(fluidVolume.fluidKey.withAmount(amount))
   }
 
-  def write(tag: CompoundTag): CompoundTag = fluidVolume.toTag(tag)
+  def write(tag: NbtCompound): NbtCompound = fluidVolume.toTag(tag)
 
   def nonEmpty: Boolean = !isEmpty
 
@@ -77,7 +77,7 @@ object FluidAmount {
     stack.getItem.isInstanceOf[BucketItem] || fromItem(stack).nonEmpty
   }
 
-  def fromNBT(tag: CompoundTag): FluidAmount = {
+  def fromNBT(tag: NbtCompound): FluidAmount = {
     val volume = FluidVolume.fromTag(tag)
     FluidAmount(volume)
   }
