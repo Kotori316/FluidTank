@@ -33,3 +33,5 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew build
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check artifacts
+        run: ll build/libs
