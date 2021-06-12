@@ -1,8 +1,6 @@
 package com.kotori316.fluidtank.recipe;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.fabricmc.api.EnvType;
@@ -25,8 +23,8 @@ public class TankRecipe extends SpecialCraftingRecipe {
 
     public TankRecipe(Identifier id) {
         super(id);
-        logics = Collections.unmodifiableList(Stream.of(Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
-            .map(TierRecipe.Logic::new).collect(Collectors.toList()));
+        logics = Stream.of(Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
+            .map(TierRecipe.Logic::new).toList();
     }
 
     @Override

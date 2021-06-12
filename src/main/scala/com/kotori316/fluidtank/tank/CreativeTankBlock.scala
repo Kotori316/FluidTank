@@ -8,7 +8,7 @@ import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.ItemStack
 import net.minecraft.text.{LiteralText, Text}
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.{BlockView, World}
+import net.minecraft.world.World
 
 class CreativeTankBlock extends TankBlock(Tiers.CREATIVE) {
 

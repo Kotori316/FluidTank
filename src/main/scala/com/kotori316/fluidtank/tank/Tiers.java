@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.Ingredient;
 import org.apache.commons.lang3.tuple.Pair;
 

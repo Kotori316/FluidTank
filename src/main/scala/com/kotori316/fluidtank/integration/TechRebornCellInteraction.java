@@ -38,7 +38,7 @@ class TechRebornCellInteraction implements FluidInteraction {
         FluidAmount fluidAmount = getFluidInContainer(stack);
         if (fluidAmount.isEmpty()) {
             // Fill the cell and drain from tanks.
-            alexiil.mc.lib.attributes.fluid.amount.FluidAmount a = BUCKET.mul(stack.getCount()).min(
+            var a = BUCKET.mul(stack.getCount()).min(
                 alexiil.mc.lib.attributes.fluid.amount.FluidAmount.of(connection.amount(), 1000L));
             FluidAmount requires = connection.getFluidStack().map(f -> f.setAmount(a)).getOrElse(FluidAmount::EMPTY);
             FluidAmount toFill = connection.handler().drain(requires, false, a.asLong(1000L));
@@ -58,7 +58,7 @@ class TechRebornCellInteraction implements FluidInteraction {
         } else {
             // Drain from cell and fill tank.
             if (connection.getFluidStack().forall(f -> f.fluidEqual(fluidAmount))) {
-                alexiil.mc.lib.attributes.fluid.amount.FluidAmount a = BUCKET.mul(stack.getCount())
+                var a = BUCKET.mul(stack.getCount())
                     .min(alexiil.mc.lib.attributes.fluid.amount.FluidAmount.of(connection.capacity() - connection.amount(), 1000L));
                 // Draining from cell always successes.
                 int stackSize = a.asInt(1);

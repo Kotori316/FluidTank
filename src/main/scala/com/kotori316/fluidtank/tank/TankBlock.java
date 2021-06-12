@@ -56,8 +56,7 @@ public class TankBlock extends BlockWithEntity {
     }
 
     public void saveTankNBT(BlockEntity entity, ItemStack stack) {
-        if (entity instanceof TileTank) {
-            TileTank tank = (TileTank) entity;
+        if (entity instanceof TileTank tank) {
             if (tank.hasContent()) {
                 stack.putSubTag(NBT_BlockTag, tank.getBlockTag());
             }
@@ -69,8 +68,7 @@ public class TankBlock extends BlockWithEntity {
     @SuppressWarnings("deprecation")
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockHitResult hit) {
         BlockEntity entity = world.getBlockEntity(pos);
-        if (entity instanceof TileTank) {
-            TileTank tileTank = (TileTank) entity;
+        if (entity instanceof TileTank tileTank) {
             ItemStack stack = playerIn.getStackInHand(handIn);
             if (playerIn.getMainHandStack().isEmpty()) {
                 if (!world.isClient) {
@@ -129,8 +127,7 @@ public class TankBlock extends BlockWithEntity {
     @SuppressWarnings("deprecation")
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
         BlockEntity e = world.getBlockEntity(pos);
-        if (e instanceof TileTank) {
-            TileTank tank = (TileTank) e;
+        if (e instanceof TileTank tank) {
             return tank.getComparatorLevel();
         }
         return super.getComparatorOutput(state, world, pos);
