@@ -165,6 +165,8 @@ task getCompileOptions() {
         List<String> strings = new ArrayList<>()
         strings.add("archivesBaseName: $archivesBaseName")
         strings.add("group: $group")
+        strings.add("project.maven_group: ${project.maven_group}")
+        strings.add("project.group: ${project.group}")
         strings.add("version: $version")
         strings.add("runs: ${minecraft.getRunConfigs().asMap.toMapString()}")
         strings.add("Absolute Client RunDir: ${project.projectDir.toPath().resolve(minecraft.getRunConfigs().getByName("client").runDir).toAbsolutePath()}")

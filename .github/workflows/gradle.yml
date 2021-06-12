@@ -23,8 +23,15 @@ jobs:
       #  with:
       #    path: ~/.gradle/caches
       #    key: ${{ runner.os }}-gradle-${{ hashFiles('**/forge_version.properties') }}
+      - name: Dummy
+        run: |
+          echo "::group::IGNORE ME"
+          chmod +x ./gradlew && ./gradlew tasks
+          echo "::endgroup::"
       - name: Check Paramater
         run: chmod +x ./gradlew && ./gradlew gCO
+      - name: Toolchain
+        run: chmod +x ./gradlew && ./gradlew javaToolchains
       - name: Check Dependencies
         run: chmod +x ./gradlew && ./gradlew dependencies
       - name: Precompile
