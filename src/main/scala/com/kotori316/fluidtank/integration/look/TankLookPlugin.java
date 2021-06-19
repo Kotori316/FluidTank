@@ -31,7 +31,7 @@ import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
 
@@ -116,7 +116,7 @@ class LookAtThatCapabilityProvider implements ICapabilityProvider, IProvidesLATI
     @Nonnull
     private String getLongMessage() {
         List<? extends ITextComponent> list;
-        Tiers tier = tank.tier();
+        Tier tier = tank.tier();
         if (tank instanceof TileTankVoid) {
             list = Collections.singletonList(new TranslationTextComponent(TIER, tier.toString()));
         } else {

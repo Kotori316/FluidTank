@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
 
@@ -72,7 +72,7 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
                     }
                 }
             } else {
-                Tiers tier = tank.tier();
+                Tier tier = tank.tier();
                 if (t instanceof TileTankVoid) {
                     list = Collections.singletonList(new TranslationTextComponent(TIER, tier.toString()));
                 } else {

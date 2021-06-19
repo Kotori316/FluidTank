@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.tiles
 import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
+import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager
@@ -21,7 +22,7 @@ import scala.collection.mutable.ArrayBuffer
 
 //@Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
 //@Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.tiles.IDebuggable")
-class TileTank(var tier: Tiers, t: TileEntityType[_ <: TileTank])
+class TileTank(var tier: Tier, t: TileEntityType[_ <: TileTank])
   extends TileEntity(t)
     with INameable
     /*with ICustomPipeConnection
@@ -29,10 +30,10 @@ class TileTank(var tier: Tiers, t: TileEntityType[_ <: TileTank])
   self =>
 
   def this() = {
-    this(Tiers.Invalid, ModObjects.TANK_TYPE)
+    this(Tier.Invalid, ModObjects.TANK_TYPE)
   }
 
-  def this(t: Tiers) = {
+  def this(t: Tier) = {
     this(t, ModObjects.TANK_TYPE)
   }
 
@@ -69,7 +70,7 @@ class TileTank(var tier: Tiers, t: TileEntityType[_ <: TileTank])
   override def read(state: BlockState, compound: CompoundNBT): Unit = {
     super.read(state, compound)
     internalTank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
-    tier = Tiers.fromNBT(compound.get(TileTank.NBT_Tier))
+    tier = Tier.fromNBT(compound.get(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
       stackName = ITextComponent.Serializer.getComponentFromJson(compound.getString(TileTank.NBT_StackName))
     }
@@ -78,7 +79,7 @@ class TileTank(var tier: Tiers, t: TileEntityType[_ <: TileTank])
 
   def readNBTClient(compound: CompoundNBT): Unit = {
     internalTank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
-    tier = Tiers.fromNBT(compound.get(TileTank.NBT_Tier))
+    tier = Tier.fromNBT(compound.get(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
       stackName = ITextComponent.Serializer.getComponentFromJson(compound.getString(TileTank.NBT_StackName))
     } else {
@@ -87,6 +88,7 @@ class TileTank(var tier: Tiers, t: TileEntityType[_ <: TileTank])
   }
 
   override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = () //handleUpdateTag(pkt.getNbtCompound) // No way to get state
+
   override def onLoad(): Unit = {
     super.onLoad()
     if (loading) {

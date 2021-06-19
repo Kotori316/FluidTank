@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import net.minecraft.block.{AbstractBlock, Block, BlockState}
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -15,7 +15,7 @@ import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).notSolid()) {
+class BlockTank(val tier: Tier) extends Block(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).notSolid()) {
 
   /*
   RegistryName will be "fluidtank:tank_wood".

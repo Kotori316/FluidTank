@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
@@ -18,7 +18,7 @@ import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
-class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirProperties.maxStackSize(1)) {
+class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirProperties.maxStackSize(1)) {
   setRegistryName(FluidTank.modID, "reservoir_" + tier.lowerName)
 
   // ---------- Fluid Interaction ----------

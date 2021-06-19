@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.transport
 
 import cats.implicits._
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.tiles.Tiers
+import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.util.Direction
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
@@ -68,5 +68,5 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
 }
 
 object PipeTile {
-  final val amountPerTick = Utils.toInt(Tiers.STONE.amount)
+  final val amountPerTick = Utils.toInt(Tier.STONE.amount)
 }

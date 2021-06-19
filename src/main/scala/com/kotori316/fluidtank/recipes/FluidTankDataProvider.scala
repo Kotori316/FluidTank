@@ -4,8 +4,8 @@ import java.io.IOException
 
 import cats.syntax.eq._
 import com.google.gson.{GsonBuilder, JsonArray}
-import com.kotori316.fluidtank.tiles.Tiers
-import com.kotori316.fluidtank.{FluidTank, ModObjects}
+import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.advancements.criterion._
 import net.minecraft.block.Blocks
 import net.minecraft.data._
@@ -97,7 +97,7 @@ object FluidTankDataProvider {
       val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
-      val woodTanks = Ingredient.fromItems(ModObjects.blockTanks.filter(_.tier === Tiers.WOOD): _*)
+      val woodTanks = Ingredient.fromItems(ModObjects.blockTanks.filter(_.tier === Tier.WOOD): _*)
       val configCondition = new FluidTankConditions.ConfigCondition()
       val easyCondition = new FluidTankConditions.EasyCondition()
       val WOOD = RecipeSerializeHelper.by(
@@ -182,7 +182,7 @@ object FluidTankDataProvider {
           .key('d', Blocks.DIRT))
       val COMBINE = RecipeSerializeHelper.bySpecial(CombineRecipe.SERIALIZER, CombineRecipe.LOCATION)
         .addCondition(configCondition)
-      val RESERVOIRS = List(Tiers.WOOD, Tiers.STONE, Tiers.IRON)
+      val RESERVOIRS = List(Tier.WOOD, Tier.STONE, Tier.IRON)
         .map(t => new ReservoirRecipe(ID("reservoir_" + t.lowerName), t))
         .map(r => new ReservoirRecipe.FinishedRecipe(r))
         .map(r => RecipeSerializeHelper(r))

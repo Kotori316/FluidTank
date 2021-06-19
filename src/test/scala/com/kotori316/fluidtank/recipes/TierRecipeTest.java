@@ -26,7 +26,7 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.Tier;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +44,7 @@ final class TierRecipeTest {
 
     @BeforeEach
     void setupEach() {
-        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tiers.STONE(), Ingredient.fromItems(Blocks.STONE));
+        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.fromItems(Blocks.STONE));
         inventory = new CraftingInventory(new AccessRecipeTest.DummyContainer(), 3, 3);
     }
 
@@ -167,7 +167,7 @@ final class TierRecipeTest {
     @ParameterizedTest
     @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
     @Disabled("Accessing tag before bounded is not allowed.")
-    void serializeJson(Tiers tier) {
+    void serializeJson(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
             tier, Ingredient.fromItems(Blocks.STONE));
         JsonObject object = new JsonObject();
@@ -185,7 +185,7 @@ final class TierRecipeTest {
 
     @ParameterizedTest
     @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
-    void serializePacket(Tiers tier) {
+    void serializePacket(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
             tier, Ingredient.fromItems(Blocks.STONE));
         PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());

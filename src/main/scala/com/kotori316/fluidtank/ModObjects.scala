@@ -34,8 +34,8 @@ object ModObjects {
 
   //---------- BLOCKS ----------
 
-  private[this] final val woodTank = new BlockTank(Tiers.WOOD)
-  private[this] final val normalTanks = Tiers.list.filter(_.hasTagRecipe).map(new BlockTank(_))
+  private[this] final val woodTank = new BlockTank(Tier.WOOD)
+  private[this] final val normalTanks = Tier.list.filter(_.hasTagRecipe).map(new BlockTank(_))
   private[this] final val creativeTank = new BlockCreativeTank
   private[this] final val voidTank = new BlockVoidTank
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank :+ voidTank
@@ -45,7 +45,7 @@ object ModObjects {
   final val blockSource = new FluidSourceBlock
 
   //---------- ITEMS ----------
-  final val itemReservoirs = List(Tiers.WOOD, Tiers.STONE, Tiers.IRON).map(t => new ReservoirItem(t))
+  final val itemReservoirs = List(Tier.WOOD, Tier.STONE, Tier.IRON).map(t => new ReservoirItem(t))
 
   //---------- TileEntities ----------
 
@@ -78,6 +78,7 @@ object ModObjects {
 
   // ---------- Markers ----------
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
+  final val MARKER_TileTank = MarkerManager.getMarker("TileTank")
   final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
   final val MARKER_Connection = MarkerManager.getMarker("Connection")
   final val MARKER_PipeTileBase = MarkerManager.getMarker("PipeTileBase")

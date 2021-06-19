@@ -45,9 +45,9 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
   }
 
-  def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else handler.getSumOfCapacity
+  def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity
 
-  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tiers.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
+  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tier.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
 
   def tankSeq(fluid: FluidAmount): Seq[TileTank] = {
     if (fluid != null && fluid.isGaseous) {
@@ -99,6 +99,7 @@ sealed class Connection(s: Seq[TileTank]) extends ICapabilityProvider {
 
   // ----- END DEPRECATED REMOVE IN 1.17 -----
 
+  //noinspection ComparingUnrelatedTypes
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       lazyOptional.cast()

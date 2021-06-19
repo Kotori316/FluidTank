@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -24,7 +24,7 @@ private[fluids] final class ItemFluidHandlerTest extends BeforeAllTest {
     val stack = new ItemStack(woodTank)
     val handler = RecipeInventoryUtil.getFluidHandler(stack)
 
-    assertEquals(Tiers.WOOD, handler.tiers)
+    assertEquals(Tier.WOOD, handler.tiers)
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
     assertEquals(1000, handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE))
   }
@@ -75,7 +75,7 @@ private[fluids] final class ItemFluidHandlerTest extends BeforeAllTest {
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(4000L).toStack, IFluidHandler.FluidAction.EXECUTE)
 
     val stackTag = handler.createTag
-    assertEquals(Tiers.WOOD.toString.toLowerCase, stackTag.getString("tier"))
+    assertEquals(Tier.WOOD.toString.toLowerCase, stackTag.getString("tier"))
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(4000L), FluidAmount.fromNBT(stackTag.getCompound("tank")))
   }
 }

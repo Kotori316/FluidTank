@@ -25,28 +25,27 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import scala.jdk.javaapi.CollectionConverters;
-import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
-import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 public class ReservoirRecipe extends ShapelessRecipe {
     public static final IRecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
     public static final String GROUP = "fluidtank:reservoirs";
-    private final Tiers tier;
+    private final Tier tier;
     private final List<Ingredient> subIngredients;
 
-    public ReservoirRecipe(ResourceLocation idIn, Tiers tier, List<Ingredient> subIngredients) {
+    public ReservoirRecipe(ResourceLocation idIn, Tier tier, List<Ingredient> subIngredients) {
         super(idIn, GROUP, findOutput(tier), findIngredients(tier, subIngredients));
         this.tier = tier;
         this.subIngredients = subIngredients;
     }
 
-    ReservoirRecipe(ResourceLocation idIn, Tiers tier) {
+    ReservoirRecipe(ResourceLocation idIn, Tier tier) {
         // Helper method for test.
         this(idIn, tier, Collections.singletonList(Ingredient.fromItems(Items.BUCKET)));
     }
@@ -70,17 +69,17 @@ public class ReservoirRecipe extends ShapelessRecipe {
         return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 
-    private static ItemStack findOutput(Tiers tier) {
+    private static ItemStack findOutput(Tier tier) {
         return CollectionConverters.asJava(ModObjects.itemReservoirs()).stream().filter(i -> i.tier() == tier).findFirst().map(ItemStack::new).orElseThrow(
             () -> new IllegalStateException("Reservoir of " + tier + " not found.")
         );
     }
 
-    Tiers getTier() { // For test
+    Tier getTier() { // For test
         return tier;
     }
 
-    private static NonNullList<Ingredient> findIngredients(Tiers tier, List<Ingredient> subIngredients) {
+    private static NonNullList<Ingredient> findIngredients(Tier tier, List<Ingredient> subIngredients) {
         NonNullList<Ingredient> recipeItemsIn = NonNullList.create();
         Stream<BlockTank> tankStream = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier);
 
@@ -97,7 +96,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
 
         @Override
         public ReservoirRecipe read(ResourceLocation recipeId, JsonObject json) {
-            Tiers tier = OptionConverters.toJava(Tiers.byName(JSONUtils.getString(json, "tier"))).orElse(Tiers.Invalid());
+            Tier tier = Tier.byName(JSONUtils.getString(json, "tier")).orElse(Tier.Invalid);
             List<Ingredient> ingredientList;
             if (json.has("sub"))
                 ingredientList = StreamSupport.stream(JSONUtils.getJsonArray(json, "sub").spliterator(), false)
@@ -115,7 +114,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         @Override
         public ReservoirRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
             String tierName = buffer.readString();
-            Tiers tier = Tiers.byName(tierName).get();
+            Tier tier = Tier.byName(tierName).orElseThrow(IllegalArgumentException::new);
             int subIngredientCount = buffer.readVarInt();
             List<Ingredient> ingredients = IntStream.range(0, subIngredientCount)
                 .mapToObj(i -> Ingredient.read(buffer))

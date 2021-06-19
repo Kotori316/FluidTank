@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +30,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
-import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -39,7 +39,7 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
 import com.kotori316.fluidtank.items.ItemBlockTank;
-import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInventory> {
@@ -48,21 +48,21 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
     private final ResourceLocation id;
-    private final Tiers tier;
+    private final Tier tier;
     private final Set<BlockTank> normalTankSet;
     private final Ingredient subItems;
     private final ItemStack result;
     private static final int recipeWidth = 3;
     private static final int recipeHeight = 3;
 
-    public TierRecipe(ResourceLocation idIn, Tiers tier, Ingredient subItems) {
+    public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems) {
         id = idIn;
         this.tier = tier;
         this.subItems = subItems;
 
         result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
-        Set<Tiers> tiersSet = Tiers.jList().stream().filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
-        normalTankSet = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tiersSet.contains(b.tier()))
+        Set<Tier> tierSet = Arrays.stream(Tier.values()).filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
+        normalTankSet = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tierSet.contains(b.tier()))
             .filter(TierRecipe::filterTier).collect(Collectors.toSet());
         LOGGER.debug("Recipe instance({}) created for Tier {}.", idIn, tier);
     }
@@ -201,7 +201,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         return subItems;
     }
 
-    public Tiers getTier() {
+    public Tier getTier() {
         return tier;
     }
 
@@ -246,7 +246,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
         @Override
         public TierRecipe read(ResourceLocation recipeId, JsonObject json) {
-            Tiers tier = OptionConverters.toJava(Tiers.byName(JSONUtils.getString(json, KEY_TIER))).orElse(Tiers.Invalid());
+            Tier tier = Tier.byName(JSONUtils.getString(json, KEY_TIER)).orElse(Tier.Invalid);
             Ingredient subItem = Ingredient.deserialize(json.get(KEY_SUB_ITEM));
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, json);
@@ -257,7 +257,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         @Override
         public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
             String tierName = buffer.readString();
-            Tiers tier = Tiers.byName(tierName).get();
+            Tier tier = Tier.byName(tierName).orElseThrow(IllegalArgumentException::new);
             Ingredient subItem = Ingredient.read(buffer);
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
@@ -276,18 +276,18 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
     public static class FinishedRecipe implements IFinishedRecipe {
         private final ResourceLocation recipeId;
-        private final Tiers tiers;
+        private final Tier tier;
 
-        public FinishedRecipe(ResourceLocation recipeId, Tiers tiers) {
+        public FinishedRecipe(ResourceLocation recipeId, Tier tier) {
             this.recipeId = recipeId;
-            this.tiers = tiers;
+            this.tier = tier;
         }
 
         @Override
         public void serialize(JsonObject json) {
-            Ingredient ingredient = Ingredient.fromTag(ItemTags.makeWrapperTag(this.tiers.tagName()));
+            Ingredient ingredient = Ingredient.fromTag(ItemTags.makeWrapperTag(this.tier.tagName()));
 
-            json.addProperty(KEY_TIER, this.tiers.lowerName());
+            json.addProperty(KEY_TIER, this.tier.lowerName());
             json.add(KEY_SUB_ITEM, ingredient.serialize());
         }
 

@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.fluids.FluidAmount
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank}
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundNBT
@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
 
-class TankItemFluidHandler(val tiers: Tiers, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
+class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
   def nbt: CompoundNBT = stack.getChildTag(TileTank.NBT_BlockTag)
 

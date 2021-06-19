@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
@@ -21,7 +22,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.tiles.Tiers;
+import com.kotori316.fluidtank.tiles.Tier;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,20 +31,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class AccessRecipeTest extends BeforeAllTest {
-    static Tiers[] tiers() {
-        return Tiers.jList().stream().filter(Tiers::hasTagRecipe).toArray(Tiers[]::new);
+    static Stream<Tier> tiers() {
+        return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe);
     }
 
     @ParameterizedTest
     @MethodSource("tiers")
-    void createTierRecipeInstance(Tiers tier) {
+    void createTierRecipeInstance(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.fromItems(Blocks.STONE));
         assertNotNull(recipe);
     }
 
     @Test
     void dummy() {
-        assertTrue(tiers().length > 0);
+        assertTrue(tiers().count() > 0);
         assertTrue(TierRecipeTest.fluids1().length > 0);
         assertTrue(ReservoirRecipeSerialize.tierAndIngredient().count() > 0);
         PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());
@@ -52,14 +53,14 @@ final class AccessRecipeTest extends BeforeAllTest {
 
     static final class ReservoirRecipeSerialize extends BeforeAllTest {
         static Stream<Object> tierAndIngredient() {
-            return Stream.of(Tiers.WOOD(), Tiers.STONE(), Tiers.IRON())
+            return Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
                 .flatMap(t -> Stream.of(Items.BUCKET, Items.APPLE).map(Ingredient::fromItems)
                     .map(i -> new Object[]{t, i}));
         }
 
         @ParameterizedTest
         @MethodSource("tierAndIngredient")
-        void serializePacket(Tiers t, Ingredient sub) {
+        void serializePacket(Tier t, Ingredient sub) {
             ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
             PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());
@@ -76,7 +77,7 @@ final class AccessRecipeTest extends BeforeAllTest {
         @ParameterizedTest
         @MethodSource("tierAndIngredient")
         @Disabled("Deserialization of Ingredient is not available in test environment.")
-        void serializeJson(Tiers t, Ingredient sub) {
+        void serializeJson(Tier t, Ingredient sub) {
             ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
             JsonObject object = new JsonObject();

@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.blocks
 import java.util
 
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{Tiers, TileTankCreative}
+import com.kotori316.fluidtank.tiles.{Tier, TileTankCreative}
 import net.minecraft.block.BlockState
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.ItemStack
@@ -14,7 +14,7 @@ import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 
-class BlockCreativeTank extends BlockTank(Tiers.CREATIVE) {
+class BlockCreativeTank extends BlockTank(Tier.CREATIVE) {
   override def namePrefix = ""
 
   override def createTileEntity(state: BlockState, world: IBlockReader) = new TileTankCreative
