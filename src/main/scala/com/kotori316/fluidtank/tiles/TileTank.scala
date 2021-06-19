@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.tiles
 
-import com.kotori316.fluidtank.ModObjects
 import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
@@ -96,8 +95,11 @@ class TileTank(var tier: Tiers, t: TileEntityType[_ <: TileTank])
         val executor: MinecraftServer = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
         executor.enqueue(new TickDelayedTask(executor.getTickCounter, () => {
           getWorld.getProfiler.startSection("Connection Loading")
-          if (this.connection.isDummy)
+          if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
+            "Connection load in delayed task. At={}, connection={}", this.getPos, this.connection)
+          if (this.connection.isDummy) {
             Connection.load(getWorld, getPos)
+          }
           getWorld.getProfiler.endSection()
         }))
       }
