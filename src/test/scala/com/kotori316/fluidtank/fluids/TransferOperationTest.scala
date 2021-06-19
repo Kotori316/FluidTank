@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, a
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.{MethodSource, ValueSource}
 
 import scala.jdk.CollectionConverters._
 
@@ -143,17 +143,52 @@ object TransferOperationTest {
       )
     }
 
-    @Test
-    def fillAll3(): Unit = {
+    @ParameterizedTest
+    @ValueSource(ints = Array(0, 1, 1000))
+    def fillAll3(amount: Int): Unit = {
       val fillAction = fillAll(List(lavaTank, lavaTank.copy(capacity = 32000)))
-      val (_, left, List(a, b)) = fillAction.run((), FluidAmount.BUCKET_WATER.setAmount(1))
+      val (_, left, List(a, b)) = fillAction.run((), FluidAmount.BUCKET_WATER.setAmount(amount))
       assertAll(
-        () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(1), left),
+        () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount), left),
         () => assertEquals(lavaTank, a),
         () => assertEquals(lavaTank.copy(capacity = 32000), b),
       )
     }
 
+    @Test
+    def fillAll4(): Unit = {
+      val tanks = Seq(Tank(FluidAmount.BUCKET_WATER, 10000), Tank(FluidAmount.BUCKET_LAVA, 10000))
+      val fillAction = fillAll(tanks)
+      val (_, left, filled) = fillAction.run((), FluidAmount.EMPTY)
+      assertAll(
+        () => assertTrue(left.isEmpty),
+        () => assertEquals(tanks, filled)
+      )
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids"))
+    def fillAllToEmpty1(fa: FluidAmount): Unit = {
+      val tanks = Seq()
+      val fillAction = fillAll(tanks)
+      val (_, left, filled) = fillAction.run((), fa)
+      assertAll(
+        () => assertFalse(left.isEmpty),
+        () => assertTrue(filled.isEmpty)
+      )
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids"))
+    def fillAllToEmpty2(fa: FluidAmount): Unit = {
+      val tanks = Seq(Tank.EMPTY, Tank.EMPTY)
+      val fillAction = fillAll(tanks)
+      val (_, left, filled) = fillAction.run((), fa)
+      assertAll(
+        () => assertFalse(left.isEmpty),
+        () => assertEquals(tanks, filled)
+      )
+    }
   }
 
   object Drain extends BeforeAllTest {
