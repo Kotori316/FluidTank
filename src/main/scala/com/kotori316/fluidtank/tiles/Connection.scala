@@ -152,7 +152,7 @@ object Connection {
         val last = seq.last
         last.getWorld.setBlockState(last.getPos, last.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.TOP))
         // MIDDLE
-        seq.tail.dropRight(1).foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
+        seq.tail.init.foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
       } else {
         // SINGLE
         seq.foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE)))
