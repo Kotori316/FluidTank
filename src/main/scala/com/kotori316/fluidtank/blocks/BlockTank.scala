@@ -7,6 +7,7 @@ import net.minecraft.block.{AbstractBlock, Block, BlockState}
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.{Item, ItemStack}
+import net.minecraft.state.StateContainer
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.shapes.{ISelectionContext, VoxelShape}
 import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
@@ -23,6 +24,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   Creative Tank -> "fluidtank:creative"
    */
   setRegistryName(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
+  setDefaultState(this.stateContainer.getBaseState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
   val itemBlock = new ItemBlockTank(this)
 
   override final def asItem(): Item = itemBlock
@@ -114,4 +116,8 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   //noinspection ScalaDeprecation
   override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext): VoxelShape = ModObjects.TANK_SHAPE
 
+  override def fillStateContainer(builder: StateContainer.Builder[Block, BlockState]): Unit = {
+    super.fillStateContainer(builder)
+    builder.add(TankPos.TANK_POS_PROPERTY)
+  }
 }
