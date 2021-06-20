@@ -27,7 +27,7 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - name: Test-JUnit
-        run: chmod +x ./gradlew && ./gradlew test
+        run: chmod +x ./gradlew && ./gradlew test --no-daemon
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 #      - name: Test-RunData
