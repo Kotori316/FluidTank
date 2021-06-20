@@ -31,7 +31,7 @@ class BlockCreativeTank extends BlockTank(Tiers.CREATIVE) {
       tooltip.add(new StringTextComponent("Creative"))
     }
 
-    override def hasRecipe: Boolean = false
+    override def hasInvisibleRecipe: Boolean = false
 
     override def initCapabilities(stack: ItemStack, nbt: CompoundNBT): ICapabilityProvider = null
 

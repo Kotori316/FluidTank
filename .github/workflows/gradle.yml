@@ -79,7 +79,7 @@ jobs:
       fail-fast: false
       matrix:
         java: [ 1.8, 11 ]
-        forge: [ 1.16.4-35.1.37, 1.16.5-latest ]
+        forge: [ 1.16.4-35.1.37, 1.16.5-latest, 1.16.5-recommended ]
     steps:
       - name: Get latest version
         run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
@@ -111,12 +111,13 @@ jobs:
       fail-fast: false
       matrix:
         java: [ 1.8, 11 ]
-        forge: [ 1.16.4-35.1.37, 1.16.5-latest ]
+        forge: [ 1.16.4-35.1.37, 1.16.5-latest, 1.16.5-recommended ]
     steps:
       - name: Set versions
         run: |
           version=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})
           sed -i -e "s/forge.version=latest/forge.version=$version/" -e "s/ci.mods=dummy/ci.mods=fluidtank/" /work/gradle.properties
+          echo /work/gradle.properties
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v1
         with:
@@ -128,14 +129,5 @@ jobs:
           path: work/
       - name: move files
         run: ls -al work && mkdir --parents /work/run/mods && mv work/*-deobf.jar /work/run/mods/ && ls -al /work/run/mods
-      - name: download_assets
-        run: |
-          cd /work
-          chmod +x ./gradlew
-          (./gradlew clean downloadAssets --no-daemon || true)
-          ( (./gradlew compileScala --no-daemon || ./gradlew clean --no-daemon) || \
-            (./gradlew compileScala --no-daemon || ./gradlew clean --no-daemon) || \
-            (sleep 10s && ./gradlew compileScala --no-daemon) )
-        continue-on-error: true
       - name: Test with runData
         run: cd /work && chmod +x ./gradlew && ( ./gradlew --no-daemon runData || ./gradlew --no-daemon runData)

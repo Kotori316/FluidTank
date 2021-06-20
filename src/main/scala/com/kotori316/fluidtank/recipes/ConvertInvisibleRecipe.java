@@ -45,7 +45,7 @@ public class ConvertInvisibleRecipe extends SpecialRecipe {
             .collect(Collectors.toList());
         return stacks.size() == 1
             && stacks.get(0).getItem() instanceof ItemBlockTank
-            && ((ItemBlockTank) stacks.get(0).getItem()).hasRecipe();
+            && ((ItemBlockTank) stacks.get(0).getItem()).hasInvisibleRecipe();
     }
 
     @Override

@@ -26,7 +26,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     if (stack.hasTag && stack.getTag.contains(TileTankNoDisplay.NBT_BlockTag)) Rarity.RARE
     else Rarity.COMMON
 
-  def hasRecipe = true
+  def hasInvisibleRecipe = true
 
   @OnlyIn(Dist.CLIENT)
   override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
