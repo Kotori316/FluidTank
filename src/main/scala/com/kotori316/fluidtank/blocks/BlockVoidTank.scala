@@ -26,7 +26,7 @@ class BlockVoidTank extends BlockTank(Tiers.VOID) {
     @OnlyIn(Dist.CLIENT)
     override def addInformation(stack: ItemStack, worldIn: World, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = ()
 
-    override def hasRecipe: Boolean = false
+    override def hasInvisibleRecipe: Boolean = false
 
     override def initCapabilities(stack: ItemStack, nbt: CompoundNBT): ICapabilityProvider = null
 
