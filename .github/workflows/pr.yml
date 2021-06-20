@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 1.8, 11 ]
+        java: [ 8, 11 ]
     name: Build Check for Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
