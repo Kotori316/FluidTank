@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.tiles
 import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import net.minecraft.util.Direction
 import net.minecraft.util.math.{BlockPos, MathHelper}
@@ -17,8 +18,7 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 
 import scala.collection.mutable.ArrayBuffer
 
-sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
-  val seq: Seq[TileTankNoDisplay] = s.sortBy(_.getPos.getY)
+sealed class Connection private(val seq: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   val hasCreative: Boolean = seq.exists(_.isInstanceOf[TileTankCreative])
   val hasVoid: Boolean = seq.exists(_.isInstanceOf[TileTankVoid])
   val updateActions: ArrayBuffer[() => Unit] = ArrayBuffer(
@@ -29,7 +29,7 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
   val isDummy: Boolean = false
   private[tiles] final var mIsValid = true
 
-  val capabilities: Cap[CapabilityDispatcher] = if (s.nonEmpty) {
+  val capabilities: Cap[CapabilityDispatcher] = if (seq.nonEmpty) {
     val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
     MinecraftForge.EVENT_BUS.post(event)
     if (event.getCapabilities.isEmpty) {
@@ -139,13 +139,32 @@ sealed class Connection(s: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
 object Connection {
 
   def create(s: Seq[TileTankNoDisplay]): Connection = {
-    if (s.isEmpty) invalid
-    else new Connection(s)
+    if (s.isEmpty) {
+      invalid
+    } else {
+      val seq = s.sortBy(_.getPos.getY)
+      // Property update
+      if (seq.lengthIs > 1) {
+        // HEAD
+        val head = seq.head
+        head.getWorld.setBlockState(head.getPos, head.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM))
+        // LAST
+        val last = seq.last
+        last.getWorld.setBlockState(last.getPos, last.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.TOP))
+        // MIDDLE
+        seq.tail.init.foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
+      } else {
+        // SINGLE
+        seq.foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE)))
+      }
+      new Connection(seq)
+    }
   }
 
   @scala.annotation.tailrec
-  def createAndInit(s: Seq[TileTankNoDisplay]): Unit = {
-    if (s.nonEmpty) {
+  def createAndInit(tankSeq: Seq[TileTankNoDisplay]): Unit = {
+    if (tankSeq.nonEmpty) {
+      val s = tankSeq.sortBy(_.getPos.getY)
       val fluid = s.map(_.internalTank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
       val (s1, s2) = s.span(t => t.internalTank.getFluid.fluidEqual(fluid) || t.internalTank.getFluid.isEmpty)
       // Assert tanks in s1 have the same fluid.
