@@ -23,6 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 
+import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -35,6 +36,9 @@ object FluidTankDataProvider {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
       event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator, event.getExistingFileHelper))
+    }
+    if (event.includeClient()) {
+      event.getGenerator.addProvider(new ModelProvider(event.getGenerator))
     }
   }
 
@@ -220,6 +224,31 @@ object FluidTankDataProvider {
         case Success(t) => getOrCreateBuilder(t).addOptional(ModObjects.MILK_FLUID.getRegistryName)
       }
     }
+  }
+
+  class ModelProvider(generatorIn: DataGenerator) extends IDataProvider {
+    //noinspection SpellCheckingInspection
+    override def act(cache: DirectoryCache): Unit = {
+      val path = generatorIn.getOutputFolder
+      val GSON = (new GsonBuilder).setPrettyPrinting().disableHtmlEscaping().create
+      val models: mutable.Buffer[ModelSerializerHelper] = mutable.Buffer.empty
+      models ++= ModObjects.blockTanks.map(ModelSerializerHelper.getTankModel)
+      models ++= ModObjects.blockTanksInvisible.map(ModelSerializerHelper.getTankModel)
+      models += ModelSerializerHelper.getFluidSourceModel(ModObjects.blockSource)
+      models += ModelSerializerHelper.getCatModel(ModObjects.blockCat)
+
+      for (model <- models) {
+        val out = path.resolve(s"assets/${model.location.getNamespace}/blockstates/${model.location.getPath}.json")
+        try {
+          IDataProvider.save(GSON, cache, model.build, out)
+        } catch {
+          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}.", e)
+          case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}. Check the serializer registered.", e)
+        }
+      }
+    }
+
+    override def getName: String = "Models of FluidTank"
   }
 
   def makeConditionArray(conditions: List[ICondition]): JsonArray = {

@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": {"model": "fluidtank:block/tank_stone"}
+    "tank_pos=bottom": {
+      "model": "fluidtank:block/tank_stone"
+    },
+    "tank_pos=middle": {
+      "model": "fluidtank:block/tank_stone"
+    },
+    "tank_pos=single": {
+      "model": "fluidtank:block/tank_stone"
+    },
+    "tank_pos=top": {
+      "model": "fluidtank:block/tank_stone"
+    }
   }
 }
