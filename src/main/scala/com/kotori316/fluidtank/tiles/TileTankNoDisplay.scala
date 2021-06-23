@@ -11,6 +11,7 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.concurrent.TickDelayedTask
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.text.{ITextComponent, StringTextComponent}
 import net.minecraft.util.{Direction, INameable}
 import net.minecraftforge.common.capabilities.Capability
@@ -88,6 +89,7 @@ class TileTankNoDisplay(var tier: Tiers, t: TileEntityType[_ <: TileTankNoDispla
   }
 
   override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = () //handleUpdateTag(pkt.getNbtCompound) // No way to get state
+
   override def onLoad(): Unit = {
     super.onLoad()
     if (loading) {
@@ -212,17 +214,10 @@ object TileTankNoDisplay {
         tile.connection.updateNeighbors()
       if (!SideProxy.isServer(tile) && capacity != 0) {
         val percent = getFluidAmount.toDouble / capacity.toDouble
-        val a = 0.001
         if (getFluidAmount > 0) {
+          val a = 0.001
           val d = 1d / 16d
-          val (minY, maxY) = {
-            val p = percent max a * 3
-            if (this.getFluid.isGaseous) {
-              (1d - p + a, 1d - a)
-            } else {
-              (a, p - a)
-            }
-          }
+          val (minY, maxY) = getFluidHeight(capacity, getFluidAmount, 0 + a, 1 - a, a * 3, getFluid.isGaseous)
           box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
         } else {
           box = null
@@ -245,4 +240,22 @@ object TileTankNoDisplay {
 
   }
 
+  /**
+   *
+   * @param capacity   the capacity of tank. Must not be 0.
+   * @param amount     the amount in the tank, assumed to be grater than 0. (amount > 0)
+   * @param lowerBound the minimum of fluid position.
+   * @param upperBound the maximum of fluid position.
+   * @param isGaseous  whether the fluid is gas or not.
+   * @return (minY, maxY)
+   */
+  def getFluidHeight(capacity: Double, amount: Double, lowerBound: Double, upperBound: Double, minRatio: Double, isGaseous: Boolean): (Double, Double) = {
+    val ratio = MathHelper.clamp(amount / capacity, minRatio, 1)
+    val height = (upperBound - lowerBound) * ratio
+    if (isGaseous) {
+      (upperBound - height, upperBound)
+    } else {
+      (lowerBound, lowerBound + height)
+    }
+  }
 }
