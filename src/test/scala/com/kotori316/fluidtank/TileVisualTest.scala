@@ -118,4 +118,13 @@ object TileVisualTest extends BeforeAllTest {
     assertEquals(1 - amount / 4000d, minY)
     assertEquals(1, maxY)
   }
+
+  @Test
+  def defaultValue(): Unit = {
+    val low: Double = Config.content.renderLowerBound.get()
+    val up: Double = Config.content.renderUpperBound.get()
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, 2000, low, up, low * 3, isGaseous = false)
+    assertEquals(0.001, minY)
+    assertEquals(0.5, maxY)
+  }
 }

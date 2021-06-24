@@ -115,9 +115,10 @@ public class Utils {
             };
         }
 
-        private Supplier<Integer> createInt() {
+        @SuppressWarnings("unchecked")
+        private <T> Supplier<T> createGeneric() {
             String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-            return () -> ((int) configs.getOrDefault(methodName, 0));
+            return () -> ((T) configs.getOrDefault(methodName, 0));
         }
 
         @Override
@@ -172,7 +173,17 @@ public class Utils {
 
         @Override
         public Supplier<Integer> pipeColor() {
-            return createInt();
+            return createGeneric();
+        }
+
+        @Override
+        public Supplier<Double> renderLowerBound() {
+            return createGeneric();
+        }
+
+        @Override
+        public Supplier<Double> renderUpperBound() {
+            return createGeneric();
         }
     }
 }

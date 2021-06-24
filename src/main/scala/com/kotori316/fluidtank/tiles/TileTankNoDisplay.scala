@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.tiles
 
-import com.kotori316.fluidtank.ModObjects
 import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
+import com.kotori316.fluidtank.{Config, ModObjects}
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.NetworkManager
@@ -201,6 +201,9 @@ object TileTankNoDisplay {
 
     def tile: TileTankNoDisplay
 
+    lazy val lowerBound: Double = Config.content.renderLowerBound.get().doubleValue()
+    lazy val upperBound: Double = Config.content.renderUpperBound.get().doubleValue()
+
     // Util methods
     def getFluidAmount: Long = this.getTank.amount
 
@@ -215,9 +218,8 @@ object TileTankNoDisplay {
       if (!SideProxy.isServer(tile) && capacity != 0) {
         val percent = getFluidAmount.toDouble / capacity.toDouble
         if (getFluidAmount > 0) {
-          val a = 0.001
           val d = 1d / 16d
-          val (minY, maxY) = getFluidHeight(capacity, getFluidAmount, 0 + a, 1 - a, a * 3, getFluid.isGaseous)
+          val (minY, maxY) = getFluidHeight(capacity, getFluidAmount, lowerBound, upperBound, 0.003, getFluid.isGaseous)
           box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
         } else {
           box = null

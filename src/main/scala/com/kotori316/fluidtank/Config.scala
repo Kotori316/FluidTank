@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank
 
+import java.lang.{Double => JDouble}
 import java.util.function.Supplier
 
 import net.minecraftforge.common.ForgeConfigSpec
@@ -19,7 +20,9 @@ object Config {
     "enableWailaAndTOP" -> true,
     "enableFluidSupplier" -> false,
     "enablePipeRainbowRenderer" -> false,
-    "pipeColor" -> (0xF0000000 + 0xFFFFFF)
+    "pipeColor" -> (0xF0000000 + 0xFFFFFF),
+    "renderLowerBound" -> 0.001d,
+    "renderUpperBound" -> (1 - 0.001d),
   )
   private var mContent: IContent = _
   var dummyContent: IContent = new Utils.TestConfig(CollectionConverters.asJava(defaultConfig))
@@ -56,6 +59,8 @@ object Config {
     val enableFluidSupplier: BoolSupplier
     val enablePipeRainbowRenderer: BoolSupplier
     val pipeColor: Supplier[Integer]
+    val renderLowerBound: Supplier[JDouble]
+    val renderUpperBound: Supplier[JDouble]
   }
 
   class Content(builder: ForgeConfigSpec.Builder) extends IContent {
@@ -96,9 +101,15 @@ object Config {
 
     val enablePipeRainbowRenderer: BoolSupplier = asSupplier(builder.worldRestart()
       .comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false))
-    val pipeColor: java.util.function.Supplier[Integer] = asSupplier(builder.worldRestart()
+    val pipeColor: Supplier[Integer] = asSupplier(builder.worldRestart()
       .comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.")
       .define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF)))
+    val renderLowerBound: Supplier[JDouble] = asSupplier(builder.worldRestart()
+      .comment("The lower bound of position of fluid rendering.")
+      .defineInRange("renderLowerBound", 0.001d, 0d, 1d))
+    val renderUpperBound: Supplier[JDouble] = asSupplier(builder.worldRestart()
+      .comment("The upper bound of position of fluid rendering.")
+      .defineInRange("renderUpperBound", 1d - 0.001d, 0d, 1d))
     builder.pop()
 
   }
