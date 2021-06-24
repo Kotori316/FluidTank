@@ -25,7 +25,7 @@ object Config {
     "renderUpperBound" -> (1 - 0.001d),
   )
   private var mContent: IContent = _
-  var dummyContent: IContent = new Utils.TestConfig(CollectionConverters.asJava(defaultConfig))
+  var dummyContent: IContent = Utils.TestConfig.getTestInstance(CollectionConverters.asJava(defaultConfig))
 
   def content: IContent = if (mContent == null) dummyContent else mContent
 
@@ -105,10 +105,10 @@ object Config {
       .comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.")
       .define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF)))
     val renderLowerBound: Supplier[JDouble] = asSupplier(builder.worldRestart()
-      .comment("The lower bound of position of fluid rendering.")
+      .comment("The lower bound of position of fluid rendering. Default 0.001")
       .defineInRange("renderLowerBound", 0.001d, 0d, 1d))
     val renderUpperBound: Supplier[JDouble] = asSupplier(builder.worldRestart()
-      .comment("The upper bound of position of fluid rendering.")
+      .comment("The upper bound of position of fluid rendering. Default 0.999")
       .defineInRange("renderUpperBound", 1d - 0.001d, 0d, 1d))
     builder.pop()
 

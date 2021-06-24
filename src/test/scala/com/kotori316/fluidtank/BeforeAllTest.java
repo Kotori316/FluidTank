@@ -33,7 +33,7 @@ public abstract class BeforeAllTest {
             Bootstrap.register();
             Map<String, Object> map = new HashMap<>(CollectionConverters.asJava(Config.defaultConfig()));
             map.put("debug", true);
-            Config.dummyContent_$eq(new Utils.TestConfig(map));
+            Config.dummyContent_$eq(Utils.TestConfig.getTestInstance(map));
         }
     }
 
