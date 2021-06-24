@@ -10,7 +10,7 @@ object TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(0, 500, 1000, 2000, 4000))
   def height1(amount: Long): Unit = {
-    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount, 0, 1, 0, isGaseous = false)
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount.toDouble, 0, 1, 0, isGaseous = false)
     assertEquals(0.0, minY)
     assertEquals(amount.toDouble / 4000d, maxY)
   }
@@ -18,7 +18,7 @@ object TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(0, 500, 1000, 2000, 4000))
   def height2(amount: Long): Unit = {
-    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount, 0, 1, 0, isGaseous = true)
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount.toDouble, 0, 1, 0, isGaseous = true)
     assertEquals(1 - amount.toDouble / 4000d, minY)
     assertEquals(1, maxY)
   }
@@ -90,7 +90,7 @@ object TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(0L, 1L, 100, 250, 500))
   def minRatio1(amount: Long): Unit = {
-    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount, 0, 1, 1d / 8, isGaseous = false)
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount.toDouble, 0, 1, 1d / 8, isGaseous = false)
     assertEquals(0.0, minY)
     assertEquals(0.125, maxY)
   }
@@ -98,7 +98,7 @@ object TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(0L, 1L, 100, 250, 500))
   def minRatio1Gas(amount: Long): Unit = {
-    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount, 0, 1, 1d / 8, isGaseous = true)
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount.toDouble, 0, 1, 1d / 8, isGaseous = true)
     assertEquals(0.875, minY)
     assertEquals(1, maxY)
   }
@@ -106,7 +106,7 @@ object TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(1000L, 2000L, 4000L))
   def minRatio2(amount: Long): Unit = {
-    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount, 0, 1, 1d / 8, isGaseous = false)
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount.toDouble, 0, 1, 1d / 8, isGaseous = false)
     assertEquals(0.0, minY)
     assertEquals(amount / 4000d, maxY)
   }
@@ -114,7 +114,7 @@ object TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(1000L, 2000L, 4000L))
   def minRatio2Gas(amount: Long): Unit = {
-    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount, 0, 1, 1d / 8, isGaseous = true)
+    val (minY, maxY) = TileTankNoDisplay.getFluidHeight(4000, amount.toDouble, 0, 1, 1d / 8, isGaseous = true)
     assertEquals(1 - amount / 4000d, minY)
     assertEquals(1, maxY)
   }
