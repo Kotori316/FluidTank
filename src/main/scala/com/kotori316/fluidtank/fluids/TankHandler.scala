@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.fluids
 
 import cats.data.Chain
-import cats.implicits.catsSyntaxFoldOps
+import cats.implicits.{catsSyntaxEq, catsSyntaxFoldOps}
 import com.kotori316.fluidtank._
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
@@ -11,8 +11,10 @@ class TankHandler extends IFluidHandler {
   private[this] final var tank: Tank = Tank.EMPTY
 
   def setTank(newTank: Tank): Unit = {
-    this.tank = newTank
-    onContentsChanged()
+    if (this.tank =!= newTank) {
+      this.tank = newTank
+      onContentsChanged()
+    }
   }
 
   def initCapacity(capacity: Long): Unit = {
@@ -75,7 +77,7 @@ class TankHandler extends IFluidHandler {
 
 object TankHandler {
   def apply(capacity: Long): TankHandler = {
-    val h = new TankHandler
+    val h = new TankHandler()
     h.setTank(h.getTank.copy(capacity = capacity))
     h
   }
