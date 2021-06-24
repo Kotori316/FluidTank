@@ -216,11 +216,12 @@ object TileTankNoDisplay {
       if (!tile.loading)
         tile.connection.updateNeighbors()
       if (!SideProxy.isServer(tile) && capacity != 0) {
-        val percent = getFluidAmount.toDouble / capacity.toDouble
         if (getFluidAmount > 0) {
           val d = 1d / 16d
-          val (minY, maxY) = getFluidHeight(capacity, getFluidAmount, lowerBound, upperBound, 0.003, getFluid.isGaseous)
-          box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
+          val (minY, maxY) = getFluidHeight(capacity.toDouble, getFluidAmount.toDouble, lowerBound, upperBound, 0.003, getFluid.isGaseous)
+          box = Box(startX = d * 8, startY = minY, startZ = d * 8, endX = d * 8, endY = maxY, endZ = d * 8,
+            sizeX = d * 12 - 0.01, sizeY = maxY - minY, sizeZ = d * 12 - 0.01,
+            firstSide = true, endSide = true)
         } else {
           box = null
         }
