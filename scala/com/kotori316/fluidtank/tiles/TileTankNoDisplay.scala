@@ -1,12 +1,11 @@
 package com.kotori316.fluidtank.tiles
 
-import java.util
-
 import buildcraft.api.tiles.IDebuggable
 import buildcraft.api.transport.pipe.ICustomPipeConnection
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.packet.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
+import com.kotori316.fluidtank.tiles.TileTankNoDisplay.getFluidHeight
 import net.minecraft.block.state.IBlockState
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
@@ -14,12 +13,14 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.Axis
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.util.text.{ITextComponent, TextComponentString}
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fml.common.Optional
+
+import java.util
 
 @Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.transport.pipe.ICustomPipeConnection")
 @Optional.Interface(modid = TileTankNoDisplay.bcId, iface = "buildcraft.api.tiles.IDebuggable")
@@ -86,6 +87,7 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
     }
   }
 
+  //noinspection ComparingUnrelatedTypes
   override def getCapability[T](capability: Capability[T], facing: EnumFacing): T = {
     if (hasWorld && world.isRemote && capability == net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       // com.kotori316.fluidtank.FluidTank.LOGGER.info("Called getCapability in client side.")
@@ -142,20 +144,12 @@ class TileTankNoDisplay(var tier: Tiers) extends TileEntity with ICustomPipeConn
       sendPacket()
       connection.updateNeighbors()
       if (!SideProxy.isServer(self) && getCapacity != 0) {
-        val percent = getFluidAmount.toDouble / getCapacity.toDouble
-        val a = 0.001
-        if (percent > a) {
+        if (getFluidAmount > 0) {
           val d = 1d / 16d
-          var maxY = 0d
-          var minY = 0d
-          if (tank.getFluid.getFluid.isGaseous(tank.getFluid)) {
-            maxY = 1d - a
-            minY = 1d - percent + a
-          } else {
-            minY = a
-            maxY = percent - a
-          }
-          box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
+          val lowerBound = 0.001d
+          val upperBound = 0.999d
+          val (minY, maxY) = getFluidHeight(capacity.toDouble, getFluidAmount.toDouble, lowerBound, upperBound, 0.003, tank.getFluid.getFluid.isGaseous(tank.getFluid))
+          box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, maxY - minY, d * 12 - 0.01, firstSide = true, endSide = true)
         } else {
           box = null
         }
@@ -211,4 +205,23 @@ object TileTankNoDisplay {
   final val NBT_StackName = "stackName"
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
+
+  /**
+    *
+    * @param capacity   the capacity of tank. Must not be 0.
+    * @param amount     the amount in the tank, assumed to be grater than 0. (amount > 0)
+    * @param lowerBound the minimum of fluid position.
+    * @param upperBound the maximum of fluid position.
+    * @param isGaseous  whether the fluid is gas or not.
+    * @return (minY, maxY)
+    */
+  def getFluidHeight(capacity: Double, amount: Double, lowerBound: Double, upperBound: Double, minRatio: Double, isGaseous: Boolean): (Double, Double) = {
+    val ratio = MathHelper.clamp(amount / capacity, minRatio, 1)
+    val height = (upperBound - lowerBound) * ratio
+    if (isGaseous) {
+      (upperBound - height, upperBound)
+    } else {
+      (lowerBound, lowerBound + height)
+    }
+  }
 }
