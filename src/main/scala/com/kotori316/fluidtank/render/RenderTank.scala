@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.tank.TileTank
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.block.entity.{BlockEntityRenderDispatcher, BlockEntityRenderer, BlockEntityRendererFactory}
+import net.minecraft.client.render.block.entity.{BlockEntityRenderer, BlockEntityRendererFactory}
 import net.minecraft.client.render.{RenderLayer, VertexConsumerProvider}
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.tag.FluidTags
@@ -30,7 +30,7 @@ class RenderTank(d: BlockEntityRendererFactory.Context) extends BlockEntityRende
             if (MinecraftClient.isFabulousGraphicsOrBetter) RenderLayer.getCutout
             else RenderLayer.getTranslucent
           }
-          val value = Box.LightValue(light).overrideBlock(0 /*te.tank.fluid.fluid.getAttributes.getLuminosity(te.tank.fluid.toStack)*/)
+          val value = Box.LightValue(light).overrideBlock(te.tank.fluid.fluidVolume.getFluidKey.luminosity)
           tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
         } else {
           import alexiil.mc.lib.attributes.fluid.render.FluidRenderFace

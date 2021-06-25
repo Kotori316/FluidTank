@@ -4,15 +4,16 @@ import alexiil.mc.lib.attributes._
 import alexiil.mc.lib.attributes.fluid.FluidInvTankChangeListener
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
-import com.kotori316.fluidtank.{FluidAmount, ModTank}
 import com.kotori316.fluidtank.render.Box
+import com.kotori316.fluidtank.tank.TileTank.getFluidHeight
+import com.kotori316.fluidtank.{FluidAmount, ModTank}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.{LiteralText, Text}
 import net.minecraft.util.Nameable
-import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.{BlockPos, MathHelper}
 import net.minecraft.world.World
 
 import scala.math.Ordering.Implicits.infixOrderingOps
@@ -117,20 +118,12 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       if (!loading)
         connection.updateNeighbors()
       if ((!hasWorld || self.getWorld.isClient) && capacity != 0) {
-        val a = 0.001
-        val percent = a * 2.5 max (getFluidAmount.toDouble / capacity.toDouble)
         if (getFluidAmount > 0) {
           val d = 1d / 16d
-          var maxY = 0d
-          var minY = 0d
-          if (tank.getFluid.isGaseous) {
-            maxY = 1d - a
-            minY = 1d - percent + a
-          } else {
-            minY = a
-            maxY = percent - a
-          }
-          box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, percent, d * 12 - 0.01, firstSide = true, endSide = true)
+          val lowerBound = 0.001d
+          val upperBound = 0.999d
+          val (minY, maxY) = getFluidHeight(capacity.toDouble, getFluidAmount.toDouble, lowerBound, upperBound, 0.003, getFluid.isGaseous)
+          box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, maxY - minY, d * 12 - 0.01, firstSide = true, endSide = true)
         } else {
           box = null
         }
@@ -282,6 +275,25 @@ object TileTank {
         Connection.load(world, pos)
       tile.loading = false
       world.getProfiler.pop()
+    }
+  }
+
+  /**
+   *
+   * @param capacity   the capacity of tank. Must not be 0.
+   * @param amount     the amount in the tank, assumed to be grater than 0. (amount > 0)
+   * @param lowerBound the minimum of fluid position.
+   * @param upperBound the maximum of fluid position.
+   * @param isGaseous  whether the fluid is gas or not.
+   * @return (minY, maxY)
+   */
+  def getFluidHeight(capacity: Double, amount: Double, lowerBound: Double, upperBound: Double, minRatio: Double, isGaseous: Boolean): (Double, Double) = {
+    val ratio = MathHelper.clamp(amount / capacity, minRatio, 1)
+    val height = (upperBound - lowerBound) * ratio
+    if (isGaseous) {
+      (upperBound - height, upperBound)
+    } else {
+      (lowerBound, lowerBound + height)
     }
   }
 }
