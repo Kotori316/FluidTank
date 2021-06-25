@@ -37,9 +37,9 @@ class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Til
 
 object RenderTank {
   private def textureName(tile: TileTank) = {
-    val tank = tile.internalTank
-    val (world, pos) = worldAndPos(tile)
-    tank.getFluid.fluid.getAttributes.getStillTexture(world, pos)
+    val world = getTankWorld(tile)
+    val pos = getTankPos(tile)
+    tile.internalTank.getFluid.fluid.getAttributes.getStillTexture(world, pos)
   }
 
   private def color(tile: TileTank) = {
@@ -51,7 +51,8 @@ object RenderTank {
     } else {
       val stackColor = attributes.getColor(fluidAmount.toStack)
       if (normal == stackColor) {
-        val (world, pos) = worldAndPos(tile)
+        val world = getTankWorld(tile)
+        val pos = getTankPos(tile)
         val worldColor = attributes.getColor(world, pos)
         worldColor
       } else {
@@ -60,9 +61,12 @@ object RenderTank {
     }
   }
 
-  private[this] def worldAndPos(tileTank: TileTank): (World, BlockPos) = {
-    if (tileTank.hasWorld) (tileTank.getWorld, tileTank.getPos)
-    else (Minecraft.getInstance().world, Minecraft.getInstance().player.getPosition)
+  private final def getTankWorld(tileTank: TileTank): World = {
+    if (tileTank.hasWorld) tileTank.getWorld else Minecraft.getInstance.world
+  }
+
+  private final def getTankPos(tileTank: TileTank): BlockPos = {
+    if (tileTank.hasWorld) tileTank.getPos else Minecraft.getInstance.player.getPosition
   }
 
 }
