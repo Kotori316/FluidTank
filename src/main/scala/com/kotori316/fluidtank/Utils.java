@@ -100,7 +100,11 @@ public class Utils {
 
     public static class TestConfig implements Config.IContent {
         private final Map<String, Object> configs;
-public static Config.IContent getTestInstance(Map<String, Object> configs){return new TestConfig(configs);}
+
+        public static Config.IContent getTestInstance(Map<String, Object> configs) {
+            return new TestConfig(configs);
+        }
+
         private TestConfig(Map<String, Object> configs) {
             this.configs = configs;
         }
