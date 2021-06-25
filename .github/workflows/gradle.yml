@@ -87,6 +87,7 @@ jobs:
         run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Set up JDK ${{ matrix.java }}
+        if: ${{ matrix.java != '11' }}
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt-hotspot'
@@ -122,6 +123,7 @@ jobs:
           sed -i -e "s/forge.version=latest/forge.version=$version/" -e "s/ci.mods=dummy/ci.mods=fluidtank/" /work/gradle.properties
           echo /work/gradle.properties
       - name: Set up JDK ${{ matrix.java }}
+        if: ${{ matrix.java != '11' }}
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt-hotspot'
