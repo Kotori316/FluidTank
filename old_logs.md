@@ -1,3 +1,9 @@
+## v16.1.8
+* Fixed performance issue of large capacity tanks.
+* Make the "top" and "bottom" of rendering fluid configurable. See the entries in config, `renderLowerBound` and `renderUpperBound`.
+
+Build with net.minecraftforge:forge:1.16.5-36.1.0, Mapping: 20201028-1.16.3
+
 ## v16.1.7
 * Added new property, "tank_pos" to the block of tanks. 
   [#79](https://github.com/Kotori316/FluidTank/issues/79) [#80](https://github.com/Kotori316/FluidTank/issues/80)
