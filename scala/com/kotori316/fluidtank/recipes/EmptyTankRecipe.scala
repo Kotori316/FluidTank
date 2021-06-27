@@ -43,6 +43,8 @@ object EmptyTankRecipe extends IForgeRegistryEntry.Impl[IRecipe] with IRecipe {
 
   override def getRecipeOutput: ItemStack = new ItemStack(BlockTank.blockTank1)
 
+  override def getRemainingItems(inv: InventoryCrafting): NonNullList[ItemStack] = NonNullList.withSize(inv.getSizeInventory, ItemStack.EMPTY)
+
   override def getGroup: String = FluidTank.modID + ":tankemptyrecipe"
 
   override def getIngredients: NonNullList[Ingredient] = ingredientList
