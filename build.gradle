@@ -1,3 +1,5 @@
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 buildscript {
@@ -12,7 +14,10 @@ buildscript {
         classpath "gradle.plugin.com.github.breadmoirai:github-release:2.2.9"
     }
 }
-apply plugin: 'scala'
+plugins {
+    id('scala')
+    id("maven-publish")
+}
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: "com.matthewprenger.cursegradle"
 apply plugin: "com.github.breadmoirai.github-release"
@@ -108,6 +113,22 @@ processResources {
     }
 }
 
+// Example for how to get properties into the manifest for reading by the runtime..
+def jarAttributeMap = [
+        "Specification-Title"     : String.valueOf(project.name),
+        "Specification-Vendor"    : "Kotori316",
+        "Specification-Version"   : "1", // We are version 1 of ourselves
+        "Implementation-Title"    : String.valueOf(project.name),
+        "Implementation-Version"  : String.valueOf(project.version),
+        "Implementation-Vendor"   : "Kotori316",
+        "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
+]
+jar {
+    manifest {
+        attributes(jarAttributeMap)
+    }
+}
+
 task signJar(type: SignJar, dependsOn: reobfJar) {
 
     // Skips if the keyStore property is missing.
@@ -136,6 +157,9 @@ task srcJar(type: Jar) {
 task deobfJar(type: Jar) {
     from sourceSets.main.output
     classifier = 'deobf'
+    manifest {
+        attributes(jarAttributeMap)
+    }
 }
 
 // Tell the artifact system about our extra jars
@@ -189,4 +213,40 @@ static String getCommit(String branch) {
     def commit = reader.readLine()
     reader.close()
     return commit
+}
+
+publish.dependsOn build
+publishToMavenLocal.dependsOn build
+publishing {
+    repositories {
+        maven {
+            name = "AzureRepository"
+            url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+            credentials {
+                username = project.findProperty("azureUserName") ?: System.getenv("AZURE_USER_NAME") ?: ""
+                password = project.findProperty("azureToken") ?: System.getenv("AZURE_TOKEN") ?: "TOKEN"
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            groupId = "com.kotori316"
+            artifactId = "FluidTank".toLowerCase()
+            artifact srcJar {
+                classifier = 'sources'
+                extension = 'jar'
+            }
+            artifact deobfJar {
+                classifier = 'deobf'
+                extension = 'jar'
+            }
+            artifact jar
+            pom {
+                name = archivesBaseName
+                description = "FluidTank for Minecraft 1.12.2, build with forge 1.12.2-14.23.5.2847"
+                url = 'https://github.com/Kotori316/FluidTank'
+                packaging = "jar"
+            }
+        }
+    }
 }
