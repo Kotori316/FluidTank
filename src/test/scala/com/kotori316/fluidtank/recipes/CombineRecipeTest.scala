@@ -10,8 +10,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE
 import org.junit.jupiter.api.Assertions._
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.{DisplayName, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -63,6 +63,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
   }
 
   @Test
+  @DisplayName("Fail to combine Wood Tank and Stone tank and CACTUS.")
   def combine2StoneFail(): Unit = {
     val wood = new ItemStack(woodTank)
     val stone = new ItemStack(stoneTank)
@@ -136,5 +137,53 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
 
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> wood2, 'w' -> wood))
     assertFalse(recipe.matches(inventory, null))
+  }
+
+  @Test
+  @DisplayName("Fail to combine Wood Tank and Creative Tank")
+  def cantCombine1(): Unit = {
+    val wood = new ItemStack(woodTank)
+    RecipeInventoryUtil.getFluidHandler(wood).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
+    val creative = new ItemStack(ModObjects.creativeTank)
+
+    val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> creative, 'w' -> wood))
+    assertFalse(recipe.matches(inventory, null))
+  }
+
+  @Test
+  @DisplayName("Fail to combine Wood Tank and non tank")
+  def cantCombine2(): Unit = {
+    val wood = new ItemStack(woodTank)
+    RecipeInventoryUtil.getFluidHandler(wood).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
+    val creative = new ItemStack(Blocks.BONE_BLOCK)
+
+    val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> creative, 'w' -> wood))
+    assertFalse(recipe.matches(inventory, null))
+  }
+
+  @Test
+  @DisplayName("Failed to combine Stone tank with 1000 mB of water and Void Tank")
+  def cantCombine3(): Unit = {
+    val voidTank = new ItemStack(ModObjects.voidTank)
+    val stone = new ItemStack(stoneTank)
+    RecipeInventoryUtil.getFluidHandler(stone).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
+
+    val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> stone, 'w' -> voidTank))
+    assertFalse(recipe.matches(inventory, null))
+  }
+
+  @Test
+  @DisplayName("Combine Wood tank with 1000 mB of water and empty Stone Tank")
+  def combineWithEmpty1(): Unit = {
+    val wood = new ItemStack(woodTank)
+    RecipeInventoryUtil.getFluidHandler(wood).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
+    val stone = new ItemStack(stoneTank)
+
+    val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> stone, 'w' -> wood))
+    assertTrue(recipe.matches(inventory, null))
+    val result = recipe.getCraftingResult(inventory)
+    val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
+    assertEquals(Tiers.STONE, tankItem.blockTank.tier)
+    assertEquals(FluidAmount.BUCKET_WATER, RecipeInventoryUtil.getFluidHandler(result).getFluid)
   }
 }
