@@ -5,13 +5,15 @@
   "name": "Fluid Tank",
   "description": "FluidTank",
   "authors": [
-    "Me!", "Kotori316"
+    "Kotori316"
   ],
   "contact": {
     "homepage": "https://github.com/Kotori316",
-    "sources": "https://github.com/Kotori316/FluidTank"
+    "sources": "https://github.com/Kotori316/FluidTank",
+    "issues": "https://github.com/Kotori316/FluidTank/issues"
   },
   "license": "All rights reserved",
+  "icon": "assets/fluidtank/textures/tank_big.png",
   "environment": "*",
   "entrypoints": {
     "main": [
