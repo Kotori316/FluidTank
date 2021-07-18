@@ -1,12 +1,5 @@
 package com.kotori316.fluidtank.render;
 
-import java.util.Collections;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import net.minecraft.block.BlockState;
-
 public class ItemModelTank /*implements IDynamicBakedModel*/ {
     /*@Nonnull
     @Override
@@ -31,7 +24,7 @@ public class ItemModelTank /*implements IDynamicBakedModel*/ {
 
     @Override
     @Deprecated
-    public TextureAtlasSprite getParticleTexture() {
+    public Sprite getParticleTexture() {
         return null;
     }
 
