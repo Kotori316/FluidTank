@@ -32,8 +32,8 @@ public class TankBlockItem extends BlockItem {
 
     @Override
     public Rarity getRarity(ItemStack stack) {
-        if (stack.hasTag()) {
-            if (stack.getTag() != null && stack.getTag().contains(TankBlock.NBT_BlockTag)) {
+        if (stack.hasNbt()) {
+            if (stack.getNbt() != null && stack.getNbt().contains(TankBlock.NBT_BlockTag)) {
                 return Rarity.RARE;
             }
         }
@@ -44,7 +44,7 @@ public class TankBlockItem extends BlockItem {
     @Environment(EnvType.CLIENT)
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        NbtCompound nbt = stack.getSubTag(TankBlock.NBT_BlockTag);
+        NbtCompound nbt = stack.getSubNbt(TankBlock.NBT_BlockTag);
         if (nbt != null) {
             NbtCompound tankNBT = nbt.getCompound(TankBlock.NBT_Tank);
             FluidAmount fluid = FluidAmount.fromNBT(tankNBT);

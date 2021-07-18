@@ -58,7 +58,7 @@ public class TankBlock extends BlockWithEntity {
     public void saveTankNBT(BlockEntity entity, ItemStack stack) {
         if (entity instanceof TileTank tank) {
             if (tank.hasContent()) {
-                stack.putSubTag(NBT_BlockTag, tank.getBlockTag());
+                stack.setSubNbt(NBT_BlockTag, tank.getBlockTag());
             }
             tank.getStackName().foreach(stack::setCustomName);
         }

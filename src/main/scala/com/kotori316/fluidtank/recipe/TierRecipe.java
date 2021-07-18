@@ -171,7 +171,7 @@ public class TierRecipe extends ShapedRecipe {
             if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getStack).allMatch(subItems)) return false;
             if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getStack).allMatch(tankItems)) return false;
             return IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
-                .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
+                .map(stack -> stack.getSubNbt(TankBlock.NBT_BlockTag))
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
                 .filter(FluidAmount::nonEmpty)
@@ -183,7 +183,7 @@ public class TierRecipe extends ShapedRecipe {
         ItemStack craft(CraftingInventory inv) {
             ItemStack result = this.result.copy();
             FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getStack)
-                .map(stack -> stack.getSubTag(TankBlock.NBT_BlockTag))
+                .map(stack -> stack.getSubNbt(TankBlock.NBT_BlockTag))
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
                 .filter(FluidAmount::nonEmpty)
@@ -199,7 +199,7 @@ public class TierRecipe extends ShapedRecipe {
                 compound.put(TankBlock.NBT_Tank, tankTag);
                 compound.put(TankBlock.NBT_Tier, tier.toNBTTag());
 
-                result.putSubTag(TankBlock.NBT_BlockTag, compound);
+                result.setSubNbt(TankBlock.NBT_BlockTag, compound);
             }
 
             return result;

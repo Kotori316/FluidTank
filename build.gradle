@@ -142,7 +142,7 @@ curseforge {
         id = '411564'
         changelogType = 'markdown'
         addGameVersion 'Fabric'
-        addGameVersion '1.17'
+        addGameVersion '1.17.1'
         changelog = joinedLog
         releaseType = 'release'
         mainArtifact remapJar

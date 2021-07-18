@@ -6,7 +6,6 @@ import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
 import net.minecraft.client.render.item.ItemRenderer
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.render.model.json.ModelTransformation
@@ -35,7 +34,7 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
         tileTank.tier = tankItem.blockTank.tiers
         tileTank.tank.setFluid(null)
-        val compound = stack.getSubTag(TankBlock.NBT_BlockTag)
+        val compound = stack.getSubNbt(TankBlock.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
         DiffuseLighting.disableGuiDepthLighting()
