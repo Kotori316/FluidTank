@@ -3,7 +3,7 @@ import java.util.stream.Collectors
 plugins {
     id "scala"
     // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
-    id 'fabric-loom' version "0.8.17"
+    id 'fabric-loom' version "0.9.31"
     // id 'maven-publish'
     //noinspection SpellCheckingInspection
     id "com.github.breadmoirai.github-release" version "2.2.12"
