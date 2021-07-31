@@ -2,6 +2,7 @@ import java.util.stream.Collectors
 
 plugins {
     id "scala"
+    id("maven-publish")
     // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
     id 'fabric-loom' version "0.9.31"
     // id 'maven-publish'
@@ -102,7 +103,7 @@ java {
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
     // If you remove this line, sources will not be generated.
-    withSourcesJar()
+    // withSourcesJar()
     toolchain {
         it.languageVersion = JavaLanguageVersion.of(16)
     }
@@ -110,6 +111,16 @@ java {
 
 jar {
     from "LICENSE"
+}
+
+task srcJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier.set("sources")
+}
+
+// Tell the artifact system about our extra jars
+artifacts {
+    archives srcJar
 }
 
 test {
@@ -179,5 +190,25 @@ task getCompileOptions() {
         strings.add(String.valueOf(fileTree("build/libs").getFiles()))
 
         println(strings.stream().collect(Collectors.joining(System.lineSeparator())))
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "AzureRepository"
+            url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+            credentials {
+                username = project.findProperty("azureUserName") ?: System.getenv("AZURE_USER_NAME") ?: ""
+                password = project.findProperty("azureToken") ?: System.getenv("AZURE_TOKEN") ?: "TOKEN"
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            artifactId = "FluidTank".toLowerCase()
+            artifact remapJar
+            artifact srcJar
+        }
     }
 }
