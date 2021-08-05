@@ -28,6 +28,7 @@ public enum Tiers {
             return Long.MAX_VALUE;
         }
     },
+    VOID(0, 0, "Void", "Unknown", false),
     COPPER(2, 1 << 5, "Copper", "c:copper_ingots", true, () -> Ingredient.ofItems(Items.COPPER_INGOT)),
     TIN(2, 1 << 6, "Tin", "c:tin_ingots", true),
     BRONZE(3, 1 << 9, "Bronze", "c:bronze_ingots", true),

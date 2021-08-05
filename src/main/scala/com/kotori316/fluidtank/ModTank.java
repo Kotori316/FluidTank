@@ -26,14 +26,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.milk.MilkFluid;
-import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.recipe.TankRecipe;
+import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.ContentTankSerializer;
 import com.kotori316.fluidtank.tank.CreativeTankBlock;
 import com.kotori316.fluidtank.tank.TankBlock;
 import com.kotori316.fluidtank.tank.Tiers;
 import com.kotori316.fluidtank.tank.TileTank;
 import com.kotori316.fluidtank.tank.TileTankCreative;
+import com.kotori316.fluidtank.tank.TileTankVoid;
+import com.kotori316.fluidtank.tank.VoidTankBlock;
 
 public class ModTank implements ModInitializer {
     public static final String modID = "fluidtank";
@@ -53,15 +55,18 @@ public class ModTank implements ModInitializer {
         Registry.register(Registry.BLOCK, new Identifier(modID, "tank_wood"), Entries.WOOD_TANK);
         Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.BLOCK, new Identifier(modID, "tank_" + block.tiers.toString().toLowerCase()), block));
         Registry.register(Registry.BLOCK, new Identifier(modID, "creative"), Entries.CREATIVE_TANK);
+        Registry.register(Registry.BLOCK, new Identifier(modID, "tank_void"), Entries.VOID_TANK);
 
         Registry.register(Registry.ITEM, new Identifier(modID, "tank_wood"), Entries.WOOD_TANK.blockItem());
         Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.ITEM, new Identifier(modID, "tank_" + block.tiers.toString().toLowerCase()), block.blockItem()));
         Registry.register(Registry.ITEM, new Identifier(modID, "creative"), Entries.CREATIVE_TANK.blockItem());
+        Registry.register(Registry.ITEM, new Identifier(modID, "tank_void"), Entries.VOID_TANK.blockItem());
 
         Registry.register(Registry.FLUID, new Identifier(modID, MilkFluid.NAME()), Entries.MILK_FLUID);
 
         Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(modID, "tank"), Entries.TANK_BLOCK_ENTITY_TYPE);
         Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(modID, "tank_creative"), Entries.CREATIVE_BLOCK_ENTITY_TYPE);
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(modID, "tank_void"), Entries.VOID_BLOCK_ENTITY_TYPE);
 
         Registry.register(Registry.LOOT_FUNCTION_TYPE, new Identifier(ModTank.modID, "content_tank"), Entries.CONTENT_LOOT_FUNCTION_TYPE);
 
@@ -73,16 +78,19 @@ public class ModTank implements ModInitializer {
         public static final TankBlock WOOD_TANK = new TankBlock(Tiers.WOOD);
         public static final List<TankBlock> TANK_BLOCKS = Collections.unmodifiableList(Tiers.stream().filter(Tiers::hasTagRecipe).map(TankBlock::new).collect(Collectors.toList()));
         public static final CreativeTankBlock CREATIVE_TANK = new CreativeTankBlock();
+        public static final VoidTankBlock VOID_TANK = new VoidTankBlock();
         public static final MilkFluid MILK_FLUID = new MilkFluid();
         public static final BlockEntityType<TileTank> TANK_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTank::new,
             ImmutableList.<TankBlock>builder().add(WOOD_TANK).addAll(TANK_BLOCKS).build().toArray(new TankBlock[0])).build(DSL.emptyPartType());
         public static final BlockEntityType<TileTankCreative> CREATIVE_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTankCreative::new, CREATIVE_TANK).build(DSL.emptyPartType());
+        public static final BlockEntityType<TileTankVoid> VOID_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTankVoid::new, VOID_TANK).build(DSL.emptyPartType());
         public static final LootFunctionType CONTENT_LOOT_FUNCTION_TYPE = new LootFunctionType(new ContentTankSerializer());
 
         public static final List<TankBlock> ALL_TANK_BLOCKS = ImmutableList.<TankBlock>builder()
             .add(WOOD_TANK)
             .addAll(TANK_BLOCKS)
             .add(CREATIVE_TANK)
+            .add(VOID_TANK)
             .build();
     }
 
