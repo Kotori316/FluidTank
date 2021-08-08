@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.integration;
 
+import java.math.RoundingMode;
+
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
@@ -58,17 +60,16 @@ class TechRebornCellInteraction implements FluidInteraction {
         } else {
             // Drain from cell and fill tank.
             if (connection.getFluidStack().forall(f -> f.fluidEqual(fluidAmount))) {
-                var a = BUCKET.mul(stack.getCount())
-                    .min(alexiil.mc.lib.attributes.fluid.amount.FluidAmount.of(connection.capacity() - connection.amount(), FluidAmount.AMOUNT_BUCKET()));
+                var simulation = connection.handler().fill(fluidAmount.setAmount(BUCKET.mul(stack.getCount())), false, 0);
                 // Draining from cell always successes.
-                int stackSize = a.asInt(1);
+                int stackSize = simulation.fluidVolume().amount().asInt(1, RoundingMode.DOWN);
                 ItemStack empty = ((ItemFluidInfo) stack.getItem()).getEmpty();
                 stack.decrement(stackSize);
                 empty.setCount(stackSize);
                 if (!player.getInventory().insertStack(empty)) {
                     player.dropStack(empty);
                 }
-                connection.handler().fill(fluidAmount.setAmount(a), true, 0);
+                connection.handler().fill(fluidAmount.setAmount(simulation.fluidVolume().amount()), true, 0);
                 player.playSound(getSoundEvent(fluidAmount, false), SoundCategory.BLOCKS, 1.0f, 1.0f);
             } else {
                 return FluidVolumeUtil.FluidTankInteraction.none(FluidVolumeUtil.ItemContainerStatus.VALID, FluidVolumeUtil.ItemContainerStatus.NOT_CHECKED);

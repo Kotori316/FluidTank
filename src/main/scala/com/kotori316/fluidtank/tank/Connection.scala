@@ -37,7 +37,6 @@ sealed class Connection(s: Seq[TileTank]) {
         return fluidAmount.setAmount(total)
       }
       val rest = capacity - amount
-      if (rest == 0) return FluidAmount.EMPTY
       if (fluidAmount.isEmpty || fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET) < min || rest < min) return FluidAmount.EMPTY
       if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
 
