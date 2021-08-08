@@ -157,7 +157,7 @@ sealed class Connection(s: Seq[TileTank]) {
   }
 
   def getFluidStack: Option[FluidAmount] = {
-    Option(fluidType).filter(_.nonEmpty)
+    Option(fluidType).filter(_.nonEmpty).map(_.setAmount(amount))
   }
 
   def remove(tileTank: TileTank): Unit = {

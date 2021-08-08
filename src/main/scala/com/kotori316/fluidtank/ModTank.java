@@ -9,6 +9,7 @@ import com.mojang.datafixers.DSL;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
@@ -25,6 +26,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.kotori316.fluidtank.integration.FabricFluidTankStorage;
 import com.kotori316.fluidtank.milk.MilkFluid;
 import com.kotori316.fluidtank.recipe.TankRecipe;
 import com.kotori316.fluidtank.recipe.TierRecipe;
@@ -72,6 +74,8 @@ public class ModTank implements ModInitializer {
 
         RecipeSerializer.register(TierRecipe.Serializer.LOCATION.toString(), TierRecipe.SERIALIZER);
         RecipeSerializer.register(TankRecipe.LOCATION.toString(), TankRecipe.SERIALIZER);
+        if (FabricLoader.getInstance().isModLoaded("fabric-transfer-api-v1"))
+            FabricFluidTankStorage.register();
     }
 
     public static class Entries {
