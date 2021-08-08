@@ -132,6 +132,7 @@ def joinedLog = String.join("\n",
         "Fluid Tank for 1.17 and Fabric.",
         "",
         "Requires:",
+        "",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
         "* [LibBlockAttributes](https://www.curseforge.com/minecraft/mc-mods/libblockattributes)",
         "",
@@ -154,6 +155,7 @@ curseforge {
         changelogType = 'markdown'
         addGameVersion 'Fabric'
         addGameVersion '1.17.1'
+        addGameVersion '1.17'
         changelog = joinedLog
         releaseType = 'release'
         mainArtifact remapJar
