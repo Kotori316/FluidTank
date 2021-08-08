@@ -146,6 +146,10 @@ public class TankBlock extends BlockWithEntity {
     @org.jetbrains.annotations.Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : checkType(type, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, TileTank::tick);
+        if (world.isClient) return null;
+        return Optional.ofNullable(checkType(type, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, TileTank::tick))
+            .or(() -> Optional.ofNullable(checkType(type, ModTank.Entries.CREATIVE_BLOCK_ENTITY_TYPE, TileTank::tick)))
+            .or(() -> Optional.ofNullable(checkType(type, ModTank.Entries.VOID_BLOCK_ENTITY_TYPE, TileTank::tick)))
+            .orElse(null);
     }
 }
