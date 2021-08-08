@@ -34,7 +34,7 @@ private[fluid] class FluidAmountTest extends BeforeAllTest {
     )
   }
 
-  private[this] def getAmount(fluidAmount: FluidAmount): Long = fluidAmount.fluidVolume.amount().asLong(1000L)
+  private[this] def getAmount(fluidAmount: FluidAmount): Long = fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET)
 
   @Test
   def adder(): Unit = {

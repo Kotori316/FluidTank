@@ -29,7 +29,7 @@ class TileTankCreative(pos: BlockPos, state: BlockState) extends TileTank(Tiers.
     }
 
     override def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long): FluidAmount = {
-      if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidAmount.fluidVolume.amount().asLong(1000L) >= min) fluid.setAmount(fluidAmount.fluidVolume.amount())
+      if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET) >= min) fluid.setAmount(fluidAmount.fluidVolume.amount())
       else FluidAmount.EMPTY
     }
 

@@ -18,7 +18,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
   // Nullable
   val fluid: Fluid = fluidVolume.getRawFluid
 
-  def setAmount(newAmount: Long): FluidAmount = setAmount(BCAmount.of(newAmount, 1000L))
+  def setAmount(newAmount: Long): FluidAmount = setAmount(BCAmount.of(newAmount, FluidAmount.AMOUNT_BUCKET))
 
   def setAmount(amount: BCAmount): FluidAmount = {
     if (fluidVolume.fluidKey.isEmpty) this // Changing tha amount of empty fluid isn't allowed.
@@ -52,7 +52,7 @@ object FluidAmount {
   final val NBT_fluid = "fluid"
   final val NBT_amount = "amount"
   final val NBT_tag = "tag"
-  final val AMOUNT_BUCKET = 1000 //FluidAttributes.BUCKET_VOLUME
+  final val AMOUNT_BUCKET = 1000L //FluidAttributes.BUCKET_VOLUME
   val EMPTY: FluidAmount = FluidAmount(FluidVolumeUtil.EMPTY)
   val BUCKET_LAVA: FluidAmount = FluidAmount(FluidKeys.LAVA.withAmount(BCAmount.BUCKET))
   val BUCKET_WATER: FluidAmount = FluidAmount(FluidKeys.WATER.withAmount(BCAmount.BUCKET))

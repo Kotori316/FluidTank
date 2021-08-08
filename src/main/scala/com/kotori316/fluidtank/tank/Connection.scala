@@ -38,7 +38,7 @@ sealed class Connection(s: Seq[TileTank]) {
       }
       val rest = capacity - amount
       if (rest == 0) return FluidAmount.EMPTY
-      if (fluidAmount.isEmpty || fluidAmount.fluidVolume.amount().asLong(1000L) < min || rest < min) return FluidAmount.EMPTY
+      if (fluidAmount.isEmpty || fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET) < min || rest < min) return FluidAmount.EMPTY
       if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
 
       @scala.annotation.tailrec
@@ -67,7 +67,7 @@ sealed class Connection(s: Seq[TileTank]) {
      * @return the fluid and amount that is (or will be) drained.
      */
     def drain(fluidAmount: FluidAmount, doDrain: Boolean, min: Long = 0): FluidAmount = {
-      if (fluidAmount.fluidVolume.amount().asLong(1000L) < min || fluidType.isEmpty) return FluidAmount.EMPTY
+      if (fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET) < min || fluidType.isEmpty) return FluidAmount.EMPTY
       if (hasCreative) {
         if (FluidAmount.EMPTY.fluidEqual(fluidAmount) || fluidType.fluidEqual(fluidAmount)) {
           val m = s"Drained $fluidAmount from ${tankSeq(fluidAmount).head.getPos} in creative connection."
@@ -83,7 +83,7 @@ sealed class Connection(s: Seq[TileTank]) {
 
       @scala.annotation.tailrec
       def internal(tanks: List[TileTank], toDrain: FluidAmount, drained: FluidAmount): FluidAmount = {
-        if (toDrain.fluidVolume.amount().asLong(1000L) <= 0) {
+        if (toDrain.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET) <= 0) {
           log(doDrain, List(s"Drained $drained"))
           drained
         } else {
@@ -128,8 +128,8 @@ sealed class Connection(s: Seq[TileTank]) {
 
     override def getStatistics(fluidFilter: FluidFilter): GroupedFluidInvView.FluidInvStatistic = {
       if (fluidFilter.matches(fluidType.fluidVolume.fluidKey)) {
-        val cap = BCAmount.of(capacity, 1000L)
-        val am = BCAmount.of(amount, 1000L)
+        val cap = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET)
+        val am = BCAmount.of(amount, FluidAmount.AMOUNT_BUCKET)
         val rest = cap sub am
         new GroupedFluidInvView.FluidInvStatistic(fluidFilter, am, rest, cap)
       } else {

@@ -157,7 +157,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     }
 
     // Util methods
-    def getFluidAmount: Long = fluid.fluidVolume.amount().asLong(1000L)
+    def getFluidAmount: Long = fluid.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET)
 
     def getFluid: FluidAmount = fluid
 
@@ -175,15 +175,15 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       if (canFillFluidType(fluidAmount) && fluidAmount.nonEmpty) {
         val previous = fluid
         val newAmount = fluid.fluidVolume.amount() add fluidAmount.fluidVolume.amount()
-        if (BCAmount.of(capacity, 1000L) >= newAmount) {
+        if (BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET) >= newAmount) {
           if (doFill) {
             fluid = fluidAmount.setAmount(newAmount)
             onContentsChanged(previous)
           }
           fluidAmount
         } else {
-          val accept = BCAmount.of(capacity, 1000L) sub fluid.fluidVolume.amount()
-          if (accept >= BCAmount.of(min, 1000L)) {
+          val accept = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET) sub fluid.fluidVolume.amount()
+          if (accept >= BCAmount.of(min, FluidAmount.AMOUNT_BUCKET)) {
             if (doFill) {
               fluid = fluidAmount.setAmount(capacity)
               onContentsChanged(previous)
@@ -209,7 +209,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       if ((canFillFluidType(fluidAmount) || FluidAmount.EMPTY.fluidEqual(fluidAmount)) && fluid.nonEmpty) {
         val previous = fluid
         val drain = fluid.fluidVolume.amount() min fluidAmount.fluidVolume.amount()
-        if (drain >= BCAmount.of(min, 1000L)) {
+        if (drain >= BCAmount.of(min, FluidAmount.AMOUNT_BUCKET)) {
           val newAmount = fluid.fluidVolume.amount() sub drain
           if (doDrain) {
             fluid = fluid.setAmount(newAmount)
@@ -247,7 +247,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       }
     }
 
-    override def getMaxAmount_F(tank: Int): BCAmount = BCAmount.of(capacity, 1000)
+    override def getMaxAmount_F(tank: Int): BCAmount = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET)
   }
 
   override def fromClientTag(tag: NbtCompound): Unit = readNbt(tag)
