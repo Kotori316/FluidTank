@@ -12,6 +12,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -27,7 +28,7 @@ public class TankBlock extends BlockWithEntity {
     public static final String NBT_Tank = "tank";
     public static final String NBT_Tier = "tier";
     public static final String NBT_Capacity = "capacity";
-    public static final String NBT_BlockTag = "BlockEntityTag";
+    public static final String NBT_BlockTag = BlockItem.BLOCK_ENTITY_TAG_KEY;
     public static final String NBT_StackName = "stackName";
     public final Tiers tiers;
     private final TankBlockItem blockItem;
