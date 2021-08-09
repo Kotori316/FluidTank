@@ -41,6 +41,7 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
         MinecraftClient.getInstance.getBlockEntityRenderDispatcher.renderEntity(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
+        DiffuseLighting.enableGuiDepthLighting()
 
       case _ => ModTank.LOGGER.warn("RenderItemTank is called for " + stack.getItem)
     }
