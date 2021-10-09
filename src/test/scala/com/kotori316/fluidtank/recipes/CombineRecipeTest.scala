@@ -3,8 +3,8 @@ package com.kotori316.fluidtank.recipes
 import cats.implicits._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.Tiers
-import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
+import com.kotori316.fluidtank.tiles.Tier
+import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects, hashTier}
 import net.minecraft.block.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -19,8 +19,8 @@ import scala.jdk.CollectionConverters._
 
 private[recipes] final class CombineRecipeTest extends BeforeAllTest {
   private final val woodTank = ModObjects.blockTanks.head
-  private final val stoneTank = ModObjects.blockTanks.find(_.tier === Tiers.STONE).get
-  private final val emeraldTank = ModObjects.blockTanks.find(_.tier === Tiers.EMERALD).get
+  private final val stoneTank = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
+  private final val emeraldTank = ModObjects.blockTanks.find(_.tier === Tier.EMERALD).get
   private final val recipe = new CombineRecipe(new ResourceLocation(FluidTank.modID, "CombineRecipeTest".toLowerCase))
 
   @ParameterizedTest
@@ -41,7 +41,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     assertFalse(result.isEmpty)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
-    assertTrue(tankItem.blockTank.tier === Tiers.STONE, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
+    assertTrue(tankItem.blockTank.tier === Tier.STONE, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
     assertTrue(RecipeInventoryUtil.getFluidHandler(result).getFluid === FluidAmount.BUCKET_WATER.setAmount(2000L), s"Tag: ${result.getTag}")
   }
 
@@ -89,7 +89,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     assertFalse(result.isEmpty)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
-    assertTrue(tankItem.blockTank.tier === Tiers.EMERALD, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
+    assertTrue(tankItem.blockTank.tier === Tier.EMERALD, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
     assertTrue(RecipeInventoryUtil.getFluidHandler(result).getFluid === FluidAmount.BUCKET_WATER.setAmount(2000L), s"Tag: ${result.getTag}")
   }
 
@@ -106,7 +106,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     val result = recipe.getCraftingResult(inventory)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
-    assertTrue(tankItem.blockTank.tier === Tiers.EMERALD, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
+    assertTrue(tankItem.blockTank.tier === Tier.EMERALD, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
     assertTrue(RecipeInventoryUtil.getFluidHandler(result).getFluid === FluidAmount.BUCKET_WATER.setAmount(5000L), s"Tag: ${result.getTag}")
   }
 

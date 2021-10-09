@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.integration.top
 
 import com.kotori316.fluidtank.integration.Localize._
-import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTankNoDisplay, TileTankVoid}
+import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTank, TileTankVoid}
 import com.kotori316.fluidtank.{Config, FluidTank}
 import mcjty.theoneprobe.api.{IProbeHitData, IProbeInfo, IProbeInfoProvider, ProbeMode}
 import net.minecraft.block.BlockState
@@ -21,7 +21,7 @@ class TankDataProvider extends IProbeInfoProvider {
     entity match {
       case v: TileTankVoid =>
         probeInfo.text(new TranslationTextComponent(TIER, v.tier))
-      case tank: TileTankNoDisplay =>
+      case tank: TileTank =>
         val tier = new TranslationTextComponent(TIER, tank.tier) //I18n.translateToLocalFormatted(WAILA_TIER, tank.tier.toString)
         val fluid = new TranslationTextComponent(CONTENT, tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL))
         val list = if (tank.connection.hasCreative) Seq(tier, fluid)

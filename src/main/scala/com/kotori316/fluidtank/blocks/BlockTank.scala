@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{Tiers, TileTank, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import net.minecraft.block.{AbstractBlock, Block, BlockState}
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -16,7 +16,7 @@ import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).notSolid()) {
+class BlockTank(val tier: Tier) extends Block(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).notSolid()) {
 
   /*
   RegistryName will be "fluidtank:tank_wood".
@@ -40,7 +40,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   //noinspection ScalaDeprecation
   override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
     worldIn.getTileEntity(pos) match {
-      case tileTank: TileTankNoDisplay =>
+      case tileTank: TileTank =>
         val stack = playerIn.getHeldItem(handIn)
         if (playerIn.getHeldItemMainhand.isEmpty) {
           if (!worldIn.isRemote) {
@@ -73,7 +73,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   override final def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack): Unit = {
     super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
     worldIn.getTileEntity(pos) match {
-      case tank: TileTankNoDisplay => if (!worldIn.isRemote) tank.onBlockPlacedBy()
+      case tank: TileTank => if (!worldIn.isRemote) tank.onBlockPlacedBy()
       case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
     }
   }
@@ -84,7 +84,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   //noinspection ScalaDeprecation
   override final def getComparatorInputOverride(blockState: BlockState, worldIn: World, pos: BlockPos): Int = {
     worldIn.getTileEntity(pos) match {
-      case tileTank: TileTankNoDisplay => tileTank.getComparatorLevel
+      case tileTank: TileTank => tileTank.getComparatorLevel
       case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile); 0
     }
   }
@@ -93,7 +93,7 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   override final def onReplaced(state: BlockState, worldIn: World, pos: BlockPos, newState: BlockState, isMoving: Boolean): Unit = {
     if (!state.isIn(newState.getBlock)) {
       worldIn.getTileEntity(pos) match {
-        case tank: TileTankNoDisplay => tank.onDestroy()
+        case tank: TileTank => tank.onDestroy()
         case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
       }
       worldIn.removeTileEntity(pos)
@@ -101,9 +101,9 @@ class BlockTank(val tier: Tiers) extends Block(AbstractBlock.Properties.create(M
   }
 
   def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
-    Option(tileEntity).collect { case tank: TileTankNoDisplay if tank.hasContent => tank.getBlockTag }
-      .foreach(tag => stack.setTagInfo(TileTankNoDisplay.NBT_BlockTag, tag))
-    Option(tileEntity).collect { case tank: TileTankNoDisplay => tank.getStackName }.flatten
+    Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
+      .foreach(tag => stack.setTagInfo(TileTank.NBT_BlockTag, tag))
+    Option(tileEntity).collect { case tank: TileTank => tank.getStackName }.flatten
       .foreach(stack.setDisplayName)
   }
 

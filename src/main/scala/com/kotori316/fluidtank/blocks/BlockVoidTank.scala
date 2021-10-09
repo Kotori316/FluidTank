@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.ModObjects
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import net.minecraft.block.BlockState
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.item.ItemStack
@@ -13,12 +13,12 @@ import net.minecraft.world.{IBlockReader, World}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 
-class BlockVoidTank extends BlockTank(Tiers.VOID) {
+class BlockVoidTank extends BlockTank(Tier.VOID) {
   override def createTileEntity(state: BlockState, world: IBlockReader): TileEntity = ModObjects.TANK_VOID_TYPE.create()
 
   override def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
     // Just save custom name.
-    Option(tileEntity).collect { case tank: TileTankNoDisplay => tank.getStackName }.flatten
+    Option(tileEntity).collect { case tank: TileTank => tank.getStackName }.flatten
       .foreach(stack.setDisplayName)
   }
 

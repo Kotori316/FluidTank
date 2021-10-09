@@ -2,8 +2,8 @@ package com.kotori316.fluidtank.recipes
 
 import cats.implicits._
 import com.kotori316.fluidtank.fluids.FluidAmount
-import com.kotori316.fluidtank.tiles.Tiers
-import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
+import com.kotori316.fluidtank.tiles.Tier
+import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects, hashTier}
 import net.minecraft.item.crafting.Ingredient
 import net.minecraft.item.{ItemStack, Items}
 import net.minecraft.util.ResourceLocation
@@ -16,13 +16,13 @@ import org.junit.jupiter.params.provider.MethodSource
 
 import scala.jdk.CollectionConverters._
 
-private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
+object ReservoirRecipeTest extends BeforeAllTest {
   val wood = ModObjects.blockTanks.head
-  val stone = ModObjects.blockTanks.find(_.tier === Tiers.STONE).get
+  val stone = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
 
   @Test
   private[recipes] def matchTest(): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tiers.STONE)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
     assertFalse(recipe.getCraftingResult(inv).hasTag)
@@ -30,7 +30,7 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
 
   @Test
   private[recipes] def matchTest1(): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tiers.STONE, List(Ingredient.fromItems(Items.BUCKET)).asJava)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE, List(Ingredient.fromItems(Items.BUCKET)).asJava)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
     assertFalse(recipe.getCraftingResult(inv).hasTag)
@@ -38,7 +38,7 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
 
   @Test
   private[recipes] def remainTest(): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tiers.STONE)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
     val stacks = recipe.getRemainingItems(inv)
@@ -47,7 +47,7 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
 
   @Test
   private[recipes] def matchTest2(): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tiers.STONE)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE)
     val inv = RecipeInventoryUtil.getInv("b", itemMap = Map('b' -> new ItemStack(Items.BUCKET)))
     assertFalse(recipe.matches(inv, null))
   }
@@ -55,7 +55,7 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
   @Test
   def matchTest3(): Unit = {
     val item = Items.ACACIA_PLANKS
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tiers.WOOD,
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tier.WOOD,
       List(Ingredient.fromItems(item)).asJava)
     locally {
       val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(wood), 'b' -> new ItemStack(item)))
@@ -74,7 +74,7 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
   def matchTest4(): Unit = {
     val item1 = new ItemStack(Items.ACACIA_LOG)
     val item2 = new ItemStack(Items.APPLE)
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tiers.WOOD,
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tier.WOOD,
       List(Ingredient.fromStacks(item1), Ingredient.fromStacks(item2)).asJava)
     val itemMap = Map('t' -> new ItemStack(wood), 'l' -> item1, 'a' -> item2)
     locally {
@@ -94,7 +94,7 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.recipes.ReservoirRecipeTest#stoneFluids"))
   private[recipes] def copyNBT1(fluid: FluidAmount): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tiers.STONE)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE)
     val tank = new ItemStack(stone)
     RecipeInventoryUtil.getFluidHandler(tank).fill(fluid.toStack, FluidAction.EXECUTE)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> tank, 'b' -> new ItemStack(Items.BUCKET)))
@@ -103,11 +103,9 @@ private[recipes] final class ReservoirRecipeTest extends BeforeAllTest {
     val result = recipe.getCraftingResult(inv)
     val handler = RecipeInventoryUtil.getFluidHandler(result)
     assertEquals(fluid, handler.getFluid)
-    assertEquals(Tiers.STONE.amount, handler.getCapacity)
+    assertEquals(Tier.STONE.amount, handler.getCapacity)
   }
-}
 
-private object ReservoirRecipeTest {
   def stoneFluids(): Array[FluidAmount] = {
     val fluids = for {
       kind <- List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)

@@ -51,7 +51,6 @@ object Config {
     val removeRecipe: BoolSupplier
     val debug: BoolSupplier
     val easyRecipe: BoolSupplier
-    val usableInvisibleInRecipe: BoolSupplier
     val usableUnavailableTankInRecipe: BoolSupplier
     val showInvisibleTank: BoolSupplier
     val showTOP: BoolSupplier
@@ -77,9 +76,6 @@ object Config {
 
     val easyRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("True to use easy recipe.")
       .define("easyRecipe", false))
-    val usableInvisibleInRecipe: BoolSupplier = asSupplier(builder.worldRestart()
-      .comment("False to prohibit invisible tanks from being used in recipes.")
-      .define("usableInvisibleInRecipe", true))
     val usableUnavailableTankInRecipe: BoolSupplier = asSupplier(builder.worldRestart()
       .comment("False to prohibit tanks with no recipe from being used in recipes of other tanks.")
       .define("usableUnavailableTankInRecipe", true))

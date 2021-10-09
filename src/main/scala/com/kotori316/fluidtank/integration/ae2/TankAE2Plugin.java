@@ -27,7 +27,7 @@ import scala.runtime.BoxedUnit;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.tiles.Connection;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 @AEAddon
 public class TankAE2Plugin implements IAEAddon {
@@ -47,8 +47,8 @@ public class TankAE2Plugin implements IAEAddon {
 
         @SubscribeEvent
         public void event(AttachCapabilitiesEvent<TileEntity> event) {
-            if (event.getObject() instanceof TileTankNoDisplay) {
-                TileTankNoDisplay tank = (TileTankNoDisplay) event.getObject();
+            if (event.getObject() instanceof TileTank) {
+                TileTank tank = (TileTank) event.getObject();
                 AEConnectionCapabilityProvider provider = new AEConnectionCapabilityProvider(api, tank);
                 event.addCapability(LOCATION, provider);
             }
@@ -60,10 +60,10 @@ class AEConnectionCapabilityProvider implements ICapabilityProvider, IStorageMon
     @CapabilityInject(IStorageMonitorableAccessor.class)
     static Capability<IStorageMonitorableAccessor> CAPABILITY = null;
     private final IAppEngApi api;
-    private final TileTankNoDisplay tank;
+    private final TileTank tank;
     AEFluidInv aeFluidInv;
 
-    public AEConnectionCapabilityProvider(IAppEngApi api, TileTankNoDisplay tank) {
+    public AEConnectionCapabilityProvider(IAppEngApi api, TileTank tank) {
         this.api = api;
         this.tank = tank;
     }

@@ -64,15 +64,4 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
         }
     }
 
-    public static final class InvisibleCondition extends FluidTankConditions<InvisibleCondition> {
-
-        public InvisibleCondition() {
-            super(new ResourceLocation(FluidTank.modID, "invisible_ok"));
-        }
-
-        @Override
-        public boolean test() {
-            return Config.content().usableInvisibleInRecipe().get();
-        }
-    }
 }

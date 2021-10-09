@@ -4,8 +4,8 @@ import java.io.IOException
 
 import cats.syntax.eq._
 import com.google.gson.{GsonBuilder, JsonArray}
-import com.kotori316.fluidtank.tiles.Tiers
-import com.kotori316.fluidtank.{FluidTank, ModObjects}
+import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.advancements.criterion._
 import net.minecraft.block.Blocks
 import net.minecraft.data._
@@ -16,7 +16,6 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition}
-import net.minecraftforge.common.data.ExistingFileHelper
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent
@@ -24,7 +23,7 @@ import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
+import scala.jdk.javaapi.CollectionConverters
 
 @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
@@ -35,7 +34,6 @@ object FluidTankDataProvider {
     if (event.includeServer()) {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
       event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
-      event.getGenerator.addProvider(new FluidTagsProvider(event.getGenerator, event.getExistingFileHelper))
     }
     if (event.includeClient()) {
       event.getGenerator.addProvider(new ModelProvider(event.getGenerator))
@@ -103,10 +101,9 @@ object FluidTankDataProvider {
       val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
-      val woodTanks = Ingredient.fromItems(ModObjects.blockTanks.filter(_.tier === Tiers.WOOD) ::: ModObjects.blockTanksInvisible.filter(_.tier === Tiers.WOOD): _*)
+      val woodTanks = Ingredient.fromItems(ModObjects.blockTanks.filter(_.tier === Tier.WOOD): _*)
       val configCondition = new FluidTankConditions.ConfigCondition()
       val easyCondition = new FluidTankConditions.EasyCondition()
-      val invisibleCondition = new FluidTankConditions.InvisibleCondition()
       val WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shapedRecipe(tankWoodItem)
           .key('x', Tags.Items.GLASS).key('p', ItemTags.LOGS)
@@ -187,16 +184,14 @@ object FluidTankDataProvider {
           .key('g', Tags.Items.INGOTS_GOLD)
           .key('I', Tags.Items.STORAGE_BLOCKS_IRON)
           .key('d', Blocks.DIRT))
-      val CONVERT_INVISIBLE = RecipeSerializeHelper.bySpecial(ConvertInvisibleRecipe.SERIALIZER, ConvertInvisibleRecipe.LOCATION)
-        .addCondition(invisibleCondition)
       val COMBINE = RecipeSerializeHelper.bySpecial(CombineRecipe.SERIALIZER, CombineRecipe.LOCATION)
         .addCondition(configCondition)
-      val RESERVOIRS = List(Tiers.WOOD, Tiers.STONE, Tiers.IRON)
+      val RESERVOIRS = List(Tier.WOOD, Tier.STONE, Tier.IRON)
         .map(t => new ReservoirRecipe(ID("reservoir_" + t.lowerName), t))
         .map(r => new ReservoirRecipe.FinishedRecipe(r))
         .map(r => RecipeSerializeHelper(r))
 
-      val recipes = RESERVOIRS ::: COMBINE :: CONVERT_INVISIBLE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
+      val recipes = RESERVOIRS ::: COMBINE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
@@ -211,19 +206,6 @@ object FluidTankDataProvider {
 
     override def getName = "Recipe of FluidTank"
 
-  }
-
-  class FluidTagsProvider(g: DataGenerator, e: ExistingFileHelper) extends net.minecraft.data.FluidTagsProvider(g, FluidTank.modID, e) {
-    override def registerTags(): Unit = {
-      val tag = Try {
-        val f = Class.forName("net.minecraftforge.common.Tags$Fluids").getField("MILK")
-        f.get(null).asInstanceOf[ITag.INamedTag[net.minecraft.fluid.Fluid]]
-      }
-      tag match {
-        case Failure(exception) => println("Skipped Fluid Tag provider " + exception.toString)
-        case Success(t) => getOrCreateBuilder(t).addOptional(ModObjects.MILK_FLUID.getRegistryName)
-      }
-    }
   }
 
   class ModelProvider(generatorIn: DataGenerator) extends IDataProvider {
@@ -256,6 +238,6 @@ object FluidTankDataProvider {
   }
 
   def ingredientArray(i1: Ingredient, is: Ingredient*): Ingredient = {
-    Ingredient.merge(java.util.Arrays.asList(i1 +: is: _*))
+    Ingredient.merge(CollectionConverters.asJava(i1 +: is))
   }
 }

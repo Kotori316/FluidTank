@@ -1,7 +1,0 @@
-{
-  "parent": "fluidtank:item/item_tank_invisible",
-  "textures": {
-    "1": "fluidtank:blocks/gold1",
-    "2": "fluidtank:blocks/gold2"
-  }
-}

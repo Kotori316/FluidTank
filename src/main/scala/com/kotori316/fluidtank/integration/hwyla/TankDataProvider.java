@@ -20,8 +20,8 @@ import net.minecraft.world.World;
 import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Tiers;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.Tier;
+import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
 
 import static com.kotori316.fluidtank.integration.Localize.AMOUNT;
@@ -47,8 +47,8 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
     @Override
     public void appendBody(List<ITextComponent> tooltip, IDataAccessor accessor, IPluginConfig config) {
         TileEntity t = accessor.getTileEntity();
-        if (t instanceof TileTankNoDisplay && config.get(KEY_TANK_INFO)) {
-            TileTankNoDisplay tank = ((TileTankNoDisplay) t);
+        if (t instanceof TileTank && config.get(KEY_TANK_INFO)) {
+            TileTank tank = ((TileTank) t);
             CompoundNBT nbtData = accessor.getServerData();
             List<? extends ITextComponent> list;
             if (config.get(KEY_SHORT_INFO)) {
@@ -72,7 +72,7 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
                     }
                 }
             } else {
-                Tiers tier = tank.tier();
+                Tier tier = tank.tier();
                 if (t instanceof TileTankVoid) {
                     list = Collections.singletonList(new TranslationTextComponent(TIER, tier.toString()));
                 } else {
@@ -99,14 +99,14 @@ public class TankDataProvider implements IServerDataProvider<TileEntity>, ICompo
     }
 
     @Nonnull
-    private static String getCreativeFluidName(TileTankNoDisplay tank) {
+    private static String getCreativeFluidName(TileTank tank) {
         return java.util.Optional.ofNullable(tank.internalTank().getTank().fluidAmount()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL);
     }
 
     @Override
     public void appendServerData(CompoundNBT tag, ServerPlayerEntity player, World world, TileEntity te) {
-        if (te instanceof TileTankNoDisplay) {
-            TileTankNoDisplay tank = (TileTankNoDisplay) te;
+        if (te instanceof TileTank) {
+            TileTank tank = (TileTank) te;
 
             tag.putString(NBT_Tier, tank.tier().toString());
             if (te instanceof TileTankVoid) return;

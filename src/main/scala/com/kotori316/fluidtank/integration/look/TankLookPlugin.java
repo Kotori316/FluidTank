@@ -31,8 +31,8 @@ import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Tiers;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.Tier;
+import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
 
 import static com.kotori316.fluidtank.integration.Localize.AMOUNT;
@@ -59,8 +59,8 @@ public class TankLookPlugin {
     static class CapHandler {
         @SubscribeEvent
         public void event(AttachCapabilitiesEvent<TileEntity> event) {
-            if (event.getObject() instanceof TileTankNoDisplay) {
-                TileTankNoDisplay tank = (TileTankNoDisplay) event.getObject();
+            if (event.getObject() instanceof TileTank) {
+                TileTank tank = (TileTank) event.getObject();
                 LookAtThatCapabilityProvider provider = new LookAtThatCapabilityProvider(tank);
                 event.addCapability(LOCATION, provider);
             }
@@ -71,9 +71,9 @@ public class TankLookPlugin {
 class LookAtThatCapabilityProvider implements ICapabilityProvider, IProvidesLATInfo {
     @CapabilityInject(IProvidesLATInfo.class)
     public static Capability<IProvidesLATInfo> CAPABILITY = null;
-    private final TileTankNoDisplay tank;
+    private final TileTank tank;
 
-    LookAtThatCapabilityProvider(TileTankNoDisplay tank) {
+    LookAtThatCapabilityProvider(TileTank tank) {
         this.tank = tank;
     }
 
@@ -116,7 +116,7 @@ class LookAtThatCapabilityProvider implements ICapabilityProvider, IProvidesLATI
     @Nonnull
     private String getLongMessage() {
         List<? extends ITextComponent> list;
-        Tiers tier = tank.tier();
+        Tier tier = tank.tier();
         if (tank instanceof TileTankVoid) {
             list = Collections.singletonList(new TranslationTextComponent(TIER, tier.toString()));
         } else {
@@ -141,7 +141,7 @@ class LookAtThatCapabilityProvider implements ICapabilityProvider, IProvidesLATI
     }
 
     @Nonnull
-    private static String getCreativeFluidName(TileTankNoDisplay tank) {
+    private static String getCreativeFluidName(TileTank tank) {
         return java.util.Optional.ofNullable(tank.internalTank().getTank().fluidAmount()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL);
     }
 

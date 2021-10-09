@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.fluids.Tank
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{TileTank, TileTankNoDisplay}
+import com.kotori316.fluidtank.tiles.TileTank
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.mojang.blaze3d.matrix.MatrixStack
 import com.mojang.blaze3d.systems.RenderSystem
@@ -37,7 +37,7 @@ class RenderItemTank extends ItemStackTileEntityRenderer {
 
         tileTank.tier = tankItem.blockTank.tier
         tileTank.internalTank.setTank(Tank.EMPTY)
-        val compound = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag)
+        val compound = stack.getChildTag(TileTank.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
         RenderHelper.disableStandardItemLighting()

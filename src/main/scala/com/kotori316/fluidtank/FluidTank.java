@@ -1,12 +1,12 @@
 package com.kotori316.fluidtank;
 
 import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,7 +26,6 @@ import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.CombineRecipe;
-import com.kotori316.fluidtank.recipes.ConvertInvisibleRecipe;
 import com.kotori316.fluidtank.recipes.FluidTankConditions;
 import com.kotori316.fluidtank.recipes.ReservoirRecipe;
 import com.kotori316.fluidtank.recipes.TagCondition;
@@ -41,7 +40,7 @@ public class FluidTank {
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
-        Utils.enableMilk();
+        ForgeMod.enableMilkFluid();
     }
 
     @Mod.EventBusSubscriber(modid = modID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -55,7 +54,6 @@ public class FluidTank {
         @SubscribeEvent
         public static void registerBlocks(RegistryEvent.Register<Block> event) {
             CollectionConverters.asJava(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
-            CollectionConverters.asJava(ModObjects.blockTanksInvisible()).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat());
             event.getRegistry().register(ModObjects.blockFluidPipe());
             event.getRegistry().register(ModObjects.blockItemPipe());
@@ -65,17 +63,11 @@ public class FluidTank {
         @SubscribeEvent
         public static void registerItems(RegistryEvent.Register<Item> event) {
             CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
-            CollectionConverters.asJava(ModObjects.blockTanksInvisible()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
             event.getRegistry().register(ModObjects.blockCat().itemBlock());
             event.getRegistry().register(ModObjects.blockFluidPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockItemPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockSource().itemBlock());
             CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(event.getRegistry()::register);
-        }
-
-        @SubscribeEvent
-        public static void registerFluids(RegistryEvent.Register<Fluid> event) {
-            event.getRegistry().register(ModObjects.MILK_FLUID());
         }
 
         @SubscribeEvent
@@ -85,14 +77,12 @@ public class FluidTank {
 
         @SubscribeEvent
         public static void registerSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
-            event.getRegistry().register(ConvertInvisibleRecipe.SERIALIZER.setRegistryName(new ResourceLocation(ConvertInvisibleRecipe.LOCATION)));
             event.getRegistry().register(CombineRecipe.SERIALIZER.setRegistryName(new ResourceLocation(CombineRecipe.LOCATION)));
             event.getRegistry().register(TierRecipe.SERIALIZER);
             event.getRegistry().register(ReservoirRecipe.SERIALIZER);
             CraftingHelper.register(new FluidTankConditions.ConfigCondition().serializer);
             CraftingHelper.register(new FluidTankConditions.EasyCondition().serializer);
-            CraftingHelper.register(new FluidTankConditions.InvisibleCondition().serializer);
-            CraftingHelper.register(new TagCondition.Serializer());
+            CraftingHelper.register(TagCondition.Serializer.INSTANCE);
         }
 
         @SubscribeEvent

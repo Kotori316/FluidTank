@@ -80,8 +80,6 @@ public class ClientProxy extends SideProxy {
             RenderType rendertype = RenderType.getCutoutMipped();
             CollectionConverters.asJava(ModObjects.blockTanks())
                 .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
-            CollectionConverters.asJava(ModObjects.blockTanksInvisible())
-                .forEach(tank -> RenderTypeLookup.setRenderLayer(tank, rendertype));
             RenderTypeLookup.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
             RenderTypeLookup.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
 

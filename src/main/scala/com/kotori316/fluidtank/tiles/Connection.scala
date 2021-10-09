@@ -18,7 +18,8 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 
 import scala.collection.mutable.ArrayBuffer
 
-sealed class Connection private(val seq: Seq[TileTankNoDisplay]) extends ICapabilityProvider {
+sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
+  val seq: Seq[TileTank] = s.sortBy(_.getPos.getY)
   val hasCreative: Boolean = seq.exists(_.isInstanceOf[TileTankCreative])
   val hasVoid: Boolean = seq.exists(_.isInstanceOf[TileTankVoid])
   val updateActions: ArrayBuffer[() => Unit] = ArrayBuffer(
@@ -45,11 +46,11 @@ sealed class Connection private(val seq: Seq[TileTankNoDisplay]) extends ICapabi
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
   }
 
-  def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else handler.getSumOfCapacity
+  def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity
 
-  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tiers.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
+  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tier.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
 
-  def tankSeq(fluid: FluidAmount): Seq[TileTankNoDisplay] = {
+  def tankSeq(fluid: FluidAmount): Seq[TileTank] = {
     if (fluid != null && fluid.isGaseous) {
       seq.reverse
     } else {
@@ -61,7 +62,7 @@ sealed class Connection private(val seq: Seq[TileTankNoDisplay]) extends ICapabi
     Option(fluidType).filter(_.nonEmpty)
   }
 
-  def remove(tileTank: TileTankNoDisplay): Unit = {
+  def remove(tileTank: TileTank): Unit = {
     val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
     val s1Connection = Connection.create(s1)
     val s2Connection = Connection.create(s2.tail)
@@ -99,6 +100,7 @@ sealed class Connection private(val seq: Seq[TileTankNoDisplay]) extends ICapabi
 
   // ----- END DEPRECATED REMOVE IN 1.17 -----
 
+  //noinspection ComparingUnrelatedTypes
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       lazyOptional.cast()
@@ -138,7 +140,7 @@ sealed class Connection private(val seq: Seq[TileTankNoDisplay]) extends ICapabi
 
 object Connection {
 
-  def create(s: Seq[TileTankNoDisplay]): Connection = {
+  def create(s: Seq[TileTank]): Connection = {
     if (s.isEmpty) {
       invalid
     } else {
@@ -162,7 +164,7 @@ object Connection {
   }
 
   @scala.annotation.tailrec
-  def createAndInit(tankSeq: Seq[TileTankNoDisplay]): Unit = {
+  def createAndInit(tankSeq: Seq[TileTank]): Unit = {
     if (tankSeq.nonEmpty) {
       val s = tankSeq.sortBy(_.getPos.getY)
       val fluid = s.map(_.internalTank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
@@ -195,12 +197,12 @@ object Connection {
 
     override def getComparatorLevel: Int = 0
 
-    override def remove(tileTank: TileTankNoDisplay): Unit = ()
+    override def remove(tileTank: TileTank): Unit = ()
 
     override def getTextComponent = new StringTextComponent(toString)
   }
 
-  val stackFromTile: TileTankNoDisplay => Option[FluidAmount] = (t: TileTankNoDisplay) => Option(t.internalTank.getFluid).filter(_.nonEmpty)
+  val stackFromTile: TileTank => Option[FluidAmount] = (t: TileTank) => Option(t.internalTank.getFluid).filter(_.nonEmpty)
 
   private class ConnectionTankHandler(tankHandlers: Chain[TankHandler], hasCreative: Boolean) extends ListTankHandler(tankHandlers, true) {
 
@@ -221,13 +223,13 @@ object Connection {
   }
 
   def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
-    val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTankNoDisplay])
+    val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTank])
       .toList.lastOption.getOrElse {
       FluidTank.LOGGER.fatal(ModObjects.MARKER_Connection, "No lowest tank", new IllegalStateException("No lowest tank"))
       pos
     }
-    val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTankNoDisplay])
-      .toList.map(_.asInstanceOf[TileTankNoDisplay])
+    val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTank])
+      .toList.map(_.asInstanceOf[TileTank])
     //    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
     createAndInit(tanks)
   }

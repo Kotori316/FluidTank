@@ -2,7 +2,6 @@ package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.items.ReservoirItem
-import com.kotori316.fluidtank.milk.MilkFluid
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
@@ -10,7 +9,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
 import net.minecraft.item.{ItemGroup, ItemStack}
 import net.minecraft.loot.LootFunctionType
-import net.minecraft.tags.FluidTags
 import net.minecraft.tileentity.{TileEntity, TileEntityType}
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
@@ -36,27 +34,23 @@ object ModObjects {
 
   //---------- BLOCKS ----------
 
-  private[this] final val woodTank = new BlockTank(Tiers.WOOD)
-  private[this] final val woodTankInvisible = new BlockInvisibleTank(Tiers.WOOD)
-  private[this] final val normalTanks = Tiers.list.filter(_.hasTagRecipe).map(new BlockTank(_))
-  private[this] final val normalTanksInv = Tiers.list.filter(_.hasTagRecipe).map(new BlockInvisibleTank(_))
-  final val creativeTank = new BlockCreativeTank
-  final val voidTank = new BlockVoidTank
-  final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank
-  final val blockTanksInvisible = woodTankInvisible +: normalTanksInv.toList :+ voidTank
+  private[this] final val woodTank = new BlockTank(Tier.WOOD)
+  private[this] final val normalTanks = Tier.list.filter(_.hasTagRecipe).map(new BlockTank(_))
+  private[this] final val creativeTank = new BlockCreativeTank
+  private[this] final val voidTank = new BlockVoidTank
+  final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank :+ voidTank
   final val blockCat = new BlockCAT
   final val blockFluidPipe = new FluidPipeBlock
   final val blockItemPipe = new ItemPipeBlock
   final val blockSource = new FluidSourceBlock
 
   //---------- ITEMS ----------
-  final val itemReservoirs = List(Tiers.WOOD, Tiers.STONE, Tiers.IRON).map(t => new ReservoirItem(t))
+  final val itemReservoirs = List(Tier.WOOD, Tier.STONE, Tier.IRON).map(t => new ReservoirItem(t))
 
   //---------- TileEntities ----------
 
   private[this] final var types: List[TileEntityType[_ <: TileEntity]] = Nil
   final val TANK_TYPE = createTileType(() => new TileTank, blockTanks)
-  final val TANK_NO_DISPLAY_TYPE = createTileType(() => new TileTankNoDisplay, blockTanksInvisible)
   final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
   final val TANK_VOID_TYPE = createTileType(() => new TileTankVoid, List(voidTank))
   final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
@@ -77,18 +71,14 @@ object ModObjects {
 
   final val CAT_CONTAINER_TYPE = CATContainer.makeType()
 
-  //---------- Fluids ----------
-  final val MILK_FLUID = new MilkFluid
-  final val MILK_TAG = FluidTags.makeWrapperTag("forge:milk")
-
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
     new ResourceLocation(FluidTank.modID, "content_tank"),
     new LootFunctionType(new ContentTankSerializer))
 
   // ---------- Markers ----------
-  final val MARKER_DynamicSerializable = MarkerManager.getMarker("DynamicSerializable")
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
+  final val MARKER_TileTank = MarkerManager.getMarker("TileTank")
   final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
   final val MARKER_Connection = MarkerManager.getMarker("Connection")
   final val MARKER_PipeTileBase = MarkerManager.getMarker("PipeTileBase")

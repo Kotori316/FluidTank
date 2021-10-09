@@ -21,13 +21,13 @@ import scala.Option;
 import scala.jdk.javaapi.FunctionConverters;
 
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerReceiver<IAEFluidStack> {
     private final IAppEngApi api;
-    private final TileTankNoDisplay tank;
+    private final TileTank tank;
 
-    public AEFluidInv(IAppEngApi api, TileTankNoDisplay tank) {
+    public AEFluidInv(IAppEngApi api, TileTank tank) {
         this.api = api;
         this.tank = tank;
     }

@@ -11,7 +11,7 @@ import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.integration.Localize;
 import com.kotori316.fluidtank.tiles.FluidSourceTile;
-import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 /*
     Use java to avoid strange java.lang.VerifyError.
@@ -20,7 +20,7 @@ import com.kotori316.fluidtank.tiles.TileTankNoDisplay;
 public class TankWailaPlugin implements IWailaPlugin {
 
     static final String Waila_ModId = "waila";
-    static final String NBT_Tier = TileTankNoDisplay.NBT_Tier();
+    static final String NBT_Tier = TileTank.NBT_Tier();
     static final String NBT_ConnectionAmount = "ConnectionAmount";
     static final String NBT_ConnectionCapacity = "ConnectionCapacity";
     static final String NBT_ConnectionComparator = "Comparator";
@@ -33,8 +33,8 @@ public class TankWailaPlugin implements IWailaPlugin {
     public void register(IRegistrar registrar) {
         if (ModList.get().isLoaded(Waila_ModId) && Config.content().enableWailaAndTOP().get()) {
             TankDataProvider tankDataProvider = new TankDataProvider();
-            registrar.registerBlockDataProvider(tankDataProvider, TileTankNoDisplay.class);
-            registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, TileTankNoDisplay.class);
+            registrar.registerBlockDataProvider(tankDataProvider, TileTank.class);
+            registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, TileTank.class);
             SupplierDataProvider supplierDataProvider = new SupplierDataProvider();
             registrar.registerBlockDataProvider(supplierDataProvider, FluidSourceTile.class);
             registrar.registerComponentProvider(supplierDataProvider, TooltipPosition.BODY, FluidSourceTile.class);

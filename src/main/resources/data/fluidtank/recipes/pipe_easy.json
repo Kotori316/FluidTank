@@ -6,14 +6,9 @@
     "gtg"
   ],
   "key": {
-    "t": [
-      {
-        "item": "fluidtank:tank_wood"
-      },
-      {
-        "item": "fluidtank:invisible_tank_wood"
-      }
-    ],
+    "t": {
+      "item": "fluidtank:tank_wood"
+    },
     "g": {
       "tag": "forge:glass"
     }
