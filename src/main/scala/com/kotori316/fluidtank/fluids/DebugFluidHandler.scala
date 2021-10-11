@@ -1,7 +1,8 @@
 package com.kotori316.fluidtank.fluids
 
+import cats.implicits.toShow
 import com.kotori316.fluidtank.fluids.DebugFluidHandler.{LOGGER, LOG_LEVEL, MARKER}
-import com.kotori316.fluidtank.{ModObjects, Utils}
+import com.kotori316.fluidtank.{ModObjects, Utils, showFluidStack}
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
@@ -9,12 +10,12 @@ import org.apache.logging.log4j.{Level, LogManager}
 
 class DebugFluidHandler private() extends EmptyFluidHandler {
   override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
-    LOGGER.log(LOG_LEVEL, MARKER, "Fill {}, mode {}", resource: AnyRef, action: AnyRef)
+    LOGGER.log(LOG_LEVEL, MARKER, "Fill {}, mode {}", resource.show: AnyRef, action: AnyRef)
     super.fill(resource, action)
   }
 
   override def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = {
-    LOGGER.log(LOG_LEVEL, MARKER, "Drain {}, mode {}", resource: AnyRef, action: AnyRef)
+    LOGGER.log(LOG_LEVEL, MARKER, "Drain {}, mode {}", resource.show: AnyRef, action: AnyRef)
     super.drain(resource, action)
   }
 

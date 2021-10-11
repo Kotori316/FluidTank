@@ -3,53 +3,48 @@ package com.kotori316.fluidtank.network
 import java.util.function.Supplier
 
 import com.kotori316.fluidtank.FluidTank
-import net.minecraft.nbt.CompoundNBT
-import net.minecraft.network.PacketBuffer
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
-import net.minecraftforge.fml.network.NetworkEvent
+import net.minecraft.core.{BlockPos, Registry}
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraftforge.fmllegacy.network.NetworkEvent
 
 /**
  * To both client and server.
  */
-class TileMessage {
-  var pos: BlockPos = BlockPos.ZERO
-  var dim: ResourceLocation = _
-  var nbt: CompoundNBT = _
+class TileMessage(pos: BlockPos, dim: ResourceKey[Level], tag: CompoundTag) {
 
-  def write(buffer: PacketBuffer): Unit = {
-    buffer.writeBlockPos(pos).writeResourceLocation(dim)
-    buffer.writeCompoundTag(nbt)
+  def write(buffer: FriendlyByteBuf): Unit = {
+    buffer.writeBlockPos(pos).writeResourceLocation(dim.location())
+    buffer.writeNbt(tag)
   }
 
   def onReceive(supplier: Supplier[NetworkEvent.Context]): Unit = {
     for {
-      world <- FluidTank.proxy.getWorld(supplier.get())
-      if world.getDimensionKey.getLocation == dim
-      tile <- Option(world.getTileEntity(pos))
+      world <- FluidTank.proxy.getLevel(supplier.get())
+      if world.dimension() == dim
+      tile <- Option(world.getBlockEntity(pos))
     } {
-      supplier.get().enqueueWork(() => tile.read(world.getBlockState(pos), nbt))
+      supplier.get().enqueueWork(() => tile.load(tag))
     }
     supplier.get().setPacketHandled(true)
   }
 }
 
 object TileMessage {
-  def apply(buffer: PacketBuffer): TileMessage = {
-    val m = new TileMessage()
-    m.pos = buffer.readBlockPos()
-    m.dim = buffer.readResourceLocation()
-    m.nbt = buffer.readCompoundTag()
-    m
+  def apply(buffer: FriendlyByteBuf): TileMessage = {
+    val pos = buffer.readBlockPos()
+    val dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, buffer.readResourceLocation())
+    val nbt = buffer.readNbt()
+    new TileMessage(pos, dim, nbt)
   }
 
-  def apply(tile: TileEntity): TileMessage = {
-    val m = new TileMessage()
-    m.pos = tile.getPos
-    m.dim = Option(tile.getWorld).map(_.getDimensionKey()).getOrElse(World.OVERWORLD).getLocation
-    m.nbt = tile.write(new CompoundNBT)
-    m
+  def apply(tile: BlockEntity): TileMessage = {
+    val pos = tile.getBlockPos
+    val dim = Option(tile.getLevel).map(_.dimension()).getOrElse(Level.OVERWORLD)
+    val nbt = tile.serializeNBT()
+    new TileMessage(pos, dim, nbt)
   }
 }

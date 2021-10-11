@@ -3,8 +3,8 @@ package com.kotori316.fluidtank.recipes;
 import java.util.Objects;
 
 import com.google.gson.JsonObject;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
@@ -65,7 +65,7 @@ public class TagCondition implements ICondition {
 
         @Override
         public TagCondition read(JsonObject json) {
-            return new TagCondition(JSONUtils.getString(json, "tag"));
+            return new TagCondition(GsonHelper.getAsString(json, "tag"));
         }
 
         @Override

@@ -11,19 +11,19 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,7 +42,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInventory> {
+public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContainer> {
     private static final Logger LOGGER = LogManager.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
@@ -68,11 +68,11 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, @Nullable World worldIn) {
+    public boolean matches(CraftingContainer inv, @Nullable Level worldIn) {
         return checkInv(inv);
     }
 
-    private boolean checkInv(CraftingInventory inv) {
+    private boolean checkInv(CraftingContainer inv) {
         for (int i = 0; i <= inv.getWidth() - recipeWidth; ++i) {
             for (int j = 0; j <= inv.getHeight() - recipeHeight; ++j) {
                 if (this.checkMatch(inv, i, j)) {
@@ -85,9 +85,9 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
     /**
      * Checks if the region of a crafting inventory is match for the recipe.
-     * <p>Copied from {@link net.minecraft.item.crafting.ShapedRecipe}</p>
+     * <p>Copied from {@link net.minecraft.world.item.crafting.ShapedRecipe}</p>
      */
-    public boolean checkMatch(CraftingInventory craftingInventory, int w, int h) {
+    public boolean checkMatch(CraftingContainer craftingInventory, int w, int h) {
         NonNullList<Ingredient> ingredients = this.getIngredients();
         for (int i = 0; i < craftingInventory.getWidth(); ++i) {
             for (int j = 0; j < craftingInventory.getHeight(); ++j) {
@@ -100,19 +100,19 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
                     ingredient = Ingredient.EMPTY;
                 }
 
-                if (!ingredient.test(craftingInventory.getStackInSlot(i + j * craftingInventory.getWidth()))) {
+                if (!ingredient.test(craftingInventory.getItem(i + j * craftingInventory.getWidth()))) {
                     return false;
                 }
             }
         }
 
         // Items are placed correctly.
-        List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.getSizeInventory())
-            .mapToObj(craftingInventory::getStackInSlot)
+        List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.getContainerSize())
+            .mapToObj(craftingInventory::getItem)
             .filter(this.getTankItems())
             .collect(Collectors.toList());
         return tankStacks.size() == 4 &&
-            tankStacks.stream().map(stack -> stack.getChildTag(TileTank.NBT_BlockTag()))
+            tankStacks.stream().map(stack -> stack.getTagElement(TileTank.NBT_BlockTag()))
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
                 .filter(FluidAmount::nonEmpty)
@@ -122,49 +122,49 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         if (!this.checkInv(inv)) {
             LOGGER.error("Requested to return crafting result for invalid inventory. {}",
-                IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot).collect(Collectors.toList()));
+                IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem).collect(Collectors.toList()));
             return ItemStack.EMPTY;
         }
-        ItemStack result = getRecipeOutput();
-        FluidAmount fluidAmount = IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot)
+        ItemStack result = getResultItem();
+        FluidAmount fluidAmount = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
-            .map(stack -> stack.getChildTag(TileTank.NBT_BlockTag()))
+            .map(stack -> stack.getTagElement(TileTank.NBT_BlockTag()))
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
 
         if (fluidAmount.nonEmpty()) {
-            CompoundNBT compound = new CompoundNBT();
+            CompoundTag compound = new CompoundTag();
 
-            CompoundNBT tankTag = new CompoundNBT();
+            CompoundTag tankTag = new CompoundTag();
             tankTag.putInt(TileTank.NBT_Capacity(), Utils.toInt(tier.amount()));
             fluidAmount.write(tankTag);
 
             compound.put(TileTank.NBT_Tank(), tankTag);
             compound.put(TileTank.NBT_Tier(), tier.toNBTTag());
 
-            result.setTagInfo(TileTank.NBT_BlockTag(), compound);
+            result.addTagElement(TileTank.NBT_BlockTag(), compound);
         }
 
         return result;
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width >= 3 && height >= 3;
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return result.copy();
     }
 
@@ -179,11 +179,11 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
-        NonNullList<ItemStack> stacks = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
+        NonNullList<ItemStack> stacks = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 
         for (int i = 0; i < stacks.size(); ++i) {
-            ItemStack item = inv.getStackInSlot(i);
+            ItemStack item = inv.getItem(i);
             if (item.hasContainerItem() && !(item.getItem() instanceof ItemBlockTank)) {
                 stacks.set(i, item.getContainerItem());
             }
@@ -194,7 +194,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
 
     public Ingredient getTankItems() {
         Stream<BlockTank> tankStream = this.normalTankSet.stream();
-        return Ingredient.fromStacks(tankStream.map(ItemStack::new).toArray(ItemStack[]::new));
+        return Ingredient.of(tankStream.map(ItemStack::new).toArray(ItemStack[]::new));
     }
 
     public Ingredient getSubItems() {
@@ -237,7 +237,7 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<TierRecipe> {
+    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "crafting_grade_up");
 
         public Serializer() {
@@ -245,9 +245,9 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         }
 
         @Override
-        public TierRecipe read(ResourceLocation recipeId, JsonObject json) {
-            Tier tier = Tier.byName(JSONUtils.getString(json, KEY_TIER)).orElse(Tier.Invalid);
-            Ingredient subItem = Ingredient.deserialize(json.get(KEY_SUB_ITEM));
+        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            Tier tier = Tier.byName(GsonHelper.getAsString(json, KEY_TIER)).orElse(Tier.Invalid);
+            Ingredient subItem = Ingredient.fromJson(json.get(KEY_SUB_ITEM));
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, json);
             LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, subItem);
@@ -255,10 +255,10 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         }
 
         @Override
-        public TierRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            String tierName = buffer.readString();
+        public TierRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+            String tierName = buffer.readUtf();
             Tier tier = Tier.byName(tierName).orElseThrow(IllegalArgumentException::new);
-            Ingredient subItem = Ingredient.read(buffer);
+            Ingredient subItem = Ingredient.fromNetwork(buffer);
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
             LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}..", recipeId, tier, subItem);
@@ -266,49 +266,49 @@ public class TierRecipe implements ICraftingRecipe, IShapedRecipe<CraftingInvent
         }
 
         @Override
-        public void write(PacketBuffer buffer, TierRecipe recipe) {
-            buffer.writeString(recipe.getTier().toString());
-            recipe.getSubItems().write(buffer);
+        public void toNetwork(FriendlyByteBuf buffer, TierRecipe recipe) {
+            buffer.writeUtf(recipe.getTier().toString());
+            recipe.getSubItems().toNetwork(buffer);
             LOGGER.debug("Serialized {} to packet for tier {}.", recipe.id, recipe.tier);
         }
 
     }
 
-    public static class FinishedRecipe implements IFinishedRecipe {
+    public static class TierFinishedRecipe implements FinishedRecipe {
         private final ResourceLocation recipeId;
         private final Tier tier;
 
-        public FinishedRecipe(ResourceLocation recipeId, Tier tier) {
+        public TierFinishedRecipe(ResourceLocation recipeId, Tier tier) {
             this.recipeId = recipeId;
             this.tier = tier;
         }
 
         @Override
-        public void serialize(JsonObject json) {
-            Ingredient ingredient = Ingredient.fromTag(ItemTags.makeWrapperTag(this.tier.tagName()));
+        public void serializeRecipeData(JsonObject json) {
+            Ingredient ingredient = Ingredient.of(ItemTags.bind(this.tier.tagName()));
 
             json.addProperty(KEY_TIER, this.tier.lowerName());
-            json.add(KEY_SUB_ITEM, ingredient.serialize());
+            json.add(KEY_SUB_ITEM, ingredient.toJson());
         }
 
         @Override
-        public ResourceLocation getID() {
+        public ResourceLocation getId() {
             return recipeId;
         }
 
         @Override
-        public IRecipeSerializer<?> getSerializer() {
+        public RecipeSerializer<?> getType() {
             return SERIALIZER;
         }
 
         @Nullable
         @Override
-        public JsonObject getAdvancementJson() {
+        public JsonObject serializeAdvancement() {
             return null;
         }
 
         @Override
-        public ResourceLocation getAdvancementID() {
+        public ResourceLocation getAdvancementId() {
             return new ResourceLocation("");
         }
     }

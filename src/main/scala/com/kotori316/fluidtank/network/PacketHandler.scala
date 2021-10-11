@@ -3,10 +3,10 @@ package com.kotori316.fluidtank.network
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.kotori316.fluidtank.FluidTank
-import net.minecraft.util.ResourceLocation
-import net.minecraft.world.World
-import net.minecraftforge.fml.network.simple.SimpleChannel
-import net.minecraftforge.fml.network.{NetworkRegistry, PacketDistributor}
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.Level
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel
+import net.minecraftforge.fmllegacy.network.{NetworkRegistry, PacketDistributor}
 
 object PacketHandler {
   private[this] final val PROTOCOL = "1"
@@ -20,14 +20,14 @@ object PacketHandler {
   def init(): Unit = {
     val counter = new AtomicInteger(1)
     INSTANCE.registerMessage[TileMessage](counter.getAndIncrement(), classOf[TileMessage], (m, b) => m.write(b), TileMessage.apply, (m, s) => m.onReceive(s))
-    INSTANCE.registerMessage[FluidCacheMessage](counter.getAndIncrement(), classOf[FluidCacheMessage], (m, b) => m.write(b), FluidCacheMessage.apply, (m, s) => m.onReceive(s))
+    INSTANCE.registerMessage[FluidCacheMessage](counter.getAndIncrement(), classOf[FluidCacheMessage], (m, b) => m.write(b), b => new FluidCacheMessage(b), (m, s) => m.onReceive(s))
   }
 
-  def sendToClient(message: TileMessage, world: World): Unit = {
-    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.getDimensionKey), message)
+  def sendToClient(message: TileMessage, world: Level): Unit = {
+    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.dimension()), message)
   }
 
-  def sendToClient(message: FluidCacheMessage, world: World): Unit = {
-    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.getDimensionKey), message)
+  def sendToClient(message: FluidCacheMessage, world: Level): Unit = {
+    INSTANCE.send(PacketDistributor.DIMENSION.`with`(() => world.dimension()), message)
   }
 }

@@ -40,7 +40,7 @@
   "chat.fluidtank.change_color": "Color was changed to %s.",
   "chat.fluidtank.change_source": "Fluid was changed to %s.",
   "chat.fluidtank.change_interval": "Interval was changed to %s.",
-  "itemGroup.FluidTank": "液体储罐",
+  "itemGroup.fluidtank": "液体储罐",
   "fluidtank.recipe.tooltip": "储罐合成配方",
   "config.waila.plugin_fluidtank": "液体储罐",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "显示储罐信息",

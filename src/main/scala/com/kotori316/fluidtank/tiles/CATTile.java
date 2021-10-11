@@ -10,16 +10,17 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
@@ -34,18 +35,18 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
 
-public class CATTile extends TileEntity implements INamedContainerProvider {
+public class CATTile extends BlockEntity implements MenuProvider {
     // The direction of FACING is facing to you, people expect to use itemBlock targeting an inventory so the chest exists on the opposite side of FACING.
     public List<FluidAmount> fluidCache = Collections.emptyList();
 
-    public CATTile() {
-        super(ModObjects.CAT_TYPE());
+    public CATTile(BlockPos pos, BlockState state) {
+        super(ModObjects.CAT_TYPE(), pos, state);
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        Direction direction = getBlockState().get(BlockStateProperties.FACING);
+        Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
         if (side != direction) {
             if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
                 return getFluidHandler(direction).cast();
@@ -55,8 +56,8 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
     }
 
     public LazyOptional<FluidHandlerWrapper> getFluidHandler(Direction direction) {
-        assert world != null;
-        TileEntity entity = world.getTileEntity(pos.offset(direction));
+        assert level != null;
+        BlockEntity entity = level.getBlockEntity(getBlockPos().relative(direction));
         if (entity == null) {
             return LazyOptional.empty();
         } else {
@@ -70,13 +71,13 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ModObjects.blockCat().getTranslationKey());
+    public Component getDisplayName() {
+        return getBlockState().getBlock().getName();
     }
 
     @Override
-    public Container createMenu(int id, PlayerInventory inv, PlayerEntity player) {
-        return new CATContainer(id, player, pos);
+    public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+        return new CATContainer(id, player, getBlockPos());
     }
 
     public static class FluidHandlerWrapper implements IFluidHandler {
@@ -182,7 +183,7 @@ public class CATTile extends TileEntity implements INamedContainerProvider {
     }
 
     public List<FluidAmount> fluidAmountList() {
-        Direction direction = getBlockState().get(BlockStateProperties.FACING);
+        Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
         LazyOptional<FluidHandlerWrapper> opt = getFluidHandler(direction);
         return opt.map(FluidHandlerWrapper::fluidList).orElse(Collections.emptyList());
     }

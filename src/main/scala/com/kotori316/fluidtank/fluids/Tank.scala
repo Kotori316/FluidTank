@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.fluids
 
 import cats.Eq
-import net.minecraft.fluid.Fluid
+import net.minecraft.world.level.material.Fluid
 
 case class Tank(fluidAmount: FluidAmount, capacity: Long) {
   def fluid: Fluid = fluidAmount.fluid

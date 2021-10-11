@@ -5,9 +5,13 @@ import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.IDyeableArmorItem;
-import net.minecraft.item.ItemStack;
+import javax.annotation.Nullable;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 public class Utils {
@@ -44,21 +48,29 @@ public class Utils {
         */
     }
 
+    /**
+     * Helper method copied from {@link net.minecraft.world.level.block.BaseEntityBlock}
+     */
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> checkType(BlockEntityType<A> type1, BlockEntityType<E> exceptedType, BlockEntityTicker<? super E> ticker) {
+        return exceptedType == type1 ? (BlockEntityTicker<A>) ticker : null;
+    }
+
     public static OptionalInt getItemColor(ItemStack stack) {
         DyeColor color = DyeColor.getColor(stack);
         if (color != null)
-            return OptionalInt.of(color.getColorValue());
-        if (stack.getItem() instanceof IDyeableArmorItem) {
-            IDyeableArmorItem item = (IDyeableArmorItem) stack.getItem();
+            return OptionalInt.of(color.getMaterialColor().col);
+        if (stack.getItem() instanceof DyeableLeatherItem item) {
             return OptionalInt.of(item.getColor(stack));
         }
         return OptionalInt.empty();
     }
 
-    public static class TestConfig implements Config.IContent {
+    public static class TestConfig implements IContent {
         private final Map<String, Object> configs;
 
-        public static Config.IContent getTestInstance(Map<String, Object> configs) {
+        public static IContent getTestInstance(Map<String, Object> configs) {
             return new TestConfig(configs);
         }
 

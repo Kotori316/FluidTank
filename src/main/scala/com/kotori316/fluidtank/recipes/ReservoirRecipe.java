@@ -11,17 +11,17 @@ import java.util.stream.StreamSupport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapelessRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import scala.jdk.javaapi.CollectionConverters;
@@ -34,7 +34,7 @@ import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 public class ReservoirRecipe extends ShapelessRecipe {
-    public static final IRecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
+    public static final RecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
     public static final String GROUP = "fluidtank:reservoirs";
     private final Tier tier;
     private final List<Ingredient> subIngredients;
@@ -47,26 +47,26 @@ public class ReservoirRecipe extends ShapelessRecipe {
 
     ReservoirRecipe(ResourceLocation idIn, Tier tier) {
         // Helper method for test.
-        this(idIn, tier, Collections.singletonList(Ingredient.fromItems(Items.BUCKET)));
+        this(idIn, tier, Collections.singletonList(Ingredient.of(Items.BUCKET)));
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inv) {
-        ItemStack result = super.getCraftingResult(inv);
-        IntStream.range(0, inv.getSizeInventory())
-            .mapToObj(inv::getStackInSlot)
+    public ItemStack assemble(CraftingContainer inv) {
+        ItemStack result = super.assemble(inv);
+        IntStream.range(0, inv.getContainerSize())
+            .mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .filter(ItemStack::hasTag)
-            .map(s -> s.getChildTag(TileTank.NBT_BlockTag()))
+            .map(s -> s.getTagElement(TileTank.NBT_BlockTag()))
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(nbt -> result.setTagInfo(TileTank.NBT_BlockTag(), nbt));
+            .ifPresent(nbt -> result.addTagElement(TileTank.NBT_BlockTag(), nbt));
         return result;
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
-        return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
+        return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
     }
 
     private static ItemStack findOutput(Tier tier) {
@@ -83,27 +83,27 @@ public class ReservoirRecipe extends ShapelessRecipe {
         NonNullList<Ingredient> recipeItemsIn = NonNullList.create();
         Stream<BlockTank> tankStream = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier);
 
-        Ingredient tankIngredient = Ingredient.fromStacks(tankStream.map(ItemStack::new));
+        Ingredient tankIngredient = Ingredient.of(tankStream.map(ItemStack::new));
         recipeItemsIn.add(tankIngredient);
         recipeItemsIn.addAll(subIngredients);
         return recipeItemsIn;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<ReservoirRecipe> {
+    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<ReservoirRecipe> {
         public Serializer() {
             setRegistryName(new ResourceLocation(FluidTank.modID, "reservoir_recipe"));
         }
 
         @Override
-        public ReservoirRecipe read(ResourceLocation recipeId, JsonObject json) {
-            Tier tier = Tier.byName(JSONUtils.getString(json, "tier")).orElse(Tier.Invalid);
+        public ReservoirRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            Tier tier = Tier.byName(GsonHelper.getAsString(json, "tier")).orElse(Tier.Invalid);
             List<Ingredient> ingredientList;
             if (json.has("sub"))
-                ingredientList = StreamSupport.stream(JSONUtils.getJsonArray(json, "sub").spliterator(), false)
+                ingredientList = StreamSupport.stream(GsonHelper.getAsJsonArray(json, "sub").spliterator(), false)
                     .map(CraftingHelper::getIngredient)
                     .collect(Collectors.toList());
             else
-                ingredientList = Collections.singletonList(Ingredient.fromItems(Items.BUCKET));
+                ingredientList = Collections.singletonList(Ingredient.of(Items.BUCKET));
             if (ingredientList.isEmpty() || ingredientList.size() > 8) {
                 FluidTank.LOGGER.error("Too many or too few items to craft reservoir. Size: {}, {}, Recipe: {}",
                     ingredientList.size(), ingredientList, recipeId);
@@ -112,57 +112,57 @@ public class ReservoirRecipe extends ShapelessRecipe {
         }
 
         @Override
-        public ReservoirRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            String tierName = buffer.readString();
+        public ReservoirRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+            String tierName = buffer.readUtf();
             Tier tier = Tier.byName(tierName).orElseThrow(IllegalArgumentException::new);
             int subIngredientCount = buffer.readVarInt();
             List<Ingredient> ingredients = IntStream.range(0, subIngredientCount)
-                .mapToObj(i -> Ingredient.read(buffer))
+                .mapToObj(i -> Ingredient.fromNetwork(buffer))
                 .collect(Collectors.toList());
             return new ReservoirRecipe(recipeId, tier, ingredients);
         }
 
         @Override
-        public void write(PacketBuffer buffer, ReservoirRecipe recipe) {
-            buffer.writeString(recipe.tier.toString());
+        public void toNetwork(FriendlyByteBuf buffer, ReservoirRecipe recipe) {
+            buffer.writeUtf(recipe.tier.toString());
             buffer.writeVarInt(recipe.subIngredients.size());
-            recipe.subIngredients.forEach(i -> i.write(buffer));
+            recipe.subIngredients.forEach(i -> i.toNetwork(buffer));
         }
     }
 
-    public static class FinishedRecipe implements IFinishedRecipe {
+    public static class ReservoirFinishedRecipe implements FinishedRecipe {
         private final ReservoirRecipe recipe;
 
-        public FinishedRecipe(ReservoirRecipe recipe) {
+        public ReservoirFinishedRecipe(ReservoirRecipe recipe) {
             this.recipe = recipe;
         }
 
         @Override
-        public void serialize(JsonObject json) {
+        public void serializeRecipeData(JsonObject json) {
             json.addProperty("tier", recipe.tier.lowerName());
             JsonArray subIngredients = new JsonArray();
-            recipe.subIngredients.stream().map(Ingredient::serialize).forEach(subIngredients::add);
+            recipe.subIngredients.stream().map(Ingredient::toJson).forEach(subIngredients::add);
             json.add("sub", subIngredients);
         }
 
         @Override
-        public ResourceLocation getID() {
+        public ResourceLocation getId() {
             return recipe.getId();
         }
 
         @Override
-        public IRecipeSerializer<?> getSerializer() {
+        public RecipeSerializer<?> getType() {
             return SERIALIZER;
         }
 
         @Nullable
         @Override
-        public JsonObject getAdvancementJson() {
+        public JsonObject serializeAdvancement() {
             return null;
         }
 
         @Override
-        public ResourceLocation getAdvancementID() {
+        public ResourceLocation getAdvancementId() {
             return new ResourceLocation("");
         }
     }

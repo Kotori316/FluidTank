@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 import com.kotori316.fluidtank.blocks.FluidSourceBlock;
 
@@ -12,10 +12,10 @@ public class FluidSourceItem extends BlockItem {
     }
 
     @Override
-    public String getTranslationKey(ItemStack stack) {
+    public String getDescriptionId(ItemStack stack) {
         if (!FluidSourceBlock.isCheatStack(stack)) {
             return "block.fluidtank.water_source";
         }
-        return super.getTranslationKey(stack);
+        return super.getDescriptionId(stack);
     }
 }

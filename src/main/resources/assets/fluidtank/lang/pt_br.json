@@ -40,7 +40,7 @@
   "chat.fluidtank.change_color": "Cor foi trocada por %s.",
   "chat.fluidtank.change_source": "Fluído foi trocado por %s.",
   "chat.fluidtank.change_interval": "Intervalo foi trocado por %s.",
-  "itemGroup.FluidTank": "Tanque de fluido",
+  "itemGroup.fluidtank": "Tanque de fluido",
   "fluidtank.recipe.tooltip": "receita do tanque",
   "config.waila.plugin_fluidtank": "Tanque de fluido",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "Mostrar tanque info",

@@ -2,8 +2,7 @@ package com.kotori316.fluidtank.transport
 
 import java.util.Objects
 
-import com.kotori316.scala_lib.util.Neighbor
-import com.kotori316.scala_lib.util.Neighbor._
+import com.kotori316.fluidtank.transport.Neighbor._
 
 class PipeConnection2[A](val poses: Set[A], isOutput: A => Boolean)(implicit private val neighbor: Neighbor[A]) {
 

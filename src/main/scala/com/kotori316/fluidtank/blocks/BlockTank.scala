@@ -3,20 +3,23 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
-import net.minecraft.block.{AbstractBlock, Block, BlockState}
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.{Item, ItemStack}
-import net.minecraft.state.StateContainer
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.shapes.{ISelectionContext, VoxelShape}
-import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
-import net.minecraft.util.{ActionResultType, Direction, Hand}
-import net.minecraft.world.{IBlockReader, World}
+import javax.annotation.Nullable
+import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.{Item, ItemStack}
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
+import net.minecraft.world.level.block.{Block, EntityBlock}
+import net.minecraft.world.level.{BlockGetter, Level}
+import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
+import net.minecraft.world.phys.{BlockHitResult, HitResult}
+import net.minecraft.world.{InteractionHand, InteractionResult}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
 
-class BlockTank(val tier: Tier) extends Block(AbstractBlock.Properties.create(ModObjects.MATERIAL).hardnessAndResistance(1f).notSolid()) {
+class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(1f).dynamicShape())
+  with EntityBlock {
 
   /*
   RegistryName will be "fluidtank:tank_wood".
@@ -24,100 +27,100 @@ class BlockTank(val tier: Tier) extends Block(AbstractBlock.Properties.create(Mo
   Creative Tank -> "fluidtank:creative"
    */
   setRegistryName(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
-  setDefaultState(this.stateContainer.getBaseState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
+  registerDefaultState(this.getStateDefinition.any.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
   val itemBlock = new ItemBlockTank(this)
 
   override final def asItem(): Item = itemBlock
 
   def namePrefix = "tank_"
 
-  override def hasTileEntity(state: BlockState) = true
-
-  override def createTileEntity(state: BlockState, world: IBlockReader): TileEntity = {
-    new TileTank(tier)
+  override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = {
+    new TileTank(tier, pos, state)
   }
 
   //noinspection ScalaDeprecation
-  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos, playerIn: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
-    worldIn.getTileEntity(pos) match {
+  override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
+    level.getBlockEntity(pos) match {
       case tileTank: TileTank =>
-        val stack = playerIn.getHeldItem(handIn)
-        if (playerIn.getHeldItemMainhand.isEmpty) {
-          if (!worldIn.isRemote) {
-            playerIn.sendStatusMessage(tileTank.connection.getTextComponent, true)
+        val stack = player.getItemInHand(hand)
+        if (player.getMainHandItem.isEmpty) {
+          if (!level.isClientSide) {
+            player.displayClientMessage(tileTank.connection.getTextComponent, true)
           }
-          ActionResultType.SUCCESS
+          InteractionResult.SUCCESS
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)
           FluidUtil.getFluidHandler(copiedStack).asScala.value.value match {
             case Some(handlerItem) if !stack.isEmpty =>
-              if (!worldIn.isRemote) {
+              if (!level.isClientSide) {
                 val tankHandler = tileTank.connection.handler
-                BucketEventHandler.transferFluid(worldIn, pos, playerIn, handIn, tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), stack, handlerItem, tankHandler)
+                BucketEventHandler.transferFluid(level, pos, player, hand, tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), stack, handlerItem, tankHandler)
               }
-              ActionResultType.SUCCESS
-            case _ => ActionResultType.PASS
+              InteractionResult.SUCCESS
+            case _ => InteractionResult.PASS
           }
         } else {
-          ActionResultType.PASS
+          InteractionResult.PASS
         }
-      case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile); ActionResultType.PASS
+      case tile =>
+        FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
+        InteractionResult.PASS
     }
   }
 
-  //  override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
+  //  override final def getRenderType(state: BlockState): RenderShape = RenderShape.MODEL
 
   //noinspection ScalaDeprecation
-  override final def isSideInvisible(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
+  override final def skipRendering(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
 
-  override final def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack): Unit = {
-    super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
-    worldIn.getTileEntity(pos) match {
-      case tank: TileTank => if (!worldIn.isRemote) tank.onBlockPlacedBy()
+  override def setPlacedBy(level: Level, pos: BlockPos, state: BlockState, @Nullable entity: LivingEntity, stack: ItemStack): Unit = {
+    super.setPlacedBy(level, pos, state, entity, stack)
+    level.getBlockEntity(pos) match {
+      case tank: TileTank => if (!level.isClientSide) tank.onBlockPlacedBy()
       case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
     }
   }
 
   //noinspection ScalaDeprecation
-  override final def hasComparatorInputOverride(state: BlockState): Boolean = true
+  override final def hasAnalogOutputSignal(state: BlockState): Boolean = true
 
   //noinspection ScalaDeprecation
-  override final def getComparatorInputOverride(blockState: BlockState, worldIn: World, pos: BlockPos): Int = {
-    worldIn.getTileEntity(pos) match {
+  override final def getAnalogOutputSignal(blockState: BlockState, level: Level, pos: BlockPos): Int = {
+    level.getBlockEntity(pos) match {
       case tileTank: TileTank => tileTank.getComparatorLevel
       case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile); 0
     }
   }
 
   //noinspection ScalaDeprecation
-  override final def onReplaced(state: BlockState, worldIn: World, pos: BlockPos, newState: BlockState, isMoving: Boolean): Unit = {
-    if (!state.isIn(newState.getBlock)) {
-      worldIn.getTileEntity(pos) match {
+  override final def onRemove(state: BlockState, level: Level, pos: BlockPos, newState: BlockState, moved: Boolean): Unit = {
+    if (!state.is(newState.getBlock)) {
+      level.getBlockEntity(pos) match {
         case tank: TileTank => tank.onDestroy()
         case tile => FluidTank.LOGGER.error(ModObjects.MARKER_BlockTank, "There is not TileTank at the pos : " + pos + " but " + tile)
       }
-      worldIn.removeTileEntity(pos)
+      super.onRemove(state, level, pos, newState, moved)
     }
   }
 
-  def saveTankNBT(tileEntity: TileEntity, stack: ItemStack): Unit = {
+  def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack): Unit = {
     Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
-      .foreach(tag => stack.setTagInfo(TileTank.NBT_BlockTag, tag))
+      .foreach(tag => stack.addTagElement(TileTank.NBT_BlockTag, tag))
     Option(tileEntity).collect { case tank: TileTank => tank.getStackName }.flatten
-      .foreach(stack.setDisplayName)
+      .foreach(stack.setHoverName)
   }
 
-  override final def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity): ItemStack = {
-    val stack = super.getPickBlock(state, target, world, pos, player)
-    saveTankNBT(world.getTileEntity(pos), stack)
+  override final def getPickBlock(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
+    val stack = super.getPickBlock(state, target, level, pos, player)
+    saveTankNBT(level.getBlockEntity(pos), stack)
     stack
   }
 
   //noinspection ScalaDeprecation
-  override def getShape(state: BlockState, worldIn: IBlockReader, pos: BlockPos, context: ISelectionContext): VoxelShape = ModObjects.TANK_SHAPE
+  override def getShape(state: BlockState, worldIn: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ModObjects.TANK_SHAPE
 
-  override def fillStateContainer(builder: StateContainer.Builder[Block, BlockState]): Unit = {
-    super.fillStateContainer(builder)
+  override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = {
+    super.createBlockStateDefinition(builder)
     builder.add(TankPos.TANK_POS_PROPERTY)
   }
 }

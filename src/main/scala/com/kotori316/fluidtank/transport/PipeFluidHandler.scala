@@ -18,13 +18,13 @@ class PipeFluidHandler(pipeTile: PipeTileBase) extends IFluidHandler {
   override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = FluidStack.EMPTY
 
   override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
-    val pipePosIterator = pipeTile.connection.outputs(pipeTile.getPos).iterator
+    val pipePosIterator = pipeTile.connection.outputs(pipeTile.getBlockPos).iterator
     val rest = resource.copy()
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
-      val handlerIterator = directions.map(dir => pipePos.offset(dir) -> dir).iterator
-        .filter { case (_, direction) => pipeTile.getWorld.getBlockState(pipePos).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput }
-        .flatMap { case (pos, direction) => Cap.make(pipeTile.getWorld.getTileEntity(pos))
+      val handlerIterator = directions.map(dir => pipePos.relative(dir) -> dir).iterator
+        .filter { case (_, direction) => pipeTile.getLevel.getBlockState(pipePos).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput }
+        .flatMap { case (pos, direction) => Cap.make(pipeTile.getLevel.getBlockEntity(pos))
           .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala).value.value
         }
       while (handlerIterator.hasNext) {

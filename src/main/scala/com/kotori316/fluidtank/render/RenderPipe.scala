@@ -4,31 +4,31 @@ import java.awt.Color
 
 import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTileBase}
-import com.mojang.blaze3d.matrix.MatrixStack
+import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
-import net.minecraft.client.renderer.{IRenderTypeBuffer, RenderType}
+import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 @OnlyIn(Dist.CLIENT)
-class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[PipeTileBase](d) {
+class RenderPipe extends BlockEntityRenderer[PipeTileBase] {
   var useColor: Boolean = false
 
-  override def render(te: PipeTileBase, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def render(te: PipeTileBase, partialTicks: Float, matrixStack: PoseStack, renderTypeBuffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
 
     val maxD = 12 * RenderPipe.d - 0.01
     val minD = 4 * RenderPipe.d + 0.01
-    Minecraft.getInstance.getProfiler.startSection("RenderPipe")
-    matrixStack.push()
+    Minecraft.getInstance.getProfiler.push("RenderPipe")
+    matrixStack.pushPose()
 
     val texture = ClientProxy.whiteTexture
-    val minU = texture.getMinU
-    val minV = texture.getMinV
-    val maxU = texture.getMaxU
-    val maxV = texture.getMaxV
+    val minU = texture.getU0
+    val minV = texture.getV0
+    val maxU = texture.getU1
+    val maxV = texture.getV1
     implicit val lightValue: Box.LightValue = Box.LightValue(light)
-    val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.getTranslucent))
-    val time = te.getWorld.getGameTime
+    val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.translucent))
+    val time = te.getLevel.getGameTime
     val color = if (useColor) te.getColor else Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF
@@ -43,7 +43,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
       buffer.pos(p._4._1, p._4._2, p._4._3, matrixStack).color(red, green, blue, alpha).tex(minU, maxV).lightmap(lightValue.l1, lightValue.l2).endVertex()
     }
 
-    if (te.getBlockState.get(PipeBlock.NORTH).hasConnection) {
+    if (te.getBlockState.getValue(PipeBlock.NORTH).hasConnection) {
       RenderPipe.North_AABB.render(buffer.buffer, matrixStack, texture, alpha, red, green, blue)
     } else {
       drawWhite(
@@ -52,7 +52,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
         (minD, minD, minD),
         (minD, maxD, minD))
     }
-    if (te.getBlockState.get(PipeBlock.SOUTH).hasConnection) {
+    if (te.getBlockState.getValue(PipeBlock.SOUTH).hasConnection) {
       RenderPipe.South_AABB.render(buffer.buffer, matrixStack, texture, alpha, red, green, blue)
     } else {
       drawWhite(
@@ -61,7 +61,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
         (maxD, minD, maxD),
         (maxD, maxD, maxD))
     }
-    if (te.getBlockState.get(PipeBlock.WEST).hasConnection) {
+    if (te.getBlockState.getValue(PipeBlock.WEST).hasConnection) {
       RenderPipe.West_AABB.render(buffer.buffer, matrixStack, texture, alpha, red, green, blue)
     } else {
       drawWhite(
@@ -70,7 +70,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
         (minD, minD, maxD),
         (minD, maxD, maxD))
     }
-    if (te.getBlockState.get(PipeBlock.EAST).hasConnection) {
+    if (te.getBlockState.getValue(PipeBlock.EAST).hasConnection) {
       RenderPipe.East_AABB.render(buffer.buffer, matrixStack, texture, alpha, red, green, blue)
     } else {
       drawWhite(
@@ -79,7 +79,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
         (maxD, minD, minD),
         (maxD, maxD, minD))
     }
-    if (te.getBlockState.get(PipeBlock.UP).hasConnection) {
+    if (te.getBlockState.getValue(PipeBlock.UP).hasConnection) {
       RenderPipe.UP_AABB.render(buffer.buffer, matrixStack, texture, alpha, red, green, blue)
     } else {
       drawWhite(
@@ -88,7 +88,7 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
         (maxD, maxD, maxD),
         (maxD, maxD, minD))
     }
-    if (te.getBlockState.get(PipeBlock.DOWN).hasConnection) {
+    if (te.getBlockState.getValue(PipeBlock.DOWN).hasConnection) {
       RenderPipe.Down_AABB.render(buffer.buffer, matrixStack, texture, alpha, red, green, blue)
     } else {
       drawWhite(
@@ -98,8 +98,8 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
         (minD, minD, minD))
     }
 
-    matrixStack.pop()
-    Minecraft.getInstance.getProfiler.endSection()
+    matrixStack.popPose()
+    Minecraft.getInstance.getProfiler.pop()
   }
 }
 

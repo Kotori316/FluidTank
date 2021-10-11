@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 
 import com.kotori316.fluidtank.recipes.TagCondition;
 
@@ -75,8 +75,8 @@ public enum Tier {
         return lowerName;
     }
 
-    public StringNBT toNBTTag() {
-        return StringNBT.valueOf(lowerName);
+    public StringTag toNBTTag() {
+        return StringTag.valueOf(lowerName);
     }
 
     public boolean hasWayToCreate() {
@@ -102,10 +102,9 @@ public enum Tier {
             .findFirst();
     }
 
-    public static Tier fromNBT(INBT nbt) {
-        if (nbt instanceof StringNBT) {
-            StringNBT stringNBT = (StringNBT) nbt;
-            return byName(stringNBT.getString()).orElse(Invalid);
+    public static Tier fromNBT(Tag nbt) {
+        if (nbt instanceof StringTag stringNBT) {
+            return byName(stringNBT.getAsString()).orElse(Invalid);
         } else {
             return Invalid;
         }

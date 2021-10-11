@@ -3,25 +3,26 @@ package com.kotori316.fluidtank.transport
 import cats.implicits._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.Tier
-import net.minecraft.util.Direction
+import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler.{FLUID_HANDLER_CAPABILITY => CAP}
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
-final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
+final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE, p, s) {
   private[this] val handler = new PipeFluidHandler(this)
 
-  override def tick(): Unit = if (!world.isRemote) {
+  def tick(): Unit = if (!level.isClientSide) {
     if (connection.isEmpty)
       makeConnection()
     import scala.jdk.CollectionConverters._
     PipeBlock.FACING_TO_PROPERTY_MAP.asScala.flatMap { case (direction, value) =>
-      if (getBlockState.get(value).isInput) {
-        val sourcePos = pos.offset(direction)
+      if (getBlockState.getValue(value).isInput) {
+        val sourcePos = getBlockPos.relative(direction)
         val c = for {
-          t <- Cap.make(getWorld.getTileEntity(sourcePos))
-          cap <- getCapFromCache(t, sourcePos, direction.getOpposite, CAP)
+          t <- Cap.make(getLevel.getBlockEntity(sourcePos))
+          cap <- getCapFromCache(t, sourcePos, direction.getOpposite, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
         } yield cap -> sourcePos
         c.toList
       } else {
@@ -31,11 +32,11 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
       for {
         p <- connection.outputNonOrdered
         direction <- directions
-        pos = p.offset(direction)
+        pos = p.relative(direction)
         if pos != sourcePos
-        if getWorld.getBlockState(p).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-        t <- Option(getWorld.getTileEntity(pos)).toList
-        dest <- getCapFromCache(t, pos, direction.getOpposite, CAP).toList
+        if getLevel.getBlockState(p).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
+        t <- Option(getLevel.getBlockEntity(pos)).toList
+        dest <- getCapFromCache(t, pos, direction.getOpposite, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).toList
         if f != dest
       } {
         val transferSimulate = FluidUtil.tryFluidTransfer(dest, f, PipeTile.amountPerTick, false)
@@ -47,9 +48,9 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    if (cap == CAP) {
+    if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       if (side != null &&
-        (!hasWorld || getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
+        (!hasLevel || getBlockState.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
         LazyOptional.of(() => handler.asInstanceOf[T])
       } else {
         LazyOptional.empty()
@@ -57,12 +58,6 @@ final class PipeTile extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE) {
     } else {
       super.getCapability(cap, side)
     }
-    /*Cap.asJava(
-      Cap.make(handler.asInstanceOf[T])
-        .filter(_ => cap == CAP)
-        .filter(_ => side != null && getBlockState.get(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))
-        .orElse(super.getCapability(cap, side).asScala)
-    )*/
   }
 
 }

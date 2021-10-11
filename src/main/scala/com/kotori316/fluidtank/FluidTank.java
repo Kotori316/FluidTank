@@ -1,11 +1,11 @@
 package com.kotori316.fluidtank;
 
-import net.minecraft.block.Block;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
@@ -71,12 +71,12 @@ public class FluidTank {
         }
 
         @SubscribeEvent
-        public static void registerTiles(RegistryEvent.Register<TileEntityType<?>> event) {
+        public static void registerTiles(RegistryEvent.Register<BlockEntityType<?>> event) {
             CollectionConverters.asJava(ModObjects.getTileTypes()).forEach(event.getRegistry()::register);
         }
 
         @SubscribeEvent
-        public static void registerSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
+        public static void registerSerializer(RegistryEvent.Register<RecipeSerializer<?>> event) {
             event.getRegistry().register(CombineRecipe.SERIALIZER.setRegistryName(new ResourceLocation(CombineRecipe.LOCATION)));
             event.getRegistry().register(TierRecipe.SERIALIZER);
             event.getRegistry().register(ReservoirRecipe.SERIALIZER);
@@ -86,7 +86,7 @@ public class FluidTank {
         }
 
         @SubscribeEvent
-        public static void registerContainerType(RegistryEvent.Register<ContainerType<?>> event) {
+        public static void registerContainerType(RegistryEvent.Register<MenuType<?>> event) {
             event.getRegistry().register(ModObjects.CAT_CONTAINER_TYPE());
         }
     }

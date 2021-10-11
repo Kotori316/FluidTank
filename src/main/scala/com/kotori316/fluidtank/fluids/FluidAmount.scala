@@ -4,25 +4,25 @@ import cats._
 import cats.implicits._
 import com.kotori316.fluidtank._
 import javax.annotation.{Nonnull, Nullable}
-import net.minecraft.fluid.{Fluid, Fluids}
-import net.minecraft.item.{BucketItem, ItemStack, Items}
-import net.minecraft.nbt.CompoundNBT
-import net.minecraft.util.ResourceLocation
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.{BucketItem, ItemStack, Items}
+import net.minecraft.world.level.material.{Fluid, Fluids}
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 
 import scala.util.chaining._
 
-case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundNBT]) {
+case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundTag]) {
   def setAmount(newAmount: Long): FluidAmount = {
     if (newAmount === this.amount) this // No need to create new instance.
     else FluidAmount(fluid, newAmount, nbt)
   }
 
-  def write(tag: CompoundNBT): CompoundNBT = {
+  def write(tag: CompoundTag): CompoundTag = {
     import com.kotori316.fluidtank.fluids.FluidAmount._
 
-    val fluidNBT = new CompoundNBT()
+    val fluidNBT = new CompoundTag()
     fluidNBT.putString(NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
     fluidNBT.putLong(NBT_amount, amount)
     this.nbt.foreach(fluidNBT.put(NBT_tag, _))
@@ -86,7 +86,7 @@ object FluidAmount {
     }
   }
 
-  def fromNBT(@Nullable tag: CompoundNBT): FluidAmount = {
+  def fromNBT(@Nullable tag: CompoundTag): FluidAmount = {
     if (tag == null || tag.isEmpty) return FluidAmount.EMPTY
     val name = new ResourceLocation(tag.getString(NBT_fluid))
     val amount = tag.getLong(NBT_amount)

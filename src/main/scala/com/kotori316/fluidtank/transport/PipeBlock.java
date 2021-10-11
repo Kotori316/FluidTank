@@ -9,33 +9,34 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableBiMap;
 import javax.annotation.Nonnull;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.Config;
@@ -43,14 +44,14 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
 
-public abstract class PipeBlock extends Block {
-    public static final VoxelShape BOX_AABB = VoxelShapes.create(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-    public static final VoxelShape North_AABB = VoxelShapes.create(0.25, 0.25, 0, 0.75, 0.75, 0.25);
-    public static final VoxelShape South_AABB = VoxelShapes.create(0.25, 0.25, .75, 0.75, 0.75, 1);
-    public static final VoxelShape West_AABB = VoxelShapes.create(0, 0.25, 0.25, .25, 0.75, 0.75);
-    public static final VoxelShape East_AABB = VoxelShapes.create(.75, 0.25, 0.25, 1, 0.75, 0.75);
-    public static final VoxelShape UP_AABB = VoxelShapes.create(0.25, .75, 0.25, 0.75, 1, 0.75);
-    public static final VoxelShape Down_AABB = VoxelShapes.create(0.25, 0, 0.25, 0.75, .25, 0.75);
+public abstract class PipeBlock extends Block implements EntityBlock {
+    public static final VoxelShape BOX_AABB = Shapes.box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+    public static final VoxelShape North_AABB = Shapes.box(0.25, 0.25, 0, 0.75, 0.75, 0.25);
+    public static final VoxelShape South_AABB = Shapes.box(0.25, 0.25, .75, 0.75, 0.75, 1);
+    public static final VoxelShape West_AABB = Shapes.box(0, 0.25, 0.25, .25, 0.75, 0.75);
+    public static final VoxelShape East_AABB = Shapes.box(.75, 0.25, 0.25, 1, 0.75, 0.75);
+    public static final VoxelShape UP_AABB = Shapes.box(0.25, .75, 0.25, 0.75, 1, 0.75);
+    public static final VoxelShape Down_AABB = Shapes.box(0.25, 0, 0.25, 0.75, .25, 0.75);
 
     public static final EnumProperty<Connection> NORTH = EnumProperty.create("north", Connection.class);
     public static final EnumProperty<Connection> SOUTH = EnumProperty.create("south", Connection.class);
@@ -84,91 +85,91 @@ public abstract class PipeBlock extends Block {
     private final BlockItem blockItem;
 
     public PipeBlock() {
-        super(Block.Properties.create(ModObjects.MATERIAL_PIPE())
-            .hardnessAndResistance(0.5f));
+        super(Block.Properties.of(ModObjects.MATERIAL_PIPE())
+            .strength(0.5f));
         setRegistryName(FluidTank.modID, getRegName());
-        setDefaultState(getStateContainer().getBaseState()
-                .with(NORTH, Connection.NO_CONNECTION)
-                .with(SOUTH, Connection.NO_CONNECTION)
-                .with(WEST, Connection.NO_CONNECTION)
-                .with(EAST, Connection.NO_CONNECTION)
-                .with(UP, Connection.NO_CONNECTION)
-                .with(DOWN, Connection.NO_CONNECTION)
+        this.registerDefaultState(getStateDefinition().any()
+                .setValue(NORTH, Connection.NO_CONNECTION)
+                .setValue(SOUTH, Connection.NO_CONNECTION)
+                .setValue(WEST, Connection.NO_CONNECTION)
+                .setValue(EAST, Connection.NO_CONNECTION)
+                .setValue(UP, Connection.NO_CONNECTION)
+                .setValue(DOWN, Connection.NO_CONNECTION)
 //            .with(WATERLOGGED, false)
         );
-        blockItem = new BlockItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS()));
+        blockItem = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS()));
         blockItem.setRegistryName(FluidTank.modID, getRegName());
     }
 
     @Nonnull
     protected abstract String getRegName();
 
-    protected abstract boolean isHandler(IBlockReader world, BlockPos pos, EnumProperty<Connection> property);
+    protected abstract boolean isHandler(BlockGetter level, BlockPos pos, EnumProperty<Connection> property);
 
     @Override
-    public abstract TileEntity createTileEntity(BlockState state, IBlockReader world);
+    public abstract BlockEntity newBlockEntity(BlockPos pos, BlockState state);
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN/*, WATERLOGGED*/);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return SHAPE_MAP.entrySet().stream()
-            .filter(s -> state.get(s.getKey()) != Connection.NO_CONNECTION || isHandler(worldIn, pos, s.getKey()))
+            .filter(s -> state.getValue(s.getKey()) != Connection.NO_CONNECTION || isHandler(worldIn, pos, s.getKey()))
             .map(Map.Entry::getValue)
-            .reduce(BOX_AABB, VoxelShapes::or);
+            .reduce(BOX_AABB, Shapes::or);
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        World worldIn = context.getWorld();
-        BlockPos pos = context.getPos();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Level worldIn = context.getLevel();
+        BlockPos pos = context.getClickedPos();
 //        return FACING_TO_PROPERTY_MAP.entrySet().stream()
 //        .reduce(this.getDefaultState(), (s, e) -> s.with(e.getValue(), canConnectTo(worldIn, pos.offset(e.getKey()), e.getKey())), (s1, s2) -> s1);
 //        FluidState fluidState = worldIn.getFluidState(pos);
-        return this.getDefaultState()
-            .with(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
-            .with(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))
-            .with(SOUTH, canConnectTo(worldIn, pos.south(), Direction.SOUTH))
-            .with(WEST, canConnectTo(worldIn, pos.west(), Direction.WEST))
-            .with(DOWN, canConnectTo(worldIn, pos.down(), Direction.DOWN))
-            .with(UP, canConnectTo(worldIn, pos.up(), Direction.UP));
+        return this.defaultBlockState()
+            .setValue(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
+            .setValue(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))
+            .setValue(SOUTH, canConnectTo(worldIn, pos.south(), Direction.SOUTH))
+            .setValue(WEST, canConnectTo(worldIn, pos.west(), Direction.WEST))
+            .setValue(DOWN, canConnectTo(worldIn, pos.below(), Direction.DOWN))
+            .setValue(UP, canConnectTo(worldIn, pos.above(), Direction.UP));
 //            .with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState,
-                                          IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState,
+                                  LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
         /*if (stateIn.get(WATERLOGGED)) {
             worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
         }*/
         Connection value;
-        Connection now = stateIn.get(FACING_TO_PROPERTY_MAP.get(facing));
+        Connection now = stateIn.getValue(FACING_TO_PROPERTY_MAP.get(facing));
         if (facingState.getBlock() == this) {
-            value = facingState.get(FACING_TO_PROPERTY_MAP.get(facing.getOpposite()));
-            return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+            value = facingState.getValue(FACING_TO_PROPERTY_MAP.get(facing.getOpposite()));
+            return stateIn.setValue(FACING_TO_PROPERTY_MAP.get(facing), value);
         } else {
-            value = canConnectTo(worldIn, currentPos.offset(facing), facing);
+            value = canConnectTo(worldIn, currentPos.relative(facing), facing);
             if (value.is(Connection.NO_CONNECTION)) {
                 if (facingState.getMaterial() == Material.AIR || facingState.getMaterial().isLiquid()) {
-                    return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+                    return stateIn.setValue(FACING_TO_PROPERTY_MAP.get(facing), value);
                 } else {
                     return stateIn;
                 }
             } else if (value.hasConnection() ^ now.hasConnection())
-                return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), value);
+                return stateIn.setValue(FACING_TO_PROPERTY_MAP.get(facing), value);
             else
                 return stateIn;
         }
     }
 
-    private Connection canConnectTo(IWorld worldIn, BlockPos pos, Direction direction) {
-        BlockState blockState = worldIn.getBlockState(pos);
-        TileEntity entity = worldIn.getTileEntity(pos);
+    private Connection canConnectTo(BlockGetter level, BlockPos pos, Direction direction) {
+        BlockState blockState = level.getBlockState(pos);
+        BlockEntity entity = level.getBlockEntity(pos);
         if (blockState.getBlock() == this) {
             if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTileBase) {
                 PipeTileBase p = (PipeTileBase) entity;
@@ -185,37 +186,32 @@ public abstract class PipeBlock extends Block {
     }
 
     @Nonnull
-    protected abstract Connection getConnection(Direction direction, @Nonnull TileEntity entity);
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
+    protected abstract Connection getConnection(Direction direction, @Nonnull BlockEntity entity);
 
     @Override
     @SuppressWarnings("deprecation")
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (player.getHeldItem(handIn).getItem() instanceof BlockItem || player.isCrouching())
-            return ActionResultType.PASS;
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        if (player.getItemInHand(handIn).getItem() instanceof BlockItem || player.isCrouching())
+            return InteractionResult.PASS;
         // Dying pipe.
-        OptionalInt maybeColor = Utils.getItemColor(player.getHeldItem(handIn));
+        OptionalInt maybeColor = Utils.getItemColor(player.getItemInHand(handIn));
         if (maybeColor.isPresent() && !Config.content().enablePipeRainbowRenderer().get()) {
-            if (!worldIn.isRemote) {
-                Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(maybeColor.getAsInt()));
-                Object colorName = Stream.of(DyeColor.values()).filter(d -> d.getColorValue() == maybeColor.getAsInt()).findFirst()
-                    .map(c -> (Object) new TranslationTextComponent("color.minecraft." + c))
+            if (!worldIn.isClientSide) {
+                Optional.ofNullable(worldIn.getBlockEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(maybeColor.getAsInt()));
+                Object colorName = Stream.of(DyeColor.values()).filter(d -> d.getMaterialColor().col == maybeColor.getAsInt()).findFirst()
+                    .map(c -> (Object) new TranslatableComponent("color.minecraft." + c))
                     .orElse(String.format("#%06x", maybeColor.getAsInt()));
-                player.sendStatusMessage(
-                    new TranslationTextComponent("chat.fluidtank.change_color", colorName),
+                player.displayClientMessage(
+                    new TranslatableComponent("chat.fluidtank.change_color", colorName),
                     false);
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         // Modifying pipe connection.
-        Vector3d d = hit.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
+        Vec3 d = hit.getLocation().subtract(pos.getX(), pos.getY(), pos.getZ());
         Predicate<Map.Entry<?, VoxelShape>> predicate = e -> {
-            AxisAlignedBB box = e.getValue().getBoundingBox();
+            AABB box = e.getValue().bounds();
             return box.minX <= d.x && box.maxX >= d.x && box.minY <= d.y && box.maxY >= d.y && box.minZ <= d.z && box.maxZ >= d.z;
         };
         Optional<Pair<BlockState, Boolean>> blockState = SHAPE_MAP.entrySet().stream()
@@ -223,57 +219,56 @@ public abstract class PipeBlock extends Block {
             .map(Map.Entry::getKey)
             .findFirst()
             .map(p -> {
-                if (worldIn.getBlockState(pos.offset(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
-                    return Pair.of(state.func_235896_a_(p), false);
+                if (worldIn.getBlockState(pos.relative(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
+                    return Pair.of(state.cycle(p), false);
                 else
-                    return Pair.of(state.with(p, Connection.onOffConnection(state.get(p))), true);
+                    return Pair.of(state.setValue(p, Connection.onOffConnection(state.getValue(p))), true);
             });
         if (blockState.isPresent()) {
-            if (!worldIn.isRemote) {
-                worldIn.setBlockState(pos, blockState.get().getKey());
+            if (!worldIn.isClientSide) {
+                worldIn.setBlockAndUpdate(pos, blockState.get().getKey());
                 if (blockState.get().getValue())
-                    Optional.ofNullable(worldIn.getTileEntity(pos)).map(PipeTileBase.class::cast).ifPresent(PipeTileBase::connectorUpdate);
+                    Optional.ofNullable(worldIn.getBlockEntity(pos)).map(PipeTileBase.class::cast).ifPresent(PipeTileBase::connectorUpdate);
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         } else {
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+            return super.use(state, worldIn, pos, player, handIn, hit);
         }
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
         BlockState fromState = worldIn.getBlockState(fromPos);
         // Update connection between pipes.
         if (fromState.getBlock() == this) {
             BlockPos vec = fromPos.subtract(pos);
-            Direction direction = Direction.byLong(vec.getX(), vec.getY(), vec.getZ());
+            Direction direction = Direction.fromNormal(vec.getX(), vec.getY(), vec.getZ());
             if (direction != null) {
-                if (fromState.get(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.NO_CONNECTION) {
-                    worldIn.setBlockState(pos, state.with(FACING_TO_PROPERTY_MAP.get(direction), Connection.NO_CONNECTION));
-                } else if (fromState.get(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.CONNECTED) {
-                    worldIn.setBlockState(pos, state.with(FACING_TO_PROPERTY_MAP.get(direction), Connection.CONNECTED));
+                if (fromState.getValue(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.NO_CONNECTION) {
+                    worldIn.setBlockAndUpdate(pos, state.setValue(FACING_TO_PROPERTY_MAP.get(direction), Connection.NO_CONNECTION));
+                } else if (fromState.getValue(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.CONNECTED) {
+                    worldIn.setBlockAndUpdate(pos, state.setValue(FACING_TO_PROPERTY_MAP.get(direction), Connection.CONNECTED));
                 }
             }
         }
         // Update handlers
-        if (!worldIn.isRemote) {
-            Optional.ofNullable((PipeTileBase) worldIn.getTileEntity(pos))
+        if (!worldIn.isClientSide) {
+            Optional.ofNullable((PipeTileBase) worldIn.getBlockEntity(pos))
                 .ifPresent(t -> t.removeCapCache(fromPos));
         }
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
-            TileEntity entity = worldIn.getTileEntity(pos);
-            if (entity instanceof PipeTileBase) {
-                PipeTileBase tile = (PipeTileBase) entity;
+            BlockEntity entity = level.getBlockEntity(pos);
+            if (entity instanceof PipeTileBase tile) {
                 tile.connectorUpdate();
             }
-            super.onReplaced(state, worldIn, pos, newState, isMoving);
+            super.onRemove(state, level, pos, newState, moved);
         }
     }
 
@@ -283,7 +278,7 @@ public abstract class PipeBlock extends Block {
         return /*state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) :*/ super.getFluidState(state);
     }
 
-    public enum Connection implements IStringSerializable {
+    public enum Connection implements StringRepresentable {
         NO_CONNECTION,
         CONNECTED,
         INPUT,
@@ -317,7 +312,7 @@ public abstract class PipeBlock extends Block {
         }
 
         @Override
-        public String getString() {
+        public String getSerializedName() {
             return getName();
         }
     }

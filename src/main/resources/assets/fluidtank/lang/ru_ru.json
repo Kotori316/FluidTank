@@ -40,7 +40,7 @@
   "chat.fluidtank.change_color": "Color was changed to %s.",
   "chat.fluidtank.change_source": "Жидкость заменена на %s.",
   "chat.fluidtank.change_interval": "Интервал изменен на %s.",
-  "itemGroup.FluidTank": "FluidTanks",
+  "itemGroup.fluidtank": "FluidTanks",
   "fluidtank.recipe.tooltip": "Рецепт резервуаров",
   "config.waila.plugin_fluidtank": "Fluidtank",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "Показать информацию о резервуаре",

@@ -1,37 +1,37 @@
 package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.tiles.TileTank
-import com.mojang.blaze3d.matrix.MatrixStack
+import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
-import net.minecraft.client.renderer.{IRenderTypeBuffer, RenderType}
-import net.minecraft.inventory.container.PlayerContainer
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEntityRendererProvider}
+import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
+import net.minecraft.core.BlockPos
+import net.minecraft.world.inventory.InventoryMenu
+import net.minecraft.world.level.Level
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.fluids.FluidAttributes
 
 @OnlyIn(Dist.CLIENT)
-class RenderTank(d: TileEntityRendererDispatcher) extends TileEntityRenderer[TileTank](d) {
+class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
 
-  override def render(te: TileTank, partialTicks: Float, matrix: MatrixStack, buffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
-    Minecraft.getInstance.getProfiler.startSection("RenderTank")
+  override def render(te: TileTank, partialTicks: Float, matrix: PoseStack, buffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
+    Minecraft.getInstance.getProfiler.push("RenderTank")
     if (te.hasContent) {
-      matrix.push()
-      val b = buffer.getBuffer(RenderType.getTranslucent)
+      matrix.pushPose()
+      val b = buffer.getBuffer(RenderType.translucent)
       val tank = te.internalTank
       if (tank.box != null) {
         val resource = RenderTank.textureName(te)
-        val texture = Minecraft.getInstance.getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE).apply(resource)
+        val texture = Minecraft.getInstance.getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(resource)
         val color = RenderTank.color(te)
 
         val value = Box.LightValue(light).overrideBlock(te.internalTank.getFluid.fluid.getAttributes.getLuminosity(te.internalTank.getFluid.toStack))
         val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
         tank.box.render(b, matrix, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
       }
-      matrix.pop()
+      matrix.popPose()
     }
-    Minecraft.getInstance.getProfiler.endSection()
+    Minecraft.getInstance.getProfiler.pop()
   }
 }
 
@@ -61,12 +61,12 @@ object RenderTank {
     }
   }
 
-  private final def getTankWorld(tileTank: TileTank): World = {
-    if (tileTank.hasWorld) tileTank.getWorld else Minecraft.getInstance.world
+  private final def getTankWorld(tileTank: TileTank): Level = {
+    if (tileTank.hasLevel) tileTank.getLevel else Minecraft.getInstance.level
   }
 
   private final def getTankPos(tileTank: TileTank): BlockPos = {
-    if (tileTank.hasWorld) tileTank.getPos else Minecraft.getInstance.player.getPosition
+    if (tileTank.hasLevel) tileTank.getBlockPos else Minecraft.getInstance.player.getOnPos
   }
 
 }

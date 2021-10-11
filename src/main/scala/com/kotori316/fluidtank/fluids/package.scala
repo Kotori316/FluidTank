@@ -5,7 +5,7 @@ import cats.syntax.eq._
 import cats.syntax.group._
 import cats.syntax.semigroupk._
 import cats.{Applicative, Foldable, Id, Monad, MonoidK}
-import net.minecraft.fluid.Fluids
+import net.minecraft.world.level.material.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 

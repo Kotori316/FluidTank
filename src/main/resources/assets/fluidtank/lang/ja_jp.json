@@ -40,7 +40,7 @@
   "chat.fluidtank.change_color": "色は%sに変更されました。",
   "chat.fluidtank.change_source": "液体は%sに変更されました。",
   "chat.fluidtank.change_interval": "液体の搬出間隔は%sに変更されました。",
-  "itemGroup.FluidTank": "FluidTanks",
+  "itemGroup.fluidtank": "FluidTanks",
   "fluidtank.recipe.tooltip": "タンクのレシピ",
   "config.waila.plugin_fluidtank": "Fluidtank",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "タンクの中身を表示する",

@@ -10,8 +10,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        // classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 
@@ -22,7 +22,7 @@ plugins {
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.spongepowered.mixin'
+// apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 version = getProperty("modVersion")
@@ -38,24 +38,23 @@ private static boolean isInCI() {
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LargeFluidTank"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-compileScala.sourceCompatibility = compileScala.targetCompatibility = '1.8'
-
-static String projectMappingVersion() { return '20201028-1.16.3' }
+// Mojang ships Java 16 to end users in 1.17+ instead of Java 8 in 1.16 or lower, so your mod should target Java 16.
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 String forgeVersion() {
+    String versionNumber
+
     if (isInCI() && System.getenv("CI_FORGE") != null && "default" != System.getenv("CI_FORGE")) {
-        return "net.minecraftforge:forge:" + System.getenv("CI_FORGE")
+        versionNumber = System.getenv("CI_FORGE")
     } else {
-        // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-        // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-        // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
-        def forge_prop = loadProperties("forge_version.properties")
-        return forge_prop.get("forge_version")
+        versionNumber = project.forgeVersion
     }
+    return "net.minecraftforge:forge:" + versionNumber
 }
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+println("Java: ${System.getProperty('java.version')} " +
+        "JVM: ${System.getProperty('java.vm.version')}(${System.getProperty('java.vendor')}) " +
+        "Arch: ${System.getProperty('os.arch')}")
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -63,7 +62,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: projectMappingVersion()
+    mappings channel: 'official', version: "1.17.1"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
@@ -129,6 +128,7 @@ repositories {
 //        name "BuildCraft"
 //        url = "https://mod-buildcraft.com/maven"
 //    }
+    mavenLocal()
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
@@ -143,15 +143,6 @@ repositories {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven.k-4u.nl"
         url = "https://modmaven.dev/"
-    }
-    if (!isInCI()) {
-        maven {
-            name = "Hwyla"
-            url "https://maven.tehnut.info"
-            content {
-                includeModule("mcp.mobius.waila", "Hwyla")
-            }
-        }
     }
     maven { // The One Probe
         name 'tterrag maven'
@@ -185,41 +176,36 @@ repositories {
     }
 }
 
-mixin {
-    add sourceSets.main, "mixins.slp.refmap.json"
-}
-
 private boolean hasGitHubToken() {
     return project.hasProperty("githubToken") || System.getenv("REPO_TOKEN") != null
 }
 
 dependencies {
     minecraft(forgeVersion())
-    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.5')
-    final String CATS_VERSION = '2.6.0'
-    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: CATS_VERSION)
+    compileOnly(group: 'org.scala-lang', name: 'scala-library', version: '2.13.6')
+    compileOnly(group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.2-kotori')
 
-    if (!isInCI()) {
+    /*if (!isInCI()) {
         implementation(fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2"))
-        // runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
-        // runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
-        // runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
-    }
-    implementation(fg.deobf("mezz.jei:jei-1.16.5:7.7.0.99"))
-    implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
-    implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
-    compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
+        runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
+        runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
+        runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
+    }*/
+    implementation(fg.deobf("mezz.jei:jei-1.17.1:" + project.jeiVersion))
+    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
+    // implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
+    // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
+    // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
-    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-2', classifier: 'dev')
+    // implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-1', classifier: 'dev')
     // Mixin
-    annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
+    // annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
     // Test Dependencies.
     String JUPITER_VERSION = '5.7.0'
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
-    testImplementation(group: 'org.typelevel', name: 'cats-kernel-laws_2.13', version: CATS_VERSION)
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -231,7 +217,7 @@ def jarAttributeMap = [
         "Implementation-Version"  : String.valueOf(project.version),
         "Implementation-Vendor"   : "Kotori316",
         "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
-        "MixinConfigs"            : "fluidtank.mixins.json"
+        // "MixinConfigs"            : "fluidtank.mixins.json"
 ]
 jar {
     manifest {
@@ -286,8 +272,7 @@ curseforge {
         changelogType = 'markdown'
         changelog = getAllChangeLog()
         releaseType = 'release'
-        addGameVersion '1.16.4'
-        addGameVersion '1.16.5'
+        addGameVersion '1.17.1'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
@@ -304,7 +289,7 @@ curseforge {
 githubRelease {
     repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish.set('1.16')
+    targetCommitish.set('1.17')
     body.set(getLatestChangeLog())
     releaseAssets = files(
             jar.getArchiveFile().get(),

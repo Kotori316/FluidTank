@@ -1,13 +1,17 @@
 package com.kotori316.fluidtank.transport;
 
 import javax.annotation.Nonnull;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -15,6 +19,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.Utils;
 
 public class FluidPipeBlock extends PipeBlock {
     @Override
@@ -23,13 +28,13 @@ public class FluidPipeBlock extends PipeBlock {
     }
 
     @Override
-    protected boolean isHandler(IBlockReader world, BlockPos pos, EnumProperty<Connection> property) {
-        return isFluidHandler(world, pos, property);
+    protected boolean isHandler(BlockGetter level, BlockPos pos, EnumProperty<Connection> property) {
+        return isFluidHandler(level, pos, property);
     }
 
     @Override
     @Nonnull
-    protected Connection getConnection(Direction direction, @Nonnull TileEntity entity) {
+    protected Connection getConnection(Direction direction, @Nonnull BlockEntity entity) {
         LazyOptional<IFluidHandler> capability = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
         if (capability.isPresent())
             if (capability.map(f -> f.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)).orElse(0) >= 4000)
@@ -41,19 +46,25 @@ public class FluidPipeBlock extends PipeBlock {
     }
 
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return ModObjects.FLUID_PIPE_TYPE().create();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return ModObjects.FLUID_PIPE_TYPE().create(pos, state);
     }
 
-    private static boolean isFluidHandler(IBlockReader w, BlockPos pipePos, EnumProperty<PipeBlock.Connection> p) {
+    private static boolean isFluidHandler(BlockGetter w, BlockPos pipePos, EnumProperty<PipeBlock.Connection> p) {
         Direction d = FACING_TO_PROPERTY_MAP.inverse().get(p);
-        return isFluidHandler(w, pipePos.offset(d), d);
+        return isFluidHandler(w, pipePos.relative(d), d);
     }
 
-    public static boolean isFluidHandler(IBlockReader world, BlockPos pos, Direction direction) {
-        TileEntity t = world.getTileEntity(pos);
-        if (t != null && t.getWorld() != null)
-            return FluidUtil.getFluidHandler(t.getWorld(), pos, direction.getOpposite()).isPresent();
+    public static boolean isFluidHandler(BlockGetter world, BlockPos pos, Direction direction) {
+        BlockEntity t = world.getBlockEntity(pos);
+        if (t != null && t.getLevel() != null)
+            return FluidUtil.getFluidHandler(t.getLevel(), pos, direction.getOpposite()).isPresent();
         else return false;
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide ? null : Utils.checkType(type, ModObjects.FLUID_PIPE_TYPE(), (l, p, s, pipe) -> pipe.tick());
     }
 }

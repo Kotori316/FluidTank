@@ -2,10 +2,10 @@ package com.kotori316.fluidtank.blocks;
 
 import java.util.Locale;
 
-import net.minecraft.state.EnumProperty;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
-public enum TankPos implements IStringSerializable {
+public enum TankPos implements StringRepresentable {
     TOP, MIDDLE, BOTTOM, SINGLE;
 
     @Override
@@ -14,7 +14,7 @@ public enum TankPos implements IStringSerializable {
     }
 
     @Override
-    public String getString() {
+    public String getSerializedName() {
         return toString();
     }
 

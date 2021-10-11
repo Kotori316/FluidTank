@@ -5,15 +5,16 @@ import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
-import net.minecraft.block.Block
-import net.minecraft.block.material.{Material, MaterialColor, PushReaction}
-import net.minecraft.item.{ItemGroup, ItemStack}
-import net.minecraft.loot.LootFunctionType
-import net.minecraft.tileentity.{TileEntity, TileEntityType}
-import net.minecraft.util.ResourceLocation
-import net.minecraft.util.math.AxisAlignedBB
-import net.minecraft.util.math.shapes.VoxelShapes
-import net.minecraft.util.registry.Registry
+import net.minecraft.core.{BlockPos, Registry}
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.{CreativeModeTab, ItemStack}
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.material.{Material, MaterialColor, PushReaction}
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.shapes.Shapes
 import org.apache.logging.log4j.MarkerManager
 
 import scala.reflect.ClassTag
@@ -21,16 +22,16 @@ import scala.reflect.ClassTag
 object ModObjects {
   //---------- Objects used in block and items ----------
 
-  final val CREATIVE_TABS = new ItemGroup(FluidTank.MOD_NAME) {
-    override def createIcon = new ItemStack(woodTank)
-  }.setTabPath(FluidTank.modID)
-  final val MATERIAL = new Material(MaterialColor.AIR, false, true, true, false,
+  final val CREATIVE_TABS = new CreativeModeTab(FluidTank.modID) {
+    override def makeIcon() = new ItemStack(woodTank)
+  }
+  final val MATERIAL = new Material(MaterialColor.NONE, false, true, true, false,
     false, false, PushReaction.BLOCK)
-  final val MATERIAL_PIPE = new Material(MaterialColor.AIR, false, false, true, false,
+  final val MATERIAL_PIPE = new Material(MaterialColor.NONE, false, false, true, false,
     false, false, PushReaction.BLOCK)
   private[this] final val d = 1 / 16d
-  final val BOUNDING_BOX = new AxisAlignedBB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d)
-  final val TANK_SHAPE = VoxelShapes.create(BOUNDING_BOX)
+  final val BOUNDING_BOX = new AABB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d)
+  final val TANK_SHAPE = Shapes.create(BOUNDING_BOX)
 
   //---------- BLOCKS ----------
 
@@ -49,23 +50,23 @@ object ModObjects {
 
   //---------- TileEntities ----------
 
-  private[this] final var types: List[TileEntityType[_ <: TileEntity]] = Nil
-  final val TANK_TYPE = createTileType(() => new TileTank, blockTanks)
-  final val TANK_CREATIVE_TYPE = createTileType(() => new TileTankCreative, List(creativeTank))
-  final val TANK_VOID_TYPE = createTileType(() => new TileTankVoid, List(voidTank))
-  final val CAT_TYPE = createTileType(() => new CATTile, List(blockCat))
-  final val FLUID_PIPE_TYPE = createTileType(() => new PipeTile, List(blockFluidPipe))
-  final val ITEM_PIPE_TYPE = createTileType(() => new ItemPipeTile, List(blockItemPipe))
-  final val SOURCE_TYPE = createTileType(() => new FluidSourceTile, List(blockSource))
+  private[this] final var types: List[BlockEntityType[_ <: BlockEntity]] = Nil
+  final val TANK_TYPE = createTileType((p, s) => new TileTank(p, s), blockTanks)
+  final val TANK_CREATIVE_TYPE = createTileType((p, s) => new TileTankCreative(p, s), List(creativeTank))
+  final val TANK_VOID_TYPE = createTileType((p, s) => new TileTankVoid(p, s), List(voidTank))
+  final val CAT_TYPE = createTileType((p, s) => new CATTile(p, s), List(blockCat))
+  final val FLUID_PIPE_TYPE = createTileType((p, s) => new PipeTile(p, s), List(blockFluidPipe))
+  final val ITEM_PIPE_TYPE = createTileType((p, s) => new ItemPipeTile(p, s), List(blockItemPipe))
+  final val SOURCE_TYPE = createTileType((p, s) => new FluidSourceTile(p, s), List(blockSource))
 
-  def createTileType[T <: TileEntity](supplier: () => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): TileEntityType[T] = {
-    val t = TileEntityType.Builder.create[T](() => supplier(), blocks: _*).build(DSL.emptyPartType())
+  def createTileType[T <: BlockEntity](supplier: (BlockPos, BlockState) => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): BlockEntityType[T] = {
+    val t = BlockEntityType.Builder.of[T]((p, s) => supplier(p, s), blocks: _*).build(DSL.emptyPartType())
     t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
     types = t :: types
     t
   }
 
-  def getTileTypes: List[TileEntityType[_ <: TileEntity]] = types
+  def getTileTypes: List[BlockEntityType[_ <: BlockEntity]] = types
 
   //---------- Containers ----------
 
@@ -74,7 +75,7 @@ object ModObjects {
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
     new ResourceLocation(FluidTank.modID, "content_tank"),
-    new LootFunctionType(new ContentTankSerializer))
+    new LootItemFunctionType(new ContentTankSerializer))
 
   // ---------- Markers ----------
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")

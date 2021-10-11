@@ -5,10 +5,10 @@ import cats.implicits._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
-import net.minecraft.util.Direction
-import net.minecraft.util.math.{BlockPos, MathHelper}
-import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}
-import net.minecraft.world.IBlockReader
+import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.util.Mth
+import net.minecraft.world.level.BlockGetter
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
@@ -19,11 +19,11 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 import scala.collection.mutable.ArrayBuffer
 
 sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
-  val seq: Seq[TileTank] = s.sortBy(_.getPos.getY)
+  val seq: Seq[TileTank] = s.sortBy(_.getBlockPos.getY)
   val hasCreative: Boolean = seq.exists(_.isInstanceOf[TileTankCreative])
   val hasVoid: Boolean = seq.exists(_.isInstanceOf[TileTankVoid])
   val updateActions: ArrayBuffer[() => Unit] = ArrayBuffer(
-    () => seq.foreach(_.markDirty())
+    () => seq.foreach(_.setChanged())
   )
 
   val handler: ListTankHandler = new Connection.ConnectionTankHandler(Chain.fromSeq(seq.map(_.internalTank)), hasCreative)
@@ -63,7 +63,7 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
   }
 
   def remove(tileTank: TileTank): Unit = {
-    val (s1, s2) = seq.sortBy(_.getPos.getY).span(_ != tileTank)
+    val (s1, s2) = seq.sortBy(_.getBlockPos.getY).span(_ != tileTank)
     val s1Connection = Connection.create(s1)
     val s2Connection = Connection.create(s2.tail)
     // Connection updated
@@ -78,7 +78,7 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
 
   def getComparatorLevel: Int = {
     if (amount > 0)
-      MathHelper.floor(amount.toDouble / capacity.toDouble * 14) + 1
+      Mth.floor(amount.toDouble / capacity.toDouble * 14) + 1
     else 0
   }
 
@@ -102,6 +102,7 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
 
   //noinspection ComparingUnrelatedTypes
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
+    //noinspection ComparingUnrelatedTypes
     if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       lazyOptional.cast()
     } else {
@@ -109,11 +110,6 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
         .getOrElse(LazyOptional.empty())
         .value
     }
-    /*Cap.asJava(
-      Cap.empty[T]
-        .orElse(if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) OptionT(Eval.always(Option.when(isValid)(handler.asInstanceOf[T]))) else Cap.empty)
-        .orElse(capabilities.flatMap(_.getCapability(capability, facing).asScala))
-    )*/
   }
 
   override def toString: String = {
@@ -124,14 +120,14 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
       s"Connection of $name in creative. Comparator outputs $getComparatorLevel."
   }
 
-  def getTextComponent: ITextComponent = {
+  def getTextComponent: Component = {
     if (hasCreative)
-      new TranslationTextComponent("chat.fluidtank.connection_creative",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslationTextComponent("chat.fluidtank.empty")),
+      new TranslatableComponent("chat.fluidtank.connection_creative",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
         Int.box(getComparatorLevel))
     else
-      new TranslationTextComponent("chat.fluidtank.connection",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslationTextComponent("chat.fluidtank.empty")),
+      new TranslatableComponent("chat.fluidtank.connection",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
         Long.box(amount),
         Long.box(capacity),
         Int.box(getComparatorLevel))
@@ -144,20 +140,20 @@ object Connection {
     if (s.isEmpty) {
       invalid
     } else {
-      val seq = s.sortBy(_.getPos.getY)
+      val seq = s.sortBy(_.getBlockPos.getY)
       // Property update
       if (seq.lengthIs > 1) {
         // HEAD
         val head = seq.head
-        head.getWorld.setBlockState(head.getPos, head.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM))
+        head.getLevel.setBlockAndUpdate(head.getBlockPos, head.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM))
         // LAST
         val last = seq.last
-        last.getWorld.setBlockState(last.getPos, last.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.TOP))
+        last.getLevel.setBlockAndUpdate(last.getBlockPos, last.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.TOP))
         // MIDDLE
-        seq.tail.init.foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
+        seq.tail.init.foreach(t => t.getLevel.setBlockAndUpdate(t.getBlockPos, t.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
       } else {
         // SINGLE
-        seq.foreach(t => t.getWorld.setBlockState(t.getPos, t.getBlockState.`with`(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE)))
+        seq.foreach(t => t.getLevel.setBlockAndUpdate(t.getBlockPos, t.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE)))
       }
       new Connection(seq)
     }
@@ -166,7 +162,7 @@ object Connection {
   @scala.annotation.tailrec
   def createAndInit(tankSeq: Seq[TileTank]): Unit = {
     if (tankSeq.nonEmpty) {
-      val s = tankSeq.sortBy(_.getPos.getY)
+      val s = tankSeq.sortBy(_.getBlockPos.getY)
       val fluid = s.map(_.internalTank.getFluid).find(_.nonEmpty).getOrElse(FluidAmount.EMPTY)
       val (s1, s2) = s.span(t => t.internalTank.getFluid.fluidEqual(fluid) || t.internalTank.getFluid.isEmpty)
       // Assert tanks in s1 have the same fluid.
@@ -199,7 +195,7 @@ object Connection {
 
     override def remove(tileTank: TileTank): Unit = ()
 
-    override def getTextComponent = new StringTextComponent(toString)
+    override def getTextComponent = new TextComponent(toString)
   }
 
   val stackFromTile: TileTank => Option[FluidAmount] = (t: TileTank) => Option(t.internalTank.getFluid).filter(_.nonEmpty)
@@ -222,13 +218,13 @@ object Connection {
       if (hasCreative) super.drain(toDrain, IFluidHandler.FluidAction.SIMULATE) else super.drain(toDrain, action)
   }
 
-  def load(iBlockReader: IBlockReader, pos: BlockPos): Unit = {
-    val lowest = Iterator.iterate(pos)(_.down()).takeWhile(p => iBlockReader.getTileEntity(p).isInstanceOf[TileTank])
+  def load(level: BlockGetter, pos: BlockPos): Unit = {
+    val lowest = Iterator.iterate(pos)(_.below()).takeWhile(p => level.getBlockEntity(p).isInstanceOf[TileTank])
       .toList.lastOption.getOrElse {
       FluidTank.LOGGER.fatal(ModObjects.MARKER_Connection, "No lowest tank", new IllegalStateException("No lowest tank"))
       pos
     }
-    val tanks = Iterator.iterate(lowest)(_.up()).map(iBlockReader.getTileEntity).takeWhile(_.isInstanceOf[TileTank])
+    val tanks = Iterator.iterate(lowest)(_.above()).map(level.getBlockEntity).takeWhile(_.isInstanceOf[TileTank])
       .toList.map(_.asInstanceOf[TileTank])
     //    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
     createAndInit(tanks)

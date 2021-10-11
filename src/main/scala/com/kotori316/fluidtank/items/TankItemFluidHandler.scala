@@ -4,9 +4,9 @@ import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import javax.annotation.{Nonnull, Nullable}
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundNBT
-import net.minecraft.util.Direction
+import net.minecraft.core.Direction
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.ItemStack
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
@@ -14,10 +14,10 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 
 class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
-  def nbt: CompoundNBT = stack.getChildTag(TileTank.NBT_BlockTag)
+  def nbt: CompoundTag = stack.getTagElement(TileTank.NBT_BlockTag)
 
   @Nullable
-  def tankNbt: CompoundNBT = if (nbt == null) null else nbt.getCompound(TileTank.NBT_Tank)
+  def tankNbt: CompoundTag = if (nbt == null) null else nbt.getCompound(TileTank.NBT_Tank)
 
   private[this] var initialized = false
   @Nonnull
@@ -99,14 +99,14 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
       compound.put(TileTank.NBT_BlockTag, createTag)
       stack.setTag(compound)
     } else {
-      stack.removeChildTag(TileTank.NBT_BlockTag)
+      stack.removeTagKey(TileTank.NBT_BlockTag)
     }
   }
 
-  def createTag: CompoundNBT = {
-    val tag = new CompoundNBT
+  def createTag: CompoundTag = {
+    val tag = new CompoundTag
     tag.put(TileTank.NBT_Tier, tiers.toNBTTag)
-    val tankTag = new CompoundNBT
+    val tankTag = new CompoundTag
     tankTag.putInt(TileTank.NBT_Capacity, Utils.toInt(getCapacity))
     getFluid.write(tankTag)
     tag.put(TileTank.NBT_Tank, tankTag)

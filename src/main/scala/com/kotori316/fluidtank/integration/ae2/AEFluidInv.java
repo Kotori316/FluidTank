@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.integration.ae2;
-
+/*
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
      * @param actionable action type
      * @param src        action source
      * @return returns the number of items not added.
-     */
+     *//*
     @Override
     public IAEFluidStack injectItems(IAEFluidStack input, Actionable actionable, IActionSource src) {
         FluidAmount fluidAmount = fromAEStack(input);
@@ -53,7 +53,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
      * @param request    item to request ( with stack size. )
      * @param actionable simulate, or perform action?
      * @return returns the number of items extracted, null
-     */
+     *//*
     @Override
     public IAEFluidStack extractItems(IAEFluidStack request, Actionable actionable, IActionSource src) {
         FluidAmount fluidAmount = fromAEStack(request);
@@ -164,7 +164,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
      *
      * @param input - item that might be added
      * @return if its prioritized
-     */
+     *//*
     @Override
     public boolean isPrioritized(IAEFluidStack input) {
         return true;
@@ -191,3 +191,4 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
     }
 
 }
+*/

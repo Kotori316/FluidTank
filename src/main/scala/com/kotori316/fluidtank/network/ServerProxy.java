@@ -2,10 +2,10 @@ package com.kotori316.fluidtank.network;
 
 import java.util.Optional;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.item.Item;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
 
@@ -14,17 +14,17 @@ import com.kotori316.fluidtank.ModObjects;
 public class ServerProxy extends SideProxy {
 
     @Override
-    public Option<World> getWorld(NetworkEvent.Context context) {
-        return OptionConverters.toScala(Optional.ofNullable(context.getSender()).map(Entity::getEntityWorld));
+    public Option<Level> getLevel(NetworkEvent.Context context) {
+        return OptionConverters.toScala(Optional.ofNullable(context.getSender()).map(Entity::getCommandSenderWorld));
     }
 
     @Override
     public Item.Properties getTankProperties() {
-        return new Item.Properties().group(ModObjects.CREATIVE_TABS());
+        return new Item.Properties().tab(ModObjects.CREATIVE_TABS());
     }
 
     @Override
     public Item.Properties getReservoirProperties() {
-        return new Item.Properties().group(ModObjects.CREATIVE_TABS());
+        return new Item.Properties().tab(ModObjects.CREATIVE_TABS());
     }
 }

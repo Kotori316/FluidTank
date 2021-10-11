@@ -9,15 +9,15 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -33,9 +33,9 @@ import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
 
-public class CombineRecipe extends SpecialRecipe {
+public class CombineRecipe extends CustomRecipe {
     private static final Logger LOGGER = LogManager.getLogger(CombineRecipe.class);
-    public static final SpecialRecipeSerializer<CombineRecipe> SERIALIZER = new SpecialRecipeSerializer<>(CombineRecipe::new);
+    public static final SimpleRecipeSerializer<CombineRecipe> SERIALIZER = new SimpleRecipeSerializer<>(CombineRecipe::new);
     public static final String LOCATION = "fluidtank:combine_tanks";
 
     public CombineRecipe(ResourceLocation location) {
@@ -44,19 +44,19 @@ public class CombineRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, @Nullable World worldIn) {
+    public boolean matches(CraftingContainer inv, @Nullable Level worldIn) {
         // Check all items are tanks.
         Ingredient tanks = tankList();
-        boolean allTanks = IntStream.range(0, inv.getSizeInventory())
-            .mapToObj(inv::getStackInSlot).filter(s -> !s.isEmpty()).allMatch(tanks);
+        boolean allTanks = IntStream.range(0, inv.getContainerSize())
+            .mapToObj(inv::getItem).filter(s -> !s.isEmpty()).allMatch(tanks);
         if (!allTanks) return false;
-        long tankCount = IntStream.range(0, inv.getSizeInventory())
-            .mapToObj(inv::getStackInSlot)
+        long tankCount = IntStream.range(0, inv.getContainerSize())
+            .mapToObj(inv::getItem)
             .filter(s -> !s.isEmpty()).filter(tanks).count();
         if (tankCount < 2) return false;
         // Check all tanks have the same fluid.
-        List<FluidAmount> fluids = IntStream.range(0, inv.getSizeInventory())
-            .mapToObj(inv::getStackInSlot)
+        List<FluidAmount> fluids = IntStream.range(0, inv.getContainerSize())
+            .mapToObj(inv::getItem)
             .map(s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
                 .filter(h -> h instanceof TankItemFluidHandler)
                 .map(h -> ((TankItemFluidHandler) h).getFluid()).orElse(FluidAmount.EMPTY()))
@@ -76,28 +76,28 @@ public class CombineRecipe extends SpecialRecipe {
         if (!Config.content().usableUnavailableTankInRecipe().get()) {
             filter = filter.and(t -> t.tier().hasWayToCreate());
         }
-        return Ingredient.fromStacks(tankStream.filter(filter).map(ItemStack::new));
+        return Ingredient.of(tankStream.filter(filter).map(ItemStack::new));
     }
 
-    private static Optional<Pair<ItemStack, Long>> getMaxCapacityTank(CraftingInventory inv) {
-        return getMaxCapacityTank(IntStream.range(0, inv.getSizeInventory())
-            .mapToObj(inv::getStackInSlot));
+    private static Optional<Pair<ItemStack, Long>> getMaxCapacityTank(CraftingContainer inv) {
+        return getMaxCapacityTank(IntStream.range(0, inv.getContainerSize())
+            .mapToObj(inv::getItem));
     }
 
     static Optional<Pair<ItemStack, Long>> getMaxCapacityTank(Stream<ItemStack> stream) {
         return stream
             .filter(s -> !s.isEmpty())
             .map(s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY))
-            .flatMap(l -> l.filter(h -> h instanceof TankItemFluidHandler).map(Stream::of).orElse(Stream.empty()))
+            .flatMap(l -> l.filter(h -> h instanceof TankItemFluidHandler).stream())
             .map(h -> Pair.of(h.getContainer(), ((TankItemFluidHandler) h).getCapacity()))
             .max(Comparator.comparing(Pair::getRight))
             .map(p -> Pair.of(p.getLeft().copy(), p.getRight()));
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inv) {
-        Optional<FluidAmount> fluid = IntStream.range(0, inv.getSizeInventory())
-            .mapToObj(inv::getStackInSlot)
+    public ItemStack assemble(CraftingContainer inv) {
+        Optional<FluidAmount> fluid = IntStream.range(0, inv.getContainerSize())
+            .mapToObj(inv::getItem)
             .map(s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
                 .filter(h -> h instanceof TankItemFluidHandler)
                 .map(h -> ((TankItemFluidHandler) h).getFluid()).orElse(FluidAmount.EMPTY()))
@@ -115,13 +115,13 @@ public class CombineRecipe extends SpecialRecipe {
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+    public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
         Optional<ItemStack> stack = getMaxCapacityTank(inv).map(Pair::getLeft);
 
-        NonNullList<ItemStack> nn = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+        NonNullList<ItemStack> nn = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
         for (int i = 0; i < nn.size(); i++) {
-            ItemStack item = inv.getStackInSlot(i);
-            if (stack.filter(s -> s.isItemEqual(item)).isPresent()) {
+            ItemStack item = inv.getItem(i);
+            if (stack.filter(s -> s.sameItem(item)).isPresent()) {
                 stack = Optional.empty();
             } else {
                 ItemStack leave = ItemHandlerHelper.copyStackWithSize(item, 1).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
@@ -136,12 +136,12 @@ public class CombineRecipe extends SpecialRecipe {
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width * height >= 2;
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
     }
 

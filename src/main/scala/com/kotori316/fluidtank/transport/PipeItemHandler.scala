@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.transport
 
 import com.kotori316.fluidtank._
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import net.minecraftforge.items.IItemHandler
 
 class PipeItemHandler(pipeTile: ItemPipeTile) extends IItemHandler {
@@ -10,16 +10,16 @@ class PipeItemHandler(pipeTile: ItemPipeTile) extends IItemHandler {
   override def getStackInSlot(slot: Int): ItemStack = ItemStack.EMPTY
 
   override def insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack = {
-    val pipePosIterator = pipeTile.connection.outputs(pipeTile.getPos).iterator
+    val pipePosIterator = pipeTile.connection.outputs(pipeTile.getBlockPos).iterator
     var rest = stack
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
       val handlerIterator =
         for {
           direction <- directions.iterator
-          pos = pipePos.offset(direction)
-          if pipeTile.getWorld.getBlockState(pipePos).get(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
-          h <- pipeTile.findItemHandler(pipeTile.getWorld, pos, direction).value.value
+          pos = pipePos.relative(direction)
+          if pipeTile.getLevel.getBlockState(pipePos).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
+          h <- pipeTile.findItemHandler(pipeTile.getLevel, pos, direction).value.value
         } yield h._1
 
       while (handlerIterator.hasNext) {

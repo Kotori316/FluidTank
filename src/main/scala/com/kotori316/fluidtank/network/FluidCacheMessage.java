@@ -3,15 +3,15 @@ package com.kotori316.fluidtank.network;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
@@ -19,39 +19,35 @@ import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.CATTile;
 
 public class FluidCacheMessage {
-    private ResourceLocation dimensionId;
-    private BlockPos pos;
-    private List<FluidAmount> amounts;
+    private final ResourceKey<Level> dimensionId;
+    private final BlockPos pos;
+    private final List<FluidAmount> amounts;
 
-    public void write(PacketBuffer buffer) {
-        buffer.writeBlockPos(pos).writeResourceLocation(dimensionId);
-        buffer.writeInt(amounts.size());
-        amounts.forEach(a -> buffer.writeCompoundTag(a.write(new CompoundNBT())));
+    public FluidCacheMessage(CATTile tile) {
+        pos = tile.getBlockPos();
+        dimensionId = Optional.ofNullable(tile.getLevel()).map(Level::dimension).orElse(Level.OVERWORLD);
+        amounts = tile.fluidAmountList();
     }
 
-    public static FluidCacheMessage apply(PacketBuffer buffer) {
-        FluidCacheMessage message = new FluidCacheMessage();
-        message.pos = buffer.readBlockPos();
-        message.dimensionId = buffer.readResourceLocation();
-        message.amounts = IntStream.range(0, buffer.readInt())
-            .mapToObj(i -> buffer.readCompoundTag())
+    public FluidCacheMessage(FriendlyByteBuf buffer) {
+        pos = buffer.readBlockPos();
+        dimensionId = ResourceKey.create(Registry.DIMENSION_REGISTRY, buffer.readResourceLocation());
+        int size = buffer.readInt();
+        amounts = Stream.generate(buffer::readNbt).limit(size)
             .map(FluidAmount::fromNBT)
-            .collect(Collectors.toList());
-        return message;
+            .toList();
     }
 
-    public static FluidCacheMessage apply(CATTile tile) {
-        FluidCacheMessage message = new FluidCacheMessage();
-        message.pos = tile.getPos();
-        message.dimensionId = Optional.ofNullable(tile.getWorld()).map(World::getDimensionKey).orElse(World.OVERWORLD).getLocation();
-        message.amounts = tile.fluidAmountList();
-        return message;
+    public void write(FriendlyByteBuf buffer) {
+        buffer.writeBlockPos(pos).writeResourceLocation(dimensionId.location());
+        buffer.writeInt(amounts.size());
+        amounts.forEach(a -> buffer.writeNbt(a.write(new CompoundTag())));
     }
 
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
-        OptionConverters.toJava(FluidTank.proxy.getWorld(ctx.get()))
-            .filter(w -> w.getDimensionKey().getLocation().equals(dimensionId))
-            .map(w -> w.getTileEntity(pos))
+        OptionConverters.toJava(FluidTank.proxy.getLevel(ctx.get()))
+            .filter(w -> w.dimension().equals(dimensionId))
+            .map(w -> w.getBlockEntity(pos))
             .filter(CATTile.class::isInstance)
             .map(CATTile.class::cast)
             .ifPresent(tile -> ctx.get().enqueueWork(() -> tile.fluidCache = this.amounts));

@@ -5,12 +5,10 @@ import java.lang.reflect.Field
 import cats._
 import cats.data._
 import com.kotori316.fluidtank.tiles.Tier
-import com.kotori316.scala_lib.util.Neighbor
 import com.mojang.serialization.DataResult
-import net.minecraft.fluid.Fluid
-import net.minecraft.nbt.CompoundNBT
-import net.minecraft.util.Direction
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 
 import scala.jdk.OptionConverters._
@@ -22,7 +20,7 @@ package object fluidtank extends CapConverter {
   implicit final val eqPos: Eq[BlockPos] = Eq.fromUniversalEquals
   implicit final val hashFluid: Hash[Fluid] = Hash.fromUniversalHashCode
   implicit final val hashTier: Hash[Tier] = Hash.fromUniversalHashCode
-  implicit final val eqCompoundNbt: Eq[CompoundNBT] = Eq.fromUniversalEquals
+  implicit final val eqCompoundNbt: Eq[CompoundTag] = Eq.fromUniversalEquals
   implicit final val hashFluidStack: Hash[FluidStack] = new Hash[FluidStack] {
     override def hash(x: FluidStack): Int = x.##
 
@@ -39,10 +37,6 @@ package object fluidtank extends CapConverter {
   final val evalExtractor: Eval ~> Id = new (Eval ~> Id) {
     override def apply[A](fa: Eval[A]): A = fa.value
   }
-
-  implicit final val NeighborOfBlockPos: Neighbor[BlockPos] = (origin: BlockPos) => Set(
-    origin.up, origin.down, origin.north, origin.east, origin.south, origin.west
-  )
 
   implicit final class EitherToResult[A](private val either: Either[String, A]) extends AnyVal {
     def toResult: DataResult[A] = either match {

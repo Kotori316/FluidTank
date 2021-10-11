@@ -4,54 +4,56 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
-import net.minecraft.block._
-import net.minecraft.block.material.Material
-import net.minecraft.client.util.ITooltipFlag
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item._
-import net.minecraft.state.{BooleanProperty, StateContainer}
-import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.{BlockPos, BlockRayTraceResult, RayTraceResult}
-import net.minecraft.util.text.{ITextComponent, StringTextComponent, TranslationTextComponent}
-import net.minecraft.util.{ActionResultType, Hand, NonNullList}
-import net.minecraft.world.{IBlockReader, World}
+import javax.annotation.Nullable
+import net.minecraft.core.{BlockPos, NonNullList}
+import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.{CreativeModeTab, Item, ItemStack, Items, TooltipFlag}
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
+import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
+import net.minecraft.world.level.block.{BaseEntityBlock, Block, RenderShape}
+import net.minecraft.world.level.material.Material
+import net.minecraft.world.level.{BlockGetter, Level}
+import net.minecraft.world.phys.{BlockHitResult, HitResult}
+import net.minecraft.world.{InteractionHand, InteractionResult}
 
-class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Material.IRON).hardnessAndResistance(0.5f)) {
+class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Material.METAL).strength(0.5f)) {
   setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
-  val itemBlock = new FluidSourceItem(this, new Item.Properties().group(ModObjects.CREATIVE_TABS))
+  val itemBlock = new FluidSourceItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
   itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
-  setDefaultState(getStateContainer.getBaseState.`with`(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
+  registerDefaultState(this.getStateDefinition.any.setValue(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
 
   //noinspection ScalaDeprecation
-  override final def getRenderType(state: BlockState): BlockRenderType = BlockRenderType.MODEL
+  override final def getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
 
-  override def createNewTileEntity(worldIn: IBlockReader): TileEntity = ModObjects.SOURCE_TYPE.create()
+  override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = ModObjects.SOURCE_TYPE.create(pos, state)
 
-  override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack): Unit = {
-    super.onBlockPlacedBy(worldIn, pos, state, placer, stack)
-    Option(worldIn.getTileEntity(pos)).foreach {
+  override def setPlacedBy(level: Level, pos: BlockPos, state: BlockState, @Nullable entity: LivingEntity, stack: ItemStack): Unit = {
+    super.setPlacedBy(level, pos, state, entity, stack)
+    Option(level.getBlockEntity(pos)).foreach {
       case s: FluidSourceTile =>
         if (FluidSourceBlock.isCheatStack(stack)) {
-          worldIn.setBlockState(pos, state.`with`(FluidSourceBlock.CHEAT_MODE, Boolean.box(true)))
+          level.setBlockAndUpdate(pos, state.setValue(FluidSourceBlock.CHEAT_MODE, Boolean.box(true)))
           s.locked = false
         } else {
-          worldIn.setBlockState(pos, state.`with`(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
+          level.setBlockAndUpdate(pos, state.setValue(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
           s.fluid = FluidAmount.BUCKET_WATER
         }
       case _ =>
     }
   }
 
-  override def getPickBlock(state: BlockState, target: RayTraceResult, world: IBlockReader, pos: BlockPos, player: PlayerEntity): ItemStack = {
-    val stack = super.getPickBlock(state, target, world, pos, player)
-    if (Option(world.getTileEntity(pos)).collect { case s: FluidSourceTile => !s.locked }.getOrElse(false)) {
+  override def getPickBlock(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
+    val stack = super.getPickBlock(state, target, level, pos, player)
+    if (Option(level.getBlockEntity(pos)).collect { case s: FluidSourceTile => !s.locked }.getOrElse(false)) {
       stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
     }
     stack
   }
 
-  override def fillItemGroup(group: ItemGroup, items: NonNullList[ItemStack]): Unit = {
+  override def fillItemCategory(group: CreativeModeTab, items: NonNullList[ItemStack]): Unit = {
     items.add(new ItemStack(this))
     val stack = new ItemStack(this)
     stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
@@ -59,36 +61,36 @@ class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Ma
   }
 
   //noinspection ScalaDeprecation
-  override def onBlockActivated(state: BlockState, worldIn: World, pos: BlockPos,
-                                player: PlayerEntity, handIn: Hand, hit: BlockRayTraceResult): ActionResultType = {
+  override def use(state: BlockState, level: Level, pos: BlockPos, player: Player,
+                   hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     if (Config.content.enableFluidSupplier.get()) {
-      val stack = player.getHeldItem(handIn)
+      val stack = player.getItemInHand(hand)
       val fluid = FluidAmount.fromItem(stack)
       if (fluid.isEmpty) {
         stack.getItem match {
           case Items.BUCKET =>
             // Reset to empty.
-            changeContent(worldIn, pos, FluidAmount.EMPTY, player, handIn == Hand.MAIN_HAND)
-            ActionResultType.SUCCESS
+            changeContent(level, pos, FluidAmount.EMPTY, player, hand == InteractionHand.MAIN_HAND)
+            InteractionResult.SUCCESS
           case Items.CLOCK =>
             // Change interval time to push fluid.
-            val i = if (handIn == Hand.MAIN_HAND) 1 else -1
-            changeInterval(worldIn, pos, stack.getCount * i, player)
-            ActionResultType.SUCCESS
-          case _ => ActionResultType.PASS
+            val i = if (hand == InteractionHand.MAIN_HAND) 1 else -1
+            changeInterval(level, pos, stack.getCount * i, player)
+            InteractionResult.SUCCESS
+          case _ => InteractionResult.PASS
         }
       } else {
-        changeContent(worldIn, pos, fluid, player, handIn == Hand.MAIN_HAND)
-        ActionResultType.SUCCESS
+        changeContent(level, pos, fluid, player, hand == InteractionHand.MAIN_HAND)
+        InteractionResult.SUCCESS
       }
     } else {
-      if (!player.isCrouching) player.sendStatusMessage(new StringTextComponent("Fluid Supplier is disabled."), true)
-      ActionResultType.PASS
+      if (!player.isCrouching) player.displayClientMessage(new TextComponent("Fluid Supplier is disabled."), true)
+      InteractionResult.PASS
     }
   }
 
-  def changeContent(world: World, pos: BlockPos, fluid: FluidAmount, player: PlayerEntity, isMainHand: Boolean): Unit = if (!world.isRemote) {
-    world.getTileEntity(pos) match {
+  def changeContent(world: Level, pos: BlockPos, fluid: FluidAmount, player: Player, isMainHand: Boolean): Unit = if (!world.isClientSide) {
+    world.getBlockEntity(pos) match {
       case s: FluidSourceTile =>
         val replace =
           if (s.fluid fluidEqual fluid) {
@@ -101,36 +103,44 @@ class FluidSourceBlock extends ContainerBlock(AbstractBlock.Properties.create(Ma
           }
         s.fluid = replace
         if (!s.locked || fluid.fluidEqual(FluidAmount.BUCKET_WATER) || fluid.isEmpty)
-          player.sendStatusMessage(new TranslationTextComponent(FluidSourceBlock.CHANGE_SOURCE, s.fluid), false)
+          player.displayClientMessage(new TranslatableComponent(FluidSourceBlock.CHANGE_SOURCE, s.fluid), false)
       case _ =>
     }
   }
 
-  def changeInterval(world: World, pos: BlockPos, dt: Int, player: PlayerEntity): Unit = if (!world.isRemote) {
-    world.getTileEntity(pos) match {
+  def changeInterval(world: Level, pos: BlockPos, dt: Int, player: Player): Unit = if (!world.isClientSide) {
+    world.getBlockEntity(pos) match {
       case s: FluidSourceTile =>
         s.interval = Math.max(1, s.interval + dt)
-        player.sendStatusMessage(new TranslationTextComponent(FluidSourceBlock.CHANGE_INTERVAL, s.interval), false)
+        player.displayClientMessage(new TranslatableComponent(FluidSourceBlock.CHANGE_INTERVAL, s.interval), false)
       case _ =>
     }
   }
 
-  override def fillStateContainer(builder: StateContainer.Builder[Block, BlockState]): Unit = {
-    super.fillStateContainer(builder)
+  override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = {
+    super.createBlockStateDefinition(builder)
     builder.add(FluidSourceBlock.CHEAT_MODE)
   }
 
-  override def addInformation(stack: ItemStack, worldIn: IBlockReader, tooltip: java.util.List[ITextComponent], flagIn: ITooltipFlag): Unit = {
+  override def appendHoverText(stack: ItemStack, worldIn: BlockGetter, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = {
     if (Config.content.enableFluidSupplier.get()) {
       tooltip.add(
         if (FluidSourceBlock.isCheatStack(stack)) {
-          new TranslationTextComponent(FluidSourceBlock.TOOLTIP_INF)
+          new TranslatableComponent(FluidSourceBlock.TOOLTIP_INF)
         } else {
-          new TranslationTextComponent(FluidSourceBlock.TOOLTIP)
+          new TranslatableComponent(FluidSourceBlock.TOOLTIP)
         }
       )
     } else {
-      tooltip.add(new TranslationTextComponent(FluidSourceBlock.TOOLTIP_DISABLED))
+      tooltip.add(new TranslatableComponent(FluidSourceBlock.TOOLTIP_DISABLED))
+    }
+  }
+
+  override def getTicker[T <: BlockEntity](l: Level, s: BlockState, t: BlockEntityType[T]): BlockEntityTicker[T] = {
+    if (l.isClientSide) {
+      null
+    } else {
+      BaseEntityBlock.createTickerHelper[FluidSourceTile, T](t, ModObjects.SOURCE_TYPE, (_, _, _, tile) => tile.tick())
     }
   }
 }

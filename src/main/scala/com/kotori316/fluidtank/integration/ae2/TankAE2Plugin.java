@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.integration.ae2;
-
+/*
 import appeng.api.AEAddon;
 import appeng.api.IAEAddon;
 import appeng.api.IAppEngApi;
@@ -13,7 +13,7 @@ import appeng.api.storage.data.IAEStack;
 import appeng.me.helpers.BaseActionSource;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.BlockEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,7 +46,7 @@ public class TankAE2Plugin implements IAEAddon {
         }
 
         @SubscribeEvent
-        public void event(AttachCapabilitiesEvent<TileEntity> event) {
+        public void event(AttachCapabilitiesEvent<BlockEntity> event) {
             if (event.getObject() instanceof TileTank) {
                 TileTank tank = (TileTank) event.getObject();
                 AEConnectionCapabilityProvider provider = new AEConnectionCapabilityProvider(api, tank);
@@ -106,4 +106,4 @@ class AEConnectionCapabilityProvider implements ICapabilityProvider, IStorageMon
         this.postUpdate();
         return BoxedUnit.UNIT;
     }
-}
+}*/

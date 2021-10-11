@@ -1,18 +1,18 @@
 package com.kotori316.fluidtank.network;
 
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public abstract class SideProxy {
 
-    public abstract scala.Option<World> getWorld(NetworkEvent.Context context);
+    public abstract scala.Option<Level> getLevel(NetworkEvent.Context context);
 
-    public static boolean isServer(TileEntity entity) {
+    public static boolean isServer(BlockEntity entity) {
         if (entity == null) return false;
-        World world = entity.getWorld();
-        return world != null && !world.isRemote();
+        var world = entity.getLevel();
+        return world != null && !world.isClientSide();
     }
 
     public abstract Item.Properties getTankProperties();
