@@ -3,64 +3,23 @@ name: Java CI
 on:
   push:
     branches:
-      - "1.16"
+      - "1.17"
     paths:
       - "src/main/**"
-      - "forge_version.properties"
       - ".github/workflows/gradle.yml"
 
 jobs:
-  check:
+  assemble:
     runs-on: ubuntu-latest
-    outputs:
-      key: ${{ steps.step1.outputs.test }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # test against the latest update of each major Java version, as well as specific updates of LTS versions:
-        java: [ 8, 11 ]
+    container:
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.17.1
+      credentials:
+        username: kotori316
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt-hotspot'
-          java-version: ${{ matrix.java }}
-      - uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
-      - id: check-parameter
-        run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
-      - name: Test-JUnit
-        run: chmod +x ./gradlew && ./gradlew --no-daemon test
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
-      - name: Upload failed test report
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          path: build/reports/tests/*
-          name: Test-Report-${{ matrix.java }}
-
-  build-publish:
-    runs-on: ubuntu-latest
-    needs: [ check ]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt-hotspot'
-          java-version: 11
-      - uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle16-${{ hashFiles('**/forge_version.properties') }}
-      - name: Build with Gradle
-        run: chmod +x ./gradlew && ./gradlew assemble --no-daemon --continue
+      - name: Compile
+        run: chmod +x ./gradlew && ./gradlew assemble --info --no-daemon
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
@@ -71,31 +30,41 @@ jobs:
 
   cross-check-JUnit:
     runs-on: ubuntu-latest
-    needs: [ check ]
+    needs: [ assemble ]
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.16.5
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.17.1
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
       matrix:
-        java: [ 8, 11 ]
-        forge: [ 1.16.4-35.1.37, 1.16.5-latest, 1.16.5-recommended ]
+        java: [ default ]
+        forge: [ 1.17.1-latest, default ]
     steps:
       - name: Get latest version
+        if: ${{ matrix.forge != 'default' }}
         run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Set up JDK ${{ matrix.java }}
-        if: ${{ matrix.java != '11' }}
+        if: ${{ matrix.java != 'default' }}
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt-hotspot'
           java-version: ${{ matrix.java }}
-      - name: Test-JUnit
-        run: chmod +x ./gradlew && ./gradlew javaToolchains --no-daemon --warning-mode all && ./gradlew --no-daemon test
+      - name: compile
+        run: |
+          chmod +x ./gradlew && (./gradlew clean || true)
+          ( (./gradlew compileScala || ./gradlew clean) || (./gradlew compileScala || ./gradlew clean) || (sleep 10s && ./gradlew compileScala) )
+        continue-on-error: true
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Java Toolchains
+        run: chmod +x ./gradlew && ./gradlew javaToolchains --no-daemon --info --warning-mode all
+      - name: Test with JUnit
+        run: chmod +x ./gradlew && ./gradlew --no-daemon test --info
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload failed test report
         if: failure()
         uses: actions/upload-artifact@v2
@@ -105,35 +74,12 @@ jobs:
 
   cross-check-runData:
     runs-on: ubuntu-latest
-    needs: [ check, build-publish ]
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.16.5
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.17.1
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
-    strategy:
-      fail-fast: false
-      matrix:
-        java: [ 8, 11 ]
-        forge: [ 1.16.4-35.1.37, 1.16.5-latest, 1.16.5-recommended ]
     steps:
-      - name: Set versions
-        run: |
-          version=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})
-          sed -i -e "s/forge.version=latest/forge.version=$version/" -e "s/ci.mods=dummy/ci.mods=fluidtank/" /work/gradle.properties
-          echo /work/gradle.properties
-      - name: Set up JDK ${{ matrix.java }}
-        if: ${{ matrix.java != '11' }}
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt-hotspot'
-          java-version: ${{ matrix.java }}
-      - name: Download Mod Jar
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}-${{ github.run_number }}
-          path: work/
-      - name: move files
-        run: ls -al work && mkdir --parents /work/run/mods && mv work/*-deobf.jar /work/run/mods/ && ls -al /work/run/mods
+      - uses: actions/checkout@v2
       - name: Test with runData
-        run: cd /work && chmod +x ./gradlew && ( ./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
+        run: chmod +x ./gradlew && ( ./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
