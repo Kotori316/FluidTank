@@ -128,7 +128,7 @@ repositories {
 //        name "BuildCraft"
 //        url = "https://mod-buildcraft.com/maven"
 //    }
-    mavenLocal()
+    mavenCentral()
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
@@ -139,11 +139,11 @@ repositories {
             it.includeModule("slimeknights.mantle", "Mantle")
         }
     }
-    maven {
+    /*maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven.k-4u.nl"
         url = "https://modmaven.dev/"
-    }
+    }*/
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
@@ -157,6 +157,8 @@ repositories {
         content {
             includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
             includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
+            it.includeVersion("org.typelevel", "cats-core_2.13", "2.6.2-kotori")
+            it.includeVersion("org.typelevel", "cats-kernel_2.13", "2.6.2-kotori")
         }
     }
     maven {
