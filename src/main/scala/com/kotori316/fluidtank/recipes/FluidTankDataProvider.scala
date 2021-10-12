@@ -19,8 +19,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition}
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
@@ -28,11 +26,9 @@ import org.apache.logging.log4j.MarkerManager
 import scala.collection.mutable
 import scala.jdk.javaapi.CollectionConverters
 
-@Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD)
 object FluidTankDataProvider {
   private final val MARKER = MarkerManager.getMarker("FluidTankDataProvider")
 
-  @SubscribeEvent
   def gatherData(event: GatherDataEvent): Unit = {
     if (event.includeServer()) {
       event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))

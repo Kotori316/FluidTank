@@ -15,6 +15,8 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
@@ -27,6 +29,7 @@ import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.CombineRecipe;
 import com.kotori316.fluidtank.recipes.FluidTankConditions;
+import com.kotori316.fluidtank.recipes.FluidTankDataProvider;
 import com.kotori316.fluidtank.recipes.ReservoirRecipe;
 import com.kotori316.fluidtank.recipes.TagCondition;
 import com.kotori316.fluidtank.recipes.TierRecipe;
@@ -41,9 +44,10 @@ public class FluidTank {
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
         ForgeMod.enableMilkFluid();
+        FMLJavaModLoadingContext.get().getModEventBus().register(Register.class);
+        FMLJavaModLoadingContext.get().getModEventBus().register(proxy);
     }
 
-    @Mod.EventBusSubscriber(modid = modID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class Register {
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
@@ -88,6 +92,11 @@ public class FluidTank {
         @SubscribeEvent
         public static void registerContainerType(RegistryEvent.Register<MenuType<?>> event) {
             event.getRegistry().register(ModObjects.CAT_CONTAINER_TYPE());
+        }
+
+        @SubscribeEvent
+        public static void gatherData(GatherDataEvent event) {
+            FluidTankDataProvider.gatherData(event);
         }
     }
 

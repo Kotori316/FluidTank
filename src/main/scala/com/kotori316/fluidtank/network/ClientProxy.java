@@ -23,7 +23,6 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
@@ -67,59 +66,56 @@ public class ClientProxy extends SideProxy {
         return new Item.Properties().tab(ModObjects.CREATIVE_TABS());
     }
 
-    @Mod.EventBusSubscriber(modid = FluidTank.modID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    static class ClientEventHandlers {
 
-        @SubscribeEvent
-        public static void registerTESR(FMLClientSetupEvent event) {
-            BlockEntityRenderers.register(ModObjects.TANK_TYPE(), RenderTank::new);
-            BlockEntityRenderers.register(ModObjects.TANK_CREATIVE_TYPE(), RenderTank::new);
-            BlockEntityRenderers.register(ModObjects.FLUID_PIPE_TYPE(), ClientEventHandlers::createPipeRenderer);
-            BlockEntityRenderers.register(ModObjects.ITEM_PIPE_TYPE(), ClientEventHandlers::createPipeRenderer);
-            MenuScreens.register(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
+    @SubscribeEvent
+    public void registerTESR(FMLClientSetupEvent event) {
+        BlockEntityRenderers.register(ModObjects.TANK_TYPE(), RenderTank::new);
+        BlockEntityRenderers.register(ModObjects.TANK_CREATIVE_TYPE(), RenderTank::new);
+        BlockEntityRenderers.register(ModObjects.FLUID_PIPE_TYPE(), ClientProxy::createPipeRenderer);
+        BlockEntityRenderers.register(ModObjects.ITEM_PIPE_TYPE(), ClientProxy::createPipeRenderer);
+        MenuScreens.register(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
-            RenderType rendertype = RenderType.cutoutMipped();
-            CollectionConverters.asJava(ModObjects.blockTanks())
-                .forEach(tank -> ItemBlockRenderTypes.setRenderLayer(tank, rendertype));
-            ItemBlockRenderTypes.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
-            ItemBlockRenderTypes.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
+        RenderType rendertype = RenderType.cutoutMipped();
+        CollectionConverters.asJava(ModObjects.blockTanks())
+            .forEach(tank -> ItemBlockRenderTypes.setRenderLayer(tank, rendertype));
+        ItemBlockRenderTypes.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
+        ItemBlockRenderTypes.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
 
-            // Item Properties Override
-            ItemProperties.register(ModObjects.blockSource().itemBlock(),
-                new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity, i) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
+        // Item Properties Override
+        ItemProperties.register(ModObjects.blockSource().itemBlock(),
+            new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity, i) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
+    }
+
+    private static RenderPipe createPipeRenderer(BlockEntityRendererProvider.Context d) {
+        RenderPipe renderPipe = new RenderPipe();
+        renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
+        return renderPipe;
+    }
+
+    @SubscribeEvent
+    public void registerModels(ModelRegistryEvent event) {
+    }
+
+    @SubscribeEvent
+    public void onBake(ModelBakeEvent event) {
+        CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
+            .map(Item::getRegistryName)
+            .filter(Objects::nonNull)
+            .map(n -> new ModelResourceLocation(n, "inventory"))
+            .forEach(n -> event.getModelRegistry().put(n, new ModelWrapper(event.getModelManager().getModel(n))));
+    }
+
+    @SubscribeEvent
+    public void registerTexture(TextureStitchEvent.Pre event) {
+        if (event.getMap().location().equals(InventoryMenu.BLOCK_ATLAS)) {
+            event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
+    }
 
-        private static RenderPipe createPipeRenderer(BlockEntityRendererProvider.Context d) {
-            RenderPipe renderPipe = new RenderPipe();
-            renderPipe.useColor_$eq(!Config.content().enablePipeRainbowRenderer().get());
-            return renderPipe;
-        }
-
-        @SubscribeEvent
-        public static void registerModels(ModelRegistryEvent event) {
-        }
-
-        @SubscribeEvent
-        public static void onBake(ModelBakeEvent event) {
-            CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
-                .map(Item::getRegistryName)
-                .filter(Objects::nonNull)
-                .map(n -> new ModelResourceLocation(n, "inventory"))
-                .forEach(n -> event.getModelRegistry().put(n, new ModelWrapper(event.getModelManager().getModel(n))));
-        }
-
-        @SubscribeEvent
-        public static void registerTexture(TextureStitchEvent.Pre event) {
-            if (event.getMap().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-                event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
-            }
-        }
-
-        @SubscribeEvent
-        public static void putTexture(TextureStitchEvent.Post event) {
-            if (event.getMap().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-                whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
-            }
+    @SubscribeEvent
+    public void putTexture(TextureStitchEvent.Post event) {
+        if (event.getMap().location().equals(InventoryMenu.BLOCK_ATLAS)) {
+            whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
     }
 }
