@@ -1,3 +1,8 @@
+## v17.0.0
+* First release for Minecraft 1.17.1 with Forge
+
+Build with 1.17.1-37.0.84, Mapping: Official 1.17.1
+
 ## v16.1.8
 * Fixed performance issue of large capacity tanks.
 * Make the "top" and "bottom" of rendering fluid configurable. See the entries in config, `renderLowerBound` and `renderUpperBound`.

@@ -239,14 +239,6 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
     builtBy 'reobfJar'
 }
 
-def loadProperties(String filename) {
-    def props = new Properties()
-    file(filename).withInputStream {
-        props.load(it)
-    }
-    return props
-}
-
 task srcJar(type: Jar) {
     from sourceSets.main.allSource
     archiveClassifier.set('sources')
@@ -359,7 +351,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${projectMappingVersion()}" +
+                "Build with ${project.forgeVersion}, Mapping: Official 1.17.1" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)
@@ -395,7 +387,7 @@ task checkMethod() {
         System.out.println("Forge: ${forgeVersion()}")
         System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}")
         System.out.println("Minecraft $minecraftVersion")
-        System.out.println("Mapping ${projectMappingVersion()}")
+        System.out.println("Mapping 1.17.1")
         System.out.println("Is In CI ${isInCI()}")
         System.out.println("FilePath ${jar.getArchiveFile().get()}")
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
