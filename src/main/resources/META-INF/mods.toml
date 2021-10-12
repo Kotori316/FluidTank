@@ -24,3 +24,9 @@ Add large fluid tanks.'''
     versionRange = "[1.17.1, )"
     ordering = "NONE"
     side = "BOTH"
+[[dependencies.fluidtank]]
+    modId = "slp"
+    mandatory = true
+    versionRange = "[2.13.6, )"
+    ordering = "NONE"
+    side = "BOTH"
