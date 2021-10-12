@@ -31,6 +31,7 @@ final class AccessTest extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource("getCapabilities")
+    @Disabled("Test Disabled: Accessing Capacity before transforming will cause crash.")
     void capability(Capability<?> cap, String name) {
         assertNull(cap, String.format("Accessing capability %s is unavailable", name));
     }
@@ -46,6 +47,7 @@ final class AccessTest extends BeforeAllTest {
     }
 
     @Test
+    @Disabled("Test Disabled: Accessing Capacity before transforming will cause crash.")
     void dummy() {
         assertTrue(getCapabilities().length > 0);
     }

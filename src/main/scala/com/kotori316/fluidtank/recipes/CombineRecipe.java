@@ -18,7 +18,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,6 +30,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
+import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
 
 public class CombineRecipe extends CustomRecipe {
@@ -57,8 +57,7 @@ public class CombineRecipe extends CustomRecipe {
         // Check all tanks have the same fluid.
         List<FluidAmount> fluids = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
-            .map(s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
-                .filter(h -> h instanceof TankItemFluidHandler)
+            .map(s -> getHandler(s)
                 .map(h -> ((TankItemFluidHandler) h).getFluid()).orElse(FluidAmount.EMPTY()))
             .collect(Collectors.toList());
         boolean allSameFluid = fluids.stream()
@@ -87,8 +86,7 @@ public class CombineRecipe extends CustomRecipe {
     static Optional<Pair<ItemStack, Long>> getMaxCapacityTank(Stream<ItemStack> stream) {
         return stream
             .filter(s -> !s.isEmpty())
-            .map(s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY))
-            .flatMap(l -> l.filter(h -> h instanceof TankItemFluidHandler).stream())
+            .flatMap(s -> getHandler(s).stream())
             .map(h -> Pair.of(h.getContainer(), ((TankItemFluidHandler) h).getCapacity()))
             .max(Comparator.comparing(Pair::getRight))
             .map(p -> Pair.of(p.getLeft().copy(), p.getRight()));
@@ -98,13 +96,13 @@ public class CombineRecipe extends CustomRecipe {
     public ItemStack assemble(CraftingContainer inv) {
         Optional<FluidAmount> fluid = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
-            .map(s -> s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+            .map(s -> getHandler(s)
                 .filter(h -> h instanceof TankItemFluidHandler)
                 .map(h -> ((TankItemFluidHandler) h).getFluid()).orElse(FluidAmount.EMPTY()))
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus);
         Optional<ItemStack> tank = getMaxCapacityTank(inv)
-            .flatMap(p -> ItemHandlerHelper.copyStackWithSize(p.getLeft(), 1).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve()
+            .flatMap(p -> getHandler(ItemHandlerHelper.copyStackWithSize(p.getLeft(), 1))
                 .flatMap(h ->
                     fluid.map(f -> {
                         h.drain(h.getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE);
@@ -124,7 +122,7 @@ public class CombineRecipe extends CustomRecipe {
             if (stack.filter(s -> s.sameItem(item)).isPresent()) {
                 stack = Optional.empty();
             } else {
-                ItemStack leave = ItemHandlerHelper.copyStackWithSize(item, 1).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+                ItemStack leave = getHandler(ItemHandlerHelper.copyStackWithSize(item, 1))
                     .map(h -> {
                         h.drain(h.getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE);
                         return h.getContainer();
@@ -145,4 +143,11 @@ public class CombineRecipe extends CustomRecipe {
         return SERIALIZER;
     }
 
+    private static Optional<TankItemFluidHandler> getHandler(ItemStack stack) {
+        if (stack.getItem() instanceof ItemBlockTank tankItem) {
+            return Optional.of(new TankItemFluidHandler(tankItem.blockTank().tier(), stack));
+        } else {
+            return Optional.empty();
+        }
+    }
 }
