@@ -23,7 +23,7 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
     import com.kotori316.fluidtank.fluids.FluidAmount._
 
     val fluidNBT = new CompoundTag()
-    fluidNBT.putString(NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
+    fluidNBT.putString(NBT_fluid, String.valueOf(fluid.getRegistryName))
     fluidNBT.putLong(NBT_amount, amount)
     this.nbt.foreach(fluidNBT.put(NBT_tag, _))
 
@@ -36,7 +36,7 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
 
   def isGaseous: Boolean = fluid.getAttributes.isGaseous
 
-  def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
+  def getLocalizedName: String = String.valueOf(fluid.getRegistryName)
 
   def +(that: FluidAmount): FluidAmount = {
     if (this.isEmpty) that
@@ -64,7 +64,7 @@ case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option
 
   def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount), nbt.orNull)
 
-  override def toString: String = FluidAmount.registry.getKey(fluid).getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
+  override def toString: String = fluid.getRegistryName.getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
 }
 
 object FluidAmount {
