@@ -1,13 +1,13 @@
 # FluidTank
 
-For Minecraft 1.16.5 (1.16 branch)
+For Minecraft 1.17.1 (1.17 branch)
 
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)][CurseForge]
 [![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)][CurseForge]
 
 [![](https://github.com/Kotori316/FluidTank/workflows/Java%20CI/badge.svg)](https://github.com/Kotori316/FluidTank/actions)
 
-[CurseForge]: [https://www.curseforge.com/minecraft/mc-mods/largefluidtank]
+[CurseForge]: https://www.curseforge.com/minecraft/mc-mods/largefluidtank
 
 LICENSE: MIT License  
 Copyright (c) 2019-2021 Kotori316
@@ -26,30 +26,31 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
 ## APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.16.5, newer than 1.16.5-36.2.0
+  * For Minecraft 1.17.1, newer than 1.17.1-37.0.84
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-  * Version 2.13.5
+  * Version 2.13.6
   * Licenced under the Apache License 2.0
 
 * **REQUIRED** [Cats](https://github.com/typelevel/cats)
-  * Version 2.4.2
+  * Version 2.6.2
   * Licensed under the MIT License
+  * Using modified version. [Source](https://github.com/Kotori316/cats)
 
 * ~[Just Enough Items (JEI)](https://github.com/mezz/JustEnoughItems)~
   * Licensed under the MIT License
   * Not used since 1.14.4
 
-* [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
+* ~[Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)~
   * Licensed under [LGPLv3](https://github.com/AppliedEnergistics/Applied-Energistics-2#license)
 
-* [Hwyla](https://github.com/TehNut/HWYLA/tree/1.16_forge)
+* ~[Hwyla](https://github.com/TehNut/HWYLA/tree/1.16_forge)~
   * Licensed under CC BY-NC-SA 4.0
 
-* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.16)
+* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.17)
   * Licensed under the MIT License Copyright © 2016 McJty
 
-* [LookAtThat](https://github.com/Geek202/LookAtThat)
+* ~[LookAtThat](https://github.com/Geek202/LookAtThat)~
   * Licensed under the MIT License Copyright (c) 2019 Tom_The_Geek
 
 ## Maven repo
