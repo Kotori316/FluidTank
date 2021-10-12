@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.network;
 import java.util.Objects;
 import java.util.Optional;
 
+import cats.Eval;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -44,8 +45,8 @@ import com.kotori316.fluidtank.tiles.CATScreen;
 @OnlyIn(Dist.CLIENT)
 public class ClientProxy extends SideProxy {
 
-    public static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
-    public static final RenderReservoirItem RENDER_ITEM_RESERVOIR = new RenderReservoirItem();
+    public static final Eval<RenderItemTank> RENDER_ITEM_TANK = Eval.later(RenderItemTank::new);
+    public static final Eval<RenderReservoirItem> RENDER_ITEM_RESERVOIR = Eval.later(RenderReservoirItem::new);
     public static TextureAtlasSprite whiteTexture;
 
     @Override

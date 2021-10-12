@@ -106,7 +106,7 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
 
   override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {
     consumer.accept(new IItemRenderProperties {
-      override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_RESERVOIR
+      override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_RESERVOIR.value
     })
   }
 }

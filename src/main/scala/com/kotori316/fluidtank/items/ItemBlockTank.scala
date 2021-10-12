@@ -102,7 +102,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
 
   override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {
     consumer.accept(new IItemRenderProperties {
-      override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_TANK
+      override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_TANK.value
     })
   }
 }
