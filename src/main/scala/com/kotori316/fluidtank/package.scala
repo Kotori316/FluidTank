@@ -37,28 +37,4 @@ package object fluidtank extends CapConverter {
   final val evalExtractor: Eval ~> Id = new (Eval ~> Id) {
     override def apply[A](fa: Eval[A]): A = fa.value
   }
-
-  implicit final class EitherToResult[A](private val either: Either[String, A]) extends AnyVal {
-    def toResult: DataResult[A] = either match {
-      case Left(value) => DataResult.error(value)
-      case Right(value) => DataResult.success(value)
-    }
-  }
-
-  implicit final class IorToResult[A](private val ior: Ior[String, A]) extends AnyVal {
-    def toResult: DataResult[A] = ior match {
-      case Ior.Left(a) => DataResult.error(a)
-      case Ior.Right(b) => DataResult.success(b)
-      case Ior.Both(a, b) => DataResult.error(a, b)
-    }
-  }
-
-  implicit final class ResultToOther[A](private val dataResult: DataResult[A]) extends AnyVal {
-    def toEither: Either[String, A] = {
-      dataResult.result().toScala match {
-        case Some(value) => Right(value)
-        case None => Left(dataResult.error().toScala.map(_.message()).get)
-      }
-    }
-  }
 }
