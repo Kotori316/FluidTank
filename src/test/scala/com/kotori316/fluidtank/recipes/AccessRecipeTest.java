@@ -6,15 +6,15 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBufAllocator;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,7 +38,7 @@ final class AccessRecipeTest extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource("tiers")
     void createTierRecipeInstance(Tier tier) {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.fromItems(Blocks.STONE));
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE));
         assertNotNull(recipe);
     }
 
@@ -47,14 +47,14 @@ final class AccessRecipeTest extends BeforeAllTest {
         assertTrue(tiers().count() > 0);
         assertTrue(TierRecipeTest.fluids1().length > 0);
         assertTrue(ReservoirRecipeSerialize.tierAndIngredient().count() > 0);
-        PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());
+        FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
         assertNotNull(buffer);
     }
 
     static final class ReservoirRecipeSerialize extends BeforeAllTest {
         static Stream<Object> tierAndIngredient() {
             return Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
-                .flatMap(t -> Stream.of(Items.BUCKET, Items.APPLE).map(Ingredient::fromItems)
+                .flatMap(t -> Stream.of(Items.BUCKET, Items.APPLE).map(Ingredient::of)
                     .map(i -> new Object[]{t, i}));
         }
 
@@ -63,14 +63,14 @@ final class AccessRecipeTest extends BeforeAllTest {
         void serializePacket(Tier t, Ingredient sub) {
             ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
-            PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());
-            ReservoirRecipe.SERIALIZER.write(buffer, recipe);
-            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.read(recipe.getId(), buffer);
+            FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
+            ReservoirRecipe.SERIALIZER.toNetwork(buffer, recipe);
+            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.fromNetwork(recipe.getId(), buffer);
             assertNotNull(read);
             assertAll(
                 () -> assertEquals(recipe.getTier(), read.getTier()),
-                () -> assertNotEquals(Items.AIR, read.getRecipeOutput().getItem()),
-                () -> assertEquals(recipe.getRecipeOutput().getItem(), read.getRecipeOutput().getItem())
+                () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+                () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
             );
         }
 
@@ -81,29 +81,29 @@ final class AccessRecipeTest extends BeforeAllTest {
             ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
             JsonObject object = new JsonObject();
-            new ReservoirRecipe.FinishedRecipe(recipe).serialize(object);
-            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.read(recipe.getId(), object);
+            new ReservoirRecipe.ReservoirFinishedRecipe(recipe).serializeRecipeData(object);
+            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.fromJson(recipe.getId(), object);
             assertNotNull(read);
             assertAll(
                 () -> assertEquals(recipe.getTier(), read.getTier()),
-                () -> assertNotEquals(Items.AIR, read.getRecipeOutput().getItem()),
-                () -> assertEquals(recipe.getRecipeOutput().getItem(), read.getRecipeOutput().getItem())
+                () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+                () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
             );
         }
     }
 
-    static final class DummyContainer extends Container {
+    static final class DummyContainer extends AbstractContainerMenu {
 
         DummyContainer() {
             super(null, 35);
-            Inventory inventory = new Inventory(9);
-            for (int i = 0; i < inventory.getSizeInventory(); i++) {
+            SimpleContainer inventory = new SimpleContainer(9);
+            for (int i = 0; i < inventory.getContainerSize(); i++) {
                 addSlot(new Slot(inventory, i, 0, 0));
             }
         }
 
         @Override
-        public boolean canInteractWith(PlayerEntity playerIn) {
+        public boolean stillValid(Player player) {
             return false;
         }
     }

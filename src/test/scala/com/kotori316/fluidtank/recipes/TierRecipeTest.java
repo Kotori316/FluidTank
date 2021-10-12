@@ -5,15 +5,15 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBufAllocator;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
@@ -35,31 +36,31 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-final class TierRecipeTest {
+final class TierRecipeTest extends BeforeAllTest {
 
     private static final BlockTank woodTank = ModObjects.blockTanks().head();
 
     TierRecipe recipe;
-    CraftingInventory inventory;
+    CraftingContainer inventory;
 
     @BeforeEach
     void setupEach() {
-        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.fromItems(Blocks.STONE));
-        inventory = new CraftingInventory(new AccessRecipeTest.DummyContainer(), 3, 3);
+        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.of(Blocks.STONE));
+        inventory = new CraftingContainer(new AccessRecipeTest.DummyContainer(), 3, 3);
     }
 
     @Test
     void fromEmptyTank() {
         ItemStack stack = new ItemStack(woodTank);
         for (int i : new int[]{0, 2, 6, 8}) {
-            inventory.setInventorySlotContents(i, stack);
+            inventory.setItem(i, stack);
         }
         for (int i : new int[]{1, 3, 5, 7}) {
-            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+            inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
 
         assertTrue(recipe.matches(inventory, null));
-        ItemStack result = recipe.getCraftingResult(inventory);
+        ItemStack result = recipe.assemble(inventory);
         assertFalse(result.hasTag());
     }
 
@@ -68,19 +69,19 @@ final class TierRecipeTest {
         {
             ItemStack stack = new ItemStack(woodTank);
             RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
-            inventory.setInventorySlotContents(0, stack);
+            inventory.setItem(0, stack);
         }
         {
             ItemStack stack = new ItemStack(woodTank);
             RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
-            inventory.setInventorySlotContents(2, stack);
+            inventory.setItem(2, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
         for (int i : new int[]{6, 8}) {
-            inventory.setInventorySlotContents(i, stack);
+            inventory.setItem(i, stack);
         }
         for (int i : new int[]{1, 3, 5, 7}) {
-            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+            inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
         assertFalse(recipe.matches(inventory, null));
     }
@@ -97,17 +98,17 @@ final class TierRecipeTest {
         {
             ItemStack stack = new ItemStack(woodTank);
             RecipeInventoryUtil.getFluidHandler(stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
-            inventory.setInventorySlotContents(0, stack);
+            inventory.setItem(0, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
         for (int i : new int[]{2, 6, 8}) {
-            inventory.setInventorySlotContents(i, stack);
+            inventory.setItem(i, stack);
         }
         for (int i : new int[]{1, 3, 5, 7}) {
-            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+            inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
         assertTrue(recipe.matches(inventory, null));
-        ItemStack result = recipe.getCraftingResult(inventory);
+        ItemStack result = recipe.assemble(inventory);
         assertEquals(amount, RecipeInventoryUtil.getFluidHandler(result).getFluid());
     }
 
@@ -117,18 +118,18 @@ final class TierRecipeTest {
         {
             ItemStack stack = new ItemStack(woodTank);
             RecipeInventoryUtil.getFluidHandler(stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
-            inventory.setInventorySlotContents(0, stack);
-            inventory.setInventorySlotContents(2, stack);
+            inventory.setItem(0, stack);
+            inventory.setItem(2, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
         for (int i : new int[]{6, 8}) {
-            inventory.setInventorySlotContents(i, stack);
+            inventory.setItem(i, stack);
         }
         for (int i : new int[]{1, 3, 5, 7}) {
-            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+            inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
         assertTrue(recipe.matches(inventory, null));
-        ItemStack result = recipe.getCraftingResult(inventory);
+        ItemStack result = recipe.assemble(inventory);
         assertEquals(amount.setAmount(amount.amount() * 2), RecipeInventoryUtil.getFluidHandler(result).getFluid());
     }
 
@@ -136,14 +137,14 @@ final class TierRecipeTest {
     void mixNBTFluid() {
         FluidStack a = new FluidStack(Fluids.WATER, 1000);
         {
-            CompoundNBT nbt = new CompoundNBT();
+            CompoundTag nbt = new CompoundTag();
             nbt.putString("name", "a");
             nbt.putInt("amount", 1000);
             a.setTag(nbt);
         }
         FluidStack b = new FluidStack(Fluids.WATER, 2000);
         {
-            CompoundNBT nbt = new CompoundNBT();
+            CompoundTag nbt = new CompoundTag();
             nbt.putString("name", "b");
             nbt.putInt("amount", 2000);
             b.setTag(nbt);
@@ -153,12 +154,12 @@ final class TierRecipeTest {
         ItemStack stack2 = new ItemStack(woodTank);
         RecipeInventoryUtil.getFluidHandler(stack2).fill(b, IFluidHandler.FluidAction.EXECUTE);
         ItemStack stack = new ItemStack(woodTank);
-        inventory.setInventorySlotContents(0, stack1);
-        inventory.setInventorySlotContents(2, stack2);
-        inventory.setInventorySlotContents(6, stack);
-        inventory.setInventorySlotContents(8, stack);
+        inventory.setItem(0, stack1);
+        inventory.setItem(2, stack2);
+        inventory.setItem(6, stack);
+        inventory.setItem(8, stack);
         for (int i : new int[]{1, 3, 5, 7}) {
-            inventory.setInventorySlotContents(i, new ItemStack(Blocks.STONE));
+            inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
 
         assertFalse(recipe.matches(inventory, null));
@@ -169,17 +170,17 @@ final class TierRecipeTest {
     @Disabled("Accessing tag before bounded is not allowed.")
     void serializeJson(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
-            tier, Ingredient.fromItems(Blocks.STONE));
+            tier, Ingredient.of(Blocks.STONE));
         JsonObject object = new JsonObject();
-        TierRecipe.FinishedRecipe finishedRecipe = new TierRecipe.FinishedRecipe(recipe.getId(), tier);
-        finishedRecipe.serialize(object);
-        TierRecipe read = TierRecipe.SERIALIZER.read(recipe.getId(), object);
+        TierRecipe.TierFinishedRecipe tierFinishedRecipe = new TierRecipe.TierFinishedRecipe(recipe.getId(), tier);
+        tierFinishedRecipe.serializeRecipeData(object);
+        TierRecipe read = TierRecipe.SERIALIZER.fromJson(recipe.getId(), object);
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
-            () -> assertNotEquals(Items.AIR, read.getRecipeOutput().getItem()),
-            () -> assertEquals(recipe.getRecipeOutput().getItem(), read.getRecipeOutput().getItem()),
-            () -> assertEquals(recipe.getSubItems().serialize(), read.getSubItems().serialize())
+            () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+            () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem()),
+            () -> assertEquals(recipe.getSubItems().toJson(), read.getSubItems().toJson())
         );
     }
 
@@ -187,16 +188,16 @@ final class TierRecipeTest {
     @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
     void serializePacket(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
-            tier, Ingredient.fromItems(Blocks.STONE));
-        PacketBuffer buffer = new PacketBuffer(ByteBufAllocator.DEFAULT.buffer());
-        TierRecipe.SERIALIZER.write(buffer, recipe);
-        TierRecipe read = TierRecipe.SERIALIZER.read(recipe.getId(), buffer);
+            tier, Ingredient.of(Blocks.STONE));
+        FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
+        TierRecipe.SERIALIZER.toNetwork(buffer, recipe);
+        TierRecipe read = TierRecipe.SERIALIZER.fromNetwork(recipe.getId(), buffer);
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
-            () -> assertNotEquals(Items.AIR, read.getRecipeOutput().getItem()),
-            () -> assertEquals(recipe.getRecipeOutput().getItem(), read.getRecipeOutput().getItem()),
-            () -> assertEquals(recipe.getSubItems().serialize(), read.getSubItems().serialize())
+            () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+            () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem()),
+            () -> assertEquals(recipe.getSubItems().toJson(), read.getSubItems().toJson())
         );
     }
 }

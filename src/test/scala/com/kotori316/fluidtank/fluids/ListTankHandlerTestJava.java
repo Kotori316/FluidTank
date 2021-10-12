@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 
 import cats.data.Chain;
 import javax.annotation.Nonnull;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.junit.jupiter.api.Test;

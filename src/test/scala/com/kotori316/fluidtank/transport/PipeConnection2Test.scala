@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.transport
 
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.transport.NeighborInstance._
 import com.kotori316.fluidtank.transport.PipeConnection2Test.Holder
-import com.kotori316.scala_lib.util.NeighborInstance._
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 

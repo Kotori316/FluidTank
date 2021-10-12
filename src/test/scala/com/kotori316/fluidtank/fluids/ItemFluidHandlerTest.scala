@@ -3,15 +3,15 @@ package com.kotori316.fluidtank.fluids
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
-import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 
 //noinspection DuplicatedCode It's a test.
-private[fluids] final class ItemFluidHandlerTest extends BeforeAllTest {
+object ItemFluidHandlerTest extends BeforeAllTest {
   private def woodTank = ModObjects.blockTanks.head
 
   @Test

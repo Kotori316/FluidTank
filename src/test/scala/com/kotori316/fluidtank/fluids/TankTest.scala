@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
 
-private[fluids] final class TankTest extends BeforeAllTest {
+object TankTest extends BeforeAllTest {
   @Test
   def makeInstance(): Unit = {
     val t = Tank(FluidAmount.BUCKET_WATER, 4000L)

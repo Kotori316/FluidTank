@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank.fluids
 
 import com.kotori316.fluidtank.BeforeAllTest
-import net.minecraft.fluid.Fluids
-import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.level.material.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import scala.util.chaining.scalaUtilChainingOps
 
 //noinspection DuplicatedCode It's a test!
-object TankHandlerTest {
+object TankHandlerTest extends BeforeAllTest{
   def nonEmptyFluidKeys: Array[FluidKey] = FluidAmountTest.fluidKeys().filter(!_.isEmpty)
 
   def keyFillFluidMode: Array[Array[AnyRef]] = for {
@@ -36,7 +36,7 @@ object TankHandlerTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#nonEmptyFluidKeys"))
     def fillToEmpty2(key: FluidKey): Unit = {
-      val tank = TankHandler(Tank(FluidKey(Fluids.EMPTY, tag = Option(new CompoundNBT().tap(_.putBoolean("h", true)))).toAmount(0), 4000))
+      val tank = TankHandler(Tank(FluidKey(Fluids.EMPTY, tag = Option(new CompoundTag().tap(_.putBoolean("h", true)))).toAmount(0), 4000))
       val filled = tank.fill(key.createStack(4000), IFluidHandler.FluidAction.EXECUTE)
       assertEquals(4000, filled)
       assertEquals(key.toAmount(4000), tank.getTank.fluidAmount)
@@ -129,7 +129,7 @@ object TankHandlerTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeys"))
     def fillFail3(key: FluidKey): Unit = {
-      val before = Tank(FluidKey(Fluids.WATER, Option(new CompoundNBT().tap(_.putInt("f", -10)))).toAmount(6000), 16000)
+      val before = Tank(FluidKey(Fluids.WATER, Option(new CompoundTag().tap(_.putInt("f", -10)))).toAmount(6000), 16000)
       val tankHandler = TankHandler(before)
 
       val filled = tankHandler.fill(key.createStack(1000), IFluidHandler.FluidAction.SIMULATE)

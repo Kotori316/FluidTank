@@ -2,9 +2,9 @@ package com.kotori316.fluidtank.fluids
 
 import cats.implicits._
 import com.kotori316.fluidtank.BeforeAllTest
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.{ItemStack, Items}
-import net.minecraft.nbt.CompoundNBT
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.{ItemStack, Items}
+import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
@@ -13,12 +13,12 @@ import org.junit.jupiter.params.provider.MethodSource
 
 import scala.util.chaining._
 
-object FluidAmountTest {
+object FluidAmountTest extends BeforeAllTest{
 
   def empties(): Array[FluidAmount] = fluidKeys().map(k => k.toAmount(0L))
 
   def fluidKeys(): Array[FluidKey] = {
-    val nbt = Option(new CompoundNBT().tap(_.putInt("b", 6)))
+    val nbt = Option(new CompoundTag().tap(_.putInt("b", 6)))
     Array(
       FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None), FluidKey(Fluids.EMPTY, None),
       FluidKey(Fluids.WATER, nbt), FluidKey(Fluids.LAVA, nbt), FluidKey(Fluids.EMPTY, nbt),
@@ -26,8 +26,8 @@ object FluidAmountTest {
   }
 
   def fluidKeysNonEmpty(): Array[FluidKey] = {
-    val nbt1 = Option(new CompoundNBT().tap(_.putInt("b", 6)))
-    val nbt2 = Option(new CompoundNBT().tap(_.putString("v", "a")))
+    val nbt1 = Option(new CompoundTag().tap(_.putInt("b", 6)))
+    val nbt2 = Option(new CompoundTag().tap(_.putString("v", "a")))
     val nbt3 = for {a <- nbt1; aa = a.copy(); b <- nbt2} yield aa merge b
     Array(
       FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None),
@@ -107,10 +107,10 @@ object FluidAmountTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
     def eqNbt(amount: Long, key: FluidKey): Unit = {
-      val nbt1 = new CompoundNBT()
+      val nbt1 = new CompoundTag()
       nbt1.putBoolean("b", true)
       nbt1.putString("name", "name")
-      val nbt2 = new CompoundNBT()
+      val nbt2 = new CompoundTag()
       nbt2.putBoolean("b", false)
       nbt2.putString("name", "tag")
       assertNotEquals(nbt1, nbt2)
@@ -127,8 +127,8 @@ object FluidAmountTest {
 
     @Test
     def keyEqual(): Unit = {
-      val tag1 = new CompoundNBT().tap(_.putInt("a", 1))
-      val tag2 = new CompoundNBT().tap(_.putInt("a", 1))
+      val tag1 = new CompoundTag().tap(_.putInt("a", 1))
+      val tag2 = new CompoundTag().tap(_.putInt("a", 1))
       val key1 = FluidKey(Fluids.WATER, Some(tag1))
       val key2 = FluidKey(Fluids.WATER, Some(tag2))
       assertTrue(key1 === key2)
@@ -148,7 +148,7 @@ object FluidAmountTest {
         assertEquals(FluidAmount.EMPTY, FluidAmount.fromStack(key.toAmount(1000).toStack))
         return
       }
-      val nbt1 = new CompoundNBT()
+      val nbt1 = new CompoundTag()
       nbt1.putBoolean("b", true)
       nbt1.putString("name", "name")
       val a = key.copy(tag = Some(nbt1)).toAmount(1000)
@@ -168,7 +168,7 @@ object FluidAmountTest {
     @Test
     def empty(): Unit = {
       val tag = Some {
-        val a = new CompoundNBT()
+        val a = new CompoundTag()
         a.putInt("e", 1)
         a.putInt("4", 2)
         a
@@ -255,7 +255,7 @@ object FluidAmountTest {
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
     def adderEmpty2(key: FluidKey): Unit = {
       val a = key.toAmount(3000)
-      val e = FluidAmount.EMPTY.copy(nbt = Option(new CompoundNBT()), amount = 2000L)
+      val e = FluidAmount.EMPTY.copy(nbt = Option(new CompoundTag()), amount = 2000L)
 
       assertEquals(3000L, (e |+| a).amount)
       assertEquals(a, a |+| e)

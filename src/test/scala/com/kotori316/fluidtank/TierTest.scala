@@ -6,7 +6,7 @@ import cats._
 import cats.implicits._
 import com.google.gson.JsonElement
 import com.kotori316.fluidtank.tiles.Tier
-import net.minecraft.nbt.INBT
+import net.minecraft.nbt.Tag
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
@@ -14,7 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
 class TierTest extends BeforeAllTest {
-  implicit val eqNBT: Eq[INBT] = Eq.fromUniversalEquals
+  implicit val eqNBT: Eq[Tag] = Eq.fromUniversalEquals
   implicit val eqJson: Eq[JsonElement] = Eq.fromUniversalEquals
 
   final def check(tier: Tier, name: String): Unit = {

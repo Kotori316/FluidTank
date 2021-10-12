@@ -2,8 +2,8 @@ package com.kotori316.fluidtank;
 
 import java.util.stream.Stream;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.model.animation.CapabilityAnimation;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -53,7 +53,7 @@ final class AccessTest extends BeforeAllTest {
     @Test
     @Disabled("Test Disabled: Accessing tag before bounding will cause crash.")
     void tag() {
-        assertTrue(FluidTags.WATER.getAllElements().isEmpty(), "Tag is empty.");
+        assertTrue(FluidTags.WATER.getValues().isEmpty(), "Tag is empty.");
     }
 
     @Test

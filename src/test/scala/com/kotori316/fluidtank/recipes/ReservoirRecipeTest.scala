@@ -4,9 +4,9 @@ import cats.implicits._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects, hashTier}
-import net.minecraft.item.crafting.Ingredient
-import net.minecraft.item.{ItemStack, Items}
-import net.minecraft.util.ResourceLocation
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
@@ -25,15 +25,15 @@ object ReservoirRecipeTest extends BeforeAllTest {
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
-    assertFalse(recipe.getCraftingResult(inv).hasTag)
+    assertFalse(recipe.assemble(inv).hasTag)
   }
 
   @Test
   private[recipes] def matchTest1(): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE, List(Ingredient.fromItems(Items.BUCKET)).asJava)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE, List(Ingredient.of(Items.BUCKET)).asJava)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
-    assertFalse(recipe.getCraftingResult(inv).hasTag)
+    assertFalse(recipe.assemble(inv).hasTag)
   }
 
   @Test
@@ -56,13 +56,13 @@ object ReservoirRecipeTest extends BeforeAllTest {
   def matchTest3(): Unit = {
     val item = Items.ACACIA_PLANKS
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tier.WOOD,
-      List(Ingredient.fromItems(item)).asJava)
+      List(Ingredient.of(item)).asJava)
     locally {
       val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(wood), 'b' -> new ItemStack(item)))
       assertTrue(recipe.matches(inv, null))
       val stacks = recipe.getRemainingItems(inv)
       assertTrue(stacks.stream().allMatch(_.isEmpty))
-      assertFalse(recipe.getCraftingResult(inv).hasTag)
+      assertFalse(recipe.assemble(inv).hasTag)
     }
     locally {
       val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(wood), 'b' -> new ItemStack(Items.BUCKET)))
@@ -75,14 +75,14 @@ object ReservoirRecipeTest extends BeforeAllTest {
     val item1 = new ItemStack(Items.ACACIA_LOG)
     val item2 = new ItemStack(Items.APPLE)
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tier.WOOD,
-      List(Ingredient.fromStacks(item1), Ingredient.fromStacks(item2)).asJava)
+      List(Ingredient.of(item1), Ingredient.of(item2)).asJava)
     val itemMap = Map('t' -> new ItemStack(wood), 'l' -> item1, 'a' -> item2)
     locally {
       val inv = RecipeInventoryUtil.getInv("tla", itemMap = itemMap)
       assertTrue(recipe.matches(inv, null))
       val stacks = recipe.getRemainingItems(inv)
       assertTrue(stacks.stream().allMatch(_.isEmpty))
-      assertFalse(recipe.getCraftingResult(inv).hasTag)
+      assertFalse(recipe.assemble(inv).hasTag)
     }
     val invalidRecipes: Seq[Executable] = "alt".combinations(2).flatMap(_.permutations).map[Executable] { recipeStr =>
       val inv = RecipeInventoryUtil.getInv(recipeStr, itemMap = itemMap)
@@ -100,7 +100,7 @@ object ReservoirRecipeTest extends BeforeAllTest {
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> tank, 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
 
-    val result = recipe.getCraftingResult(inv)
+    val result = recipe.assemble(inv)
     val handler = RecipeInventoryUtil.getFluidHandler(result)
     assertEquals(fluid, handler.getFluid)
     assertEquals(Tier.STONE.amount, handler.getCapacity)

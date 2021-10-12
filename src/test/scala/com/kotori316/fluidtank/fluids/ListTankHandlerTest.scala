@@ -3,8 +3,8 @@ package com.kotori316.fluidtank.fluids
 import cats.data.Chain
 import cats.implicits._
 import com.kotori316.fluidtank._
-import net.minecraft.fluid.{Fluid, Fluids, WaterFluid}
-import net.minecraft.util.ResourceLocation
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.material.{Fluid, Fluids, WaterFluid}
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack}
 import net.minecraftforge.fml.unsafe.UnsafeHacks
@@ -15,7 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 //noinspection DuplicatedCode
-object ListTankHandlerTest {
+object ListTankHandlerTest extends BeforeAllTest{
   private final val WOOD = Tank(FluidAmount.EMPTY, 4000L)
   private final val STONE = Tank(FluidAmount.EMPTY, 16000L)
 

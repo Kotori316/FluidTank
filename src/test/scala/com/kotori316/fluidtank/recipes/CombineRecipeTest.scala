@@ -1,13 +1,14 @@
 package com.kotori316.fluidtank.recipes
 
 import cats.implicits._
+import com.kotori316.fluidtank.blocks.{BlockCreativeTank, BlockVoidTank}
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects, hashTier}
-import net.minecraft.block.Blocks
-import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.function.Executable
@@ -17,7 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource
 
 import scala.jdk.CollectionConverters._
 
-private[recipes] final class CombineRecipeTest extends BeforeAllTest {
+object CombineRecipeTest extends BeforeAllTest {
   private final val woodTank = ModObjects.blockTanks.head
   private final val stoneTank = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
   private final val emeraldTank = ModObjects.blockTanks.find(_.tier === Tier.EMERALD).get
@@ -36,7 +37,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> stone, 'w' -> wood))
     assertTrue(recipe.matches(inventory, null))
 
-    val result = recipe.getCraftingResult(inventory)
+    val result = recipe.assemble(inventory)
     assertEquals(1, result.getCount)
     assertFalse(result.isEmpty)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
@@ -84,7 +85,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> emerald, 'w' -> wood))
     assertTrue(recipe.matches(inventory, null))
 
-    val result = recipe.getCraftingResult(inventory)
+    val result = recipe.assemble(inventory)
     assertEquals(1, result.getCount)
     assertFalse(result.isEmpty)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
@@ -103,7 +104,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> emerald, 'w' -> emerald0))
     assertTrue(recipe.matches(inventory, null))
 
-    val result = recipe.getCraftingResult(inventory)
+    val result = recipe.assemble(inventory)
     assertTrue(result.getItem.isInstanceOf[ItemBlockTank], s"Class check of $result, ${result.getItem.getClass}")
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
     assertTrue(tankItem.blockTank.tier === Tier.EMERALD, s"The tier of tank, $tankItem, ${tankItem.blockTank}, ${tankItem.blockTank.tier}")
@@ -144,7 +145,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
   def cantCombine1(): Unit = {
     val wood = new ItemStack(woodTank)
     RecipeInventoryUtil.getFluidHandler(wood).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
-    val creative = new ItemStack(ModObjects.creativeTank)
+    val creative = new ItemStack(ModObjects.blockTanks.find(_.isInstanceOf[BlockCreativeTank]).get)
 
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> creative, 'w' -> wood))
     assertFalse(recipe.matches(inventory, null))
@@ -164,7 +165,7 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
   @Test
   @DisplayName("Failed to combine Stone tank with 1000 mB of water and Void Tank")
   def cantCombine3(): Unit = {
-    val voidTank = new ItemStack(ModObjects.voidTank)
+    val voidTank = new ItemStack(ModObjects.blockTanks.find(_.isInstanceOf[BlockVoidTank]).get)
     val stone = new ItemStack(stoneTank)
     RecipeInventoryUtil.getFluidHandler(stone).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
 
@@ -181,9 +182,9 @@ private[recipes] final class CombineRecipeTest extends BeforeAllTest {
 
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> stone, 'w' -> wood))
     assertTrue(recipe.matches(inventory, null))
-    val result = recipe.getCraftingResult(inventory)
+    val result = recipe.assemble(inventory)
     val tankItem = result.getItem.asInstanceOf[ItemBlockTank]
-    assertEquals(Tiers.STONE, tankItem.blockTank.tier)
+    assertEquals(Tier.STONE, tankItem.blockTank.tier)
     assertEquals(FluidAmount.BUCKET_WATER, RecipeInventoryUtil.getFluidHandler(result).getFluid)
   }
 }
