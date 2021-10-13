@@ -109,10 +109,7 @@ minecraft {
             property('forge.logging.console.level', 'info')
             setForceExit(false)
 
-            if (isInCI())
-                args('--mod', "fluidtank", '--dev')
-            else
-                args('--mod', "fluidtank", '--all')
+            args('--mod', "fluidtank", '--all')
 
             mods {
                 fluidtank {
@@ -121,6 +118,10 @@ minecraft {
             }
         }
     }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 repositories {
@@ -242,11 +243,13 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
 task srcJar(type: Jar) {
     from sourceSets.main.allSource
     archiveClassifier.set('sources')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 task deobfJar(type: Jar) {
     from sourceSets.main.output
     archiveClassifier.set('deobf')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(jarAttributeMap)
     }

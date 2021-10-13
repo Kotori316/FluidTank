@@ -64,9 +64,9 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Java Toolchains
-        run: chmod +x ./gradlew && ./gradlew javaToolchains --no-daemon --info --warning-mode all
+        run: chmod +x ./gradlew && ./gradlew javaToolchains --no-daemon --info --stacktrace --warning-mode all
       - name: Test with JUnit
-        run: chmod +x ./gradlew && ./gradlew --no-daemon test --info
+        run: chmod +x ./gradlew && ./gradlew --no-daemon test --info --stacktrace
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload failed test report
@@ -92,4 +92,4 @@ jobs:
         env:
           DOWNLOAD_URL: https://github.com/Kotori316/SLP/releases/download/v2.13.6-build-2/ScalableCatsForce-2.13.6-build-2.jar
       - name: Test with runData
-        run: chmod +x ./gradlew && ( ./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
+        run: chmod +x ./gradlew && ( ./gradlew --no-daemon runData --stacktrace || ./gradlew --no-daemon runData)
