@@ -19,7 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Compile
-        run: chmod +x ./gradlew && ./gradlew assemble --info --no-daemon
+        run: chmod +x ./gradlew && ./gradlew compileScala --info --stacktrace --no-daemon
+      - name: Make Java dir
+        run: mkdir -p src/main/java
+      - name: Assemble
+        run: chmod +x ./gradlew && ./gradlew assemble --stacktrace --no-daemon
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
@@ -81,5 +85,11 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+      - name: Prepare dependency
+        run: |
+          mkdir -p run-server/mods
+          curl -L -o run-server/mods/s.jar ${DOWNLOAD_URL}
+        env:
+          DOWNLOAD_URL: https://github.com/Kotori316/SLP/releases/download/v2.13.6-build-2/ScalableCatsForce-2.13.6-build-2.jar
       - name: Test with runData
         run: chmod +x ./gradlew && ( ./gradlew --no-daemon runData || ./gradlew --no-daemon runData)
