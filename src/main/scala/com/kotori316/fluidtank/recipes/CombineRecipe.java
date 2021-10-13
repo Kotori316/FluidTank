@@ -58,7 +58,8 @@ public class CombineRecipe extends CustomRecipe {
         List<FluidAmount> fluids = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
             .map(s -> getHandler(s)
-                .map(h -> ((TankItemFluidHandler) h).getFluid()).orElse(FluidAmount.EMPTY()))
+                .map(TankItemFluidHandler::getFluid)
+                .orElse(FluidAmount.EMPTY()))
             .collect(Collectors.toList());
         boolean allSameFluid = fluids.stream()
             .map(FluidKey::from)
@@ -87,7 +88,7 @@ public class CombineRecipe extends CustomRecipe {
         return stream
             .filter(s -> !s.isEmpty())
             .flatMap(s -> getHandler(s).stream())
-            .map(h -> Pair.of(h.getContainer(), ((TankItemFluidHandler) h).getCapacity()))
+            .map(h -> Pair.of(h.getContainer(), h.getCapacity()))
             .max(Comparator.comparing(Pair::getRight))
             .map(p -> Pair.of(p.getLeft().copy(), p.getRight()));
     }
@@ -97,8 +98,8 @@ public class CombineRecipe extends CustomRecipe {
         Optional<FluidAmount> fluid = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
             .map(s -> getHandler(s)
-                .filter(h -> h instanceof TankItemFluidHandler)
-                .map(h -> ((TankItemFluidHandler) h).getFluid()).orElse(FluidAmount.EMPTY()))
+                .map(TankItemFluidHandler::getFluid)
+                .orElse(FluidAmount.EMPTY()))
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus);
         Optional<ItemStack> tank = getMaxCapacityTank(inv)
