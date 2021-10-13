@@ -22,7 +22,7 @@ class PipeFluidHandler(pipeTile: PipeTileBase) extends IFluidHandler {
     val rest = resource.copy()
     while (pipePosIterator.hasNext) {
       val pipePos = pipePosIterator.next()
-      val handlerIterator = directions.map(dir => pipePos.relative(dir) -> dir).iterator
+      val handlerIterator = directions.map(dir => pipePos.offset(dir) -> dir).iterator
         .filter { case (_, direction) => pipeTile.getLevel.getBlockState(pipePos).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput }
         .flatMap { case (pos, direction) => Cap.make(pipeTile.getLevel.getBlockEntity(pos))
           .flatMap(_.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala).value.value

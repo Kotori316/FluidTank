@@ -17,7 +17,7 @@ class PipeItemHandler(pipeTile: ItemPipeTile) extends IItemHandler {
       val handlerIterator =
         for {
           direction <- directions.iterator
-          pos = pipePos.relative(direction)
+          pos = pipePos.offset(direction)
           if pipeTile.getLevel.getBlockState(pipePos).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
           h <- pipeTile.findItemHandler(pipeTile.getLevel, pos, direction).value.value
         } yield h._1

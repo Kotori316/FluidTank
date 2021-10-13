@@ -19,7 +19,7 @@ final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects
     import scala.jdk.CollectionConverters._
     PipeBlock.FACING_TO_PROPERTY_MAP.asScala.flatMap { case (direction, value) =>
       if (getBlockState.getValue(value).isInput) {
-        val sourcePos = getBlockPos.relative(direction)
+        val sourcePos = getBlockPos.offset(direction)
         val c = for {
           t <- Cap.make(getLevel.getBlockEntity(sourcePos))
           cap <- getCapFromCache(t, sourcePos, direction.getOpposite, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
@@ -32,7 +32,7 @@ final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects
       for {
         p <- connection.outputNonOrdered
         direction <- directions
-        pos = p.relative(direction)
+        pos = p.offset(direction)
         if pos != sourcePos
         if getLevel.getBlockState(p).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
         t <- Option(getLevel.getBlockEntity(pos)).toList

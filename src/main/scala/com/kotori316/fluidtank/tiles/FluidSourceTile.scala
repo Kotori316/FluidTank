@@ -19,7 +19,7 @@ class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects
     // In server world only.
     for (direction <- directions) {
       for {
-        tile <- Option(getLevel.getBlockEntity(getBlockPos.relative(direction)))
+        tile <- Option(getLevel.getBlockEntity(getBlockPos.offset(direction)))
         cap <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala.value.value
       } yield {
         val accepted = cap.fill(fluid.toStack, IFluidHandler.FluidAction.SIMULATE)

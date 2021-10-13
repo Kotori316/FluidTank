@@ -35,7 +35,7 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
     def makePosList(start: BlockPos): List[BlockPos] = {
       for {
         d <- directions
-        pos = start.relative(d)
+        pos = start.offset(d)
         if checked.add(pos) // True means it's first time to check the pos. False means the pos already checked.
         state = getLevel.getBlockState(pos)
         if state.getBlock == this.getBlockState.getBlock

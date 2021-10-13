@@ -43,9 +43,9 @@ object RecipeSerializeHelper {
   }
 
   private def getConsumeValue(c: ShapedRecipeBuilder): FinishedRecipe = {
-    c.unlockedBy("dummy", RecipeUnlockedTrigger.unlocked(new ResourceLocation("dummy:dummy")))
+    val fixed: ShapedRecipeBuilder = c.unlockedBy("dummy", RecipeUnlockedTrigger.unlocked(new ResourceLocation("dummy:dummy")))
     var t: FinishedRecipe = null
-    c.save(p => t = p)
+    fixed.save(p => t = p)
     t
   }
 

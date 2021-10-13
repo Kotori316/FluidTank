@@ -3,15 +3,12 @@ package com.kotori316
 import java.lang.reflect.Field
 
 import cats._
-import cats.data._
 import com.kotori316.fluidtank.tiles.Tier
-import com.mojang.serialization.DataResult
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 
-import scala.jdk.OptionConverters._
 import scala.util.chaining._
 
 package object fluidtank extends CapConverter {
@@ -36,5 +33,16 @@ package object fluidtank extends CapConverter {
   final val directions: List[Direction] = Direction.values().toList
   final val evalExtractor: Eval ~> Id = new (Eval ~> Id) {
     override def apply[A](fa: Eval[A]): A = fa.value
+  }
+
+  implicit class BlockPosHelper(private val pos: BlockPos) extends AnyVal {
+    /**
+     * Performs the same operation as `offset` in old mapping, now `relative`.
+     * This method can be used to avoid "ambiguous reference to overloaded definition".
+     *
+     * @param direction the direction.
+     * @return the pos moved 1 to the direction.
+     */
+    def offset(direction: Direction): BlockPos = pos relative direction
   }
 }

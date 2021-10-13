@@ -28,7 +28,7 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
     if (coolTime <= 0) {
       val handlers = PipeBlock.FACING_TO_PROPERTY_MAP.asScala.flatMap { case (direction, value) =>
         if (getBlockState.getValue(value).isInput) {
-          val sourcePos = getBlockPos.relative(direction)
+          val sourcePos = getBlockPos.offset(direction)
           val c = findItemHandler(getLevel, sourcePos, direction)
           c.toList
         } else {
@@ -41,7 +41,7 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
           val func = (i: Int) => Option(f.extractItem(i, ItemPipeTile.transferItemCount, true)).filterNot(_.isEmpty).map(item => i -> item)
           for {
             p <- outputPoses
-            (direction, pos) <- directions.map(f => f -> p.relative(f))
+            (direction, pos) <- directions.map(f => f -> p.offset(f))
             if pos != sourcePos
             if getLevel.getBlockState(p).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
             dest <- findItemHandler(getLevel, pos, direction).map { case (i, _) => i }.toList
