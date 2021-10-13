@@ -5,4 +5,4 @@ FluidTank for 1.17.1 and Forge
 **You have to download version 2.13.6 of [Scalable Cat's Force](https://www.curseforge.com/minecraft/mc-mods/scalable-cats-force).**
 I don't support any other environment.
 
-**This version recommends forge newer than 37.0.84**
+**This version recommends forge newer than 37.0.86**

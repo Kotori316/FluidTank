@@ -223,6 +223,7 @@ def jarAttributeMap = [
         "Implementation-Vendor"   : "Kotori316",
         "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
         // "MixinConfigs"            : "fluidtank.mixins.json"
+        'Automatic-Module-Name': 'fluidtank',
 ]
 jar {
     manifest {
