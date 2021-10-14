@@ -185,8 +185,8 @@ private boolean hasGitHubToken() {
 
 dependencies {
     minecraft(forgeVersion())
-    compileOnly(group: 'org.scala-lang', name: 'scala-library', version: '2.13.6')
-    compileOnly(group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.2-kotori')
+    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.6')
+    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.2-kotori')
 
     /*if (!isInCI()) {
         implementation(fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2"))
@@ -200,7 +200,9 @@ dependencies {
     // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
-    // implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-1', classifier: 'dev')
+    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.6-build-4', classifier: 'with-library') {
+        transitive(false)
+    }
     // Mixin
     // annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
     // Test Dependencies.
@@ -209,8 +211,6 @@ dependencies {
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
-    testImplementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.6')
-    testImplementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.2-kotori')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -222,8 +222,7 @@ def jarAttributeMap = [
         "Implementation-Version"  : String.valueOf(project.version),
         "Implementation-Vendor"   : "Kotori316",
         "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
-        // "MixinConfigs"            : "fluidtank.mixins.json"
-        'Automatic-Module-Name': 'fluidtank',
+        'Automatic-Module-Name'   : 'fluidtank',
 ]
 jar {
     manifest {
