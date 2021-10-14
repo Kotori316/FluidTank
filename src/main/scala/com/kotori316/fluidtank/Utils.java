@@ -98,10 +98,10 @@ public class Utils {
         }
     }
 
-    public static class TestConfig implements Config.IContent {
+    public static class TestConfig implements IContent {
         private final Map<String, Object> configs;
 
-        public static Config.IContent getTestInstance(Map<String, Object> configs) {
+        public static IContent getTestInstance(Map<String, Object> configs) {
             return new TestConfig(configs);
         }
 

@@ -47,21 +47,6 @@ object Config {
     override def getAsBoolean: Boolean = get()
   }
 
-  trait IContent {
-    val removeRecipe: BoolSupplier
-    val debug: BoolSupplier
-    val easyRecipe: BoolSupplier
-    val usableInvisibleInRecipe: BoolSupplier
-    val usableUnavailableTankInRecipe: BoolSupplier
-    val showInvisibleTank: BoolSupplier
-    val showTOP: BoolSupplier
-    val enableWailaAndTOP: BoolSupplier
-    val enableFluidSupplier: BoolSupplier
-    val enablePipeRainbowRenderer: BoolSupplier
-    val pipeColor: Supplier[Integer]
-    val renderLowerBound: Supplier[JDouble]
-    val renderUpperBound: Supplier[JDouble]
-  }
 
   class Content(builder: ForgeConfigSpec.Builder) extends IContent {
     private def asSupplier(b: ForgeConfigSpec.BooleanValue): BoolSupplier = () => b.get()
@@ -114,4 +99,23 @@ object Config {
 
   }
 
+}
+
+trait IContent {
+
+  import com.kotori316.fluidtank.Config.BoolSupplier
+
+  val removeRecipe: BoolSupplier
+  val debug: BoolSupplier
+  val easyRecipe: BoolSupplier
+  val usableInvisibleInRecipe: BoolSupplier
+  val usableUnavailableTankInRecipe: BoolSupplier
+  val showInvisibleTank: BoolSupplier
+  val showTOP: BoolSupplier
+  val enableWailaAndTOP: BoolSupplier
+  val enableFluidSupplier: BoolSupplier
+  val enablePipeRainbowRenderer: BoolSupplier
+  val pipeColor: Supplier[Integer]
+  val renderLowerBound: Supplier[JDouble]
+  val renderUpperBound: Supplier[JDouble]
 }
