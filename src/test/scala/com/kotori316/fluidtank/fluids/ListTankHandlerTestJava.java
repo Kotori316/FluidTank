@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import scala.Option;
+import scala.collection.immutable.ArraySeq;
 
 import com.kotori316.fluidtank.BeforeAllTest;
 
@@ -255,10 +256,6 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
 
     @SafeVarargs
     static <T> scala.collection.immutable.List<T> asList(T... ts) {
-        scala.collection.mutable.Builder<T, scala.collection.immutable.List<T>> builder = scala.collection.immutable.List.newBuilder();
-        for (T t : ts) {
-            builder.addOne(t);
-        }
-        return builder.result();
+        return ArraySeq.unsafeWrapArray(ts).toList();
     }
 }
