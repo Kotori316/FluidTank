@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fluids;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,7 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import scala.Option;
-import scala.collection.immutable.ArraySeq;
+import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.BeforeAllTest;
 
@@ -256,6 +257,6 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
 
     @SafeVarargs
     static <T> scala.collection.immutable.List<T> asList(T... ts) {
-        return ArraySeq.unsafeWrapArray(ts).toList();
+        return CollectionConverters.asScala(Arrays.asList(ts)).toList();
     }
 }

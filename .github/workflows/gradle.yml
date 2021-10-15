@@ -6,6 +6,7 @@ on:
       - "1.16"
     paths:
       - "src/main/**"
+      - "src/test/**"
       - "forge_version.properties"
       - ".github/workflows/gradle.yml"
 
