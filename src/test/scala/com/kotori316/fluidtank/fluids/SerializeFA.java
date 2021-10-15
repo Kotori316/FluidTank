@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class SerializeFA extends BeforeAllTest {
-    private static final List<FluidAmount> examples = Arrays.asList(
+    final List<FluidAmount> examples = Arrays.asList(
         // Milk is not vanilla fluid, so deserialization fails.
         FluidAmount.BUCKET_LAVA(), /*FluidAmount.BUCKET_MILK()*/ FluidAmount.BUCKET_WATER(),
         FluidAmount.apply(Fluids.LAVA, 2000L, Option.apply(new CompoundNBT())),

@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This test calls {@link ListTankHandler} from Java.
  */
 final class ListTankHandlerTestJava extends BeforeAllTest {
-    static final Tank EMPTY_TANK = new Tank(FluidAmount.EMPTY(), 4000L);
+    final Tank EMPTY_TANK = new Tank(FluidAmount.EMPTY(), 4000L);
 
     //-------------------- PARAMETER PROVIDERS --------------------
     static Fluid[] fluids() {
@@ -109,7 +109,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         @ParameterizedTest
         @MethodSource("fluids")
         void fillCreativeTank(FluidAmount fluid, long amount) {
-            ListTankHandler handler = new ListTankHandler(Chain.fromSeq(asList(new CreativeTankHandler(), TankHandler.apply(EMPTY_TANK))));
+            ListTankHandler handler = new ListTankHandler(Chain.fromSeq(asList(new CreativeTankHandler(), TankHandler.apply(new Tank(FluidAmount.EMPTY(), 4000L)))));
             FluidAmount toFill = fluid.setAmount(amount);
             {
                 // Simulate
@@ -249,7 +249,8 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
     //-------------------- Utility methods --------------------
     @Nonnull
     private static ListTankHandler createEmptyHandler() {
-        return new ListTankHandler(Chain.fromSeq(asList(EMPTY_TANK, EMPTY_TANK).map(TankHandler::apply)));
+        Tank e = new Tank(FluidAmount.EMPTY(), 4000L);
+        return new ListTankHandler(Chain.fromSeq(asList(e, e).map(TankHandler::apply)));
     }
 
     @SafeVarargs
