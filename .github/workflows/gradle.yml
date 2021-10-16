@@ -85,11 +85,5 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Prepare dependency
-        run: |
-          mkdir -p run-server/mods
-          curl -L -o run-server/mods/s.jar ${DOWNLOAD_URL}
-        env:
-          DOWNLOAD_URL: https://github.com/Kotori316/SLP/releases/download/v2.13.6-build-2/ScalableCatsForce-2.13.6-build-2.jar
       - name: Test with runData
         run: chmod +x ./gradlew && ( ./gradlew --no-daemon runData --stacktrace || ./gradlew --no-daemon runData)
