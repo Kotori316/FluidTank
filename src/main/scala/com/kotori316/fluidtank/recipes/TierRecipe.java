@@ -277,16 +277,22 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
     public static class TierFinishedRecipe implements FinishedRecipe {
         private final ResourceLocation recipeId;
         private final Tier tier;
+        private final Ingredient ingredient;
 
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier) {
             this.recipeId = recipeId;
             this.tier = tier;
+            this.ingredient = Ingredient.of(ItemTags.bind(this.tier.tagName()));
+        }
+
+        public TierFinishedRecipe(ResourceLocation recipeId, Tier tier, Ingredient ingredient) {
+            this.recipeId = recipeId;
+            this.tier = tier;
+            this.ingredient = ingredient;
         }
 
         @Override
         public void serializeRecipeData(JsonObject json) {
-            Ingredient ingredient = Ingredient.of(ItemTags.bind(this.tier.tagName()));
-
             json.addProperty(KEY_TIER, this.tier.lowerName());
             json.add(KEY_SUB_ITEM, ingredient.toJson());
         }
