@@ -17,7 +17,9 @@
       "conditions": {
         "items": [
           {
-            "item": "fluidtank:tank_wood"
+            "items": [
+              "fluidtank:tank_wood"
+            ]
           }
         ]
       }

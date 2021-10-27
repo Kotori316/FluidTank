@@ -26,7 +26,9 @@
       "trigger": "minecraft:filled_bucket",
       "conditions": {
         "item": {
-          "item": "minecraft:water_bucket"
+          "items": [
+            "minecraft:water_bucket"
+          ]
         }
       }
     }

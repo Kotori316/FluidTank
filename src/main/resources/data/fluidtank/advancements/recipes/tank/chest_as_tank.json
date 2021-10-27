@@ -22,7 +22,9 @@
         },
         "items": [
           {
-            "item": "minecraft:water_bucket"
+            "items": [
+              "minecraft:water_bucket"
+            ]
           }
         ]
       }
@@ -32,7 +34,9 @@
       "conditions": {
         "items": [
           {
-            "item": "fluidtank:tank_wood"
+            "items": [
+              "fluidtank:tank_wood"
+            ]
           }
         ]
       }
