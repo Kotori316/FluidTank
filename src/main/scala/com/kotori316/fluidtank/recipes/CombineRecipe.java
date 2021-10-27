@@ -21,12 +21,12 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.StreamConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
@@ -34,7 +34,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
 
 public class CombineRecipe extends CustomRecipe {
-    private static final Logger LOGGER = LogManager.getLogger(CombineRecipe.class);
+    private static final Logger LOGGER = Utils.getLogger(CombineRecipe.class);
     public static final SimpleRecipeSerializer<CombineRecipe> SERIALIZER = new SimpleRecipeSerializer<>(CombineRecipe::new);
     public static final String LOCATION = "fluidtank:combine_tanks";
 

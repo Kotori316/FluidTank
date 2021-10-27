@@ -17,7 +17,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -38,7 +37,7 @@ import com.kotori316.fluidtank.recipes.TierRecipe;
 public class FluidTank {
     public static final String MOD_NAME = "FluidTank";
     public static final String modID = "fluidtank";
-    public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
+    public static final Logger LOGGER = Utils.getLogger(MOD_NAME);
     public static final SideProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
     public FluidTank() {

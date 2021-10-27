@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.{ModObjects, Utils, showFluidStack}
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
-import org.apache.logging.log4j.{Level, LogManager}
+import org.apache.logging.log4j.Level
 
 class DebugFluidHandler private() extends EmptyFluidHandler {
   override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
@@ -29,7 +29,7 @@ class DebugFluidHandler private() extends EmptyFluidHandler {
 
 object DebugFluidHandler {
   final val INSTANCE = new DebugFluidHandler
-  private final val LOGGER = LogManager.getLogger(classOf[DebugFluidHandler])
+  private final val LOGGER = Utils.getLogger(classOf[DebugFluidHandler])
   private final val MARKER = ModObjects.MARKER_DebugFluidHandler
   private final val LOG_LEVEL = if (Utils.isInDev) Level.INFO else Level.DEBUG
 }

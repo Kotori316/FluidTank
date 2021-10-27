@@ -27,7 +27,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -43,7 +42,7 @@ import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContainer> {
-    private static final Logger LOGGER = LogManager.getLogger(TierRecipe.class);
+    private static final Logger LOGGER = Utils.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};

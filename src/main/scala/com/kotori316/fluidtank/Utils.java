@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.logging.log4j.Logger;
 
 public class Utils {
     public static int toInt(long l) {
@@ -65,6 +66,21 @@ public class Utils {
             return OptionalInt.of(item.getColor(stack));
         }
         return OptionalInt.empty();
+    }
+
+    public static Logger getLogger(Class<?> clazz) {
+        return getLogger(clazz.getName());
+    }
+
+    public static Logger getLogger(String name) {
+        try {
+            var field = Class.forName("net.minecraftforge.fml.ModLoader").getDeclaredField("LOGGER");
+            field.setAccessible(true);
+            var loaderLogger = (org.apache.logging.log4j.core.Logger) field.get(null);
+            return loaderLogger.getContext().getLogger(name);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Can't access to LOGGER in loader.", e);
+        }
     }
 
     public static class TestConfig implements IContent {
