@@ -56,66 +56,39 @@ println("Java: ${System.getProperty('java.version')} " +
         "JVM: ${System.getProperty('java.vm.version')}(${System.getProperty('java.vendor')}) " +
         "Arch: ${System.getProperty('os.arch')}")
 
+def commonRunSetting = {
+    // Recommended logging data for a userdev environment
+    property('forge.logging.markers', 'REGISTRIES')
+    property('mixin.env.remapRefMap', 'true')
+    property('mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg")
+    property("mixin.debug.export", "true")
+    property('forge.logging.console.level', 'debug')
+
+    mods {
+        fluidtank {
+            source sourceSets.main
+        }
+    }
+}
+
 minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'official', version: "1.17.1"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
+            with commonRunSetting
             workingDirectory file('Minecraft')
-
-            // Recommended logging data for a userdev environment
-            property('forge.logging.markers', 'REGISTRIES')
-            property('mixin.env.disableRefMap', 'true')
-            property("mixin.debug.export", "true")
-            property('forge.logging.console.level', 'debug')
-
-            mods {
-                fluidtank {
-                    source sourceSets.main
-                }
-            }
         }
 
         server {
+            with commonRunSetting
             workingDirectory file('run-server')
-
-            // Recommended logging data for a userdev environment
-            property('forge.logging.markers', 'REGISTRIES')
-            property('mixin.env.disableRefMap', 'true')
-            property("mixin.debug.export", "true")
-            property('forge.logging.console.level', 'debug')
-
-            mods {
-                fluidtank {
-                    source sourceSets.main
-                }
-            }
         }
         data {
+            with commonRunSetting
             workingDirectory file('run-server')
-            property('forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP')
-            property('mixin.env.disableRefMap', 'true')
-            property("mixin.debug.export", "true")
-            property('forge.logging.console.level', 'info')
             setForceExit(false)
-
             args('--mod', "fluidtank", '--all')
-
-            mods {
-                fluidtank {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }
@@ -236,7 +209,7 @@ jar {
 // Note you'll need to add a repository here
 def reobfFile = file("$buildDir/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
+    setType('jar')
     builtBy 'reobfJar'
 }
 
@@ -334,15 +307,6 @@ if (!isInCI()) {
         // Avoid error of GL
         systemProperty("fml.earlyprogresswindow", false)
     }
-    // Remove HWYLA class.
-    sourceSets {
-        main {
-            scala {
-                srcDir 'src/main/scala'
-                exclude "/com/kotori316/fluidtank/integration/hwyla/**"
-            }
-        }
-    }
 }
 
 void moveOldLog() {
@@ -387,40 +351,42 @@ task makeChangeLog() {
 def minecraftVersion = forgeVersion().substring(forgeVersion().lastIndexOf(":") + 1).split("-")[0]
 task checkMethod() {
     doLast {
-        System.out.println("Forge: ${forgeVersion()}")
-        System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}")
-        System.out.println("Minecraft $minecraftVersion")
+        System.out.println("Forge: ${forgeVersion()}" as String)
+        System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}" as String)
+        System.out.println("Minecraft $minecraftVersion" as String)
         System.out.println("Mapping 1.17.1")
-        System.out.println("Is In CI ${isInCI()}")
-        System.out.println("FilePath ${jar.getArchiveFile().get()}")
-        System.out.println("FilePath ${srcJar.getArchiveFile().get()}")
-        System.out.println("FilePath ${deobfJar.getArchiveFile().get()}")
-        System.out.println("Name $project.name")
-        System.out.println("BaseName $archivesBaseName")
-        System.out.println("ModVersion-fromProperty ${getProperty("modVersion")}")
-        System.out.println("ModVersion-fromProject ${project.version}")
-        println("*" * 20)
-        println("changes.md")
-        println(getLatestChangeLog())
-        println("*" * 20)
-        println("hasGitHubToken ${hasGitHubToken()}")
-        println("hasSignToken ${project.hasProperty("keyStore")}")
-        println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}")
-        println("*" * 20)
-        println("All Changes")
-//        println(getAllChangeLog())
-        println("*" * 20)
-        println("FindProperty of githubToken: project.findProperty(\"githubToken\") != null ${project.findProperty("githubToken") != null}")
-        println("FindProperty of gpr.user ${project.findProperty("gpr.user")}")
-        println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}")
-//        println("Property of gpr.user ${project.property("gpr.user")}") // FAILED
-        println("*" * 20)
-        println("Repository")
-        getProject().getRepositories().stream().forEach { n -> println("${n.name} $n ${n instanceof MavenArtifactRepository ? n.getUrl() : "Not maven"}") }
-        println("Dependency" + System.lineSeparator() + "*" * 20)
+        System.out.println("Is In CI ${isInCI()}" as String)
+        System.out.println("FilePath ${jar.getArchiveFile().get()}".toString())
+        System.out.println("FilePath ${srcJar.getArchiveFile().get()}" as String)
+        System.out.println("FilePath ${deobfJar.getArchiveFile().get()}" as String)
+        System.out.println("Name $project.name" as String)
+        System.out.println("BaseName $archivesBaseName" as String)
+        System.out.println("ModVersion-fromProperty ${getProperty("modVersion")}" as String)
+        System.out.println("ModVersion-fromProject ${project.version}" as String)
+        System.out.println("*" * 20 as String)
+        System.out.println("changes.md")
+        System.out.println(getLatestChangeLog())
+        System.out.println("*" * 20 as String)
+        System.out.println("hasGitHubToken ${hasGitHubToken()}" as String)
+        System.out.println("hasSignToken ${project.hasProperty("keyStore")}" as String)
+        System.out.println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}" as String)
+        System.out.println("*" * 20 as String)
+        System.out.println("All Changes")
+//        System.out.println(getAllChangeLog())
+        System.out.println("*" * 20 as String)
+        System.out.println("FindProperty of githubToken: project.findProperty(\"githubToken\") != null ${project.findProperty("githubToken") != null}" as String)
+        System.out.println("FindProperty of gpr.user ${project.findProperty("gpr.user")}" as String)
+        System.out.println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}" as String)
+//        println("Property of gpr.user ${project.property("gpr.user")}" as String) // FAILED
+        System.out.println("*" * 20 as String)
+        System.out.println("Repository")
+        getProject().getRepositories().stream().forEach { n ->
+            System.out.println("${n.name} $n ${n instanceof MavenArtifactRepository ? n.getUrl() : "Not maven"}" as String)
+        }
+        System.out.println("Dependency" + System.lineSeparator() + "*" * 20 as String)
         getProject().getConfigurations().each { config ->
-            println(config.getName())
-            config.getAllDependencies().each { println(it) }
+            System.out.println(config.getName())
+            config.getAllDependencies().each { System.out.println(it) }
         }
     }
 }
@@ -437,7 +403,7 @@ publishing {
         }
         maven {
             name = "BuildDir"
-            url = "$buildDir/repo"
+            url = file("$buildDir/repo")
         }
         maven {
             name = "AzureRepository"
@@ -478,5 +444,20 @@ task copyToDrive(type: Copy, dependsOn: "build") {
     onlyIf {
         System.getenv(PATH_NAME) != null &&
                 Files.exists(Paths.get(System.getenv(PATH_NAME)))
+    }
+}
+
+////////////////
+// IntelliJ Project Import
+// The Mixin annotation process does not have an obfuscation source when running through the IntelliJ compiler,
+// thus we have to prevent it from being activated as part of importing this Gradle project into IntelliJ.
+if (System.getProperty("idea.sync.active") == "true") {
+    afterEvaluate {
+        tasks.withType(JavaCompile).all {
+            it.options.annotationProcessorPath = files()
+        }
+        tasks.withType(ScalaCompile).all {
+            it.options.annotationProcessorPath = files()
+        }
     }
 }
