@@ -39,7 +39,7 @@ object FluidTankDataProvider {
     }
   }
 
-  private[this] final val ID = (s: String) => new ResourceLocation(FluidTank.modID, s)
+  private[this] final def ID(s: String) = new ResourceLocation(FluidTank.modID, s)
 
   private def tag(name: ResourceLocation): Tag.Named[Item] = SerializationTags.getInstance.getOrEmpty(ForgeRegistries.Keys.ITEMS).getTag(name) match {
     case tag: Tag.Named[_] => tag.asInstanceOf[Tag.Named[Item]]

@@ -1,9 +1,10 @@
 package com.kotori316.fluidtank.tiles
 
+import cats.implicits.toShow
+import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
-import com.kotori316.fluidtank.{Config, FluidTank, ModObjects, Utils}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TextComponent}
@@ -97,7 +98,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
         executor.tell(new TickTask(executor.getTickCount, () => {
           getLevel.getProfiler.push("Connection Loading")
           if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
-            "Connection load in delayed task. At={}, connection={}", this.getBlockPos, this.connection)
+            "Connection load in delayed task. At={}, connection={}", this.getBlockPos.show, this.connection)
           if (this.connection.isDummy) {
             Connection.load(getLevel, getBlockPos)
           }

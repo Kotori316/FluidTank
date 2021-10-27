@@ -52,7 +52,8 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
     }
     applyToAllPipe(tile => tile.connection = lastConnection, c = lastConnection)
     if (Utils.isInDev)
-      FluidTank.LOGGER.debug(ModObjects.MARKER_PipeTileBase, s"PipeConnection2 by ${getClass.getName}, fromPos: $worldPosition, made: $lastConnection")
+      FluidTank.LOGGER.debug(ModObjects.MARKER_PipeTileBase, "PipeConnection2 by {}, fromPos: {}, made: {}",
+        getClass.getSimpleName, worldPosition.show, lastConnection.show)
   }
 
   def connectorUpdate(): Unit =

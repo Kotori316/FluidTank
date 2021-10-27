@@ -2,6 +2,8 @@ package com.kotori316.fluidtank.transport
 
 import java.util.Objects
 
+import cats.Show
+import cats.implicits.showInterpolator
 import com.kotori316.fluidtank.transport.Neighbor._
 
 class PipeConnection2[A](val poses: Set[A], isOutput: A => Boolean)(implicit private val neighbor: Neighbor[A]) {
@@ -49,4 +51,7 @@ object PipeConnection2 {
     connection.copy(connection.poses + a)
   }
 
+  implicit def showPipeConnection2[A: Show]: Show[PipeConnection2[A]] = { c =>
+    show"PipeConnection{${c.poses.size}, ${c.poses}"
+  }
 }
