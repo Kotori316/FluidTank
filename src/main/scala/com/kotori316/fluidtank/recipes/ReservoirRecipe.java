@@ -130,12 +130,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         }
     }
 
-    public static class ReservoirFinishedRecipe implements FinishedRecipe {
-        private final ReservoirRecipe recipe;
-
-        public ReservoirFinishedRecipe(ReservoirRecipe recipe) {
-            this.recipe = recipe;
-        }
+    record ReservoirFinishedRecipe(ReservoirRecipe recipe) implements FinishedRecipe {
 
         @Override
         public void serializeRecipeData(JsonObject json) {

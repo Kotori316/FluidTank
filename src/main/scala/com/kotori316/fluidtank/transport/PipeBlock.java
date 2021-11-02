@@ -171,8 +171,7 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         BlockState blockState = level.getBlockState(pos);
         BlockEntity entity = level.getBlockEntity(pos);
         if (blockState.getBlock() == this) {
-            if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTileBase) {
-                PipeTileBase p = (PipeTileBase) entity;
+            if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTileBase p) {
                 return p.getColor() == Config.content().pipeColor().get() ? Connection.CONNECTED : Connection.NO_CONNECTION;
             }
             return Connection.CONNECTED;

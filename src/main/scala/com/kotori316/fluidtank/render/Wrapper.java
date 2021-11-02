@@ -5,12 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector4f;
 
-class Wrapper {
-    final VertexConsumer buffer;
-
-    Wrapper(VertexConsumer buffer) {
-        this.buffer = buffer;
-    }
+record Wrapper(VertexConsumer buffer) {
 
     private static final Vector4f vector4f = new Vector4f();
 
