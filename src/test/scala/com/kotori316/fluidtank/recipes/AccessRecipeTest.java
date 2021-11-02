@@ -44,9 +44,9 @@ final class AccessRecipeTest extends BeforeAllTest {
 
     @Test
     void dummy() {
-        assertTrue(tiers().count() > 0);
+        assertTrue(tiers().findAny().isPresent());
         assertTrue(TierRecipeTest.fluids1().length > 0);
-        assertTrue(ReservoirRecipeSerialize.tierAndIngredient().count() > 0);
+        assertTrue(ReservoirRecipeSerialize.tierAndIngredient().findAny().isPresent());
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
         assertNotNull(buffer);
     }

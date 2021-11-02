@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank.ModObjects
 import com.kotori316.fluidtank.items.ItemBlockTank
-import com.kotori316.fluidtank.tiles.{Tier, TileTank}
+import com.kotori316.fluidtank.tiles.{Tier, TileTankVoid}
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
@@ -18,7 +18,7 @@ class BlockVoidTank extends BlockTank(Tier.VOID) {
 
   override def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack): Unit = {
     // Just save custom name.
-    Option(tileEntity).collect { case tank: TileTank => tank.getStackName }.flatten
+    Option(tileEntity).collect { case tank: TileTankVoid => tank.getStackName }.flatten
       .foreach(stack.setHoverName)
   }
 
