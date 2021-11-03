@@ -173,7 +173,7 @@ dependencies {
     // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
-    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.6-build-4', classifier: 'with-library') {
+    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.7-build-1', classifier: 'with-library') {
         transitive(false)
     }
     // Mixin
@@ -388,6 +388,7 @@ task checkMethod() {
             System.out.println(config.getName())
             config.getAllDependencies().each { System.out.println(it) }
         }
+        printProperties()
     }
 }
 
@@ -445,6 +446,15 @@ task copyToDrive(type: Copy, dependsOn: "build") {
         System.getenv(PATH_NAME) != null &&
                 Files.exists(Paths.get(System.getenv(PATH_NAME)))
     }
+}
+
+static void printProperties() {
+    System.out.println("PRINT_PROPERTIES_START")
+    System.getProperties().entrySet().stream()
+            .map { e -> Map.entry(String.valueOf(e.getKey()), e.getValue()) }
+            .sorted(Map.Entry.comparingByKey())
+            .forEach { e -> System.out.println(e.getKey() + ": " + e.getValue().toString()) }
+    System.out.println("PRINT_PROPERTIES_END")
 }
 
 ////////////////
