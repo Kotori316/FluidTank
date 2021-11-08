@@ -28,6 +28,6 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
   * FOR USERS install https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala
 
 * **REQUIRED** [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)
-  * Version 0.9.0
+  * Version 0.9.2
   * Licensed under the [MPL-2.0](https://github.com/AlexIIL/LibBlockAttributes/blob/0.9.x-1.17.x/LICENSE)
   * For Users, install https://www.curseforge.com/minecraft/mc-mods/libblockattributes

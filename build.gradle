@@ -4,7 +4,7 @@ plugins {
     id "scala"
     id("maven-publish")
     // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
-    id 'fabric-loom' version "0.9.31"
+    id 'fabric-loom' version "0.10.50"
     // id 'maven-publish'
     //noinspection SpellCheckingInspection
     id "com.github.breadmoirai.github-release" version "2.2.12"
@@ -16,7 +16,7 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-minecraft {
+loom {
     runs {
         it.configure {
             client {
@@ -59,20 +59,20 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     //noinspection SpellCheckingInspection
-    modImplementation "net.fabricmc:fabric-language-scala:1.0.0"
+    modImplementation "net.fabricmc:fabric-language-scala:${project.fabric_scala_version}"
 
     // library
-    implementation "org.scala-lang:scala-library:2.13.4"
+    implementation "org.scala-lang:scala-library:2.13.6"
     implementation "com.google.code.findbugs:jsr305:3.0.1"
     //noinspection SpellCheckingInspection
     modImplementation "alexiil.mc.lib:libblockattributes-all:${project.bc_attribute_version}"
 
     //noinspection SpellCheckingInspection
-    modRuntime("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
+    modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
     //noinspection SpellCheckingInspection
-    modRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
     modImplementation("RebornCore:RebornCore-1.17:${project.RebornCore_version}")
-    modRuntime("TechReborn:TechReborn-1.17:${project.TechReborn_version}")
+    modRuntimeOnly("TechReborn:TechReborn-1.17:${project.TechReborn_version}")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
@@ -96,7 +96,6 @@ processResources {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
-    options.release.set(16)
 }
 
 java {
@@ -104,9 +103,9 @@ java {
     // if it is present.
     // If you remove this line, sources will not be generated.
     // withSourcesJar()
-    toolchain {
-        it.languageVersion = JavaLanguageVersion.of(16)
-    }
+//    toolchain {
+//        it.languageVersion = JavaLanguageVersion.of(16)
+//    }
 }
 
 jar {
