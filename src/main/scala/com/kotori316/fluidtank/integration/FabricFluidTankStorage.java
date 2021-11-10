@@ -13,7 +13,7 @@ import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.tank.Connection;
 import com.kotori316.fluidtank.tank.TileTank;
 
-@SuppressWarnings({"deprecation", "UnstableApiUsage"})
+@SuppressWarnings({"UnstableApiUsage"})
 public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> implements SingleSlotStorage<FluidVariant> {
     private final Connection connection;
 

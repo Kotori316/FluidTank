@@ -3,8 +3,8 @@ package com.kotori316.fluidtank.fluid
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys
 import com.kotori316.fluidtank.{BeforeAllTest, FluidAmount}
-import net.minecraft.fluid.Fluids
-import net.minecraft.item.{ItemStack, Items}
+import net.minecraft.world.item.{ItemStack, Items}
+import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable

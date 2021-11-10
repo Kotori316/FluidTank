@@ -2,8 +2,8 @@ package com.kotori316.fluidtank;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.minecraft.Bootstrap;
 import net.minecraft.SharedConstants;
+import net.minecraft.server.Bootstrap;
 import org.junit.jupiter.api.BeforeAll;
 
 public class BeforeAllTest {
@@ -16,10 +16,10 @@ public class BeforeAllTest {
 
     public static synchronized void setup() {
         if (!INITIALIZED.getAndSet(true)) {
-            SharedConstants.createGameVersion();
+            SharedConstants.tryDetectVersion();
             initLoader();
             changeDist();
-            Bootstrap.initialize();
+            Bootstrap.bootStrap();
         }
     }
 
