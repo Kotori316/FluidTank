@@ -8,13 +8,14 @@ import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.tank.TileTank.getFluidHeight
 import com.kotori316.fluidtank.{FluidAmount, ModTank}
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.{BlockEntity, BlockEntityType}
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.text.{LiteralText, Text}
-import net.minecraft.util.Nameable
-import net.minecraft.util.math.{BlockPos, MathHelper}
-import net.minecraft.world.World
+import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.{Component, TextComponent}
+import net.minecraft.util.Mth
+import net.minecraft.world.Nameable
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
+import net.minecraft.world.level.block.state.BlockState
 
 import scala.math.Ordering.Implicits.infixOrderingOps
 
@@ -36,36 +37,36 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
   val tank = new Tank
   var connection: Connection = Connection.invalid
   var loading = false
-  var stackName: Text = _
+  var stackName: Component = _
 
-  override def writeNbt(compound: NbtCompound): NbtCompound = {
-    compound.put(TileTank.NBT_Tank, tank.writeToNBT(new NbtCompound))
+  override def save(compound: CompoundTag): CompoundTag = {
+    compound.put(TileTank.NBT_Tank, tank.writeToNBT(new CompoundTag))
     compound.put(TileTank.NBT_Tier, tier.toNBTTag)
-    getStackName.foreach(t => compound.putString(TileTank.NBT_StackName, Text.Serializer.toJson(t)))
-    super.writeNbt(compound)
+    getStackName.foreach(t => compound.putString(TileTank.NBT_StackName, Component.Serializer.toJson(t)))
+    super.save(compound)
   }
 
-  def getBlockTag: NbtCompound = {
-    val nbt = writeNbt(new NbtCompound)
+  def getBlockTag: CompoundTag = {
+    val nbt = save(new CompoundTag)
     Seq("x", "y", "z", "id").foreach(nbt.remove)
     nbt
   }
 
-  override def readNbt(compound: NbtCompound): Unit = {
-    super.readNbt(compound)
+  override def load(compound: CompoundTag): Unit = {
+    super.load(compound)
     tank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
-      stackName = Text.Serializer.fromJson(compound.getString(TileTank.NBT_StackName))
+      stackName = Component.Serializer.fromJson(compound.getString(TileTank.NBT_StackName))
     }
     loading = true
   }
 
-  def readNBTClient(compound: NbtCompound): Unit = {
+  def readNBTClient(compound: CompoundTag): Unit = {
     tank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
     tier = Tiers.fromNBT(compound.getCompound(TileTank.NBT_Tier))
     if (compound.contains(TileTank.NBT_StackName)) {
-      stackName = Text.Serializer.fromJson(compound.getString(TileTank.NBT_StackName))
+      stackName = Component.Serializer.fromJson(compound.getString(TileTank.NBT_StackName))
     } else {
       stackName = null
     }
@@ -75,7 +76,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = handleUpdateTag(pkt.getNbtCompound)
   */
   private def sendPacket(): Unit = {
-    if (hasWorld && !world.isClient) sync()
+    if (hasLevel && !level.isClientSide) sync()
   }
 
   def hasContent: Boolean = tank.getFluidAmount > 0
@@ -83,8 +84,8 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
   def getComparatorLevel: Int = connection.getComparatorLevel
 
   def onBlockPlacedBy(): Unit = {
-    val downTank = Option(getWorld.getBlockEntity(getPos.down())).collect { case t: TileTank => t }
-    val upTank = Option(getWorld.getBlockEntity(getPos.up())).collect { case t: TileTank => t }
+    val downTank = Option(getLevel.getBlockEntity(getBlockPos.below())).collect { case t: TileTank => t }
+    val upTank = Option(getLevel.getBlockEntity(getBlockPos.above())).collect { case t: TileTank => t }
     val newSeq = (downTank, upTank) match {
       case (Some(dT), Some(uT)) => (dT.connection.seq :+ this) ++ uT.connection.seq
       case (None, Some(uT)) => this +: uT.connection.seq
@@ -98,14 +99,14 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     this.connection.remove(this)
   }
 
-  def getStackName: Option[Text] = Option(stackName)
+  def getStackName: Option[Component] = Option(stackName)
 
-  override def getName: Text = getStackName
-    .getOrElse(new LiteralText(tier.toString + " Tank"))
+  override def getName: Component = getStackName
+    .getOrElse(new TextComponent(tier.toString + " Tank"))
 
   override def hasCustomName: Boolean = stackName != null
 
-  override def getCustomName: Text = getStackName.orNull
+  override def getCustomName: Component = getStackName.orNull
 
   class Tank extends FluidAmount.Tank {
     var box: Box = _
@@ -117,7 +118,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       sendPacket()
       if (!loading)
         connection.updateNeighbors()
-      if ((!hasWorld || self.getWorld.isClient) && capacity != 0) {
+      if ((!hasLevel || self.getLevel.isClientSide) && capacity != 0) {
         if (getFluidAmount > 0) {
           val d = 1d / 16d
           val lowerBound = 0.001d
@@ -131,7 +132,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       listeners.keys.foreach(_.onChange(this, 0, previous.fluidVolume, fluid.fluidVolume))
     }
 
-    def readFromNBT(nbt: NbtCompound): Tank = {
+    def readFromNBT(nbt: CompoundTag): Tank = {
       capacity = nbt.getInt(TileTank.NBT_Capacity)
       val fluid = FluidAmount.fromNBT(nbt)
       setFluid(fluid)
@@ -139,7 +140,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       this
     }
 
-    def writeToNBT(nbt: NbtCompound): NbtCompound = {
+    def writeToNBT(nbt: CompoundTag): CompoundTag = {
       fluid.write(nbt)
       nbt.putInt(TileTank.NBT_Capacity, capacity)
       nbt
@@ -250,9 +251,9 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     override def getMaxAmount_F(tank: Int): BCAmount = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET)
   }
 
-  override def fromClientTag(tag: NbtCompound): Unit = readNbt(tag)
+  override def fromClientTag(tag: CompoundTag): Unit = self.load(tag)
 
-  override def toClientTag(tag: NbtCompound): NbtCompound = writeNbt(tag)
+  override def toClientTag(tag: CompoundTag): CompoundTag = self.save(tag)
 
   override def addAllAttributes(to: AttributeList[_]): Unit = {
     to.offer(this.connection.handler)
@@ -268,8 +269,8 @@ object TileTank {
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
 
-  def tick(world: World, pos: BlockPos, state: BlockState, tile: TileTank): Unit = {
-    if (tile.loading && !world.isClient) {
+  def tick(world: Level, pos: BlockPos, state: BlockState, tile: TileTank): Unit = {
+    if (tile.loading && !world.isClientSide) {
       world.getProfiler.push("Connection Loading")
       if (tile.connection == Connection.invalid)
         Connection.load(world, pos)
@@ -288,7 +289,7 @@ object TileTank {
    * @return (minY, maxY)
    */
   def getFluidHeight(capacity: Double, amount: Double, lowerBound: Double, upperBound: Double, minRatio: Double, isGaseous: Boolean): (Double, Double) = {
-    val ratio = MathHelper.clamp(amount / capacity, minRatio, 1)
+    val ratio = Mth.clamp(amount / capacity, minRatio, 1)
     val height = (upperBound - lowerBound) * ratio
     if (isGaseous) {
       (upperBound - height, upperBound)

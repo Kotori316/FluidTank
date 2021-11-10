@@ -2,16 +2,16 @@ package com.kotori316.fluidtank.integration;
 
 import java.math.RoundingMode;
 
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Hand;
 import reborncore.common.fluid.container.ItemFluidInfo;
 
 import com.kotori316.fluidtank.FluidAmount;
@@ -36,7 +36,7 @@ class TechRebornCellInteraction implements FluidInteraction {
     }
 
     @Override
-    public FluidVolumeUtil.FluidTankInteraction interact(Connection connection, PlayerEntity player, Hand hand, ItemStack stack) {
+    public FluidVolumeUtil.FluidTankInteraction interact(Connection connection, Player player, InteractionHand hand, ItemStack stack) {
         FluidAmount fluidAmount = getFluidInContainer(stack);
         if (fluidAmount.isEmpty()) {
             // Fill the cell and drain from tanks.
@@ -47,13 +47,13 @@ class TechRebornCellInteraction implements FluidInteraction {
             if (toFill.nonEmpty() && toFill.fluid() != null) { // Null means not registered fluid such as potion.
                 int stackSize = toFill.fluidVolume().amount().asInt(1);
                 ItemStack full = ((ItemFluidInfo) stack.getItem()).getFull(toFill.fluid());
-                stack.decrement(stackSize);
+                stack.shrink(stackSize);
                 full.setCount(stackSize);
-                if (!player.getInventory().insertStack(full)) {
-                    player.dropStack(full);
+                if (!player.getInventory().add(full)) {
+                    player.spawnAtLocation(full);
                 }
                 connection.handler().drain(toFill, true, 0);
-                player.playSound(getSoundEvent(toFill, true), SoundCategory.BLOCKS, 1.0f, 1.0f);
+                player.playNotifySound(getSoundEvent(toFill, true), SoundSource.BLOCKS, 1.0f, 1.0f);
             }
             return new FluidVolumeUtil.FluidTankInteraction(toFill.fluidVolume(), false,
                 FluidVolumeUtil.ItemContainerStatus.NOT_CHECKED, FluidVolumeUtil.ItemContainerStatus.VALID);
@@ -64,13 +64,13 @@ class TechRebornCellInteraction implements FluidInteraction {
                 // Draining from cell always successes.
                 int stackSize = simulation.fluidVolume().amount().asInt(1, RoundingMode.DOWN);
                 ItemStack empty = ((ItemFluidInfo) stack.getItem()).getEmpty();
-                stack.decrement(stackSize);
+                stack.shrink(stackSize);
                 empty.setCount(stackSize);
-                if (!player.getInventory().insertStack(empty)) {
-                    player.dropStack(empty);
+                if (!player.getInventory().add(empty)) {
+                    player.spawnAtLocation(empty);
                 }
                 connection.handler().fill(fluidAmount.setAmount(simulation.fluidVolume().amount()), true, 0);
-                player.playSound(getSoundEvent(fluidAmount, false), SoundCategory.BLOCKS, 1.0f, 1.0f);
+                player.playNotifySound(getSoundEvent(fluidAmount, false), SoundSource.BLOCKS, 1.0f, 1.0f);
             } else {
                 return FluidVolumeUtil.FluidTankInteraction.none(FluidVolumeUtil.ItemContainerStatus.VALID, FluidVolumeUtil.ItemContainerStatus.NOT_CHECKED);
             }
@@ -81,9 +81,9 @@ class TechRebornCellInteraction implements FluidInteraction {
     private static SoundEvent getSoundEvent(FluidAmount toFill, boolean fill) {
         final SoundEvent soundEvent;
         if (toFill.fluidEqual(FluidAmount.BUCKET_LAVA()))
-            soundEvent = fill ? SoundEvents.ITEM_BUCKET_FILL_LAVA : SoundEvents.ITEM_BUCKET_EMPTY_LAVA;
+            soundEvent = fill ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_EMPTY_LAVA;
         else
-            soundEvent = fill ? SoundEvents.ITEM_BUCKET_FILL : SoundEvents.ITEM_BUCKET_EMPTY;
+            soundEvent = fill ? SoundEvents.BUCKET_FILL : SoundEvents.BUCKET_EMPTY;
         return soundEvent;
     }
 }

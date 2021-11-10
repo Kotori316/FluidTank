@@ -2,46 +2,47 @@ package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.ModTank
 import com.kotori316.fluidtank.tank.{TankBlock, TankBlockItem, TileTank}
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.item.ItemRenderer
-import net.minecraft.client.render.model.BakedModel
-import net.minecraft.client.render.model.json.ModelTransformation
-import net.minecraft.client.render.{DiffuseLighting, VertexConsumerProvider}
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.item.ItemStack
-import net.minecraft.util.math.BlockPos
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.block.model.ItemTransforms
+import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.resources.model.BakedModel
+import net.minecraft.core.BlockPos
+import net.minecraft.world.item.ItemStack
 
 @Environment(EnvType.CLIENT)
 class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
-  lazy val tileTank = new TileTank(BlockPos.ORIGIN, ModTank.Entries.WOOD_TANK.getDefaultState)
+  lazy val tileTank = new TileTank(BlockPos.ZERO, ModTank.Entries.WOOD_TANK.defaultBlockState())
   private val internalModel = new RenderItemTank.Model
 
-  override def render(stack: ItemStack, mode: ModelTransformation.Mode, matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, mode: ItemTransforms.TransformType, matrixStack: PoseStack, renderTypeBuffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: TankBlockItem =>
 
-        val state = tankItem.blockTank.getDefaultState
-        val model = MinecraftClient.getInstance.getBlockRenderManager.getModel(state)
+        val state = tankItem.blockTank.defaultBlockState()
+        val model = Minecraft.getInstance.getBlockRenderer.getBlockModel(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
         //val renderType = RenderLayers.getItemLayer(stack, true)
         //val b = renderTypeBuffer.getBuffer(renderType)
-        renderItemModel(MinecraftClient.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
+        renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
 
         tileTank.tier = tankItem.blockTank.tiers
         tileTank.tank.setFluid(null)
-        val compound = stack.getSubNbt(TankBlock.NBT_BlockTag)
+        val compound = stack.getTagElement(TankBlock.NBT_BlockTag)
         if (compound != null)
           tileTank.readNBTClient(compound)
-        DiffuseLighting.disableGuiDepthLighting()
-        MinecraftClient.getInstance.getBlockEntityRenderDispatcher.renderEntity(
+        Lighting.setupForFlatItems()
+        Minecraft.getInstance.getBlockEntityRenderDispatcher.renderItem(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
-        DiffuseLighting.enableGuiDepthLighting()
+        Lighting.setupFor3DItems()
 
       case _ => ModTank.LOGGER.warn("RenderItemTank is called for " + stack.getItem)
     }
@@ -49,13 +50,13 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
   // copy of ItemRenderer#func_229114_a_()
   def renderItemModel(renderer: ItemRenderer, model: BakedModel, stack: ItemStack, light: Int, otherLight: Int,
-                      matrixStack: MatrixStack, renderTypeBuffer: VertexConsumerProvider): Unit = {
+                      matrixStack: PoseStack, renderTypeBuffer: MultiBufferSource): Unit = {
     //    renderBakedItemModel.invoke(renderer,
     //      model, stack, light, otherLight, matrixStack, builder)
     internalModel.setModel(model)
     matrixStack.push()
     matrixStack.translate(0.5D, 0.5D, 0.5D)
-    renderer.renderItem(stack, ModelTransformation.Mode.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, internalModel)
+    renderer.render(stack, ItemTransforms.TransformType.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, internalModel)
     matrixStack.pop()
   }
 
@@ -68,7 +69,7 @@ object RenderItemTank {
       this.wrapped = newModel
     }
 
-    override def isBuiltin: Boolean = false
+    override def isCustomRenderer: Boolean = false
   }
 
 }

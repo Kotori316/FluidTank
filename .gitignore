@@ -25,5 +25,5 @@ FILES
 run-server
 
 # fabric
-
 run/
+remappedSrc/

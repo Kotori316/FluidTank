@@ -1,12 +1,11 @@
 package com.kotori316.fluidtank
 
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.math.{Direction, Vec3f, Vector4f}
+import com.mojang.blaze3d.vertex.{PoseStack, VertexConsumer}
+import com.mojang.math.Vector4f
 
 package object render {
 
-  implicit class MatrixHelper(private val mat: MatrixStack) extends AnyVal {
+  implicit class MatrixHelper(private val mat: PoseStack) extends AnyVal {
     def push(): Unit = {
       mat.push()
     }
@@ -28,14 +27,10 @@ package object render {
     }
   }
 
-  private[this] final val vector3f = new Vec3f()
   private[this] final val vector4f = new Vector4f()
 
-  private def getPosVector(x: Float, y: Float, z: Float, matrix: MatrixStack): Vector4f = {
-    val vec3i = Direction.UP.getVector
-    vector3f.set(vec3i.getX.toFloat, vec3i.getY.toFloat, vec3i.getZ.toFloat)
-    val matrix4f = matrix.peek().getModel
-    vector3f.transform(matrix.peek().getNormal)
+  private def getPosVector(x: Float, y: Float, z: Float, matrix: PoseStack): Vector4f = {
+    val matrix4f = matrix.last().pose()
 
     vector4f.set(x, y, z, 1.0F)
     vector4f.transform(matrix4f)
@@ -43,9 +38,9 @@ package object render {
   }
 
   class Wrapper(val buffer: VertexConsumer) extends AnyVal {
-    def pos(x: Double, y: Double, z: Double, matrix: MatrixStack): Wrapper = {
+    def pos(x: Double, y: Double, z: Double, matrix: PoseStack): Wrapper = {
       val vector4f = getPosVector(x.toFloat, y.toFloat, z.toFloat, matrix)
-      buffer.vertex(vector4f.getX, vector4f.getY, vector4f.getZ)
+      buffer.vertex(vector4f.x, vector4f.y, vector4f.z)
       this
     }
 
@@ -55,18 +50,18 @@ package object render {
     }
 
     def tex(u: Float, v: Float): Wrapper = {
-      buffer.texture(u, v)
+      buffer.uv(u, v)
       this
     }
 
     //noinspection SpellCheckingInspection
     def lightmap(l1: Int, l2: Int): Wrapper = {
-      buffer.overlay(10, 10).light(l1, l2)
+      buffer.overlayCoords(10, 10).uv2(l1, l2)
       this
     }
 
     def endVertex(): Unit = {
-      buffer.normal(0, 1, 0).next()
+      buffer.normal(0, 1, 0).endVertex()
     }
   }
 

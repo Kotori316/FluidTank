@@ -2,8 +2,8 @@ package com.kotori316.fluidtank.tank
 
 import com.kotori316.fluidtank.ModTank.Entries
 import com.kotori316.fluidtank._
-import net.minecraft.block.BlockState
-import net.minecraft.util.math.BlockPos
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.state.BlockState
 
 class TileTankCreative(pos: BlockPos, state: BlockState) extends TileTank(Tiers.CREATIVE, Entries.CREATIVE_BLOCK_ENTITY_TYPE, pos, state) {
 

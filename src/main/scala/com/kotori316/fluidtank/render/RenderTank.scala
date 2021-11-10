@@ -3,32 +3,32 @@ package com.kotori316.fluidtank.render
 import java.util.Objects
 
 import com.kotori316.fluidtank.tank.TileTank
+import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.block.entity.{BlockEntityRenderer, BlockEntityRendererFactory}
-import net.minecraft.client.render.{RenderLayer, VertexConsumerProvider}
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.tag.FluidTags
-import net.minecraft.util.math.Direction
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.blockentity.{BlockEntityRenderer, BlockEntityRendererProvider}
+import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
+import net.minecraft.core.Direction
+import net.minecraft.tags.FluidTags
 
 @Environment(EnvType.CLIENT)
-class RenderTank(d: BlockEntityRendererFactory.Context) extends BlockEntityRenderer[TileTank] {
+class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
 
-  override def render(te: TileTank, partialTicks: Float, matrix: MatrixStack, buffer: VertexConsumerProvider, light: Int, otherLight: Int): Unit = {
-    MinecraftClient.getInstance.getProfiler.push("RenderTank")
+  override def render(te: TileTank, partialTicks: Float, matrix: PoseStack, buffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
+    Minecraft.getInstance.getProfiler.push("RenderTank")
     if (te.hasContent) {
       matrix.push()
       val tank = te.tank
       if (tank.box != null) {
         if (tank.fluid.fluid != null) {
           val texture = RenderTank.textureName(te)
-          //        val texture = MinecraftClient.getInstance.getSpriteAtlas(PlayerContainer.BLOCK_ATLAS_TEXTURE).apply(resource)
+          //        val texture = Minecraft.getInstance.getSpriteAtlas(PlayerContainer.BLOCK_ATLAS_TEXTURE).apply(resource)
           val color = RenderTank.color(te)
 
           val b = buffer.getBuffer {
-            if (MinecraftClient.isFabulousGraphicsOrBetter) RenderLayer.getCutout
-            else RenderLayer.getTranslucent
+            if (Minecraft.useShaderTransparency()) RenderType.cutout()
+            else RenderType.translucent()
           }
           val value = Box.LightValue(light).overrideBlock(te.tank.fluid.fluidVolume.getFluidKey.luminosity)
           tank.box.render(b, matrix, texture, color >> 24 & 0xFF, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
@@ -48,7 +48,7 @@ class RenderTank(d: BlockEntityRendererFactory.Context) extends BlockEntityRende
       }
       matrix.pop()
     }
-    MinecraftClient.getInstance.getProfiler.pop()
+    Minecraft.getInstance.getProfiler.pop()
   }
 }
 
@@ -61,15 +61,15 @@ object RenderTank {
     Objects.requireNonNull(world, "World should not be null.")
     Objects.requireNonNull(pos, "BlockPos should not be null.")
     val handler = FluidRenderHandlerRegistry.INSTANCE.get(tank.fluid.fluid)
-    val sprites = handler.getFluidSprites(world, pos, tank.fluid.fluid.getDefaultState)
+    val sprites = handler.getFluidSprites(world, pos, tank.fluid.fluid.defaultFluidState())
     sprites.apply(0)
   }
 
   private def color(tile: TileTank) = {
     val fluidAmount = tile.tank.fluid
     val (world, pos) = getWorldAndPos(tile)
-    val c = FluidRenderHandlerRegistry.INSTANCE.get(fluidAmount.fluid).getFluidColor(world, pos, fluidAmount.fluid.getDefaultState)
-    if (fluidAmount.fluid.isIn(FluidTags.WATER)) {
+    val c = FluidRenderHandlerRegistry.INSTANCE.get(fluidAmount.fluid).getFluidColor(world, pos, fluidAmount.fluid.defaultFluidState())
+    if (fluidAmount.fluid.is(FluidTags.WATER)) {
       c | 0xFF000000
     } else {
       c
@@ -77,5 +77,5 @@ object RenderTank {
   }
 
   private[this] def getWorldAndPos(tileTank: TileTank) =
-    if (tileTank.hasWorld) (tileTank.getWorld, tileTank.getPos) else (MinecraftClient.getInstance().world, MinecraftClient.getInstance().player.getBlockPos)
+    if (tileTank.hasLevel) (tileTank.getLevel, tileTank.getBlockPos) else (Minecraft.getInstance().level, Minecraft.getInstance().player.getOnPos)
 }

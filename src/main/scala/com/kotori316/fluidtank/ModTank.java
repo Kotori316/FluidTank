@@ -10,19 +10,19 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.function.LootFunctionType;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,35 +42,35 @@ import com.kotori316.fluidtank.tank.VoidTankBlock;
 public class ModTank implements ModInitializer {
     public static final String modID = "fluidtank";
     public static final Logger LOGGER = LogManager.getLogger(modID);
-    public static final ItemGroup CREATIVE_TAB = FabricItemGroupBuilder.build(
-        new Identifier(modID, modID), () -> new ItemStack(Entries.WOOD_TANK)
+    public static final CreativeModeTab CREATIVE_TAB = FabricItemGroupBuilder.build(
+        new ResourceLocation(modID, modID), () -> new ItemStack(Entries.WOOD_TANK)
     );
-    public static final Material MATERIAL = new Material(MapColor.CLEAR, false, true, true, false,
-        true, false, PistonBehavior.BLOCK);
+    public static final Material MATERIAL = new Material(MaterialColor.NONE, false, true, true, false,
+        true, false, PushReaction.BLOCK);
     public static final double d = 1 / 16d;
-    public static final Box BOUNDING_BOX = new Box(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d);
-    public static final VoxelShape TANK_SHAPE = VoxelShapes.cuboid(BOUNDING_BOX);
+    public static final AABB BOUNDING_BOX = new AABB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d);
+    public static final VoxelShape TANK_SHAPE = Shapes.create(BOUNDING_BOX);
 
     @Override
     public void onInitialize() {
         ModTank.LOGGER.debug("Universal init is called. {} ", ModTank.modID);
-        Registry.register(Registry.BLOCK, new Identifier(modID, "tank_wood"), Entries.WOOD_TANK);
-        Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.BLOCK, new Identifier(modID, "tank_" + block.tiers.toString().toLowerCase()), block));
-        Registry.register(Registry.BLOCK, new Identifier(modID, "creative"), Entries.CREATIVE_TANK);
-        Registry.register(Registry.BLOCK, new Identifier(modID, "tank_void"), Entries.VOID_TANK);
+        Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_wood"), Entries.WOOD_TANK);
+        Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_" + block.tiers.toString().toLowerCase()), block));
+        Registry.register(Registry.BLOCK, new ResourceLocation(modID, "creative"), Entries.CREATIVE_TANK);
+        Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_void"), Entries.VOID_TANK);
 
-        Registry.register(Registry.ITEM, new Identifier(modID, "tank_wood"), Entries.WOOD_TANK.blockItem());
-        Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.ITEM, new Identifier(modID, "tank_" + block.tiers.toString().toLowerCase()), block.blockItem()));
-        Registry.register(Registry.ITEM, new Identifier(modID, "creative"), Entries.CREATIVE_TANK.blockItem());
-        Registry.register(Registry.ITEM, new Identifier(modID, "tank_void"), Entries.VOID_TANK.blockItem());
+        Registry.register(Registry.ITEM, new ResourceLocation(modID, "tank_wood"), Entries.WOOD_TANK.blockItem());
+        Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.ITEM, new ResourceLocation(modID, "tank_" + block.tiers.toString().toLowerCase()), block.blockItem()));
+        Registry.register(Registry.ITEM, new ResourceLocation(modID, "creative"), Entries.CREATIVE_TANK.blockItem());
+        Registry.register(Registry.ITEM, new ResourceLocation(modID, "tank_void"), Entries.VOID_TANK.blockItem());
 
-        Registry.register(Registry.FLUID, new Identifier(modID, MilkFluid.NAME()), Entries.MILK_FLUID);
+        Registry.register(Registry.FLUID, new ResourceLocation(modID, MilkFluid.NAME()), Entries.MILK_FLUID);
 
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(modID, "tank"), Entries.TANK_BLOCK_ENTITY_TYPE);
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(modID, "tank_creative"), Entries.CREATIVE_BLOCK_ENTITY_TYPE);
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(modID, "tank_void"), Entries.VOID_BLOCK_ENTITY_TYPE);
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(modID, "tank"), Entries.TANK_BLOCK_ENTITY_TYPE);
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(modID, "tank_creative"), Entries.CREATIVE_BLOCK_ENTITY_TYPE);
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(modID, "tank_void"), Entries.VOID_BLOCK_ENTITY_TYPE);
 
-        Registry.register(Registry.LOOT_FUNCTION_TYPE, new Identifier(ModTank.modID, "content_tank"), Entries.CONTENT_LOOT_FUNCTION_TYPE);
+        Registry.register(Registry.LOOT_FUNCTION_TYPE, new ResourceLocation(ModTank.modID, "content_tank"), Entries.CONTENT_LOOT_FUNCTION_TYPE);
 
         RecipeSerializer.register(TierRecipe.Serializer.LOCATION.toString(), TierRecipe.SERIALIZER);
         RecipeSerializer.register(TankRecipe.LOCATION.toString(), TankRecipe.SERIALIZER);
@@ -88,7 +88,7 @@ public class ModTank implements ModInitializer {
             ImmutableList.<TankBlock>builder().add(WOOD_TANK).addAll(TANK_BLOCKS).build().toArray(new TankBlock[0])).build(DSL.emptyPartType());
         public static final BlockEntityType<TileTankCreative> CREATIVE_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTankCreative::new, CREATIVE_TANK).build(DSL.emptyPartType());
         public static final BlockEntityType<TileTankVoid> VOID_BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(TileTankVoid::new, VOID_TANK).build(DSL.emptyPartType());
-        public static final LootFunctionType CONTENT_LOOT_FUNCTION_TYPE = new LootFunctionType(new ContentTankSerializer());
+        public static final LootItemFunctionType CONTENT_LOOT_FUNCTION_TYPE = new LootItemFunctionType(new ContentTankSerializer());
 
         public static final List<TankBlock> ALL_TANK_BLOCKS = ImmutableList.<TankBlock>builder()
             .add(WOOD_TANK)

@@ -1,9 +1,9 @@
 package com.kotori316.fluidtank.render
 
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.texture.Sprite
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.math.{BlockBox, MathHelper}
+import com.mojang.blaze3d.vertex.{PoseStack, VertexConsumer}
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.Mth
+import net.minecraft.world.phys.AABB
 
 //noinspection DuplicatedCode
 sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
@@ -20,7 +20,7 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
   val offZ: Double = sizeZ / 2
   val maxSize: Double = Math.max(Math.max(sizeX, sizeY), sizeZ)
 
-  def render(buffer: VertexConsumer, matrix: MatrixStack, sprite: Sprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lightValue: Box.LightValue): Unit = {
+  def render(buffer: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lightValue: Box.LightValue): Unit = {
     val n1X = dx
     val n1Y = Box.normalY(dx, dy, dz)
     val n1Z = dz
@@ -32,7 +32,7 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
       alpha, red, green, blue)
   }
 
-  protected final def renderInternal(r: VertexConsumer, matrix: MatrixStack, sprite: Sprite,
+  protected final def renderInternal(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite,
                                      n1X: Double, n1Y: Double, n1Z: Double,
                                      n2X: Double, n2Z: Double, lv: Box.LightValue,
                                      alpha: Int, red: Int, green: Int, blue: Int): Unit = {
@@ -58,43 +58,43 @@ sealed class Box(val startX: Double, val startY: Double, val startZ: Double,
     val e4Z = startZ + n1Z * sizeZ - n2Z * sizeZ
 
     if (firstSide) {
-      buffer.pos(e1X, e1Y, e1Z, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e2X, e2Y, e2Z, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e3X, e3Y, e3Z, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e4X, e4Y, e4Z, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e1X, e1Y, e1Z, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e2X, e2Y, e2Z, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e3X, e3Y, e3Z, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e4X, e4Y, e4Z, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
     }
     val l = Math.sqrt(dx / sizeX * dx / sizeX + dy / sizeY * dy / sizeY + dz / sizeZ * dz / sizeZ)
-    val lengthFloor = MathHelper.floor(l)
+    val lengthFloor = Mth.floor(l)
     var i1 = 0
     while (i1 <= lengthFloor) {
       val i2 = if (i1 == lengthFloor) l else i1 + 1
-      buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
 
-      buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e2X + eX * i2, e2Y + eY * i2, e2Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e2X + eX * i1, e2Y + eY * i1, e2Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
 
-      buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e3X + eX * i2, e3Y + eY * i2, e3Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e3X + eX * i1, e3Y + eY * i1, e3Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
 
-      buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e4X + eX * i2, e4Y + eY * i2, e4Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e4X + eX * i1, e4Y + eY * i1, e4Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e1X + eX * i1, e1Y + eY * i1, e1Z + eZ * i1, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e1X + eX * i2, e1Y + eY * i2, e1Z + eZ * i2, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
 
       i1 += 1
     }
     if (endSide) {
-      buffer.pos(e1X + dx, e1Y + dy, e1Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e2X + dx, e2Y + dy, e2Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMinV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e3X + dx, e3Y + dy, e3Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getMaxU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
-      buffer.pos(e4X + dx, e4Y + dy, e4Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getMinU, sprite.getMaxV).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e1X + dx, e1Y + dy, e1Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e2X + dx, e2Y + dy, e2Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV0).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e3X + dx, e3Y + dy, e3Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getU1, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
+      buffer.pos(e4X + dx, e4Y + dy, e4Z + dz, matrix).color(red, green, blue, alpha).tex(sprite.getU0, sprite.getV1).lightmap(lv.l1, lv.l2).endVertex()
     }
   }
 
@@ -119,15 +119,15 @@ private class BoxX(startX: Double,
   extends Box(startX, y, z, endX, y, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length: Double = dx
 
-  override def render(r: VertexConsumer, matrix: MatrixStack, sprite: Sprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val buffer: Wrapper = new Wrapper(r)
-    val count = MathHelper.floor(length / sizeX)
-    val minU = sprite.getMinU
-    val minV = sprite.getMinV
-    val maXV = sprite.getFrameV(sizeX / maxSize * 16)
-    val maYU = sprite.getFrameU(sizeY / maxSize * 16)
-    val maZU = sprite.getFrameU(sizeZ / maxSize * 16)
-    val maZV = sprite.getFrameV(sizeZ / maxSize * 16)
+    val count = Mth.floor(length / sizeX)
+    val minU = sprite.getU0
+    val minV = sprite.getV0
+    val maXV = sprite.getV(sizeX / maxSize * 16)
+    val maYU = sprite.getU(sizeY / maxSize * 16)
+    val maZU = sprite.getU(sizeZ / maxSize * 16)
+    val maZV = sprite.getV(sizeZ / maxSize * 16)
     if (firstSide) {
       //West
       buffer.pos(startX, y + offY, z - offZ, matrix).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -178,16 +178,16 @@ private class BoxY(startY: Double,
   extends Box(x, startY, z, x, endY, z, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = dy
 
-  override def render(r: VertexConsumer, matrix: MatrixStack, sprite: Sprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val buffer: Wrapper = new Wrapper(r)
-    val count = MathHelper.floor(length / sizeY)
-    val minU = sprite.getMinU
-    val minV = sprite.getMinV
+    val count = Mth.floor(length / sizeY)
+    val minU = sprite.getU0
+    val minV = sprite.getV0
 
-    val maYU = sprite.getFrameU(sizeY / maxSize * 16)
-    val maXV = sprite.getFrameV(sizeX / maxSize * 16)
-    val maZU = sprite.getFrameU(sizeZ / maxSize * 16)
-    val maZV = sprite.getFrameV(sizeZ / maxSize * 16)
+    val maYU = sprite.getU(sizeY / maxSize * 16)
+    val maXV = sprite.getV(sizeX / maxSize * 16)
+    val maZU = sprite.getU(sizeZ / maxSize * 16)
+    val maZV = sprite.getV(sizeZ / maxSize * 16)
     if (firstSide) {
       //Bottom
       buffer.pos(x + offX, startY, z - offZ, matrix).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -238,15 +238,15 @@ private class BoxZ(startZ: Double,
   extends Box(x, y, startZ, x, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = dz
 
-  override def render(r: VertexConsumer, matrix: MatrixStack, sprite: Sprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(r: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val buffer: Wrapper = new Wrapper(r)
-    val count = MathHelper.floor(length / sizeZ)
-    val minU = sprite.getMinU
-    val minV = sprite.getMinV
-    val maXU = sprite.getFrameU(sizeX / maxSize * 16)
-    val maXV = sprite.getFrameV(sizeX / maxSize * 16)
-    val maYU = sprite.getFrameU(sizeY / maxSize * 16)
-    val maZV = sprite.getFrameV(sizeZ / maxSize * 16)
+    val count = Mth.floor(length / sizeZ)
+    val minU = sprite.getU0
+    val minV = sprite.getV0
+    val maXU = sprite.getU(sizeX / maxSize * 16)
+    val maXV = sprite.getV(sizeX / maxSize * 16)
+    val maYU = sprite.getU(sizeY / maxSize * 16)
+    val maZV = sprite.getV(sizeZ / maxSize * 16)
     if (firstSide) {
       //North
       buffer.pos(x + offX, y + offY, startZ, matrix).color(red, green, blue, alpha).tex(minU, minV).lightmap(lv.l1, lv.l2).endVertex()
@@ -296,16 +296,16 @@ private class BoxXZ(startX: Double, startZ: Double, endX: Double, y: Double, end
   extends Box(startX, y, startZ, endX, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
   override val length = Math.sqrt(dx * dx + dz * dz)
 
-  override def render(buffer: VertexConsumer, matrix: MatrixStack, sprite: Sprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
+  override def render(buffer: VertexConsumer, matrix: PoseStack, sprite: TextureAtlasSprite, alpha: Int = 255, red: Int = 255, green: Int = 255, blue: Int = 255)(implicit lv: Box.LightValue): Unit = {
     val n2Size = length
     renderInternal(buffer, matrix, sprite, 0, 0.5, 0, -dz / n2Size / 2, dx / n2Size / 2, lv, alpha, red, green, blue)
   }
 }
 
 object Box {
-  def apply(axisAlignedBB: BlockBox, sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean): Box =
-    apply(axisAlignedBB.getMinX, axisAlignedBB.getMinY, axisAlignedBB.getMinZ,
-      axisAlignedBB.getMaxX, axisAlignedBB.getMaxY, axisAlignedBB.getMaxZ,
+  def apply(axisAlignedBB: AABB, sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean): Box =
+    apply(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ,
+      axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ,
       sizeX, sizeY, sizeZ, firstSide, endSide)
 
   def apply(startX: Double, startY: Double, startZ: Double,

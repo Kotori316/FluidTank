@@ -2,14 +2,15 @@ package com.kotori316.fluidtank.tank
 
 import com.google.gson.{JsonDeserializationContext, JsonObject}
 import com.kotori316.fluidtank.ModTank
-import net.minecraft.item.ItemStack
-import net.minecraft.loot.condition.LootCondition
-import net.minecraft.loot.context.{LootContext, LootContextParameters}
-import net.minecraft.loot.function.{ConditionalLootFunction, LootFunctionType}
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.storage.loot.LootContext
+import net.minecraft.world.level.storage.loot.functions.{LootItemConditionalFunction, LootItemFunctionType}
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition
 
-class ContentTank(cond: Array[LootCondition]) extends ConditionalLootFunction(cond) {
-  override def process(stack: ItemStack, context: LootContext): ItemStack = {
-    val tile = context.get(LootContextParameters.BLOCK_ENTITY)
+class ContentTank(cond: Array[LootItemCondition]) extends LootItemConditionalFunction(cond) {
+  override def run(stack: ItemStack, context: LootContext): ItemStack = {
+    val tile = context.getParam(LootContextParams.BLOCK_ENTITY)
     stack.getItem match {
       case tank: TankBlockItem => tank.getBlock.asInstanceOf[TankBlock].saveTankNBT(tile, stack)
       case _ =>
@@ -17,10 +18,10 @@ class ContentTank(cond: Array[LootCondition]) extends ConditionalLootFunction(co
     stack
   }
 
-  override def getType: LootFunctionType = ModTank.Entries.CONTENT_LOOT_FUNCTION_TYPE
+  override def getType: LootItemFunctionType = ModTank.Entries.CONTENT_LOOT_FUNCTION_TYPE
 }
 
-class ContentTankSerializer extends ConditionalLootFunction.Serializer[ContentTank] {
-  override def fromJson(json: JsonObject, context: JsonDeserializationContext, conditions: Array[LootCondition]): ContentTank =
+class ContentTankSerializer extends LootItemConditionalFunction.Serializer[ContentTank] {
+  override def deserialize(json: JsonObject, context: JsonDeserializationContext, conditions: Array[LootItemCondition]): ContentTank =
     new ContentTank(conditions)
 }

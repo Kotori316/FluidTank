@@ -6,22 +6,22 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.Ingredient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import org.apache.commons.lang3.tuple.Pair;
 
 public enum Tiers {
     Invalid(0, 0, "Invalid", "Unknown", false),
     WOOD(1, 1 << 2, "Wood", "minecraft:logs", false),
     STONE(2, 1 << 4, "Stone", "forge:stone", true, () ->
-        Ingredient.ofItems(Blocks.STONE, Blocks.ANDESITE, Blocks.GRANITE, Blocks.DIORITE, Blocks.TUFF, Blocks.DEEPSLATE)),
-    IRON(3, 1 << 8, "Iron", "forge:ingots/iron", true, () -> Ingredient.ofItems(Items.IRON_INGOT)),
-    GOLD(4, 1 << 12, "Gold", "forge:ingots/gold", true, () -> Ingredient.ofItems(Items.GOLD_INGOT)),
-    DIAMOND(5, 1 << 14, "Diamond", "forge:gems/diamond", true, () -> Ingredient.ofItems(Items.DIAMOND)),
-    EMERALD(6, 1 << 16, "Emerald", "forge:gems/emerald", true, () -> Ingredient.ofItems(Items.EMERALD)),
-    STAR(7, 1 << 20, "Star", "forge:nether_stars", true, () -> Ingredient.ofItems(Items.NETHER_STAR)),
+        Ingredient.of(Blocks.STONE, Blocks.ANDESITE, Blocks.GRANITE, Blocks.DIORITE, Blocks.TUFF, Blocks.DEEPSLATE)),
+    IRON(3, 1 << 8, "Iron", "forge:ingots/iron", true, () -> Ingredient.of(Items.IRON_INGOT)),
+    GOLD(4, 1 << 12, "Gold", "forge:ingots/gold", true, () -> Ingredient.of(Items.GOLD_INGOT)),
+    DIAMOND(5, 1 << 14, "Diamond", "forge:gems/diamond", true, () -> Ingredient.of(Items.DIAMOND)),
+    EMERALD(6, 1 << 16, "Emerald", "forge:gems/emerald", true, () -> Ingredient.of(Items.EMERALD)),
+    STAR(7, 1 << 20, "Star", "forge:nether_stars", true, () -> Ingredient.of(Items.NETHER_STAR)),
     CREATIVE(8, 0, "Creative", "Unknown", false) {
         @Override
         public long amount() {
@@ -29,7 +29,7 @@ public enum Tiers {
         }
     },
     VOID(0, 0, "Void", "Unknown", false),
-    COPPER(2, 1 << 5, "Copper", "c:copper_ingots", true, () -> Ingredient.ofItems(Items.COPPER_INGOT)),
+    COPPER(2, 1 << 5, "Copper", "c:copper_ingots", true, () -> Ingredient.of(Items.COPPER_INGOT)),
     TIN(2, 1 << 6, "Tin", "c:tin_ingots", true),
     BRONZE(3, 1 << 9, "Bronze", "c:bronze_ingots", true),
     LEAD(3, 1 << 8, "Lead", "c:lead_ingots", true),
@@ -71,13 +71,13 @@ public enum Tiers {
         return name;
     }
 
-    public NbtCompound toNBTTag() {
-        NbtCompound nbt = new NbtCompound();
+    public CompoundTag toNBTTag() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putString("string", toString());
         return nbt;
     }
 
-    public static Tiers fromNBT(NbtCompound tag) {
+    public static Tiers fromNBT(CompoundTag tag) {
         if (tag == null) {
             return Invalid;
         }

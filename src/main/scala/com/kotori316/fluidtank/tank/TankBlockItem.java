@@ -5,15 +5,15 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Rarity;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
@@ -22,7 +22,7 @@ public class TankBlockItem extends BlockItem {
     public final TankBlock blockTank;
 
     public TankBlockItem(TankBlock block) {
-        super(block, new Item.Settings().group(ModTank.CREATIVE_TAB));
+        super(block, new Item.Properties().tab(ModTank.CREATIVE_TAB));
         blockTank = block;
     }
 
@@ -32,8 +32,8 @@ public class TankBlockItem extends BlockItem {
 
     @Override
     public Rarity getRarity(ItemStack stack) {
-        if (stack.hasNbt()) {
-            if (stack.getNbt() != null && stack.getNbt().contains(TankBlock.NBT_BlockTag)) {
+        if (stack.hasTag()) {
+            if (stack.getTag() != null && stack.getTag().contains(TankBlock.NBT_BlockTag)) {
                 return Rarity.RARE;
             }
         }
@@ -42,16 +42,16 @@ public class TankBlockItem extends BlockItem {
 
     @Override
     @Environment(EnvType.CLIENT)
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
-        NbtCompound nbt = stack.getSubNbt(TankBlock.NBT_BlockTag);
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag context) {
+        super.appendHoverText(stack, world, tooltip, context);
+        CompoundTag nbt = stack.getTagElement(TankBlock.NBT_BlockTag);
         if (nbt != null) {
-            NbtCompound tankNBT = nbt.getCompound(TankBlock.NBT_Tank);
+            CompoundTag tankNBT = nbt.getCompound(TankBlock.NBT_Tank);
             FluidAmount fluid = FluidAmount.fromNBT(tankNBT);
             long c = tankNBT.getInt(TankBlock.NBT_Capacity);
-            tooltip.add(new LiteralText(fluid.getLocalizedName() + " : " + fluid.fluidVolume().amount().asLong(FluidAmount.AMOUNT_BUCKET()) + " mB / " + c + " mB"));
+            tooltip.add(new TextComponent(fluid.getLocalizedName() + " : " + fluid.fluidVolume().amount().asLong(FluidAmount.AMOUNT_BUCKET()) + " mB / " + c + " mB"));
         } else {
-            tooltip.add(new LiteralText("Capacity : " + blockTank.tiers.amount() + "mB"));
+            tooltip.add(new TextComponent("Capacity : " + blockTank.tiers.amount() + "mB"));
         }
     }
 }

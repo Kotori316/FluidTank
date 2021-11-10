@@ -4,7 +4,7 @@ import java.awt.Color
 
 import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTile}
-import com.mojang.blaze3d.matrix.MatrixStack
+import com.mojang.blaze3d.matrix.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.tileentity.{TileEntityRenderer, TileEntityRendererDispatcher}
 import net.minecraft.client.renderer.{IRenderTypeBuffer, RenderType}
@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 @OnlyIn(Dist.CLIENT)
 class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[PipeTile](d) {
 
-  override def func_225616_a_(te: PipeTile, partialTicks: Float, matrixStack: MatrixStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
+  override def func_225616_a_(te: PipeTile, partialTicks: Float, matrixStack: PoseStack, renderTypeBuffer: IRenderTypeBuffer, light: Int, otherLight: Int): Unit = {
 
     val maxD = 12 * RenderPipe.d - 0.01
     val minD = 4 * RenderPipe.d + 0.01
@@ -21,13 +21,13 @@ class RenderPipe(d: TileEntityRendererDispatcher) extends TileEntityRenderer[Pip
     matrixStack.push()
 
     val texture = ClientProxy.whiteTexture
-    val minU = texture.getMinU
-    val minV = texture.getMinV
-    val maxU = texture.getMaxU
-    val maxV = texture.getMaxV
+    val minU = texture.getU0
+    val minV = texture.getV0
+    val maxU = texture.getU1
+    val maxV = texture.getV1
     val light = implicitly[Box.LightValue]
     val buffer = new Wrapper(renderTypeBuffer.getBuffer(RenderType.func_228643_e_()))
-    val time = te.getWorld.getGameTime
+    val time = te.getLevel.getGameTime
     val color = Color.HSBtoRGB((time % RenderPipe.duration).toFloat / RenderPipe.duration, 1f, 1f)
     val red = color >> 16 & 0xFF
     val green = color >> 8 & 0xFF

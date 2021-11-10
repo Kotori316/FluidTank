@@ -5,12 +5,13 @@ import alexiil.mc.lib.attributes.fluid.FluidInvUtil;
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
 import alexiil.mc.lib.attributes.fluid.impl.EmptyFluidExtractable;
 import alexiil.mc.lib.attributes.fluid.impl.RejectingFluidInsertable;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.tank.Connection;
+
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 class BCAttributeInteraction implements FluidInteraction {
     @Override
@@ -25,7 +26,7 @@ class BCAttributeInteraction implements FluidInteraction {
     }
 
     @Override
-    public FluidVolumeUtil.FluidTankInteraction interact(Connection connection, PlayerEntity player, Hand hand, ItemStack stack) {
+    public FluidVolumeUtil.FluidTankInteraction interact(Connection connection, Player player, InteractionHand hand, ItemStack stack) {
         return FluidInvUtil.interactHandWithTank(connection.handler(), player, hand);
     }
 }

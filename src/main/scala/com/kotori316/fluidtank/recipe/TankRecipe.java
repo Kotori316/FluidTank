@@ -5,40 +5,40 @@ import java.util.stream.Stream;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.SpecialRecipeSerializer;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.level.Level;
 
 import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.tank.Tiers;
 
-public class TankRecipe extends SpecialCraftingRecipe {
-    public static final SpecialRecipeSerializer<TankRecipe> SERIALIZER = new SpecialRecipeSerializer<>(TankRecipe::new);
-    public static final Identifier LOCATION = new Identifier(ModTank.modID, "metal_recipe");
+public class TankRecipe extends CustomRecipe {
+    public static final SimpleRecipeSerializer<TankRecipe> SERIALIZER = new SimpleRecipeSerializer<>(TankRecipe::new);
+    public static final ResourceLocation LOCATION = new ResourceLocation(ModTank.modID, "metal_recipe");
     private final List<TierRecipe.Logic> logics;
 
-    public TankRecipe(Identifier id) {
+    public TankRecipe(ResourceLocation id) {
         super(id);
         logics = Stream.of(Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
             .map(TierRecipe.Logic::new).toList();
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, World world) {
+    public boolean matches(CraftingContainer inv, Level world) {
         return logics.stream().anyMatch(l -> l.matches(inv));
     }
 
     @Override
-    public ItemStack craft(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         return logics.stream().filter(l -> l.matches(inv)).findFirst().map(l -> l.craft(inv)).orElse(ItemStack.EMPTY);
     }
 
     @Override
-    public boolean fits(int width, int height) {
+    public boolean canCraftInDimensions(int width, int height) {
         return width >= 3 && height >= 3;
     }
 
