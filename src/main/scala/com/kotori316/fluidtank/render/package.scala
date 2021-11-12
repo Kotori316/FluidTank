@@ -7,7 +7,7 @@ package object render {
 
   implicit class MatrixHelper(private val mat: PoseStack) extends AnyVal {
     def push(): Unit = {
-      mat.push()
+      mat.pushPose()
     }
 
     def offset(x: Double, y: Double, z: Double): Unit = {
@@ -23,7 +23,7 @@ package object render {
     }
 
     def pop(): Unit = {
-      mat.pop()
+      mat.popPose()
     }
   }
 
