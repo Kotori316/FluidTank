@@ -41,6 +41,14 @@ repositories {
         }
     }
     maven {
+        name = "What The Hell Is That"
+        url = "https://maven.bai.lol"
+        content {
+            it.includeVersion("mcp.mobius.waila", "wthit-api", "fabric-${project.wthit_version}")
+            it.includeVersion("mcp.mobius.waila", "wthit", "fabric-${project.wthit_version}")
+        }
+    }
+    maven {
         name = "TechReborn"
         url = "https://modmaven.dev/"
     }
@@ -73,6 +81,8 @@ dependencies {
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
     modImplementation("RebornCore:RebornCore-1.17:${project.RebornCore_version}")
     modRuntimeOnly("TechReborn:TechReborn-1.17:${project.TechReborn_version}")
+    modCompileOnly("mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}")
+    modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
