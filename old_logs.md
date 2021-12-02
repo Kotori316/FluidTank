@@ -1,3 +1,9 @@
+## v17.0.2
+* Added recipe of Copper Tank
+* Save debug message to "debug.log"
+
+Build with 1.17.1-37.0.90, Mapping: Official 1.17.1
+
 ## v17.0.1
 * Changed dependency system.
 
