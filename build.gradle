@@ -38,8 +38,11 @@ private static boolean isInCI() {
 group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "LargeFluidTank"
 
-// Mojang ships Java 16 to end users in 1.17+ instead of Java 8 in 1.16 or lower, so your mod should target Java 16.
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+compileScala {
+    scalaCompileOptions.additionalParameters = ["-Wconf:cat=deprecation:ws,any:e"]
+}
 
 String forgeVersion() {
     String versionNumber
@@ -72,7 +75,7 @@ def commonRunSetting = {
 }
 
 minecraft {
-    mappings channel: 'official', version: "1.17.1"
+    mappings channel: 'official', version: "1.18"
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
         client {
@@ -167,8 +170,8 @@ dependencies {
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
-    implementation(fg.deobf("mezz.jei:jei-1.17.1:" + project.jeiVersion))
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")
+    /*implementation(fg.deobf("mezz.jei:jei-1.17.1:" + project.jeiVersion))
+    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")*/
     // implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
     // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
@@ -179,7 +182,7 @@ dependencies {
     // Mixin
     // annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
     // Test Dependencies.
-    String JUPITER_VERSION = '5.7.0'
+    String JUPITER_VERSION = '5.7.1'
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
@@ -244,7 +247,7 @@ curseforge {
         changelogType = 'markdown'
         changelog = getAllChangeLog()
         releaseType = 'release'
-        addGameVersion '1.17.1'
+        addGameVersion '1.18'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
@@ -261,7 +264,7 @@ curseforge {
 githubRelease {
     repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish.set('1.17')
+    targetCommitish.set('1.18')
     body.set(getLatestChangeLog())
     releaseAssets = files(
             jar.getArchiveFile().get(),
@@ -318,7 +321,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${project.forgeVersion}, Mapping: Official 1.17.1" +
+                "Build with ${project.forgeVersion}, Mapping: Official 1.18" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)

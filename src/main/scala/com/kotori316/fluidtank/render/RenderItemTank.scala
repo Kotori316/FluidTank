@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.{BlockEntityWithoutLevelRenderer, MultiBufferSource}
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.BlockPos
-import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.{BlockItem, ItemStack}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 import scala.collection.mutable
@@ -39,7 +39,7 @@ class RenderItemTank extends BlockEntityWithoutLevelRenderer(Minecraft.getInstan
 
         tileTank.tier = tankItem.blockTank.tier
         tileTank.internalTank.setTank(Tank.EMPTY)
-        val compound = stack.getTagElement(TileTank.NBT_BlockTag)
+        val compound = BlockItem.getBlockEntityData(stack)
         if (compound != null)
           tileTank.readNBTClient(compound)
 //        RenderHelper.disableStandardItemLighting()

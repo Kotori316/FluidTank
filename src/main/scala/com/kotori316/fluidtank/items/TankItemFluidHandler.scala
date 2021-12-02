@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.{BlockItem, ItemStack}
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
@@ -14,7 +14,7 @@ import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandl
 
 class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
-  def nbt: CompoundTag = stack.getTagElement(TileTank.NBT_BlockTag)
+  def nbt: CompoundTag = BlockItem.getBlockEntityData(stack)
 
   @Nullable
   def tankNbt: CompoundTag = if (nbt == null) null else nbt.getCompound(TileTank.NBT_Tank)

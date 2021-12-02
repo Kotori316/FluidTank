@@ -9,16 +9,14 @@ import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TextComponent}
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
-import net.minecraft.server.{MinecraftServer, TickTask}
+import net.minecraft.server.TickTask
 import net.minecraft.util.Mth
 import net.minecraft.world.Nameable
-import net.minecraft.world.item.BlockItem
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.common.util.{LazyOptional, LogicalSidedProvider}
 import net.minecraftforge.fml.LogicalSide
-import net.minecraftforge.fmllegacy.LogicalSidedProvider
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -50,22 +48,23 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     connectionAttaches.foreach(_.apply(c))
   }
 
-  override def save(compound: CompoundTag): CompoundTag = {
+  override def saveAdditional(compound: CompoundTag): Unit = {
     compound.put(TileTank.NBT_Tank, internalTank.writeToNBT(new CompoundTag))
     compound.put(TileTank.NBT_Tier, tier.toNBTTag)
     getStackName.foreach(t => compound.putString(TileTank.NBT_StackName, Component.Serializer.toJson(t)))
+    super.saveAdditional(compound)
+  }
+
+  override final def save(compound: CompoundTag): CompoundTag = {
+    saveAdditional(compound)
     super.save(compound)
   }
 
-  def getBlockTag: CompoundTag = {
-    val nbt = save(new CompoundTag)
-    Seq("x", "y", "z", "id").foreach(nbt.remove)
-    nbt
-  }
+  def getBlockTag: CompoundTag = saveWithoutMetadata()
 
-  override def getUpdateTag: CompoundTag = save(new CompoundTag)
+  override def getUpdateTag: CompoundTag = saveWithFullMetadata()
 
-  override def getUpdatePacket = new ClientboundBlockEntityDataPacket(getBlockPos, 0, getUpdateTag)
+  override def getUpdatePacket: ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
 
   override def load(compound: CompoundTag): Unit = {
     super.load(compound)
@@ -94,8 +93,8 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     if (loading) {
       loading = false
       if (SideProxy.isServer(this)) {
-        val executor: MinecraftServer = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
-        executor.tell(new TickTask(executor.getTickCount, () => {
+        val executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
+        executor.tell(new TickTask(0, () => {
           getLevel.getProfiler.push("Connection Loading")
           if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
             "Connection load in delayed task. At={}, connection={}", this.getBlockPos.show, this.connection)
@@ -167,7 +166,7 @@ object TileTank {
   final val NBT_Tank = "tank"
   final val NBT_Tier = "tier"
   final val NBT_Capacity = "capacity"
-  final val NBT_BlockTag = BlockItem.BLOCK_ENTITY_TAG
+  final val NBT_BlockTag = "BlockEntityTag"
   final val NBT_StackName = "stackName"
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"

@@ -5,7 +5,7 @@ import java.util.Optional;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.OptionConverters;
 

@@ -59,7 +59,6 @@ public abstract class PipeBlock extends Block implements EntityBlock {
     public static final EnumProperty<Connection> EAST = EnumProperty.create("east", Connection.class);
     public static final EnumProperty<Connection> UP = EnumProperty.create("up", Connection.class);
     public static final EnumProperty<Connection> DOWN = EnumProperty.create("down", Connection.class);
-    @SuppressWarnings("UnstableApiUsage")
     private static final ImmutableBiMap<EnumProperty<Connection>, VoxelShape> SHAPE_MAP = Stream.of(
         Pair.of(NORTH, North_AABB),
         Pair.of(SOUTH, South_AABB),
@@ -68,7 +67,6 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         Pair.of(UP, UP_AABB),
         Pair.of(DOWN, Down_AABB)
     ).collect(ImmutableBiMap.toImmutableBiMap(Pair::getKey, Pair::getValue));
-    @SuppressWarnings("UnstableApiUsage")
     public static final ImmutableBiMap<Direction, EnumProperty<Connection>> FACING_TO_PROPERTY_MAP = Stream.of(
         Pair.of(Direction.NORTH, NORTH),
         Pair.of(Direction.SOUTH, SOUTH),

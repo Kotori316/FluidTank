@@ -94,10 +94,10 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
     this.repeated = compound.getInt("repeated")
   }
 
-  override def save(compound: CompoundTag): CompoundTag = {
+  override def saveAdditional(compound: CompoundTag): Unit = {
     compound.putInt("coolTime", this.coolTime)
     compound.putInt("repeated", this.repeated)
-    super.save(compound)
+    super.saveAdditional(compound)
   }
 }
 

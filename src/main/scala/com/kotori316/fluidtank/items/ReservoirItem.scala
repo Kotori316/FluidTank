@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TranslatableComponent}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.UseOnContext
-import net.minecraft.world.item.{Item, ItemStack, Rarity, TooltipFlag}
+import net.minecraft.world.item.{BlockItem, Item, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.{InteractionHand, InteractionResult, InteractionResultHolder}
@@ -84,12 +84,12 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
       .value
   }
 
-  override def hasContainerItem(stack: ItemStack): Boolean = stack.getTagElement(TileTank.NBT_BlockTag) != null
+  override def hasContainerItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
 
   // ---------- Information ----------
   @OnlyIn(Dist.CLIENT)
   override def appendHoverText(stack: ItemStack, worldIn: Level, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = {
-    val nbt = stack.getTagElement(TileTank.NBT_BlockTag)
+    val nbt = BlockItem.getBlockEntityData(stack)
     if (nbt != null) {
       val fluid = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).asScala
         .collect { case h: TankItemFluidHandler => h.getFluid -> h.getCapacity }
@@ -101,7 +101,7 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
   }
 
   override def getRarity(stack: ItemStack): Rarity =
-    if (stack.hasTag && stack.getTag.contains(TileTank.NBT_BlockTag)) Rarity.RARE
+    if (BlockItem.getBlockEntityData(stack) != null) Rarity.RARE
     else Rarity.COMMON
 
   override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {

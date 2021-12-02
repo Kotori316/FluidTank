@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.{BaseEntityBlock, Block, RenderShape}
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.{InteractionHand, InteractionResult}
 import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fmllegacy.network.NetworkHooks
+import net.minecraftforge.network.NetworkHooks
 import net.minecraftforge.items.ItemHandlerHelper
 
 class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(0.7f)) {

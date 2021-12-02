@@ -1,3 +1,2 @@
-## v17.0.2
-* Added recipe of Copper Tank
-* Save debug message to "debug.log"
+## v18.0.0
+* First release for Minecraft 1.18

@@ -22,10 +22,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fmllegacy.LogicalSidedProvider;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import scala.Option;
 import scala.jdk.javaapi.CollectionConverters;
 import scala.jdk.javaapi.OptionConverters;
@@ -52,7 +52,7 @@ public class ClientProxy extends SideProxy {
     public Option<Level> getLevel(NetworkEvent.Context context) {
         Optional<Level> serverWorld = Optional.ofNullable(context.getSender()).map(Entity::getCommandSenderWorld);
         scala.Function0<Option<Level>> clientWorldGetter = () ->
-            OptionConverters.toScala(LogicalSidedProvider.CLIENTWORLD.<Optional<Level>>get(context.getDirection().getReceptionSide()));
+            OptionConverters.toScala(LogicalSidedProvider.CLIENTWORLD.get(context.getDirection().getReceptionSide()));
         return OptionConverters.toScala(serverWorld).orElse(clientWorldGetter);
     }
 
@@ -107,15 +107,15 @@ public class ClientProxy extends SideProxy {
 
     @SubscribeEvent
     public void registerTexture(TextureStitchEvent.Pre event) {
-        if (event.getMap().location().equals(InventoryMenu.BLOCK_ATLAS)) {
+        if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
             event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
     }
 
     @SubscribeEvent
     public void putTexture(TextureStitchEvent.Post event) {
-        if (event.getMap().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-            whiteTexture = event.getMap().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+        if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
+            whiteTexture = event.getAtlas().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
         }
     }
 }

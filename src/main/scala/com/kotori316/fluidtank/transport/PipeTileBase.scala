@@ -64,8 +64,13 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
     this.color = compound.getInt("color")
   }
 
-  override def save(compound: CompoundTag): CompoundTag = {
+  override def saveAdditional(compound: CompoundTag): Unit = {
     compound.putInt("color", this.color)
+    super.saveAdditional(compound)
+  }
+
+  override final def save(compound: CompoundTag): CompoundTag = {
+    saveAdditional(compound)
     super.save(compound)
   }
 

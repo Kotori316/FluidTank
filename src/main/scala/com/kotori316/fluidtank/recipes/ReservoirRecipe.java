@@ -17,6 +17,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -57,7 +58,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             .mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .filter(ItemStack::hasTag)
-            .map(s -> s.getTagElement(TileTank.NBT_BlockTag()))
+            .map(BlockItem::getBlockEntityData)
             .filter(Objects::nonNull)
             .findFirst()
             .ifPresent(nbt -> result.addTagElement(TileTank.NBT_BlockTag(), nbt));

@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -111,7 +112,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             .filter(this.getTankItems())
             .collect(Collectors.toList());
         return tankStacks.size() == 4 &&
-            tankStacks.stream().map(stack -> stack.getTagElement(TileTank.NBT_BlockTag()))
+            tankStacks.stream().map(BlockItem::getBlockEntityData)
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
                 .filter(FluidAmount::nonEmpty)
@@ -130,7 +131,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         ItemStack result = getResultItem();
         FluidAmount fluidAmount = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
-            .map(stack -> stack.getTagElement(TileTank.NBT_BlockTag()))
+            .map(BlockItem::getBlockEntityData)
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
             .filter(FluidAmount::nonEmpty)

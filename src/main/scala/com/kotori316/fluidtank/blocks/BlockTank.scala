@@ -7,7 +7,7 @@ import javax.annotation.Nullable
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.{Item, ItemStack}
+import net.minecraft.world.item.{BlockItem, Item, ItemStack}
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.{Block, EntityBlock}
@@ -104,14 +104,14 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
   }
 
   def saveTankNBT(tileEntity: BlockEntity, stack: ItemStack): Unit = {
-    Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag }
-      .foreach(tag => stack.addTagElement(TileTank.NBT_BlockTag, tag))
+    Option(tileEntity).collect { case tank: TileTank if tank.hasContent => tank.getBlockTag -> tank }
+      .foreach { case (tag, tank) => BlockItem.setBlockEntityData(stack, tank.getType, tag) }
     Option(tileEntity).collect { case tank: TileTank => tank.getStackName }.flatten
       .foreach(stack.setHoverName)
   }
 
-  override final def getPickBlock(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
-    val stack = super.getPickBlock(state, target, level, pos, player)
+  override final def getCloneItemStack(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
+    val stack = super.getCloneItemStack(state, target, level, pos, player)
     saveTankNBT(level.getBlockEntity(pos), stack)
     stack
   }

@@ -45,8 +45,8 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
     }
   }
 
-  override def getPickBlock(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
-    val stack = super.getPickBlock(state, target, level, pos, player)
+  override def getCloneItemStack(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
+    val stack = super.getCloneItemStack(state, target, level, pos, player)
     if (Option(level.getBlockEntity(pos)).collect { case s: FluidSourceTile => !s.locked }.getOrElse(false)) {
       stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
     }

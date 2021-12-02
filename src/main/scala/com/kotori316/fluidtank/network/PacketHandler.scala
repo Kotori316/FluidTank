@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import com.kotori316.fluidtank.FluidTank
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.Level
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel
-import net.minecraftforge.fmllegacy.network.{NetworkRegistry, PacketDistributor}
+import net.minecraftforge.network.simple.SimpleChannel
+import net.minecraftforge.network.{NetworkRegistry, PacketDistributor}
 
 object PacketHandler {
   private[this] final val PROTOCOL = "1"

@@ -29,14 +29,14 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
   setRegistryName(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
 
   override def getRarity(stack: ItemStack): Rarity =
-    if (stack.hasTag && stack.getTag.contains(TileTank.NBT_BlockTag)) Rarity.RARE
+    if (BlockItem.getBlockEntityData(stack) != null) Rarity.RARE
     else Rarity.COMMON
 
   def hasInvisibleRecipe = true
 
   @OnlyIn(Dist.CLIENT)
   override def appendHoverText(stack: ItemStack, @Nullable level: Level, tooltip: java.util.List[Component], flag: TooltipFlag): Unit = {
-    val nbt = stack.getTagElement(TileTank.NBT_BlockTag)
+    val nbt = BlockItem.getBlockEntityData(stack)
     if (nbt != null) {
       val tankNBT = nbt.getCompound(TileTank.NBT_Tank)
       val fluid = FluidAmount.fromNBT(tankNBT)
@@ -55,7 +55,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     if (level.getServer != null) {
       val tileentity = level.getBlockEntity(pos)
       if (tileentity != null) {
-        val subTag = stack.getTagElement(TileTank.NBT_BlockTag)
+        val subTag = BlockItem.getBlockEntityData(stack)
         if (subTag != null) {
           if (!(!level.isClientSide && tileentity.onlyOpCanSetNbt) || !(player == null || !player.canUseGameMasterBlocks)) {
             val nbt = tileentity.save(new CompoundTag)
@@ -98,7 +98,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
       .value
   }
 
-  override def hasContainerItem(stack: ItemStack): Boolean = stack.getTagElement(TileTank.NBT_BlockTag) != null
+  override def hasContainerItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
 
   override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {
     consumer.accept(new IItemRenderProperties {

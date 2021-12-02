@@ -8,7 +8,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
@@ -23,7 +23,7 @@ public class CATContainer extends AbstractContainerMenu {
      * Only for internal use. Use instance in {@link com.kotori316.fluidtank.ModObjects}.
      */
     public static MenuType<CATContainer> makeType() {
-        MenuType<CATContainer> t = IForgeContainerType.create((windowId1, inv, data) -> new CATContainer(windowId1, inv.player, data.readBlockPos()));
+        MenuType<CATContainer> t = IForgeMenuType.create((windowId1, inv, data) -> new CATContainer(windowId1, inv.player, data.readBlockPos()));
         t.setRegistryName(GUI_ID);
         return t;
     }

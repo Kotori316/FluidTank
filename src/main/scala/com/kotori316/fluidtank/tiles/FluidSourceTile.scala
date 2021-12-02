@@ -58,15 +58,20 @@ class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects
     interval = Math.max(1, compound.getInt("interval"))
   }
 
-  override def save(compound: CompoundTag): CompoundTag = {
+  override def saveAdditional(compound: CompoundTag): Unit = {
     val fluidNBT = new CompoundTag
     compound.putBoolean("locked", locked)
     this.mFluid.write(fluidNBT)
     compound.put("fluid", fluidNBT)
     compound.putInt("interval", interval)
+    super.saveAdditional(compound)
+  }
+
+  override def save(compound: CompoundTag): CompoundTag = {
+    saveAdditional(compound)
     super.save(compound)
   }
 
-  override def getUpdateTag: CompoundTag = this.save(new CompoundTag)
+  override def getUpdateTag: CompoundTag = this.saveWithFullMetadata()
 
 }
