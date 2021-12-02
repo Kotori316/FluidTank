@@ -26,13 +26,13 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.9.1",
+    "fabricloader": ">=0.12.0",
     "fabric": "*",
     "minecraft": "1.18.x",
     "fabric-language-scala": ">=0.3.0",
-    "libblockattributes": ">=0.9.0",
-    "libblockattributes_items": ">=0.9.0",
-    "libblockattributes_fluids": ">=0.9.0"
+    "libblockattributes": ">=0.10.0",
+    "libblockattributes_items": ">=0.10.0",
+    "libblockattributes_fluids": ">=0.10.0"
   },
   "custom": {
     "waila:plugins": [
