@@ -1,10 +1,12 @@
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.stream.Collectors
 
 plugins {
     id "scala"
     id("maven-publish")
     // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
-    id 'fabric-loom' version "0.10.50"
+    id 'fabric-loom' version "0.10-SNAPSHOT"
     // id 'maven-publish'
     //noinspection SpellCheckingInspection
     id "com.github.breadmoirai.github-release" version "2.2.12"
@@ -15,6 +17,17 @@ plugins {
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+if (isInCI()) {
+    String postFix = System.getenv("GITHUB_RUN_NUMBER") ?: "SNAPSHOT"
+    // In remote CI/CD environment
+    version = (version + "." + postFix + "-fabric")
+
+    System.out.println("Set version to $version because I'm in CI." as String)
+    System.out.println("CURSEFORGE_KEY: ${System.getenv().containsKey('CURSEFORGE_KEY')}" as String)
+} else {
+    version = (version + ".0" + "-fabric")
+}
 
 loom {
     runs {
@@ -27,6 +40,12 @@ loom {
             }
         }
     }
+}
+
+@SuppressWarnings("SpellCheckingInspection")
+private static boolean isInCI() {
+    return Boolean.parseBoolean(System.getenv("GITHUB_ACTIONS")) || Boolean.parseBoolean(System.getenv("CI")) ||
+            (!System.getProperty("os.name").toLowerCase().startsWith("windows") && Files.exists(Paths.get("/", ".dockerenv")))
 }
 
 repositories {
@@ -76,11 +95,11 @@ dependencies {
     modImplementation "alexiil.mc.lib:libblockattributes-all:${project.bc_attribute_version}"
 
     //noinspection SpellCheckingInspection
-    modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
+    /*modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
     //noinspection SpellCheckingInspection
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
     modImplementation("RebornCore:RebornCore-1.17:${project.RebornCore_version}")
-    modRuntimeOnly("TechReborn:TechReborn-1.17:${project.TechReborn_version}")
+    modRuntimeOnly("TechReborn:TechReborn-1.17:${project.TechReborn_version}")*/
     modCompileOnly("mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}")
     modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
 
@@ -136,22 +155,31 @@ test {
     useJUnitPlatform()
 }
 
+def BRANCH = "1.18-fabric"
+
 // PUBLISH
-def joinedLog = String.join("\n",
-        "Fluid Tank for 1.17 and Fabric.",
+def joinedLog = String.join("\n", List.of(
+        "Fluid Tank for ${project.minecraft_version} and Fabric.",
         "",
         "Requires:",
         "",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
         "* [LibBlockAttributes](https://www.curseforge.com/minecraft/mc-mods/libblockattributes)",
         "",
-        "See https://github.com/Kotori316/FluidTank/tree/1.17-fabric to get all change log."
-)
+        "See https://github.com/Kotori316/FluidTank/tree/${BRANCH} to get all change log.",
+        "",
+        "Built with:",
+        "",
+        "* Minecraft ${project.minecraft_version}",
+        "* Mapping Official",
+        "* Fabric API ${project.fabric_version}",
+        "* Fabric Loader ${project.loader_version}",
+).stream().map { it.toString() }.toList())
 
 githubRelease {
     repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish.set('1.17-fabric')
+    targetCommitish.set(BRANCH)
 
     body.set(joinedLog)
     releaseAssets = fileTree("build/libs")
@@ -163,8 +191,7 @@ curseforge {
         id = '411564'
         changelogType = 'markdown'
         addGameVersion 'Fabric'
-        addGameVersion '1.17.1'
-        addGameVersion '1.17'
+        addGameVersion '1.18-Snapshot'
         changelog = joinedLog
         releaseType = 'release'
         mainArtifact remapJar
@@ -172,7 +199,7 @@ curseforge {
         relations {
             requiredDependency 'fabric-language-scala'
             //noinspection SpellCheckingInspection
-            requiredDependency 'libblockattributes'
+            // requiredDependency 'libblockattributes'
         }
     }
     options {
@@ -190,7 +217,8 @@ task getCompileOptions() {
         strings.add("project.maven_group: ${project.maven_group}")
         strings.add("project.group: ${project.group}")
         strings.add("version: $version")
-        strings.add("runs: ${minecraft.getRunConfigs().asMap.toMapString()}")
+        strings.add("version in config: ${project.version}")
+        strings.add("runs: ${loom.getRunConfigs().asMap.toMapString()}")
         strings.add("Absolute Client RunDir: ${project.projectDir.toPath().resolve(minecraft.getRunConfigs().getByName("client").runDir).toAbsolutePath()}")
         strings.add("Absolute Server RunDir: ${project.projectDir.toPath().resolve(minecraft.getRunConfigs().getByName("server").runDir).toAbsolutePath()}")
         strings.add("-" * 20)
