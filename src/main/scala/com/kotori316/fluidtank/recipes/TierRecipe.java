@@ -10,7 +10,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
@@ -29,6 +28,7 @@ import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.Config;

@@ -11,8 +11,8 @@ import appeng.api.storage.IStorageMonitorableAccessor;
 import appeng.api.storage.channels.IFluidStorageChannel;
 import appeng.api.storage.data.IAEStack;
 import appeng.me.helpers.BaseActionSource;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.tileentity.BlockEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -68,9 +68,9 @@ class AEConnectionCapabilityProvider implements ICapabilityProvider, IStorageMon
         this.tank = tank;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         return CAPABILITY.orEmpty(cap, LazyOptional.of(() -> this).cast());
     }
 

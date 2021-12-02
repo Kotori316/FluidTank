@@ -10,7 +10,6 @@ import java.util.stream.StreamSupport;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
@@ -25,6 +24,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.FluidTank;

@@ -3,7 +3,6 @@ package com.kotori316.fluidtank.blocks
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
-import javax.annotation.Nullable
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
@@ -17,6 +16,9 @@ import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import net.minecraft.world.{InteractionHand, InteractionResult}
 import net.minecraftforge.fluids.{FluidStack, FluidUtil}
 import net.minecraftforge.items.ItemHandlerHelper
+import org.jetbrains.annotations.Nullable
+
+import scala.annotation.nowarn
 
 class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(1f).dynamicShape())
   with EntityBlock {
@@ -92,7 +94,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     }
   }
 
-  //noinspection ScalaDeprecation
+  @nowarn //noinspection ScalaDeprecation
   override final def onRemove(state: BlockState, level: Level, pos: BlockPos, newState: BlockState, moved: Boolean): Unit = {
     if (!state.is(newState.getBlock)) {
       level.getBlockEntity(pos) match {

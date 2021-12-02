@@ -3,17 +3,17 @@ package com.kotori316.fluidtank.fluids
 import cats._
 import cats.implicits._
 import com.kotori316.fluidtank._
-import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BucketItem, ItemStack, Items}
 import net.minecraft.world.level.material.{Fluid, Fluids}
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
+import org.jetbrains.annotations.{NotNull, Nullable}
 
 import scala.util.chaining._
 
-case class FluidAmount(@Nonnull fluid: Fluid, amount: Long, @Nonnull nbt: Option[CompoundTag]) {
+case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option[CompoundTag]) {
   def setAmount(newAmount: Long): FluidAmount = {
     if (newAmount === this.amount) this // No need to create new instance.
     else FluidAmount(fluid, newAmount, nbt)

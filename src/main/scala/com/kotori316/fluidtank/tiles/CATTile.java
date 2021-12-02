@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -30,6 +28,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
@@ -43,9 +43,9 @@ public class CATTile extends BlockEntity implements MenuProvider {
         super(ModObjects.CAT_TYPE(), pos, state);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
         if (side != direction) {
             if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
@@ -100,7 +100,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return inventory.getSlots();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public FluidStack getFluidInTank(int tank) {
             return getFluidHandler(tank).map(h -> h.drain(Integer.MAX_VALUE, FluidAction.SIMULATE)).orElse(FluidStack.EMPTY);
@@ -112,7 +112,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
         }
 
         @Override
-        public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
+        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
             return getFluidHandler(tank).map(h -> h.isFluidValid(0, stack)).orElse(false);
         }
 
@@ -135,7 +135,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return resource.getAmount() - toFill.getAmount();
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
             if (resource == null || resource.isEmpty()) return FluidStack.EMPTY;
@@ -157,7 +157,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return new FluidStack(resource, resource.getAmount() - toDrain.getAmount());
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
             if (maxDrain <= 0) return FluidStack.EMPTY;
@@ -171,7 +171,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return getFluidAmountStream().collect(Collectors.toList());
         }
 
-        @Nonnull
+        @NotNull
         public Stream<FluidAmount> getFluidAmountStream() {
             return IntStream.range(0, this.getTanks())
                 .mapToObj(this::getFluidInTank)

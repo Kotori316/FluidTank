@@ -3,7 +3,6 @@ package com.kotori316.fluidtank.items
 import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
-import javax.annotation.{Nonnull, Nullable}
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.{BlockItem, ItemStack}
@@ -11,6 +10,7 @@ import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
+import org.jetbrains.annotations.{NotNull, Nullable}
 
 class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
@@ -20,7 +20,7 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
   def tankNbt: CompoundTag = if (nbt == null) null else nbt.getCompound(TileTank.NBT_Tank)
 
   private[this] var initialized = false
-  @Nonnull
+  @NotNull
   private[this] var fluid: FluidStack = FluidStack.EMPTY
 
   override def getContainer: ItemStack = stack
@@ -50,7 +50,7 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
     }
   }
 
-  @Nonnull
+  @NotNull
   override def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = {
     init()
     if (fluid.isEmpty || resource.isEmpty || stack.getCount > 1) {
@@ -67,7 +67,7 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
       FluidStack.EMPTY
   }
 
-  @Nonnull
+  @NotNull
   override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = {
     init()
     if (fluid.isEmpty || maxDrain <= 0 || stack.getCount > 1) {
@@ -120,7 +120,7 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
    *
    * @return The content if stack size = 1, else empty fluid.
    */
-  @Nonnull
+  @NotNull
   override def getFluidInTank(tank: Int): FluidStack = {
     init()
     if (stack.getCount == 1) fluid else FluidStack.EMPTY

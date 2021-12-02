@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableBiMap;
-import javax.annotation.Nonnull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -38,6 +37,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -99,7 +99,7 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         blockItem.setRegistryName(FluidTank.modID, getRegName());
     }
 
-    @Nonnull
+    @NotNull
     protected abstract String getRegName();
 
     protected abstract boolean isHandler(BlockGetter level, BlockPos pos, EnumProperty<Connection> property);
@@ -182,8 +182,8 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         }
     }
 
-    @Nonnull
-    protected abstract Connection getConnection(Direction direction, @Nonnull BlockEntity entity);
+    @NotNull
+    protected abstract Connection getConnection(Direction direction, @NotNull BlockEntity entity);
 
     @Override
     @SuppressWarnings("deprecation")

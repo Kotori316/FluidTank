@@ -7,11 +7,11 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import cats.data.Chain;
-import javax.annotation.Nonnull;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -219,7 +219,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
     }
 
     //-------------------- Utility methods --------------------
-    @Nonnull
+    @NotNull
     private static ListTankHandler createEmptyHandler() {
         return new ListTankHandler(Chain.fromSeq(asList(EMPTY_TANK, EMPTY_TANK).map(TankHandler::apply)));
     }

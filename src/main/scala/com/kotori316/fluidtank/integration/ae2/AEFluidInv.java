@@ -15,8 +15,8 @@ import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.channels.IFluidStorageChannel;
 import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IItemList;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import scala.Option;
 import scala.jdk.javaapi.FunctionConverters;
 
@@ -86,7 +86,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
         return api.storage().getStorageChannel(IFluidStorageChannel.class);
     }
 
-    @Nonnull
+    @NotNull
     static FluidAmount fromAEStack(@Nullable IAEFluidStack stack) {
         if (stack == null) {
             return FluidAmount.EMPTY();
@@ -100,7 +100,7 @@ public class AEFluidInv implements IMEMonitor<IAEFluidStack>, IMEMonitorHandlerR
     }
 
     @Nullable
-    IAEFluidStack toAEStack(@Nonnull FluidAmount amount) {
+    IAEFluidStack toAEStack(@NotNull FluidAmount amount) {
         // Null when stack is empty.
         IAEFluidStack stack = getChannel().createStack(amount.toStack());
         if (stack != null) {

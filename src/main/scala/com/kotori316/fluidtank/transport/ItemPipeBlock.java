@@ -2,8 +2,6 @@ package com.kotori316.fluidtank.transport;
 
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -18,12 +16,14 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
 
 public class ItemPipeBlock extends PipeBlock {
-    @Nonnull
+    @NotNull
     @Override
     protected String getRegName() {
         return "item_pipe";
@@ -52,9 +52,9 @@ public class ItemPipeBlock extends PipeBlock {
         return ModObjects.ITEM_PIPE_TYPE().create(pos, state);
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    protected Connection getConnection(Direction direction, @Nonnull BlockEntity entity) {
+    protected Connection getConnection(Direction direction, @NotNull BlockEntity entity) {
         if (entity instanceof Container ||
             entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent())
             return Connection.CONNECTED;

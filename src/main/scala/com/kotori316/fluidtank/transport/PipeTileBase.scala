@@ -4,7 +4,6 @@ import cats.implicits._
 import com.kotori316.fluidtank.network.{PacketHandler, TileMessage}
 import com.kotori316.fluidtank.transport.NeighborInstance._
 import com.kotori316.fluidtank.{FluidTank, _}
-import javax.annotation.Nonnull
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.DyeColor
@@ -12,6 +11,7 @@ import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
+import org.jetbrains.annotations.NotNull
 
 import scala.ref.WeakReference
 
@@ -99,7 +99,7 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
     }
   }
 
-  protected def getCapFromCache[CapType](@Nonnull t: BlockEntity, pos: BlockPos, dOfTile: Direction, cap: Capability[CapType]): Cap[CapType] = {
+  protected def getCapFromCache[CapType](@NotNull t: BlockEntity, pos: BlockPos, dOfTile: Direction, cap: Capability[CapType]): Cap[CapType] = {
     def getAndCacheCap(): LazyOptional[CapType] = {
       val o = t.getCapability(cap, dOfTile)
       if (o.isPresent)

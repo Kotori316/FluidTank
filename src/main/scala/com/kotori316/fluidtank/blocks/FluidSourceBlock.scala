@@ -4,7 +4,6 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
-import javax.annotation.Nullable
 import net.minecraft.core.{BlockPos, NonNullList}
 import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
 import net.minecraft.world.entity.LivingEntity
@@ -18,6 +17,7 @@ import net.minecraft.world.level.material.Material
 import net.minecraft.world.level.{BlockGetter, Level}
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import net.minecraft.world.{InteractionHand, InteractionResult}
+import org.jetbrains.annotations.Nullable
 
 class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Material.METAL).strength(0.5f)) {
   setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)

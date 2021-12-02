@@ -13,7 +13,7 @@ object RecipeInventoryUtil {
 
     require(s1.length <= 3 && s2.length <= 3 && s3.length <= 3, s"Over 4 elements are not allowed. ${(s1, s2, s3)}")
     require(s1.nonEmpty || s2.nonEmpty || s3.nonEmpty, "All Empty?")
-    require(Set(s1, s2, s3).flatMap(_.toIterable).forall(map.keySet), s"Contains all keys, ${Set(s1, s2, s3).flatMap(_.toIterable)}")
+    require(Set(s1, s2, s3).flatMap(_.toSeq).forall(map.keySet), s"Contains all keys, ${Set(s1, s2, s3).flatMap(_.toSeq)}")
 
     val itemList = (List(s1, s2, s3) zip (0 until 9 by 3))
       .flatMap { case (str, i) => str.zipWithIndex.map { case (c, i1) => (c, i + i1) } }

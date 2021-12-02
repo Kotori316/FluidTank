@@ -1,7 +1,5 @@
 package com.kotori316.fluidtank.transport;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -17,6 +15,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
@@ -33,8 +33,8 @@ public class FluidPipeBlock extends PipeBlock {
     }
 
     @Override
-    @Nonnull
-    protected Connection getConnection(Direction direction, @Nonnull BlockEntity entity) {
+    @NotNull
+    protected Connection getConnection(Direction direction, @NotNull BlockEntity entity) {
         LazyOptional<IFluidHandler> capability = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
         if (capability.isPresent())
             if (capability.map(f -> f.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)).orElse(0) >= 4000)

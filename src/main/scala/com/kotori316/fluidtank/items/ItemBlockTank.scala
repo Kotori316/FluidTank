@@ -8,7 +8,6 @@ import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.tiles.TileTank
-import javax.annotation.Nullable
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
@@ -24,6 +23,7 @@ import net.minecraftforge.client.IItemRenderProperties
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
+import org.jetbrains.annotations.Nullable
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, FluidTank.proxy.getTankProperties) {
   setRegistryName(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)

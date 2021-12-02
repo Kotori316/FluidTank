@@ -41,7 +41,7 @@ archivesBaseName = "LargeFluidTank"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 compileScala {
-    scalaCompileOptions.additionalParameters = ["-Wconf:cat=deprecation:ws,any:e"]
+    scalaCompileOptions.additionalParameters = ["-Wconf:cat=deprecation:w,any:e"]
 }
 
 String forgeVersion() {
