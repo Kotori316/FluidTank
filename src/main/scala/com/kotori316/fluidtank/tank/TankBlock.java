@@ -28,7 +28,6 @@ public class TankBlock extends BaseEntityBlock {
     public static final String NBT_Tank = "tank";
     public static final String NBT_Tier = "tier";
     public static final String NBT_Capacity = "capacity";
-    public static final String NBT_BlockTag = BlockItem.BLOCK_ENTITY_TAG;
     public static final String NBT_StackName = "stackName";
     public final Tiers tiers;
     private final TankBlockItem blockItem;
@@ -59,7 +58,7 @@ public class TankBlock extends BaseEntityBlock {
     public void saveTankNBT(BlockEntity entity, ItemStack stack) {
         if (entity instanceof TileTank tank) {
             if (tank.hasContent()) {
-                stack.addTagElement(NBT_BlockTag, tank.getBlockTag());
+                BlockItem.setBlockEntityData(stack, tank.getType(), tank.getBlockTag());
             }
             tank.getStackName().foreach(stack::setHoverName);
         }

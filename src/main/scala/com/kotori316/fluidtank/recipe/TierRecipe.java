@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -16,12 +17,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.SerializationTags;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
-import com.google.gson.JsonObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidAmount;
@@ -171,7 +172,7 @@ public class TierRecipe extends ShapedRecipe {
             if (!IntStream.of(SUB_SLOTS).mapToObj(inv::getItem).allMatch(subItems)) return false;
             if (!IntStream.of(TANK_SLOTS).mapToObj(inv::getItem).allMatch(tankItems)) return false;
             return IntStream.of(TANK_SLOTS).mapToObj(inv::getItem)
-                .map(stack -> stack.getTagElement(TankBlock.NBT_BlockTag))
+                .map(BlockItem::getBlockEntityData)
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
                 .filter(FluidAmount::nonEmpty)
@@ -183,7 +184,7 @@ public class TierRecipe extends ShapedRecipe {
         ItemStack craft(CraftingContainer inv) {
             ItemStack result = this.result.copy();
             FluidAmount fluidAmount = IntStream.of(TANK_SLOTS).mapToObj(inv::getItem)
-                .map(stack -> stack.getTagElement(TankBlock.NBT_BlockTag))
+                .map(BlockItem::getBlockEntityData)
                 .filter(Objects::nonNull)
                 .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TankBlock.NBT_Tank)))
                 .filter(FluidAmount::nonEmpty)
@@ -199,7 +200,7 @@ public class TierRecipe extends ShapedRecipe {
                 compound.put(TankBlock.NBT_Tank, tankTag);
                 compound.put(TankBlock.NBT_Tier, tier.toNBTTag());
 
-                result.addTagElement(TankBlock.NBT_BlockTag, compound);
+                result.addTagElement("BlockEntityTag", compound);
             }
 
             return result;

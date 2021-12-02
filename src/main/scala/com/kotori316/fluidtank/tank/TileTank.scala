@@ -4,10 +4,10 @@ import alexiil.mc.lib.attributes._
 import alexiil.mc.lib.attributes.fluid.FluidInvTankChangeListener
 import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
 import alexiil.mc.lib.attributes.fluid.volume.{FluidKey, FluidVolume}
+import com.kotori316.fluidtank.packet.ClientSync
 import com.kotori316.fluidtank.render.Box
 import com.kotori316.fluidtank.tank.TileTank.getFluidHeight
 import com.kotori316.fluidtank.{FluidAmount, ModTank}
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TextComponent}
@@ -22,7 +22,7 @@ import scala.math.Ordering.Implicits.infixOrderingOps
 class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos, state: BlockState)
   extends BlockEntity(t, pos, state)
     with Nameable
-    with BlockEntityClientSerializable
+    with ClientSync
     with AttributeProviderBlockEntity {
   self =>
 
@@ -39,17 +39,15 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
   var loading = false
   var stackName: Component = _
 
-  override def save(compound: CompoundTag): CompoundTag = {
+  override def saveAdditional(compound: CompoundTag): Unit = {
     compound.put(TileTank.NBT_Tank, tank.writeToNBT(new CompoundTag))
     compound.put(TileTank.NBT_Tier, tier.toNBTTag)
     getStackName.foreach(t => compound.putString(TileTank.NBT_StackName, Component.Serializer.toJson(t)))
-    super.save(compound)
+    super.saveAdditional(compound)
   }
 
   def getBlockTag: CompoundTag = {
-    val nbt = save(new CompoundTag)
-    Seq("x", "y", "z", "id").foreach(nbt.remove)
-    nbt
+    saveWithoutMetadata()
   }
 
   override def load(compound: CompoundTag): Unit = {
@@ -253,7 +251,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
 
   override def fromClientTag(tag: CompoundTag): Unit = self.load(tag)
 
-  override def toClientTag(tag: CompoundTag): CompoundTag = self.save(tag)
+  override def toClientTag(tag: CompoundTag): CompoundTag = self.saveWithFullMetadata()
 
   override def addAllAttributes(to: AttributeList[_]): Unit = {
     to.offer(this.connection.handler)
@@ -264,7 +262,6 @@ object TileTank {
   final val NBT_Tank = TankBlock.NBT_Tank
   final val NBT_Tier = TankBlock.NBT_Tier
   final val NBT_Capacity = TankBlock.NBT_Capacity
-  final val NBT_BlockTag = TankBlock.NBT_BlockTag
   final val NBT_StackName = TankBlock.NBT_StackName
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"

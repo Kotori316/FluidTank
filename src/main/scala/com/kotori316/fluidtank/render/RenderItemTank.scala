@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.render
 
 import com.kotori316.fluidtank.ModTank
-import com.kotori316.fluidtank.tank.{TankBlock, TankBlockItem, TileTank}
+import com.kotori316.fluidtank.tank.{TankBlockItem, TileTank}
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.{EnvType, Environment}
@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.BlockPos
-import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.{BlockItem, ItemStack}
 
 @Environment(EnvType.CLIENT)
 class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
@@ -35,7 +35,7 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
         tileTank.tier = tankItem.blockTank.tiers
         tileTank.tank.setFluid(null)
-        val compound = stack.getTagElement(TankBlock.NBT_BlockTag)
+        val compound = BlockItem.getBlockEntityData(stack)
         if (compound != null)
           tileTank.readNBTClient(compound)
         Lighting.setupForFlatItems()

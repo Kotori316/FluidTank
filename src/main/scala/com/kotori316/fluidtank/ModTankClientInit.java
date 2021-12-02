@@ -15,6 +15,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 
+import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tank.TileTankCreative;
@@ -30,6 +31,7 @@ public class ModTankClientInit implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModTank.LOGGER.info("Client init is called. {} ", ModTank.modID);
+        PacketHandler.Client.initClient();
         ModTank.Entries.ALL_TANK_BLOCKS.forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, RenderType.cutoutMipped()));
         BlockEntityRendererRegistry.register(ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, RenderTank::new);
         BlockEntityRendererRegistry.register(ModTank.Entries.CREATIVE_BLOCK_ENTITY_TYPE, d ->

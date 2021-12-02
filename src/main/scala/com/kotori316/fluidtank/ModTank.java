@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.kotori316.fluidtank.integration.FabricFluidTankStorage;
 import com.kotori316.fluidtank.milk.MilkFluid;
+import com.kotori316.fluidtank.packet.PacketHandler;
 import com.kotori316.fluidtank.recipe.TankRecipe;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.ContentTankSerializer;
@@ -54,6 +55,7 @@ public class ModTank implements ModInitializer {
     @Override
     public void onInitialize() {
         ModTank.LOGGER.debug("Universal init is called. {} ", ModTank.modID);
+        PacketHandler.Server.initServer();
         Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_wood"), Entries.WOOD_TANK);
         Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_" + block.tiers.toString().toLowerCase()), block));
         Registry.register(Registry.BLOCK, new ResourceLocation(modID, "creative"), Entries.CREATIVE_TANK);
