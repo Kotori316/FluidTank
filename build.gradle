@@ -188,7 +188,7 @@ githubRelease {
 }
 
 curseforge {
-    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
+    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : (System.getenv("CURSEFORGE_KEY") ?: "")
     project {
         id = '411564'
         changelogType = 'markdown'
