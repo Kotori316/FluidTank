@@ -37,12 +37,12 @@ jobs:
       - name: Precompile
         run: chmod +x ./gradlew && ./gradlew compileScala
       - name: Test with Gradle
-        if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
+        if: ${{ contains(github.event.head_commit.message, '[skip release]') }}
         run: chmod +x ./gradlew && ./gradlew build
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Publish with Gradle
-        if: ${{ contains(github.event.head_commit.message, '[skip release]') }}
+        if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
         run: chmod +x ./gradlew && ./gradlew build curseforge
         env:
           CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_KEY }}
