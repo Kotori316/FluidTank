@@ -3,14 +3,14 @@ name: Java CI
 on:
   push:
     branches:
-      - "1.17-fabric"
+      - "1.18-fabric"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 16 ]
+        java: [ 17 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
       #- uses: actions/cache@v2
       #  with:
       #    path: ~/.gradle/caches
@@ -36,9 +36,16 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew dependencies
       - name: Precompile
         run: chmod +x ./gradlew && ./gradlew compileScala
-      - name: Build with Gradle
+      - name: Test with Gradle
+        if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
         run: chmod +x ./gradlew && ./gradlew build
         env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Publish with Gradle
+        if: ${{ contains(github.event.head_commit.message, '[skip release]') }}
+        run: chmod +x ./gradlew && ./gradlew build curseforge
+        env:
+          CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_KEY }}
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check artifacts
         run: ls -alF build/libs

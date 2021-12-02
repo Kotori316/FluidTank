@@ -133,7 +133,7 @@ java {
     // If you remove this line, sources will not be generated.
     // withSourcesJar()
 //    toolchain {
-//        it.languageVersion = JavaLanguageVersion.of(16)
+//        it.languageVersion = JavaLanguageVersion.of(17)
 //    }
 }
 
@@ -161,6 +161,8 @@ def BRANCH = "1.18-fabric"
 def joinedLog = String.join("\n", List.of(
         "Fluid Tank for ${project.minecraft_version} and Fabric.",
         "",
+        isInCI() ? "Released via GitHub Action. This version may contain some bugs!" : "",
+        "",
         "Requires:",
         "",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
@@ -171,7 +173,7 @@ def joinedLog = String.join("\n", List.of(
         "Built with:",
         "",
         "* Minecraft ${project.minecraft_version}",
-        "* Mapping Official",
+        "* Mapping Official ${project.minecraft_version}",
         "* Fabric API ${project.fabric_version}",
         "* Fabric Loader ${project.loader_version}",
 ).stream().map { it.toString() }.toList())
@@ -191,15 +193,15 @@ curseforge {
         id = '411564'
         changelogType = 'markdown'
         addGameVersion 'Fabric'
-        addGameVersion '1.18-Snapshot'
+        addGameVersion '1.18'
         changelog = joinedLog
-        releaseType = 'release'
+        releaseType = isInCI() ? 'alpha' : 'release'
         mainArtifact remapJar
         addArtifact jar
         relations {
             requiredDependency 'fabric-language-scala'
             //noinspection SpellCheckingInspection
-            // requiredDependency 'libblockattributes'
+            requiredDependency 'libblockattributes'
         }
     }
     options {
@@ -246,6 +248,12 @@ publishing {
     publications {
         gpr(MavenPublication) {
             artifactId = "FluidTank".toLowerCase()
+            if (isInCI()) {
+                version = "${project.mod_version}.0-fabric-SNAPSHOT"
+            } else {
+                version = "${project.mod_version}.0-fabric"
+
+            }
             artifact remapJar
             artifact srcJar
         }
