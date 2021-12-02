@@ -1,10 +1,18 @@
+## v18.0.0
+
+* First release for Minecraft 1.18
+
+Build with 1.18-38.0.1, Mapping: Official 1.18
+
 ## v17.0.2
+
 * Added recipe of Copper Tank
 * Save debug message to "debug.log"
 
 Build with 1.17.1-37.0.90, Mapping: Official 1.17.1
 
 ## v17.0.1
+
 * Changed dependency system.
 
 Build with 1.17.1-37.0.90, Mapping: Official 1.17.1
@@ -21,7 +29,7 @@ Build with 1.17.1-37.0.84, Mapping: Official 1.17.1
 Build with net.minecraftforge:forge:1.16.5-36.1.0, Mapping: 20201028-1.16.3
 
 ## v16.1.7
-* Added new property, "tank_pos" to the block of tanks. 
+* Added new property, "tank_pos" to the block of tanks.
   [#79](https://github.com/Kotori316/FluidTank/issues/79) [#80](https://github.com/Kotori316/FluidTank/issues/80)
   * This property is created for changing models that depend on the position of tank.
   * This property doesn't affect anything in server side. (the content of tanks or drain/fill action)
@@ -84,8 +92,8 @@ Build with net.minecraftforge:forge:1.16.5-36.0.1, Mapping: 20201028-1.16.3
 Build with net.minecraftforge:forge:1.16.4-35.1.4, Mapping: 20201028-1.16.3
 
 ## v16.0.8
-* Remove usage of unstable mixin. 
-The error of 
+* Remove usage of unstable mixin.
+  The error of 
 "java.util.NoSuchElementException: Supplier is empty. Mixin system for `kotori_scala`(Scalable Cats Force) seems not working."
 is fixed.
 

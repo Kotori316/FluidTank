@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
     branches:
-      - "1.17"
+      - "1.18"
     paths:
       - "src/main/**"
       - ".github/workflows/gradle.yml"
@@ -12,14 +12,12 @@ jobs:
   assemble:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.17.1
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.18
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Compile
-        run: chmod +x ./gradlew && ./gradlew compileScala --info --stacktrace --no-daemon
       - name: Make Java dir
         run: mkdir -p src/main/java
       - name: Assemble
@@ -36,35 +34,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ assemble ]
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.17.1
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.18
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       fail-fast: false
       matrix:
-        java: [ default ]
-        forge: [ 1.17.1-latest, default ]
+        forge: [ 1.18-latest, default ]
     steps:
       - name: Get latest version
         if: ${{ matrix.forge != 'default' }}
         run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
       - uses: actions/checkout@v2
-      - name: Set up JDK ${{ matrix.java }}
-        if: ${{ matrix.java != 'default' }}
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt-hotspot'
-          java-version: ${{ matrix.java }}
-      - name: compile
-        run: |
-          chmod +x ./gradlew && (./gradlew clean || true)
-          ( (./gradlew compileScala || ./gradlew clean) || (./gradlew compileScala || ./gradlew clean) || (sleep 10s && ./gradlew compileScala) )
-        continue-on-error: true
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Java Toolchains
-        run: chmod +x ./gradlew && ./gradlew javaToolchains --no-daemon --info --stacktrace --warning-mode all
+        run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon --stacktrace --warning-mode all
       - name: Test with JUnit
         run: chmod +x ./gradlew && ./gradlew --no-daemon test --info --stacktrace
         env:
@@ -79,7 +63,7 @@ jobs:
   cross-check-runData:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.17.1
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.18
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
