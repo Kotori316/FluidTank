@@ -11,6 +11,7 @@ import com.kotori316.fluidtank.{FluidAmount, ModTank}
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TextComponent}
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.util.Mth
 import net.minecraft.world.Nameable
 import net.minecraft.world.level.Level
@@ -46,10 +47,6 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     super.saveAdditional(compound)
   }
 
-  def getBlockTag: CompoundTag = {
-    saveWithoutMetadata()
-  }
-
   override def load(compound: CompoundTag): Unit = {
     super.load(compound)
     tank.readFromNBT(compound.getCompound(TileTank.NBT_Tank))
@@ -70,9 +67,10 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     }
   }
 
-  /*
-    override def onDataPacket(net: NetworkManager, pkt: SUpdateTileEntityPacket): Unit = handleUpdateTag(pkt.getNbtCompound)
-  */
+  override def getUpdatePacket: ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
+
+  override def getUpdateTag: CompoundTag = saveWithoutMetadata()
+
   private def sendPacket(): Unit = {
     if (hasLevel && !level.isClientSide) sync()
   }
@@ -251,7 +249,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
 
   override def fromClientTag(tag: CompoundTag): Unit = self.load(tag)
 
-  override def toClientTag(tag: CompoundTag): CompoundTag = self.saveWithFullMetadata()
+  override def toClientTag(tag: CompoundTag): CompoundTag = self.getUpdateTag
 
   override def addAllAttributes(to: AttributeList[_]): Unit = {
     to.offer(this.connection.handler)
