@@ -275,9 +275,9 @@ githubRelease {
     targetCommitish.set('1.18')
     body.set(getLatestChangeLog())
     releaseAssets = files(
-            jar.getArchiveFile().get(),
-            deobfJar.getArchiveFile().get(),
-            srcJar.getArchiveFile().get()
+            jar,
+            deobfJar,
+            srcJar,
     )
 }
 
