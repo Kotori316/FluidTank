@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.integration.top
-/*
+
 import com.kotori316.fluidtank.integration.Localize._
 import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTank, TileTankVoid}
 import com.kotori316.fluidtank.{Config, FluidTank}
@@ -38,4 +38,4 @@ class TankDataProvider extends IProbeInfoProvider {
       case _ =>
     }
   }
-}*/
+}

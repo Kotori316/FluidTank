@@ -116,6 +116,14 @@ repositories {
             it.includeModule("slimeknights.mantle", "Mantle")
         }
     }
+    maven {
+        name = "What The Hell Is That"
+        url = "https://maven.bai.lol"
+        content {
+            it.includeVersion("mcp.mobius.waila", "wthit-api", "forge-${project.wthit_version}")
+            it.includeVersion("mcp.mobius.waila", "wthit", "forge-${project.wthit_version}")
+        }
+    }
     /*maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven.k-4u.nl"
@@ -165,14 +173,14 @@ dependencies {
     implementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.2-kotori')
 
     /*if (!isInCI()) {
-        implementation(fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2"))
         runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
     implementation(fg.deobf("mezz.jei:jei-1.18:" + project.jeiVersion))
-    /*implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")*/
-    // implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
+    compileOnly(fg.deobf("mcp.mobius.waila:wthit-api:forge-${project.wthit_version}"))
+    runtimeOnly(fg.deobf("mcp.mobius.waila:wthit:forge-${project.wthit_version}"))
+    implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
     // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
