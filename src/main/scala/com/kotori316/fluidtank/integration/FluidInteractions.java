@@ -22,16 +22,15 @@ public final class FluidInteractions {
     static {
         List<FluidInteraction> list = new ArrayList<>();
         list.add(new BCAttributeInteraction());
-        /*if (FabricLoader.getInstance().isModLoaded("TechReborn".toLowerCase())) {
+        if (FabricLoader.getInstance().isModLoaded("TechReborn".toLowerCase())) {
             list.add(techRebornInteraction());
-        }*/
+        }
 
         FLUID_INTERACTIONS = Collections.unmodifiableList(list);
     }
 
     private static FluidInteraction techRebornInteraction() {
-        return null;
-        // return new TechRebornCellInteraction();
+        return new TechRebornCellInteraction();
     }
 
     public static InteractionResult interact(Connection connection, Player player, InteractionHand hand, ItemStack stack) {

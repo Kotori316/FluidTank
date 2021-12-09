@@ -21,7 +21,7 @@ public class TankWailaPlugin implements IWailaPlugin {
     static final String WAILA_TANK_INFO = "fluidtank.waila.tank_info";
     static final String WAILA_SHORT_INFO = "fluidtank.waila.short_info";
     static final String WAILA_SHORT = "fluidtank.waila.short";
-    static final String FLUID_NULL = "None";
+    static final String FLUID_NULL = "Empty";
     static final String NBT_Tier = TileTank.NBT_Tier();
     static final String NBT_ConnectionAmount = "ConnectionAmount";
     static final String NBT_ConnectionCapacity = "ConnectionCapacity";

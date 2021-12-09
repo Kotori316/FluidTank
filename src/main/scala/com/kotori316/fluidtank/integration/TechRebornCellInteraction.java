@@ -1,5 +1,5 @@
 package com.kotori316.fluidtank.integration;
-/*
+
 import java.math.RoundingMode;
 
 import net.minecraft.sounds.SoundEvent;
@@ -86,4 +86,4 @@ class TechRebornCellInteraction implements FluidInteraction {
             soundEvent = fill ? SoundEvents.BUCKET_FILL : SoundEvents.BUCKET_EMPTY;
         return soundEvent;
     }
-}*/
+}
