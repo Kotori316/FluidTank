@@ -1,3 +1,9 @@
+## v18.1.0
+
+* Added support of TOP and WTHIT
+
+Build with 1.18-38.0.16, Mapping: Official 1.18
+
 ## v18.0.0
 
 * First release for Minecraft 1.18
@@ -92,8 +98,7 @@ Build with net.minecraftforge:forge:1.16.5-36.0.1, Mapping: 20201028-1.16.3
 Build with net.minecraftforge:forge:1.16.4-35.1.4, Mapping: 20201028-1.16.3
 
 ## v16.0.8
-* Remove usage of unstable mixin.
-  The error of 
+* Remove usage of unstable mixin. The error of 
 "java.util.NoSuchElementException: Supplier is empty. Mixin system for `kotori_scala`(Scalable Cats Force) seems not working."
 is fixed.
 

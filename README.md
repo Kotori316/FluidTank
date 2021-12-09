@@ -47,7 +47,10 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
 * ~[Hwyla](https://github.com/TehNut/HWYLA/tree/1.16_forge)~
   * Licensed under CC BY-NC-SA 4.0
 
-* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.17)
+* [WTHIT](https://github.com/badasintended/wthit)
+  * Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+* [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.18)
   * Licensed under the MIT License Copyright © 2016 McJty
 
 * ~[LookAtThat](https://github.com/Geek202/LookAtThat)~
