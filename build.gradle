@@ -95,7 +95,7 @@ dependencies {
     modImplementation "alexiil.mc.lib:libblockattributes-all:${project.bc_attribute_version}"
 
     //noinspection SpellCheckingInspection
-    /*modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
+    modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
     //noinspection SpellCheckingInspection
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
     modImplementation("RebornCore:RebornCore-1.18:${project.RebornCore_version}") {
