@@ -170,8 +170,8 @@ dependencies {
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
-    /*implementation(fg.deobf("mezz.jei:jei-1.17.1:" + project.jeiVersion))
-    implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")*/
+    implementation(fg.deobf("mezz.jei:jei-1.18:" + project.jeiVersion))
+    /*implementation fg.deobf("curse.maven:the-one-probe-245211:3430022")*/
     // implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
     // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
