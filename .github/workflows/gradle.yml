@@ -45,7 +45,7 @@ jobs:
     steps:
       - name: Get latest version
         if: ${{ matrix.forge != 'default' }}
-        run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
+        run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "fictional*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Java Toolchains
         run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon --stacktrace --warning-mode all
