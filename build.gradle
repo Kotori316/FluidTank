@@ -75,7 +75,7 @@ def commonRunSetting = {
 }
 
 minecraft {
-    mappings channel: 'official', version: "1.18"
+    mappings channel: 'official', version: '1.18.1'
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
         client {
@@ -255,7 +255,7 @@ curseforge {
         changelogType = 'markdown'
         changelog = getAllChangeLog()
         releaseType = 'release'
-        addGameVersion '1.18'
+        addGameVersion '1.18.1'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
@@ -272,7 +272,7 @@ curseforge {
 githubRelease {
     repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish.set('1.18')
+    targetCommitish.set(project.getProperty("branch"))
     body.set(getLatestChangeLog())
     releaseAssets = files(
             jar,
@@ -329,7 +329,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${project.forgeVersion}, Mapping: Official 1.18" +
+                "Build with ${project.forgeVersion}, Mapping: Official 1.18.1" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)
@@ -365,7 +365,7 @@ task checkMethod() {
         System.out.println("Forge: ${forgeVersion()}" as String)
         System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}" as String)
         System.out.println("Minecraft $minecraftVersion" as String)
-        System.out.println("Mapping 1.17.1")
+        System.out.println("Mapping 1.18.1")
         System.out.println("Is In CI ${isInCI()}" as String)
         System.out.println("FilePath ${jar.getArchiveFile().get()}".toString())
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}" as String)
@@ -374,6 +374,7 @@ task checkMethod() {
         System.out.println("BaseName $archivesBaseName" as String)
         System.out.println("ModVersion-fromProperty ${getProperty("modVersion")}" as String)
         System.out.println("ModVersion-fromProject ${project.version}" as String)
+        System.out.println("Branch ${project.getProperty("branch")}" as String)
         System.out.println("*" * 20 as String)
         System.out.println("changes.md")
         System.out.println(getLatestChangeLog())
