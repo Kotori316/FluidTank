@@ -1,6 +1,6 @@
 # FluidTank
 
-For Minecraft 1.17 (1.17-fabric branch)
+For Minecraft 1.18 (1.18-fabric branch)
 
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank-fabric.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank-fabric)
 [![](http://cf.way2muchnoise.eu/full_largefluidtank-fabric_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank-fabric)
@@ -20,14 +20,14 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ### APIs
 
 * **REQUIRED** [Fabric](https://github.com/FabricMC/fabric)
-  * For Minecraft 1.17
+  * For Minecraft 1.18
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-  * Version 2.13.4
+  * Version 2.13.6
   * Licensed under the [Apache License 2.0](https://github.com/scala/scala/blob/2.13.x/LICENSE)
   * FOR USERS install https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala
 
 * **REQUIRED** [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)
-  * Version 0.9.2
-  * Licensed under the [MPL-2.0](https://github.com/AlexIIL/LibBlockAttributes/blob/0.9.x-1.17.x/LICENSE)
+  * Version 0.10.0
+  * Licensed under the [MPL-2.0](https://github.com/AlexIIL/LibBlockAttributes/blob/0.10.x-1.18.x/LICENSE)
   * For Users, install https://www.curseforge.com/minecraft/mc-mods/libblockattributes
