@@ -12,7 +12,7 @@ import com.kotori316.fluidtank.tiles.TileTank;
 /*
     Use java to avoid strange java.lang.VerifyError.
  */
-@WailaPlugin(id = FluidTank.modID)
+@WailaPlugin(id = FluidTank.modID + ":wthit_plugin")
 public class TankWailaPlugin implements IWailaPlugin {
 
     static final String TIER = "fluidtank.waila.tier";
