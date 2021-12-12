@@ -25,10 +25,10 @@ apply plugin: 'net.minecraftforge.gradle'
 // apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = getProperty("modVersion")
+version = project.getProperty("modVersion")
 if (isInCI()) {
     // In remote CI/CD environment
-    version = (getProperty("modVersion") + "_" + (System.getenv("GITHUB_SHA") ?: "NOT_GIT").substring(0, 7))
+    version = (project.getProperty("modVersion") + "_" + (System.getenv("GITHUB_SHA") ?: "NOT_GIT").substring(0, 7))
 }
 
 private static boolean isInCI() {
@@ -75,7 +75,7 @@ def commonRunSetting = {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.18.1'
+    mappings channel: 'official', version: (project.minecraftVersion as String)
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
         client {
@@ -168,7 +168,9 @@ private boolean hasGitHubToken() {
 }
 
 dependencies {
-    minecraft(forgeVersion())
+    def versionNumber = forgeVersion()
+    minecraft(versionNumber)
+    System.out.println("Detected $versionNumber with Minecraft ${project.minecraftVersion}" as String)
     implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.7')
     implementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.6.2-kotori')
 
@@ -255,7 +257,7 @@ curseforge {
         changelogType = 'markdown'
         changelog = getAllChangeLog()
         releaseType = 'release'
-        addGameVersion '1.18.1'
+        addGameVersion(project.minecraftVersion as String)
         addGameVersion 'Forge'
         mainArtifact jar
         addArtifact deobfJar
@@ -330,7 +332,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${project.forgeVersion}, Mapping: Official 1.18.1" +
+                "Build with ${project.forgeVersion}, Mapping: Official ${project.minecraftVersion}" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)
@@ -365,8 +367,8 @@ task checkMethod() {
     doLast {
         System.out.println("Forge: ${forgeVersion()}" as String)
         System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}" as String)
-        System.out.println("Minecraft $minecraftVersion" as String)
-        System.out.println("Mapping 1.18.1")
+        System.out.println("Minecraft ${minecraftVersion}" as String)
+        System.out.println("Mapping ${project.minecraftVersion}" as String)
         System.out.println("Is In CI ${isInCI()}" as String)
         System.out.println("FilePath ${jar.getArchiveFile().get()}" as String)
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}" as String)
@@ -443,7 +445,7 @@ publishing {
             pom {
                 def v = forgeVersion()
                 name = archivesBaseName
-                description = "FluidTank for Minecraft $minecraftVersion, build with forge $v"
+                description = "FluidTank for Minecraft ${project.minecraftVersion}, build with forge $v"
                 url = 'https://github.com/Kotori316/FluidTank'
                 packaging = "jar"
             }
