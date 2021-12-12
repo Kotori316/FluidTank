@@ -1,3 +1,9 @@
+## v18.2.0
+
+* Release for 1.18.1
+
+Build with 1.18.1-39.0.0, Mapping: Official 1.18.1
+
 ## v18.1.0
 
 * Added support of TOP and WTHIT

@@ -1,7 +1,7 @@
 {
   "pack": {
     "description": "FluidTank",
-    "pack_format": 7,
+    "pack_format": 8,
     "_comment": "Resource for FluidTank. V7"
   }
 }

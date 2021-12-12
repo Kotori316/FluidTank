@@ -256,6 +256,7 @@ curseforge {
         changelog = getAllChangeLog()
         releaseType = 'release'
         addGameVersion '1.18.1'
+        addGameVersion 'Forge'
         mainArtifact jar
         addArtifact deobfJar
         addArtifact srcJar
@@ -367,12 +368,12 @@ task checkMethod() {
         System.out.println("Minecraft $minecraftVersion" as String)
         System.out.println("Mapping 1.18.1")
         System.out.println("Is In CI ${isInCI()}" as String)
-        System.out.println("FilePath ${jar.getArchiveFile().get()}".toString())
+        System.out.println("FilePath ${jar.getArchiveFile().get()}" as String)
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}" as String)
         System.out.println("FilePath ${deobfJar.getArchiveFile().get()}" as String)
         System.out.println("Name $project.name" as String)
         System.out.println("BaseName $archivesBaseName" as String)
-        System.out.println("ModVersion-fromProperty ${getProperty("modVersion")}" as String)
+        System.out.println("ModVersion-fromProperty ${project.getProperty("modVersion")}" as String)
         System.out.println("ModVersion-fromProject ${project.version}" as String)
         System.out.println("Branch ${project.getProperty("branch")}" as String)
         System.out.println("*" * 20 as String)

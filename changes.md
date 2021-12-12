@@ -1,3 +1,3 @@
-## v18.1.0
+## v18.2.0
 
-* Added support of TOP and WTHIT
+* Release for 1.18.1
