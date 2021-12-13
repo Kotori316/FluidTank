@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.transport;
 
+import java.util.Objects;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -51,7 +53,7 @@ public class FluidPipeBlock extends PipeBlock {
     }
 
     private static boolean isFluidHandler(BlockGetter w, BlockPos pipePos, EnumProperty<PipeBlock.Connection> p) {
-        Direction d = FACING_TO_PROPERTY_MAP.inverse().get(p);
+        Direction d = Objects.requireNonNull(FACING_TO_PROPERTY_MAP.inverse().get(p));
         return isFluidHandler(w, pipePos.relative(d), d);
     }
 

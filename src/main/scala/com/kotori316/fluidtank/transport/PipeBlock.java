@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.transport;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
@@ -59,22 +60,27 @@ public abstract class PipeBlock extends Block implements EntityBlock {
     public static final EnumProperty<Connection> EAST = EnumProperty.create("east", Connection.class);
     public static final EnumProperty<Connection> UP = EnumProperty.create("up", Connection.class);
     public static final EnumProperty<Connection> DOWN = EnumProperty.create("down", Connection.class);
-    private static final ImmutableBiMap<EnumProperty<Connection>, VoxelShape> SHAPE_MAP = Stream.of(
-        Pair.of(NORTH, North_AABB),
-        Pair.of(SOUTH, South_AABB),
-        Pair.of(WEST, West_AABB),
-        Pair.of(EAST, East_AABB),
-        Pair.of(UP, UP_AABB),
-        Pair.of(DOWN, Down_AABB)
-    ).collect(ImmutableBiMap.toImmutableBiMap(Pair::getKey, Pair::getValue));
-    public static final ImmutableBiMap<Direction, EnumProperty<Connection>> FACING_TO_PROPERTY_MAP = Stream.of(
-        Pair.of(Direction.NORTH, NORTH),
-        Pair.of(Direction.SOUTH, SOUTH),
-        Pair.of(Direction.WEST, WEST),
-        Pair.of(Direction.EAST, EAST),
-        Pair.of(Direction.UP, UP),
-        Pair.of(Direction.DOWN, DOWN)
-    ).collect(ImmutableBiMap.toImmutableBiMap(Pair::getKey, Pair::getValue));
+    private static final ImmutableBiMap<EnumProperty<Connection>, VoxelShape> SHAPE_MAP = ImmutableBiMap.of(
+        PipeBlock.NORTH, North_AABB,
+        PipeBlock.SOUTH, South_AABB,
+        PipeBlock.WEST, West_AABB,
+        PipeBlock.EAST, East_AABB,
+        PipeBlock.UP, UP_AABB,
+        PipeBlock.DOWN, Down_AABB
+    );
+    public static final ImmutableBiMap<Direction, EnumProperty<Connection>> FACING_TO_PROPERTY_MAP = ImmutableBiMap.of(
+        Direction.NORTH, NORTH,
+        Direction.SOUTH, SOUTH,
+        Direction.WEST, WEST,
+        Direction.EAST, EAST,
+        Direction.UP, UP,
+        Direction.DOWN, DOWN
+    );
+
+    @NotNull
+    public static EnumProperty<Connection> getPropertyFromDirection(Direction facing) {
+        return Objects.requireNonNull(FACING_TO_PROPERTY_MAP.get(facing));
+    }
 
     public BlockItem itemBlock() {
         return blockItem;
@@ -125,9 +131,6 @@ public abstract class PipeBlock extends Block implements EntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Level worldIn = context.getLevel();
         BlockPos pos = context.getClickedPos();
-//        return FACING_TO_PROPERTY_MAP.entrySet().stream()
-//        .reduce(this.getDefaultState(), (s, e) -> s.with(e.getValue(), canConnectTo(worldIn, pos.offset(e.getKey()), e.getKey())), (s1, s2) -> s1);
-//        FluidState fluidState = worldIn.getFluidState(pos);
         return this.defaultBlockState()
             .setValue(NORTH, canConnectTo(worldIn, pos.north(), Direction.NORTH))
             .setValue(EAST, canConnectTo(worldIn, pos.east(), Direction.EAST))
@@ -146,20 +149,20 @@ public abstract class PipeBlock extends Block implements EntityBlock {
             worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
         }*/
         Connection value;
-        Connection now = stateIn.getValue(FACING_TO_PROPERTY_MAP.get(facing));
+        Connection now = stateIn.getValue(getPropertyFromDirection(facing));
         if (facingState.getBlock() == this) {
-            value = facingState.getValue(FACING_TO_PROPERTY_MAP.get(facing.getOpposite()));
-            return stateIn.setValue(FACING_TO_PROPERTY_MAP.get(facing), value);
+            value = facingState.getValue(getPropertyFromDirection(facing.getOpposite()));
+            return stateIn.setValue(getPropertyFromDirection(facing), value);
         } else {
             value = canConnectTo(worldIn, currentPos.relative(facing), facing);
             if (value.is(Connection.NO_CONNECTION)) {
                 if (facingState.getMaterial() == Material.AIR || facingState.getMaterial().isLiquid()) {
-                    return stateIn.setValue(FACING_TO_PROPERTY_MAP.get(facing), value);
+                    return stateIn.setValue(getPropertyFromDirection(facing), value);
                 } else {
                     return stateIn;
                 }
             } else if (value.hasConnection() ^ now.hasConnection())
-                return stateIn.setValue(FACING_TO_PROPERTY_MAP.get(facing), value);
+                return stateIn.setValue(getPropertyFromDirection(facing), value);
             else
                 return stateIn;
         }
@@ -216,7 +219,7 @@ public abstract class PipeBlock extends Block implements EntityBlock {
             .map(Map.Entry::getKey)
             .findFirst()
             .map(p -> {
-                if (worldIn.getBlockState(pos.relative(FACING_TO_PROPERTY_MAP.inverse().get(p))).getBlock() != this)
+                if (worldIn.getBlockState(pos.relative(Objects.requireNonNull(FACING_TO_PROPERTY_MAP.inverse().get(p)))).getBlock() != this)
                     return Pair.of(state.cycle(p), false);
                 else
                     return Pair.of(state.setValue(p, Connection.onOffConnection(state.getValue(p))), true);
@@ -243,10 +246,10 @@ public abstract class PipeBlock extends Block implements EntityBlock {
             BlockPos vec = fromPos.subtract(pos);
             Direction direction = Direction.fromNormal(vec.getX(), vec.getY(), vec.getZ());
             if (direction != null) {
-                if (fromState.getValue(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.NO_CONNECTION) {
-                    worldIn.setBlockAndUpdate(pos, state.setValue(FACING_TO_PROPERTY_MAP.get(direction), Connection.NO_CONNECTION));
-                } else if (fromState.getValue(FACING_TO_PROPERTY_MAP.get(direction.getOpposite())) == Connection.CONNECTED) {
-                    worldIn.setBlockAndUpdate(pos, state.setValue(FACING_TO_PROPERTY_MAP.get(direction), Connection.CONNECTED));
+                if (fromState.getValue(getPropertyFromDirection(direction.getOpposite())) == Connection.NO_CONNECTION) {
+                    worldIn.setBlockAndUpdate(pos, state.setValue(getPropertyFromDirection(direction), Connection.NO_CONNECTION));
+                } else if (fromState.getValue(getPropertyFromDirection(direction.getOpposite())) == Connection.CONNECTED) {
+                    worldIn.setBlockAndUpdate(pos, state.setValue(getPropertyFromDirection(direction), Connection.CONNECTED));
                 }
             }
         }

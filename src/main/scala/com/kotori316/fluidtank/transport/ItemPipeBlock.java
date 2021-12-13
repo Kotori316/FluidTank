@@ -31,7 +31,7 @@ public class ItemPipeBlock extends PipeBlock {
 
     @Override
     protected boolean isHandler(BlockGetter level, BlockPos pos, EnumProperty<Connection> property) {
-        Direction d = FACING_TO_PROPERTY_MAP.inverse().get(property);
+        Direction d = Objects.requireNonNull(FACING_TO_PROPERTY_MAP.inverse().get(property));
         BlockPos maybeTilePos = pos.relative(d);
         BlockEntity maybeTile = level.getBlockEntity(maybeTilePos);
         if (maybeTile != null) {
