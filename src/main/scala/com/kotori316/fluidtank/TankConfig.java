@@ -14,9 +14,8 @@ public final class TankConfig implements ConfigData {
 
     @ConfigEntry.Gui.CollapsibleObject
     public Capacity capacity = new Capacity();
-    public boolean enableRecipe = true;
+    public boolean enableUpdateRecipe = true;
 
-    @SuppressWarnings("unused")  // Accessed via reflection.
     public static class Capacity {
         public long wood = Tiers.WOOD.buckets;
         public long stone = Tiers.STONE.buckets;
