@@ -23,6 +23,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.kotori316.fluidtank.ModTank;
+import com.kotori316.fluidtank.TankConstant;
 
 public class TankBlock extends BaseEntityBlock {
     public static final String NBT_Tank = "tank";
@@ -33,7 +34,7 @@ public class TankBlock extends BaseEntityBlock {
     private final TankBlockItem blockItem;
 
     public TankBlock(Tiers tiers) {
-        super(Properties.of(ModTank.MATERIAL).noOcclusion().strength(1f, 1f));
+        super(Properties.of(TankConstant.MATERIAL).noOcclusion().strength(1f, 1f));
         this.tiers = tiers;
         this.blockItem = new TankBlockItem(this);
     }
@@ -41,13 +42,13 @@ public class TankBlock extends BaseEntityBlock {
     @Override
     @SuppressWarnings("deprecation")
     public VoxelShape getCollisionShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
-        return ModTank.TANK_SHAPE;
+        return TankConstant.TANK_SHAPE;
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
-        return ModTank.TANK_SHAPE;
+        return TankConstant.TANK_SHAPE;
     }
 
     @Override

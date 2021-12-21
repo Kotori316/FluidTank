@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.DSL;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -16,13 +18,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
-import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,15 +42,12 @@ public class ModTank implements ModInitializer {
     public static final CreativeModeTab CREATIVE_TAB = FabricItemGroupBuilder.build(
         new ResourceLocation(modID, modID), () -> new ItemStack(Entries.WOOD_TANK)
     );
-    public static final Material MATERIAL = new Material(MaterialColor.NONE, false, true, true, false,
-        true, false, PushReaction.BLOCK);
-    public static final double d = 1 / 16d;
-    public static final AABB BOUNDING_BOX = new AABB(2 * d, 0, 2 * d, 14 * d, 1d, 14 * d);
-    public static final VoxelShape TANK_SHAPE = Shapes.create(BOUNDING_BOX);
 
     @Override
     public void onInitialize() {
         ModTank.LOGGER.debug("Universal init is called. {} ", ModTank.modID);
+        AutoConfig.register(TankConfig.class, GsonConfigSerializer::new);
+        TankConstant.config = AutoConfig.getConfigHolder(TankConfig.class).getConfig();
         PacketHandler.Server.initServer();
         Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_wood"), Entries.WOOD_TANK);
         Entries.TANK_BLOCKS.forEach(block -> Registry.register(Registry.BLOCK, new ResourceLocation(modID, "tank_" + block.tiers.toString().toLowerCase()), block));
