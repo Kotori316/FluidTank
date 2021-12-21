@@ -25,6 +25,7 @@ if (isInCI()) {
 
     System.out.println("Set version to $version because I'm in CI." as String)
     System.out.println("CURSEFORGE_KEY: ${System.getenv().containsKey('CURSEFORGE_KEY')}" as String)
+    System.out.println("AZURE_TOKEN: ${System.getenv().containsKey('AZURE_TOKEN')}" as String)
 } else {
     version = (version + ".0" + "-fabric")
 }
@@ -255,7 +256,7 @@ publishing {
         gpr(MavenPublication) {
             artifactId = "FluidTank".toLowerCase()
             if (isInCI()) {
-                version = "${project.mod_version}.0-fabric-SNAPSHOT"
+                version = "${project.snapshot_version}.0-fabric-SNAPSHOT"
             } else {
                 version = "${project.mod_version}.0-fabric"
 
