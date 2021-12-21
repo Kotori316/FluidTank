@@ -20,6 +20,7 @@ public class BeforeAllTest {
             initLoader();
             changeDist();
             Bootstrap.bootStrap();
+            TankConstant.config = new TankConfig();
         }
     }
 

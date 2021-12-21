@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
 
 import com.kotori316.fluidtank.ModTank;
+import com.kotori316.fluidtank.TankConstant;
 import com.kotori316.fluidtank.tank.Tiers;
 
 public class TankRecipe extends CustomRecipe {
@@ -23,8 +24,12 @@ public class TankRecipe extends CustomRecipe {
 
     public TankRecipe(ResourceLocation id) {
         super(id);
-        logics = Stream.of(Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
-            .map(TierRecipe.Logic::new).toList();
+        if (TankConstant.config.enableUpdateRecipe) {
+            logics = Stream.of(Tiers.TIN, Tiers.LEAD, Tiers.BRONZE, Tiers.SILVER)
+                .map(TierRecipe.Logic::new).toList();
+        } else {
+            logics = List.of(TierRecipe.EmptyLogic.INSTANCE);
+        }
     }
 
     @Override

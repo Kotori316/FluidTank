@@ -110,11 +110,16 @@ dependencies {
     modCompileOnly("mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}")
     modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
 
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
+        //noinspection SpellCheckingInspection
+        exclude(group: "net.fabricmc.fabric-api")
+    }
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
     // Test Dependencies.
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2')
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.6.2')
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2')
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.6.2')
 }
@@ -209,6 +214,7 @@ curseforge {
             requiredDependency 'fabric-language-scala'
             //noinspection SpellCheckingInspection
             requiredDependency 'libblockattributes'
+            requiredDependency 'cloth-config'
         }
     }
     options {

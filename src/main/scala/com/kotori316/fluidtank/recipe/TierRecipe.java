@@ -27,6 +27,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
+import com.kotori316.fluidtank.TankConstant;
 import com.kotori316.fluidtank.tank.TankBlock;
 import com.kotori316.fluidtank.tank.Tiers;
 
@@ -48,13 +49,21 @@ public class TierRecipe extends ShapedRecipe {
         id = idIn;
         this.tier = tier;
 
-        result = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> b.tiers == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
-        tankItems = Logic.getTankItemIngredient(tier);
-        subItems = Logic.getSubItems(tier);
-        isEmptyRecipe = subItems.isEmpty();
-        logic = new Logic(tier, tankItems, subItems, result);
-//        if (isEmptyRecipe)
-//            throw new IllegalArgumentException(String.format("Mod 'FluidTank' Recipe for %s is disabled.", tier));
+        if (TankConstant.config.enableUpdateRecipe) {
+            result = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> b.tiers == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
+            tankItems = Logic.getTankItemIngredient(tier);
+            subItems = Logic.getSubItems(tier);
+            isEmptyRecipe = subItems.isEmpty();
+            logic = new Logic(tier, tankItems, subItems, result);
+            if (isEmptyRecipe) {
+                ModTank.LOGGER.warn("Sub item in recipe({}) is empty.", tier);
+            }
+        } else {
+            result = ItemStack.EMPTY;
+            tankItems = subItems = Ingredient.EMPTY;
+            isEmptyRecipe = true;
+            logic = EmptyLogic.INSTANCE;
+        }
     }
 
     @Override
@@ -218,5 +227,23 @@ public class TierRecipe extends ShapedRecipe {
                 .orElse(tier.getAlternative());
         }
 
+    }
+
+    static class EmptyLogic extends Logic {
+        static final EmptyLogic INSTANCE = new EmptyLogic();
+
+        private EmptyLogic() {
+            super(Tiers.Invalid, Ingredient.EMPTY, Ingredient.EMPTY, ItemStack.EMPTY);
+        }
+
+        @Override
+        boolean matches(CraftingContainer inv) {
+            return false;
+        }
+
+        @Override
+        ItemStack craft(CraftingContainer inv) {
+            return ItemStack.EMPTY;
+        }
     }
 }

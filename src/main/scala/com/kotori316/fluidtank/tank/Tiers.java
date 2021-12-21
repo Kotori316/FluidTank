@@ -12,6 +12,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.kotori316.fluidtank.TankConstant;
+
 public enum Tiers {
     Invalid(0, 0, "Invalid", "Unknown", false),
     WOOD(1, 1 << 2, "Wood", "minecraft:logs", false),
@@ -49,7 +51,6 @@ public enum Tiers {
     public final String tagName;
     private final String name;
     private final boolean hasTagRecipe;
-    private final long amount;
     private final Supplier<Ingredient> alternative;
 
     Tiers(int rank, int buckets, String name, String tagName, boolean hasTagRecipe) {
@@ -62,7 +63,6 @@ public enum Tiers {
         this.name = name;
         this.tagName = tagName;
         this.hasTagRecipe = hasTagRecipe;
-        this.amount = buckets * 1000L;
         this.alternative = alternative;
     }
 
@@ -90,7 +90,7 @@ public enum Tiers {
     }
 
     public long amount() {
-        return amount;
+        return TankConstant.config.capacity.get(name()).orElse(buckets) * 1000L;
     }
 
     public boolean hasTagRecipe() {
