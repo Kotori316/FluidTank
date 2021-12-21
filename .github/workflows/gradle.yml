@@ -43,9 +43,11 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Publish with Gradle
         if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
-        run: chmod +x ./gradlew && ./gradlew build curseforge
+        run: chmod +x ./gradlew && ./gradlew build curseforge publishAllPublicationsToAzureRepositoryRepository
         env:
           CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_KEY }}
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AZURE_USER_NAME: 'Kotori316'
+          AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
       - name: Check artifacts
         run: ls -alF build/libs
