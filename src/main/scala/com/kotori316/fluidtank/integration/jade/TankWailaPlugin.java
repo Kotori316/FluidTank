@@ -1,18 +1,20 @@
-package com.kotori316.fluidtank.integration.wthit;
+package com.kotori316.fluidtank.integration.jade;
 
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.WailaPlugin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 /*
     Use java to avoid strange java.lang.VerifyError.
  */
-@WailaPlugin(id = FluidTank.modID + ":wthit_plugin")
+@WailaPlugin
 public class TankWailaPlugin implements IWailaPlugin {
 
     static final String TIER = "fluidtank.waila.tier";
@@ -36,8 +38,8 @@ public class TankWailaPlugin implements IWailaPlugin {
     @Override
     public void register(IRegistrar registrar) {
         TankDataProvider tankDataProvider = new TankDataProvider();
-        registrar.addBlockData(tankDataProvider, TileTank.class);
-        registrar.addComponent(tankDataProvider, TooltipPosition.BODY, TileTank.class);
+        registrar.registerBlockDataProvider(tankDataProvider, BlockEntity.class);
+        registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, BlockTank.class);
 
         registrar.addConfig(KEY_TANK_INFO, true);
         registrar.addConfig(KEY_SHORT_INFO, true);

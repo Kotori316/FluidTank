@@ -119,14 +119,6 @@ repositories {
             it.includeModule("slimeknights.mantle", "Mantle")
         }
     }
-    maven {
-        name = "What The Hell Is That"
-        url = "https://maven.bai.lol"
-        content {
-            it.includeVersion("mcp.mobius.waila", "wthit-api", "forge-${project.wthit_version}")
-            it.includeVersion("mcp.mobius.waila", "wthit", "forge-${project.wthit_version}")
-        }
-    }
     /*maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven.k-4u.nl"
@@ -183,8 +175,7 @@ dependencies {
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
     implementation(fg.deobf("mezz.jei:jei-1.18:" + project.jeiVersion))
-    compileOnly(fg.deobf("mcp.mobius.waila:wthit-api:forge-${project.wthit_version}"))
-    runtimeOnly(fg.deobf("mcp.mobius.waila:wthit:forge-${project.wthit_version}"))
+    implementation fg.deobf("curse.maven:jade-324717:${project.jade_id}")
     implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
     // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
