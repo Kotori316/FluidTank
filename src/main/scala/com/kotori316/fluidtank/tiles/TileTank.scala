@@ -166,6 +166,7 @@ object TileTank {
   final val NBT_Tank = "tank" // Tag map
   final val NBT_Tier = "tier" // Tag map provided in Tier class (Actually, String)
   final val NBT_Capacity = "capacity" // Long
+  @deprecated("The use should be removed and use utility method in BlockItem or Utils", since = "1.18")
   final val NBT_BlockTag = Utils.BLOCK_ENTITY_TAG
   final val NBT_StackName = "stackName" // String parsed in Text
   final val bcId = "buildcraftcore"

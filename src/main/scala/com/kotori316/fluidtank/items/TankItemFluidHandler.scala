@@ -94,13 +94,7 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandl
     if (stack.getCount > 1) {
       return
     }
-    if (!fluid.isEmpty) {
-      val compound = stack.getOrCreateTag()
-      compound.put(TileTank.NBT_BlockTag, createTag)
-      stack.setTag(compound)
-    } else {
-      stack.removeTagKey(TileTank.NBT_BlockTag)
-    }
+    Utils.setTileTag(stack, if (!fluid.isEmpty) createTag else null)
   }
 
   def createTag: CompoundTag = {

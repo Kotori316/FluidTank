@@ -43,6 +43,18 @@ object ItemFluidHandlerTest extends BeforeAllTest {
   }
 
   @Test
+  def makeEmpty(): Unit = {
+    val stack = new ItemStack(woodTank)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
+
+    handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
+    assertTrue(stack.hasTag)
+    val drained = handler.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
+    assertEquals(FluidAmount.BUCKET_WATER, FluidAmount.fromStack(drained))
+    assertFalse(stack.hasTag)
+  }
+
+  @Test
   def filledTag(): Unit = {
     val stack = new ItemStack(woodTank)
     val handler = RecipeInventoryUtil.getFluidHandler(stack)

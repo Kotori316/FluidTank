@@ -58,7 +58,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
         val subTag = BlockItem.getBlockEntityData(stack)
         if (subTag != null) {
           if (!(!level.isClientSide && tileentity.onlyOpCanSetNbt) || !(player == null || !player.canUseGameMasterBlocks)) {
-            val nbt = tileentity.save(new CompoundTag)
+            val nbt = tileentity.saveWithoutMetadata()
             nbt.merge(subTag)
             nbt.putInt("x", pos.getX)
             nbt.putInt("y", pos.getY)
