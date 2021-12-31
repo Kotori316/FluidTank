@@ -169,7 +169,7 @@ object TileTank {
   final val NBT_BlockTag = "BlockEntityTag"
   final val NBT_StackName = "stackName"
   final val bcId = "buildcraftcore"
-  final val ae2id = "appliedenergistics2"
+  final val ae2id = "ae2"
 
   trait RealTank {
     self: TankHandler =>
