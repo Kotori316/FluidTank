@@ -12,7 +12,7 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
-class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
+class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
   def nbt: CompoundTag = BlockItem.getBlockEntityData(stack)
 
@@ -105,9 +105,9 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
 
   def createTag: CompoundTag = {
     val tag = new CompoundTag
-    tag.put(TileTank.NBT_Tier, tiers.toNBTTag)
+    tag.put(TileTank.NBT_Tier, tier.toNBTTag)
     val tankTag = new CompoundTag
-    tankTag.putInt(TileTank.NBT_Capacity, Utils.toInt(getCapacity))
+    tankTag.putLong(TileTank.NBT_Capacity, getCapacity)
     getFluid.write(tankTag)
     tag.put(TileTank.NBT_Tank, tankTag)
     tag
@@ -140,5 +140,5 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
     FluidAmount.fromStack(fluid)
   }
 
-  def getCapacity: Long = if (tankNbt == null) tiers.amount else tankNbt.getLong(TileTank.NBT_Capacity)
+  def getCapacity: Long = if (tankNbt == null) tier.amount else tankNbt.getLong(TileTank.NBT_Capacity)
 }

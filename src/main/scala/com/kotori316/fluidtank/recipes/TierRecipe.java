@@ -141,7 +141,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             CompoundTag compound = new CompoundTag();
 
             CompoundTag tankTag = new CompoundTag();
-            tankTag.putInt(TileTank.NBT_Capacity(), Utils.toInt(tier.amount()));
+            tankTag.putLong(TileTank.NBT_Capacity(), tier.amount());
             fluidAmount.write(tankTag);
 
             compound.put(TileTank.NBT_Tank(), tankTag);

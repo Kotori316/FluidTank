@@ -40,7 +40,7 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     if (nbt != null) {
       val tankNBT = nbt.getCompound(TileTank.NBT_Tank)
       val fluid = FluidAmount.fromNBT(tankNBT)
-      val c = tankNBT.getInt(TileTank.NBT_Capacity)
+      val c = tankNBT.getLong(TileTank.NBT_Capacity)
       tooltip.add(new TranslatableComponent(Localize.TOOLTIP, fluid.toStack.getDisplayName, fluid.amount, c))
     } else {
       tooltip.add(new TranslatableComponent(Localize.CAPACITY, blockTank.tier.amount))

@@ -16,6 +16,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 public class Utils {
+
+    public static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
+
     public static int toInt(long l) {
         int i = (int) l;
         if (i == l) {

@@ -163,11 +163,11 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
 }
 
 object TileTank {
-  final val NBT_Tank = "tank"
-  final val NBT_Tier = "tier"
-  final val NBT_Capacity = "capacity"
-  final val NBT_BlockTag = "BlockEntityTag"
-  final val NBT_StackName = "stackName"
+  final val NBT_Tank = "tank" // Tag map
+  final val NBT_Tier = "tier" // Tag map provided in Tier class (Actually, String)
+  final val NBT_Capacity = "capacity" // Long
+  final val NBT_BlockTag = Utils.BLOCK_ENTITY_TAG
+  final val NBT_StackName = "stackName" // String parsed in Text
   final val bcId = "buildcraftcore"
   final val ae2id = "ae2"
 
