@@ -13,12 +13,12 @@ import com.kotori316.fluidtank.FluidTank;
 
 public class TagCondition implements ICondition {
     public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "tag");
-    private final ResourceLocation tag_name;
+    private final ResourceLocation tagName;
     private final TagEmptyCondition condition;
 
-    public TagCondition(ResourceLocation tag_name) {
-        this.tag_name = tag_name;
-        condition = new TagEmptyCondition(tag_name);
+    public TagCondition(ResourceLocation tagName) {
+        this.tagName = tagName;
+        condition = new TagEmptyCondition(tagName);
     }
 
     public TagCondition(String tagName) {
@@ -40,18 +40,18 @@ public class TagCondition implements ICondition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TagCondition that = (TagCondition) o;
-        return tag_name.equals(that.tag_name);
+        return tagName.equals(that.tagName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tag_name);
+        return Objects.hash(tagName);
     }
 
     @Override
     public String toString() {
         return "TagCondition{" +
-            "tag_name=" + tag_name +
+            "tag_name=" + tagName +
             '}';
     }
 
@@ -60,7 +60,7 @@ public class TagCondition implements ICondition {
 
         @Override
         public void write(JsonObject json, TagCondition value) {
-            json.addProperty("tag", value.tag_name.toString());
+            json.addProperty("tag", value.tagName.toString());
         }
 
         @Override

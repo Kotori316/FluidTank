@@ -110,7 +110,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         List<ItemStack> tankStacks = IntStream.range(0, craftingInventory.getContainerSize())
             .mapToObj(craftingInventory::getItem)
             .filter(this.getTankItems())
-            .collect(Collectors.toList());
+            .toList();
         return tankStacks.size() == 4 &&
             tankStacks.stream().map(BlockItem::getBlockEntityData)
                 .filter(Objects::nonNull)

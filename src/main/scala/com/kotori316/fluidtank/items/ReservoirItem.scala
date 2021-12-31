@@ -5,7 +5,7 @@ import java.util.function.Consumer
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.network.ClientProxy
-import com.kotori316.fluidtank.tiles.{Tier, TileTank}
+import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.nbt.CompoundTag

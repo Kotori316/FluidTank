@@ -1,8 +1,7 @@
 package com.kotori316.fluidtank
 
+import cats.Eval
 import cats.data.OptionT
-import cats.{Eval, Now}
-import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 
 import scala.language.implicitConversions

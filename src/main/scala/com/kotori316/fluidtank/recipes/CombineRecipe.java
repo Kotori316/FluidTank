@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -60,7 +59,7 @@ public class CombineRecipe extends CustomRecipe {
             .map(s -> getHandler(s)
                 .map(TankItemFluidHandler::getFluid)
                 .orElse(FluidAmount.EMPTY()))
-            .collect(Collectors.toList());
+            .toList();
         boolean allSameFluid = fluids.stream()
             .map(FluidKey::from)
             .filter(FluidKey::isDefined)
