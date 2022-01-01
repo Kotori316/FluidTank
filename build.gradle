@@ -194,6 +194,8 @@ dependencies {
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
+    testImplementation(group: 'org.mockito', name: 'mockito-core', version: '3.+')
+    testImplementation(group: 'org.mockito', name: 'mockito-inline', version: '3.+')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

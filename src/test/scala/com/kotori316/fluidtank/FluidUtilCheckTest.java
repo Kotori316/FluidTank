@@ -18,7 +18,9 @@ import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.TankHandler;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class FluidUtilCheckTest extends BeforeAllTest {
     private static final BlockTank BLOCK_TANK = ModObjects.blockTanks().head();
@@ -100,7 +102,7 @@ final class FluidUtilCheckTest extends BeforeAllTest {
     }
 
     @Test
-    void insert1Stack() {
+    void tryTransfer() {
         var tankStack = new ItemStack(BLOCK_TANK);
         var tank = TankHandler.apply(5000L);
         RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
@@ -110,5 +112,37 @@ final class FluidUtilCheckTest extends BeforeAllTest {
         assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid());
         assertEquals(Fluids.EMPTY, tank.getTank().fluid());
         assertEquals(0L, tank.getTank().amount());
+        assertEquals(FluidAmount.BUCKET_WATER(), FluidAmount.fromStack(transfer));
+    }
+
+    @Test
+    void insert1StackSimulate() {
+        var tankStack = new ItemStack(BLOCK_TANK);
+        var tank = TankHandler.apply(5000L);
+        var inv = new ItemHandler();
+        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+
+        assertTrue(tank.getTank().isEmpty(), "Content: %s".formatted(tank.getTank())); // Make sure the tank is empty before filling.
+        var result = FluidUtil.tryEmptyContainerAndStow(tankStack, tank, inv, 1000, null, false);
+        assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid());
+        assertTrue(RecipeInventoryUtil.getFluidHandler(result.getResult()).getFluid().isEmpty());
+        assertTrue(result.isSuccess());
+        //assertTrue(tank.getTank().isEmpty(), "Content: %s".formatted(tank.getTank())); // The tank must be empty after simulating, but not.
+    }
+
+    @Test
+    void insert1StackExecute() {
+        var tankStack = new ItemStack(BLOCK_TANK);
+        var tank = TankHandler.apply(5000L);
+        var inv = new ItemHandler();
+        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+
+        var result = FluidUtil.tryEmptyContainerAndStow(tankStack, tank, inv, 1000, null, true);
+        assertAll(
+            () -> assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid()), // Input will not be changed.
+            () -> assertTrue(RecipeInventoryUtil.getFluidHandler(result.getResult()).getFluid().isEmpty()),
+            () -> assertTrue(result.isSuccess()),
+            () -> assertEquals(FluidAmount.BUCKET_WATER(), tank.getTank().fluidAmount())
+        );
     }
 }
