@@ -12,7 +12,7 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
-class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
+class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
 
   def nbt: CompoundTag = BlockItem.getBlockEntityData(stack)
 
@@ -79,7 +79,6 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    if (capability == null) return LazyOptional.of(() => this).cast() // Cap is null when testing with JUnit and Data gen.
     CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.orEmpty(capability, LazyOptional.of(() => this))
   }
 
@@ -94,20 +93,14 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
     if (stack.getCount > 1) {
       return
     }
-    if (!fluid.isEmpty) {
-      val compound = stack.getOrCreateTag()
-      compound.put(TileTank.NBT_BlockTag, createTag)
-      stack.setTag(compound)
-    } else {
-      stack.removeTagKey(TileTank.NBT_BlockTag)
-    }
+    Utils.setTileTag(stack, if (!fluid.isEmpty) createTag else null)
   }
 
   def createTag: CompoundTag = {
     val tag = new CompoundTag
-    tag.put(TileTank.NBT_Tier, tiers.toNBTTag)
+    tag.put(TileTank.NBT_Tier, tier.toNBTTag)
     val tankTag = new CompoundTag
-    tankTag.putInt(TileTank.NBT_Capacity, Utils.toInt(getCapacity))
+    tankTag.putLong(TileTank.NBT_Capacity, getCapacity)
     getFluid.write(tankTag)
     tag.put(TileTank.NBT_Tank, tankTag)
     tag
@@ -140,5 +133,5 @@ class TankItemFluidHandler(val tiers: Tier, stack: ItemStack) extends IFluidHand
     FluidAmount.fromStack(fluid)
   }
 
-  def getCapacity: Long = if (tankNbt == null) tiers.amount else tankNbt.getLong(TileTank.NBT_Capacity)
+  def getCapacity: Long = if (tankNbt == null) tier.amount else tankNbt.getLong(TileTank.NBT_Capacity)
 }

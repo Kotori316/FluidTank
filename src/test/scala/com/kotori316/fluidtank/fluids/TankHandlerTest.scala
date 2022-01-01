@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import scala.util.chaining.scalaUtilChainingOps
 
 //noinspection DuplicatedCode It's a test!
-object TankHandlerTest extends BeforeAllTest{
+object TankHandlerTest extends BeforeAllTest {
   def nonEmptyFluidKeys: Array[FluidKey] = FluidAmountTest.fluidKeys().filter(!_.isEmpty)
 
   def keyFillFluidMode: Array[Array[AnyRef]] = for {

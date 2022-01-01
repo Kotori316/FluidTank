@@ -119,11 +119,14 @@ repositories {
             it.includeModule("slimeknights.mantle", "Mantle")
         }
     }
-    /*maven {
-        // location of a maven mirror for JEI files, as a fallback
+    maven {
+        // location of a maven mirror for many mods, as a fallback
         name = "ModMaven.k-4u.nl"
         url = "https://modmaven.dev/"
-    }*/
+        content {
+            includeGroup 'appeng'
+        }
+    }
     maven { // The One Probe
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
@@ -177,7 +180,7 @@ dependencies {
     implementation(fg.deobf("mezz.jei:jei-1.18:" + project.jeiVersion))
     implementation fg.deobf("curse.maven:jade-324717:${project.jade_id}")
     implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
-    // implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
+    implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
     runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.7-build-1', classifier: 'with-library') {
@@ -191,6 +194,8 @@ dependencies {
     testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     testRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.7.0')
+    testImplementation(group: 'org.mockito', name: 'mockito-core', version: '3.+')
+    testImplementation(group: 'org.mockito', name: 'mockito-inline', version: '3.+')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

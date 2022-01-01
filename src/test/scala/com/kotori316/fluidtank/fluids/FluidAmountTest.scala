@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.fluids
 
 import cats.implicits._
 import com.kotori316.fluidtank.BeforeAllTest
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.{CompoundTag, LongTag, StringTag}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions._
@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource
 
 import scala.util.chaining._
 
-object FluidAmountTest extends BeforeAllTest{
+object FluidAmountTest extends BeforeAllTest {
 
   def empties(): Array[FluidAmount] = fluidKeys().map(k => k.toAmount(0L))
 
@@ -277,6 +277,41 @@ object FluidAmountTest extends BeforeAllTest{
       } yield () => assertEquals(hasContent, if (d) zero + hasContent else hasContent + zero)
 
       assertAll(assertions: _*)
+    }
+  }
+
+  object SerializeTag extends BeforeAllTest {
+    @Test
+    def serializeEmpty(): Unit = {
+      val tag = FluidAmount.EMPTY.write(new CompoundTag())
+      assertAll(
+        () => assertEquals(StringTag.TYPE, tag.get(FluidAmount.NBT_fluid).getType),
+        () => assertEquals(LongTag.TYPE, tag.get(FluidAmount.NBT_amount).getType),
+        () => assertNull(tag.get(FluidAmount.NBT_tag)),
+      )
+    }
+
+    @Test
+    def serializeTagged(): Unit = {
+      val fluid = FluidAmount(Fluids.WATER, 2000L, Some(new CompoundTag().tap(_.putInt("tt", 4))))
+      val tag = fluid.write(new CompoundTag())
+      assertAll(
+        () => assertEquals(StringTag.TYPE, tag.get(FluidAmount.NBT_fluid).getType),
+        () => assertEquals(LongTag.TYPE, tag.get(FluidAmount.NBT_amount).getType),
+        () => assertEquals(CompoundTag.TYPE, tag.get(FluidAmount.NBT_tag).getType),
+      )
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
+    def serializeNonEmpty(amount: Long, key: FluidKey): Unit = {
+      val fluid = key.toAmount(amount)
+      val tag = fluid.write(new CompoundTag())
+      assertAll(
+        () => assertEquals(StringTag.TYPE, tag.get(FluidAmount.NBT_fluid).getType),
+        () => assertEquals(LongTag.TYPE, tag.get(FluidAmount.NBT_amount).getType),
+        () => assertTrue(tag.get(FluidAmount.NBT_tag) == null || tag.get(FluidAmount.NBT_tag).getType == CompoundTag.TYPE),
+      )
     }
   }
 }

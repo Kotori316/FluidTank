@@ -29,10 +29,10 @@ import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tier;
-import com.kotori316.fluidtank.tiles.TileTank;
 
 public class ReservoirRecipe extends ShapelessRecipe {
     public static final RecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
@@ -61,7 +61,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             .map(BlockItem::getBlockEntityData)
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(nbt -> result.addTagElement(TileTank.NBT_BlockTag(), nbt));
+            .ifPresent(nbt -> Utils.setTileTag(result, nbt));
         return result;
     }
 

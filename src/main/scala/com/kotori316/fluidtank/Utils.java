@@ -5,6 +5,7 @@ import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
@@ -13,9 +14,13 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Utils {
+
+    public static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
+
     public static int toInt(long l) {
         int i = (int) l;
         if (i == l) {
@@ -47,6 +52,27 @@ public class Utils {
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "Stone", id: "fluidtank:tiletank", tank: {amount: 10000L, fluid: "fluidtank:vanilla_milk", capacity: 16000}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier:"stone",tank:{amount:10000L,fluid:"fluidtank:vanilla_milk",capacity:16000}}}
         */
+    }
+
+    /**
+     * Replacement of {@link net.minecraft.world.item.BlockItem#setBlockEntityData(ItemStack, BlockEntityType, CompoundTag)}.
+     * The method requires {@link BlockEntityType} as parameter to add "id", but it is not available in serializing tile data in item.
+     * Then, the nbt of crafted tank and of removed tank will be different, which makes items un-stackable.
+     * <p>
+     * To solve this issue, the "id" should not be saved in item nbt. This is why I created this method.
+     * <p>
+     * This method will remove "BlockEntityTag" in stack tag if the {@code tileTag} is {@code null} or empty.
+     *
+     * @param stack   the stack where the nbt saved
+     * @param tileTag The nbt provided by {@link BlockEntity#saveWithoutMetadata()}.
+     *                If {@code null} or empty, the nbt in stack will be removed instead of putting empty tag.
+     */
+    public static void setTileTag(@NotNull ItemStack stack, @Nullable CompoundTag tileTag) {
+        if (tileTag == null || tileTag.isEmpty()) {
+            stack.removeTagKey(BLOCK_ENTITY_TAG);
+        } else {
+            stack.addTagElement(BLOCK_ENTITY_TAG, tileTag);
+        }
     }
 
     /**

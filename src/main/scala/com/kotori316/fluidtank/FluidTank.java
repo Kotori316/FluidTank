@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
@@ -52,6 +53,7 @@ public class FluidTank {
         public static void init(FMLCommonSetupEvent event) {
             PacketHandler.init();
             FluidTankTOPPlugin.sendIMC().apply(modID);
+            TankAE2Plugin.onAPIAvailable();
         }
 
         @SubscribeEvent

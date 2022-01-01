@@ -163,13 +163,14 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
 }
 
 object TileTank {
-  final val NBT_Tank = "tank"
-  final val NBT_Tier = "tier"
-  final val NBT_Capacity = "capacity"
-  final val NBT_BlockTag = "BlockEntityTag"
-  final val NBT_StackName = "stackName"
+  final val NBT_Tank = "tank" // Tag map
+  final val NBT_Tier = "tier" // Tag map provided in Tier class (Actually, String)
+  final val NBT_Capacity = "capacity" // Long
+  @deprecated("The use should be removed and use utility method in BlockItem or Utils", since = "1.18")
+  final val NBT_BlockTag = Utils.BLOCK_ENTITY_TAG
+  final val NBT_StackName = "stackName" // String parsed in Text
   final val bcId = "buildcraftcore"
-  final val ae2id = "appliedenergistics2"
+  final val ae2id = "ae2"
 
   trait RealTank {
     self: TankHandler =>
