@@ -7,7 +7,7 @@ import net.minecraft.nbt.{CompoundTag, LongTag}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.IFluidHandler
+import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{DisplayName, Test}
 
@@ -121,5 +121,21 @@ object ItemFluidHandlerTest extends BeforeAllTest {
 
     val capacityTag = tankTag.asInstanceOf[CompoundTag].get(TileTank.NBT_Capacity)
     assertEquals(LongTag.TYPE, capacityTag.getType)
+  }
+
+  @Test
+  @DisplayName("Get capability via getter")
+  def testGetCapability1(): Unit = {
+    val stack = new ItemStack(woodTank)
+    val handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+    assertTrue(handler.isPresent)
+  }
+
+  @Test
+  @DisplayName("Disable capability if stack size is over 2")
+  def testGetCapability2(): Unit = {
+    val stack = new ItemStack(woodTank, 2)
+    val handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+    assertFalse(handler.isPresent)
   }
 }
