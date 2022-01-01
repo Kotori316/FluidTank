@@ -59,7 +59,7 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
   }
 
   def getFluidStack: Option[FluidAmount] = {
-    Option(fluidType).filter(_.nonEmpty)
+    Option(fluidType).filter(_.nonEmpty).map(_.setAmount(amount))
   }
 
   def remove(tileTank: TileTank): Unit = {
