@@ -7,7 +7,6 @@ import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.MEStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,10 +45,9 @@ class AEFluidInv implements MEStorage {
     }
 
     @NotNull
-    @SuppressWarnings("UnstableApiUsage")
     static FluidAmount fromAEStack(@Nullable AEKey what, long amount) {
         if (what instanceof AEFluidKey fluidKey) {
-            return new FluidAmount(FluidKeys.get(fluidKey.getFluid()).withAmount(alexiil.mc.lib.attributes.fluid.amount.FluidAmount.of(amount, FluidConstants.BUCKET)));
+            return new FluidAmount(FluidKeys.get(fluidKey.getFluid()).withAmount(alexiil.mc.lib.attributes.fluid.amount.FluidAmount.of(amount, AEFluidKey.AMOUNT_BUCKET)));
         } else {
             return FluidAmount.EMPTY();
         }

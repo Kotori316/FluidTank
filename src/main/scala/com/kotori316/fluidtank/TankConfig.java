@@ -15,6 +15,7 @@ public final class TankConfig implements ConfigData {
     @ConfigEntry.Gui.CollapsibleObject
     public Capacity capacity = new Capacity();
     public boolean enableUpdateRecipe = true;
+    public boolean enableAE2Integration = true;
 
     public static class Capacity {
         public long wood = Tiers.WOOD.buckets;
