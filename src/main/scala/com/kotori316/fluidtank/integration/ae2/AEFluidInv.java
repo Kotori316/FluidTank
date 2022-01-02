@@ -36,7 +36,8 @@ record AEFluidInv(TileTank tank) implements MEStorage {
     @Override
     public void getAvailableStacks(KeyCounter out) {
         var amount = OptionConverters.toJava(tank.connection().getFluidStack());
-        amount.ifPresent(fluidAmount -> out.add(AEFluidKey.of(fluidAmount.fluid(), OptionConverters.toJava(fluidAmount.nbt()).orElse(null)), fluidAmount.amount()));
+        amount.ifPresent(fluidAmount -> out.add(AEFluidKey.of(fluidAmount.fluid(), OptionConverters.toJava(fluidAmount.nbt()).orElse(null)),
+            Math.min(fluidAmount.amount(), Long.MAX_VALUE - Integer.MAX_VALUE * 2L)));
     }
 
     @NotNull
