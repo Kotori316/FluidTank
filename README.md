@@ -6,7 +6,7 @@ For Minecraft 1.18 (1.18-fabric branch)
 [![](http://cf.way2muchnoise.eu/full_largefluidtank-fabric_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/largefluidtank-fabric)
 
 LICENSE: MIT License  
-Copyright (c) 2019-2021 Kotori316
+Copyright (c) 2019-2022 Kotori316
 
 Add large tanks that can have up to 1048576 buckets of fluid.
 
