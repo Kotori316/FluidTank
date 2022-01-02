@@ -60,12 +60,12 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
 
     @Override
     public long getAmount() {
-        return connection.amount();
+        return connection.amountInBCAmount().asLong(FluidConstants.BUCKET);
     }
 
     @Override
     public long getCapacity() {
-        return connection.capacity();
+        return connection.capacity() / FluidAmount.AMOUNT_BUCKET() * FluidConstants.BUCKET;
     }
 
     @Override

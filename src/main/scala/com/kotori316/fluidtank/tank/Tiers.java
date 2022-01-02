@@ -12,6 +12,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.TankConstant;
 
 public enum Tiers {
@@ -90,7 +91,7 @@ public enum Tiers {
     }
 
     public long amount() {
-        return TankConstant.config.capacity.get(name()).orElse(buckets) * 1000L;
+        return TankConstant.config.capacity.get(name()).orElse(buckets) * FluidAmount.AMOUNT_BUCKET();
     }
 
     public boolean hasTagRecipe() {

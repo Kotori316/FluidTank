@@ -75,7 +75,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     if (hasLevel && !level.isClientSide) sync()
   }
 
-  def hasContent: Boolean = tank.getFluidAmount > 0
+  def hasContent: Boolean = tank.getFluidAmount > BCAmount.ZERO
 
   def getComparatorLevel: Int = connection.getComparatorLevel
 
@@ -115,11 +115,11 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
       if (!loading)
         connection.updateNeighbors()
       if ((!hasLevel || self.getLevel.isClientSide) && capacity != 0) {
-        if (getFluidAmount > 0) {
+        if (getFluidAmount > BCAmount.ZERO) {
           val d = 1d / 16d
           val lowerBound = 0.001d
           val upperBound = 0.999d
-          val (minY, maxY) = getFluidHeight(capacity.toDouble, getFluidAmount.toDouble, lowerBound, upperBound, 0.003, getFluid.isGaseous)
+          val (minY, maxY) = getFluidHeight(capacity.toDouble, getFluidAmount.asLong(FluidAmount.AMOUNT_BUCKET).toDouble, lowerBound, upperBound, 0.003, getFluid.isGaseous)
           box = Box(d * 8, minY, d * 8, d * 8, maxY, d * 8, d * 12 - 0.01, maxY - minY, d * 12 - 0.01, firstSide = true, endSide = true)
         } else {
           box = null
@@ -145,7 +145,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     override def toString: String = {
       val fluid = getFluid
       if (fluid == null) "Tank : no fluid : Capacity = " + capacity
-      else "Tank : " + fluid.getLocalizedName + " " + getFluidAmount + "mB : Capacity = " + capacity
+      else "Tank : " + fluid.getLocalizedName + " " + getFluidAmount.asLong(FluidAmount.AMOUNT_BUCKET) + "mB : Capacity = " + capacity
     }
 
     def canFillFluidType(fluid: FluidAmount): Boolean = {
@@ -154,7 +154,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
     }
 
     // Util methods
-    def getFluidAmount: Long = fluid.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET)
+    def getFluidAmount: BCAmount = fluid.fluidVolume.amount()
 
     def getFluid: FluidAmount = fluid
 
@@ -264,6 +264,7 @@ object TileTank {
   final val bcId = "buildcraftcore"
   final val ae2id = "appliedenergistics2"
 
+  //noinspection ScalaUnusedSymbol
   def tick(world: Level, pos: BlockPos, state: BlockState, tile: TileTank): Unit = {
     if (tile.loading && !world.isClientSide) {
       world.getProfiler.push("Connection Loading")

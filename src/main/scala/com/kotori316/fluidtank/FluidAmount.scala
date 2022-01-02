@@ -41,7 +41,7 @@ case class FluidAmount(fluidVolume: FluidVolume) {
     else FluidAmount(fluidVolume.fluidKey.withAmount(fluidVolume.amount() add that.fluidVolume.amount()))
   }
 
-  def -(that: FluidAmount): FluidAmount = FluidAmount(fluidVolume.withAmount(fluidVolume.amount().sub(that.fluidVolume.amount())))
+  def -(that: FluidAmount): FluidAmount = FluidAmount(fluidVolume.withAmount(fluidVolume.amount() sub that.fluidVolume.amount()))
 
   def fluidEqual(that: FluidAmount): Boolean = FluidVolume.areEqualExceptAmounts(this.fluidVolume, that.fluidVolume)
 

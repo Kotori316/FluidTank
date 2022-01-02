@@ -54,7 +54,7 @@ public class TankDataProvider implements IServerDataProvider<TileTank>, IBlockCo
                         list = Collections.singletonList(
                             new TranslatableComponent(WAILA_SHORT,
                                 tank.tank().fluid().getLocalizedName(),
-                                tank.tank().getFluidAmount(),
+                                tank.tank().getFluidAmount().asLong(FluidAmount.AMOUNT_BUCKET()),
                                 tank.tank().capacity())
                         );
                     } else if (!nbtData.getBoolean(NBT_Creative)) {

@@ -15,6 +15,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.level.BlockGetter
 
 import scala.collection.mutable.ArrayBuffer
+import scala.math.Ordering.Implicits.infixOrderingOps
 
 sealed class Connection(s: Seq[TileTank]) {
   val seq: Seq[TileTank] = s.sortBy(_.getBlockPos.getY)
@@ -37,8 +38,9 @@ sealed class Connection(s: Seq[TileTank]) {
         val total = totalLong min fluidAmount.fluidVolume.amount()
         return fluidAmount.setAmount(total)
       }
-      val rest = capacity - amount
-      if (fluidAmount.isEmpty || fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET) < min || rest < min) return FluidAmount.EMPTY
+      val rest = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET) sub amountInBCAmount
+      val minInBCAmount = BCAmount.of(min, FluidAmount.AMOUNT_BUCKET)
+      if (fluidAmount.isEmpty || fluidAmount.fluidVolume.amount < minInBCAmount || rest < minInBCAmount) return FluidAmount.EMPTY
       if (!seq.headOption.exists(_.tank.canFillFluidType(fluidAmount))) return FluidAmount.EMPTY
 
       @scala.annotation.tailrec
@@ -129,7 +131,7 @@ sealed class Connection(s: Seq[TileTank]) {
     override def getStatistics(fluidFilter: FluidFilter): GroupedFluidInvView.FluidInvStatistic = {
       if (fluidFilter.matches(fluidType.fluidVolume.fluidKey)) {
         val cap = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET)
-        val am = BCAmount.of(amount, FluidAmount.AMOUNT_BUCKET)
+        val am = amountInBCAmount
         val rest = cap sub am
         new GroupedFluidInvView.FluidInvStatistic(fluidFilter, am, rest, cap)
       } else {
@@ -147,7 +149,9 @@ sealed class Connection(s: Seq[TileTank]) {
 
   def capacity: Long = if (hasCreative) Tiers.CREATIVE.amount else seq.map(_.tank.capacity.toLong).sum
 
-  def amount: Long = if (hasCreative && fluidType.nonEmpty) Tiers.CREATIVE.amount else seq.map(_.tank.getFluidAmount).sum
+  def amount: Long = amountInBCAmount.asLong(FluidAmount.AMOUNT_BUCKET)
+
+  def amountInBCAmount: BCAmount = if (hasCreative && fluidType.nonEmpty) BCAmount.of(Tiers.CREATIVE.amount, FluidAmount.AMOUNT_BUCKET) else seq.map(_.tank.getFluidAmount).sum
 
   def tankSeq(fluid: FluidAmount): Seq[TileTank] = {
     if (fluid != null && fluid.isGaseous) {
@@ -158,7 +162,7 @@ sealed class Connection(s: Seq[TileTank]) {
   }
 
   def getFluidStack: Option[FluidAmount] = {
-    Option(fluidType).filter(_.nonEmpty).map(_.setAmount(amount))
+    Option(fluidType).filter(_.nonEmpty).map(_.setAmount(amountInBCAmount))
   }
 
   def remove(tileTank: TileTank): Unit = {
@@ -229,6 +233,8 @@ object Connection {
     override def capacity: Long = 0
 
     override def amount: Long = 0
+
+    override def amountInBCAmount = BCAmount.ZERO
 
     override val toString: String = "Connection.Invalid"
 

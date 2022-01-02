@@ -40,8 +40,7 @@ class TechRebornCellInteraction implements FluidInteraction {
         FluidAmount fluidAmount = getFluidInContainer(stack);
         if (fluidAmount.isEmpty()) {
             // Fill the cell and drain from tanks.
-            var a = BUCKET.mul(stack.getCount()).min(
-                alexiil.mc.lib.attributes.fluid.amount.FluidAmount.of(connection.amount(), FluidAmount.AMOUNT_BUCKET()));
+            var a = BUCKET.mul(stack.getCount()).min(connection.amountInBCAmount());
             FluidAmount requires = connection.getFluidStack().map(f -> f.setAmount(a)).getOrElse(FluidAmount::EMPTY);
             FluidAmount toFill = connection.handler().drain(requires, false, a.asLong(FluidAmount.AMOUNT_BUCKET()));
             if (toFill.nonEmpty() && toFill.fluid() != null) { // Null means not registered fluid such as potion.
