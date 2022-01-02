@@ -114,6 +114,10 @@ dependencies {
         //noinspection SpellCheckingInspection
         exclude(group: "net.fabricmc.fabric-api")
     }
+
+    modImplementation("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
+        transitive(false)
+    }
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
@@ -179,6 +183,7 @@ def joinedLog = String.join("\n", List.of(
         "",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
         "* [LibBlockAttributes](https://www.curseforge.com/minecraft/mc-mods/libblockattributes)",
+        "* [Cloth Config API (Fabric)](https://www.curseforge.com/minecraft/mc-mods/cloth-config)",
         "",
         "See https://github.com/Kotori316/FluidTank/tree/${BRANCH} to get all change log.",
         "",

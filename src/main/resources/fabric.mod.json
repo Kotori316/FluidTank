@@ -23,6 +23,9 @@
     ],
     "client": [
       "com.kotori316.fluidtank.ModTankClientInit"
+    ],
+    "ae2": [
+      "com.kotori316.fluidtank.integration.ae2.TankAE2Plugin"
     ]
   },
   "depends": {
