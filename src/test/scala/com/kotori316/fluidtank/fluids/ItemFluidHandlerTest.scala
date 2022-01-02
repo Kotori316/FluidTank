@@ -132,10 +132,10 @@ object ItemFluidHandlerTest extends BeforeAllTest {
   }
 
   @Test
-  @DisplayName("Disable capability if stack size is over 2")
+  @DisplayName("Get capability even if stack size is over 2")
   def testGetCapability2(): Unit = {
     val stack = new ItemStack(woodTank, 2)
     val handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
-    assertFalse(handler.isPresent)
+    assertTrue(handler.isPresent)
   }
 }
