@@ -8,10 +8,10 @@ import com.google.gson.JsonElement
 import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.nbt.Tag
 import org.junit.jupiter.api.Assertions._
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.{EnumSource, MethodSource}
+
+import scala.jdk.javaapi.StreamConverters
 
 class TierTest extends BeforeAllTest {
   implicit val eqNBT: Eq[Tag] = Eq.fromUniversalEquals
@@ -43,25 +43,33 @@ class TierTest extends BeforeAllTest {
     }
   }
 
-  @Test
-  def tierMaxIsLessThanNextTierMin(): Unit = {
-    val max = Tier.list.groupBy(_.rank).map { case (i, value) => i -> value.maxBy(_.amount) }.toSeq.sortBy(_._1)
-    val min = Tier.list.groupBy(_.rank).map { case (i, value) => i -> value.minBy(_.amount) }.toSeq.sortBy(_._1)
-    assertAll((max.dropRight(1) zip min.drop(1)).flatMap {
-      case ((maxL, maxAmount), (minL, minAmount)) =>
-        List.apply[Executable](
-          () => assertTrue(maxL < minL, s"Rank check of $maxL, $minL."),
-          () => assertTrue(maxAmount.amount * 4 <= minAmount.amount, s"Amount check of $maxAmount, $minAmount."),
-        )
-    }: _*)
+  @ParameterizedTest
+  @MethodSource(Array("com.kotori316.fluidtank.TierTest#ranks"))
+  def tierMaxIsLessThanNextTierMin(less: Tier, grater: Tier): Unit = {
+    assertAll(
+      () => assertTrue(less.rank < grater.rank, s"Rank check of ${less.rank}, ${grater.rank}."),
+      () => assertTrue(less.amount * 4 <= grater.amount, s"Amount check of $less, $grater."),
+    )
   }
 
-  @Test
-  def allInstanceIsNotSame(): Unit = assertAll(
-    Tier.list.toList.combinations(2).map[Executable] { buf =>
-      val List(a, b) = buf
-      () => assertTrue(a =!= b, s"$a =!= $b")
-    }.toSeq: _*
-  )
+  @ParameterizedTest
+  @MethodSource(Array("com.kotori316.fluidtank.TierTest#combinationOfTier"))
+  def allInstanceIsNotSame(a: Tier, b: Tier): Unit = {
+    assertTrue(a =!= b, s"$a =!= $b")
+  }
 
+}
+
+object TierTest {
+  def ranks(): java.util.stream.Stream[Array[Object]] = {
+    val graterTiers = Tier.list.groupBy(_.rank).map { case (_, value) => value.minBy(_.amount) }.toSeq.sortBy(_.rank)
+    val lessTiers = Tier.list.groupBy(_.rank).map { case (_, value) => value.maxBy(_.amount) }.toSeq.sortBy(_.rank)
+    StreamConverters.asJavaSeqStream((lessTiers.init zip graterTiers.tail).map { case (less, grater) => Array(less, grater) })
+  }
+
+  def combinationOfTier(): java.util.stream.Stream[Array[Object]] = {
+    StreamConverters.asJavaSeqStream(
+      Tier.list.toList.combinations(2).map(_.toArray)
+    )
+  }
 }
