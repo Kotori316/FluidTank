@@ -5,7 +5,8 @@ on:
     branches:
       - "1.18"
     paths:
-      - "src/main/**"
+      - "src/main/scala/**"
+      - "src/test/**"
       - ".github/workflows/gradle.yml"
 
 jobs:

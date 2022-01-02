@@ -105,4 +105,6 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
       override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_TANK.value
     })
   }
+
+  override def toString: String = String.valueOf(getRegistryName)
 }
