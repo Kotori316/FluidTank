@@ -1,3 +1,5 @@
-## v18.2.0
+## v18.3.0
 
-* Release for 1.18.1
+* Build for Jade.
+* Added AE2 integration.
+  * I know there is a dupe bug in fluid inserting, but it can't be fixed from this mod.

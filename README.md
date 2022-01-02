@@ -10,12 +10,12 @@ For Minecraft 1.18.1 (1.18 branch)
 [CurseForge]: https://www.curseforge.com/minecraft/mc-mods/largefluidtank
 
 LICENSE: MIT License  
-Copyright (c) 2019-2021 Kotori316
+Copyright (c) 2019-2022 Kotori316
 
 Add large tanks that can have up to 1048576 buckets of fluid.
 
 There are 7 tiers in this mod, Wood, Stone, Iron, Gold, Diamond, Emerald and Star. The capacity of wood tank is 4000 mB
-but star one can have 1048576000 mB.
+but star one can have 1048576000 mB. These tanks can be connected vertically to get more capacity.
 
 All tanks have Fluid Capability to transfer fluid, and their items also have Fluid Capability for items.
 
