@@ -29,7 +29,7 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
   * For Minecraft 1.18.1, newer than 1.18.1-39.0.0
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
-  * Version 2.13.7
+  * Version 2.13.8
   * Licenced under the Apache License 2.0
 
 * **REQUIRED** [Cats](https://github.com/typelevel/cats)
