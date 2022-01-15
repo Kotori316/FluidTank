@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
@@ -125,6 +127,10 @@ public class TierRecipe extends ShapedRecipe {
 
     public Stream<Pair<Integer, Ingredient>> allSlot() {
         return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
+    }
+
+    public FinishedRecipe getFinishedRecipe() {
+        return new TierFinishedRecipe();
     }
 
     public static class Serializer implements RecipeSerializer<TierRecipe> {
@@ -244,6 +250,35 @@ public class TierRecipe extends ShapedRecipe {
         @Override
         ItemStack craft(CraftingContainer inv) {
             return ItemStack.EMPTY;
+        }
+    }
+
+    private class TierFinishedRecipe implements FinishedRecipe {
+        @Override
+        public void serializeRecipeData(JsonObject jsonObject) {
+            jsonObject.addProperty("tier", TierRecipe.this.tier.toString());
+        }
+
+        @Override
+        public ResourceLocation getId() {
+            return TierRecipe.this.getId();
+        }
+
+        @Override
+        public RecipeSerializer<?> getType() {
+            return SERIALIZER;
+        }
+
+        @Nullable
+        @Override
+        public JsonObject serializeAdvancement() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public ResourceLocation getAdvancementId() {
+            return null;
         }
     }
 }

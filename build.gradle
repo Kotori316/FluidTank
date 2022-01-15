@@ -32,13 +32,35 @@ if (isInCI()) {
 
 loom {
     runs {
-        it.configure {
-            client {
-                runDir = Boolean.parseBoolean(System.getenv("FABRIC_SERVER") ?: "false") ? "run-server" : "run"
-            }
-            server {
-                runDir = "run-server"
-            }
+        client {
+            name "Client"
+            runDir = Boolean.parseBoolean(System.getenv("FABRIC_SERVER") ?: "false") ? "run-server" : "run"
+        }
+        server {
+            name "Server"
+            runDir = "run-server"
+        }
+        data {
+            client()
+            name "Data Generation"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.datagen"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.datagen.strict-validation"
+
+            ideConfigGenerated = true
+            runDir "run-server"
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/resources'
+            srcDir 'src/generated/resources'
         }
     }
 }
@@ -129,6 +151,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
