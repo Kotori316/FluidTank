@@ -177,17 +177,12 @@ java {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from "LICENSE"
 }
 
-task srcJar(type: Jar) {
-    from sourceSets.main.allSource
-    archiveClassifier.set("sources")
-}
-
-// Tell the artifact system about our extra jars
-artifacts {
-    archives srcJar
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 test {
@@ -267,7 +262,7 @@ task getCompileOptions() {
         strings.add("-" * 20)
         strings.add("Jar: ${jar.getArchiveFile().get()}")
         strings.add("Remap Jar ${remapJar.getArchiveFile().get()}")
-        // strings.add("Source Jar ${sourcesJar.getArchiveFile().get()}")
+        strings.add("Source Jar ${sourcesJar.getArchiveFile().get()}")
         // strings.add("RemapSource Jar ${remapSourcesJar.getOutput()}")
         strings.add(String.valueOf(fileTree("build/libs").getFiles()))
 
