@@ -7,10 +7,15 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipesProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.fabricmc.fabric.api.tag.TagFactory;
+import net.minecraft.advancements.critereon.FilledBucketTrigger;
+import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.recipe.RecipeConfigCondition;
@@ -28,6 +33,24 @@ final class RecipeGenerator extends FabricRecipesProvider {
             .filter(Tiers::hasTagRecipe)
             .map(RecipeGenerator::getTierRecipes)
             .forEach(withTierCondition(exporter));
+        ShapedRecipeBuilder.shaped(ModTank.Entries.WOOD_TANK)
+            .pattern("x x")
+            .pattern("xpx")
+            .pattern("xxx")
+            .define('x', Items.GLASS)
+            .define('p', ItemTags.LOGS)
+            .unlockedBy("has_glass", FabricRecipesProvider.has(Items.GLASS))
+            .unlockedBy("has_bucket", FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.WATER_BUCKET).build()))
+            .save(withConditions(exporter, new RecipeConfigCondition.Provider()));
+        ShapedRecipeBuilder.shaped(ModTank.Entries.VOID_TANK)
+            .pattern("ooo")
+            .pattern("oto")
+            .pattern("ooo")
+            .define('o', Items.OBSIDIAN)
+            .define('t', ModTank.Entries.WOOD_TANK)
+            .unlockedBy("has_obsidian", FabricRecipesProvider.has(Items.OBSIDIAN))
+            .unlockedBy("has_tank", FabricRecipesProvider.has(ModTank.Entries.WOOD_TANK))
+            .save(exporter);
     }
 
     private Consumer<TierFinished> withTierCondition(Consumer<FinishedRecipe> exporter) {
