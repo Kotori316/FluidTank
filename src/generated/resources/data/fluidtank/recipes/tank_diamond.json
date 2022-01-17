@@ -1,4 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "tier": "Diamond"
+  "tier": "Diamond",
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
+  ]
 }

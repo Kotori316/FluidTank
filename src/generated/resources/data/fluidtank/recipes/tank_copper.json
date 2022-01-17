@@ -1,4 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "tier": "Copper"
+  "tier": "Copper",
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
+  ]
 }

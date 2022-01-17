@@ -3,6 +3,9 @@
   "tier": "Tin",
   "fabric:load_conditions": [
     {
+      "condition": "fluidtank:config_update_recipe"
+    },
+    {
       "condition": "fabric:item_tags_populated",
       "values": [
         "c:tin_ingots"

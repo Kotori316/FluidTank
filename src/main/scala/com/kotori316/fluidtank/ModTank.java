@@ -11,6 +11,7 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import com.kotori316.fluidtank.integration.FabricFluidTankStorage;
 import com.kotori316.fluidtank.milk.MilkFluid;
 import com.kotori316.fluidtank.packet.PacketHandler;
+import com.kotori316.fluidtank.recipe.RecipeConfigCondition;
 import com.kotori316.fluidtank.recipe.TankRecipe;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.ContentTankSerializer;
@@ -67,6 +69,7 @@ public class ModTank implements ModInitializer {
 
         Registry.register(Registry.LOOT_FUNCTION_TYPE, new ResourceLocation(ModTank.modID, "content_tank"), Entries.CONTENT_LOOT_FUNCTION_TYPE);
 
+        ResourceConditions.register(RecipeConfigCondition.Provider.ID, new RecipeConfigCondition());
         RecipeSerializer.register(TierRecipe.Serializer.LOCATION.toString(), TierRecipe.SERIALIZER);
         RecipeSerializer.register(TankRecipe.LOCATION.toString(), TankRecipe.SERIALIZER);
         if (FabricLoader.getInstance().isModLoaded("fabric-transfer-api-v1"))

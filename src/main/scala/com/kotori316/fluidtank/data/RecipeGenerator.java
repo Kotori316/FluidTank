@@ -4,12 +4,16 @@ import java.util.function.Consumer;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipesProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
 
 import com.kotori316.fluidtank.ModTank;
+import com.kotori316.fluidtank.recipe.RecipeConfigCondition;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tiers;
 
@@ -26,16 +30,18 @@ final class RecipeGenerator extends FabricRecipesProvider {
             .forEach(withTierCondition(exporter));
     }
 
-    @SuppressWarnings("unchecked")
     private Consumer<TierFinished> withTierCondition(Consumer<FinishedRecipe> exporter) {
+        var configCondition = new RecipeConfigCondition.Provider();
         return recipePair -> {
+            ConditionJsonProvider[] conditions;
             if (recipePair.shouldUseTagCondition()) {
                 var tag = recipePair.tier.tagName;
-                var tagCondition = DefaultResourceConditions.itemTagsPopulated(TagFactory.ITEM.create(new ResourceLocation(tag)));
-                withConditions(exporter, tagCondition).accept(recipePair.recipe);
+                var tagCondition = tagProvider(TagFactory.ITEM.create(new ResourceLocation(tag)));
+                conditions = new ConditionJsonProvider[]{configCondition, tagCondition};
             } else {
-                exporter.accept(recipePair.recipe);
+                conditions = new ConditionJsonProvider[]{configCondition};
             }
+            withConditions(exporter, conditions).accept(recipePair.recipe);
         };
     }
 
@@ -48,5 +54,10 @@ final class RecipeGenerator extends FabricRecipesProvider {
         boolean shouldUseTagCondition() {
             return tier.getAlternative().isEmpty();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ConditionJsonProvider tagProvider(Tag.Named<Item> tag) {
+        return DefaultResourceConditions.itemTagsPopulated(tag);
     }
 }
