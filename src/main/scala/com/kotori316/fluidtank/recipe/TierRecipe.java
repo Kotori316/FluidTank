@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.recipe;
 
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -9,9 +10,15 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.tag.TagFactory;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -19,13 +26,13 @@ import net.minecraft.tags.SerializationTags;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
@@ -269,16 +276,24 @@ public class TierRecipe extends ShapedRecipe {
             return SERIALIZER;
         }
 
-        @Nullable
         @Override
         public JsonObject serializeAdvancement() {
-            return null;
+            var advancement = Advancement.Builder.advancement();
+            var inventoryCriterion = tier.getAlternative().isEmpty()
+                ? RecipeProvider.has(TagFactory.ITEM.create(new ResourceLocation(tier.tagName)))
+                : RecipeProvider.has(tier.getAlternative().getItems()[0].getItem());
+            advancement.parent(new ResourceLocation("recipes/root"))
+                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(getId()))
+                .addCriterion("has_" + tier.toString().toLowerCase(Locale.ROOT), inventoryCriterion)
+                .rewards(AdvancementRewards.Builder.recipe(getId()))
+                .requirements(RequirementsStrategy.OR);
+            return advancement.serializeToJson();
         }
 
-        @Nullable
         @Override
         public ResourceLocation getAdvancementId() {
-            return null;
+            String recipeFolderName = Optional.ofNullable(result.getItem().getItemCategory()).map(CreativeModeTab::getRecipeFolderName).orElse("dummy");
+            return new ResourceLocation(getId().getNamespace(), "recipes/" + recipeFolderName + "/" + getId().getPath());
         }
     }
 }
