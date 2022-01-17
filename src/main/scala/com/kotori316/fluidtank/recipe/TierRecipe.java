@@ -54,7 +54,7 @@ public class TierRecipe extends ShapedRecipe {
     private final Logic logic;
 
     public TierRecipe(ResourceLocation idIn, Tiers tier) {
-        super(idIn, GROUP, 3, 3, NonNullList.create(), ItemStack.EMPTY);
+        super(idIn, "", 3, 3, NonNullList.create(), ItemStack.EMPTY);
         id = idIn;
         this.tier = tier;
 
