@@ -2,22 +2,22 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_stone"
+      "fluidtank:tank_lead"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_stone"
+        "recipe": "fluidtank:tank_lead"
       }
     },
-    "has_stone": {
+    "has_lead": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:stone"
+            "tag": "c:lead_ingots"
           }
         ]
       }
@@ -26,7 +26,18 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_stone"
+      "has_lead"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:lead_ingots"
+      ]
+    }
   ]
 }

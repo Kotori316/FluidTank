@@ -12,12 +12,14 @@
         "recipe": "fluidtank:tank_diamond"
       }
     },
-    "has_gems/diamond": {
+    "has_diamond": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:diamond"
+            "items": [
+              "minecraft:diamond"
+            ]
           }
         ]
       }
@@ -26,7 +28,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_gems/diamond"
+      "has_diamond"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
   ]
 }

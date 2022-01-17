@@ -2,22 +2,24 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_emerald"
+      "fluidtank:tank_copper"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_emerald"
+        "recipe": "fluidtank:tank_copper"
       }
     },
-    "has_gems/emerald": {
+    "has_copper": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:emerald"
+            "items": [
+              "minecraft:copper_ingot"
+            ]
           }
         ]
       }
@@ -26,7 +28,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_gems/emerald"
+      "has_copper"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
   ]
 }

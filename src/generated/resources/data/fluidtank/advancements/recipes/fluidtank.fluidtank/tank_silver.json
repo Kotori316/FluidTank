@@ -2,32 +2,22 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_void"
+      "fluidtank:tank_silver"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_void"
+        "recipe": "fluidtank:tank_silver"
       }
     },
-    "has_obsidian": {
+    "has_silver": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:obsidian"
-          }
-        ]
-      }
-    },
-    "has_tank": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "item": "fluidtank:tank_wood"
+            "tag": "c:silver_ingots"
           }
         ]
       }
@@ -36,8 +26,18 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_obsidian",
-      "has_tank"
+      "has_silver"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:silver_ingots"
+      ]
+    }
   ]
 }

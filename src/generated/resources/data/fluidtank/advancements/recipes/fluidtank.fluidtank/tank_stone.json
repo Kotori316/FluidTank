@@ -2,22 +2,24 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_copper"
+      "fluidtank:tank_stone"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_copper"
+        "recipe": "fluidtank:tank_stone"
       }
     },
-    "has_ingots/copper": {
+    "has_stone": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:copper_ingot"
+            "items": [
+              "minecraft:stone"
+            ]
           }
         ]
       }
@@ -26,7 +28,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/copper"
+      "has_stone"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
   ]
 }

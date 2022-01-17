@@ -2,22 +2,22 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_star"
+      "fluidtank:tank_tin"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_star"
+        "recipe": "fluidtank:tank_tin"
       }
     },
-    "has_nether_stars": {
+    "has_tin": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:nether_star"
+            "tag": "c:tin_ingots"
           }
         ]
       }
@@ -26,7 +26,18 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_nether_stars"
+      "has_tin"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:tin_ingots"
+      ]
+    }
   ]
 }

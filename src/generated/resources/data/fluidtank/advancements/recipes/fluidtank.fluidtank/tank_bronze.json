@@ -2,22 +2,22 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_gold"
+      "fluidtank:tank_bronze"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_gold"
+        "recipe": "fluidtank:tank_bronze"
       }
     },
-    "has_ingots/gold": {
+    "has_bronze": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:gold_ingot"
+            "tag": "c:bronze_ingots"
           }
         ]
       }
@@ -26,7 +26,18 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/gold"
+      "has_bronze"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:bronze_ingots"
+      ]
+    }
   ]
 }

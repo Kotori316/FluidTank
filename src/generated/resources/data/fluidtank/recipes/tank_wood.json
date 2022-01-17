@@ -15,5 +15,10 @@
   },
   "result": {
     "item": "fluidtank:tank_wood"
-  }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
+  ]
 }

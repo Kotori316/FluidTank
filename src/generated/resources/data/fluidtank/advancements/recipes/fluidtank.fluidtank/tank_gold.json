@@ -2,22 +2,24 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "fluidtank:tank_iron"
+      "fluidtank:tank_gold"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fluidtank:tank_iron"
+        "recipe": "fluidtank:tank_gold"
       }
     },
-    "has_ingots/iron": {
+    "has_gold": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "minecraft:iron_ingot"
+            "items": [
+              "minecraft:gold_ingot"
+            ]
           }
         ]
       }
@@ -26,7 +28,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/iron"
+      "has_gold"
     ]
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config_update_recipe"
+    }
   ]
 }
