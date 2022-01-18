@@ -12,6 +12,10 @@ import com.kotori316.fluidtank.TankConstant;
 public final class RecipeConfigCondition implements Predicate<JsonObject> {
     @Override
     public boolean test(JsonObject object) {
+        return isUpdateRecipeEnabled();
+    }
+
+    public static boolean isUpdateRecipeEnabled() {
         return TankConstant.config.enableUpdateRecipe;
     }
 

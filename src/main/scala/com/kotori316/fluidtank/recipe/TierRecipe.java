@@ -36,7 +36,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
-import com.kotori316.fluidtank.TankConstant;
 import com.kotori316.fluidtank.tank.TankBlock;
 import com.kotori316.fluidtank.tank.Tiers;
 
@@ -58,7 +57,7 @@ public class TierRecipe extends ShapedRecipe {
         id = idIn;
         this.tier = tier;
 
-        if (TankConstant.config.enableUpdateRecipe) {
+        if (RecipeConfigCondition.isUpdateRecipeEnabled()) {
             result = ModTank.Entries.ALL_TANK_BLOCKS.stream().filter(b -> b.tiers == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
             tankItems = Logic.getTankItemIngredient(tier);
             subItems = Logic.getSubItems(tier);
@@ -292,7 +291,9 @@ public class TierRecipe extends ShapedRecipe {
 
         @Override
         public ResourceLocation getAdvancementId() {
-            String recipeFolderName = Optional.ofNullable(result.getItem().getItemCategory()).map(CreativeModeTab::getRecipeFolderName).orElse("dummy");
+            String recipeFolderName = Optional.ofNullable(result.getItem().getItemCategory()).map(CreativeModeTab::getRecipeFolderName).orElseThrow(
+                () -> new IllegalStateException("Item doesn't have Creative Tab. %s (Class: %s)".formatted(result.getItem(), result.getItem().getClass()))
+            );
             return new ResourceLocation(getId().getNamespace(), "recipes/" + recipeFolderName + "/" + getId().getPath());
         }
     }
