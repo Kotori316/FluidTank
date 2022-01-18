@@ -83,4 +83,9 @@ final class RecipeGenerator extends FabricRecipesProvider {
     private static ConditionJsonProvider tagProvider(Tag.Named<Item> tag) {
         return DefaultResourceConditions.itemTagsPopulated(tag);
     }
+
+    @Override
+    public String getName() {
+        return "%s of %s".formatted(super.getName(), ModTank.modID);
+    }
 }
