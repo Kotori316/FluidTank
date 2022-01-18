@@ -36,6 +36,8 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew dependencies
       - name: Precompile
         run: chmod +x ./gradlew && ./gradlew compileScala
+      - name: Data Generation
+        run: chmod +x ./gradlew && ./gradlew runData
       - name: Test with Gradle
         if: ${{ contains(github.event.head_commit.message, '[skip release]') }}
         run: chmod +x ./gradlew && ./gradlew build
@@ -43,7 +45,7 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Publish with Gradle
         if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
-        run: chmod +x ./gradlew && ./gradlew build curseforge publishAllPublicationsToAzureRepositoryRepository
+        run: chmod +x ./gradlew && ./gradlew build curseforge publishAllPublicationsToAzureRepositoryRepository --stacktrace
         env:
           CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_KEY }}
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
