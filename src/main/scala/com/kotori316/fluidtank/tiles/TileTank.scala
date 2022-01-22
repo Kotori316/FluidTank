@@ -55,14 +55,9 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     super.saveAdditional(compound)
   }
 
-  override final def save(compound: CompoundTag): CompoundTag = {
-    saveAdditional(compound)
-    super.save(compound)
-  }
-
   def getBlockTag: CompoundTag = saveWithoutMetadata()
 
-  override def getUpdateTag: CompoundTag = saveWithFullMetadata()
+  override def getUpdateTag: CompoundTag = saveWithoutMetadata()
 
   override def getUpdatePacket: ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
 

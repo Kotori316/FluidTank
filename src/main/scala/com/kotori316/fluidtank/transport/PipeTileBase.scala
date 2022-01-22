@@ -69,12 +69,7 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
     super.saveAdditional(compound)
   }
 
-  override final def save(compound: CompoundTag): CompoundTag = {
-    saveAdditional(compound)
-    super.save(compound)
-  }
-
-  override def getUpdateTag: CompoundTag = super.serializeNBT()
+  override def getUpdateTag: CompoundTag = saveWithoutMetadata()
 
   def changeColor(color: DyeColor): Unit = changeColor(colorInt = color.getMaterialColor.col)
 

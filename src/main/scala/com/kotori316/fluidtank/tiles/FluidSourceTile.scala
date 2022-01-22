@@ -67,11 +67,6 @@ class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects
     super.saveAdditional(compound)
   }
 
-  override def save(compound: CompoundTag): CompoundTag = {
-    saveAdditional(compound)
-    super.save(compound)
-  }
-
-  override def getUpdateTag: CompoundTag = this.saveWithFullMetadata()
+  override def getUpdateTag: CompoundTag = this.saveWithoutMetadata()
 
 }
