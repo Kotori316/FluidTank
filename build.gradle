@@ -34,7 +34,7 @@ loom {
     runs {
         client {
             name "Client"
-            runDir = Boolean.parseBoolean(System.getenv("FABRIC_SERVER") ?: "false") ? "run-server" : "run"
+            runDir = Boolean.parseBoolean(System.getenv("FABRIC_SERVER")) ? "run-server" : "run"
         }
         server {
             name "Server"
