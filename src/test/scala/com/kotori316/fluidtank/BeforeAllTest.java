@@ -2,8 +2,11 @@ package com.kotori316.fluidtank;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cpw.mods.modlauncher.Launcher;
@@ -15,11 +18,18 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.targets.FMLDataUserdevLaunchHandler;
+import net.minecraftforge.forgespi.language.IConfigurable;
+import net.minecraftforge.forgespi.language.IModFileInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.BeforeAll;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -45,6 +55,7 @@ public abstract class BeforeAllTest {
             setHandler();
             assertEquals(Dist.CLIENT, FMLEnvironment.dist);
             Bootstrap.bootStrap();
+            ModLoadingContext.get().setActiveContainer(new DummyModContainer());
             Map<String, Object> map = new HashMap<>(CollectionConverters.asJava(Config.defaultConfig()));
             map.put("debug", true);
             Config.dummyContent_$eq(Utils.TestConfig.getTestInstance(map));
@@ -102,5 +113,96 @@ public abstract class BeforeAllTest {
         assertNotNull(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
         assertNotNull(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
         assertNotNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    }
+
+    private static class DummyModContainer extends ModContainer {
+
+        public DummyModContainer() {
+            super(new DummyModInfo());
+            contextExtension = Object::new;
+        }
+
+        @Override
+        public boolean matches(Object mod) {
+            return mod == getMod();
+        }
+
+        @Override
+        public Object getMod() {
+            return "FluidTank Test";
+        }
+    }
+
+    private static class DummyModInfo implements IModInfo, IConfigurable {
+
+        @Override
+        public IModFileInfo getOwningFile() {
+            return null;
+        }
+
+        @Override
+        public String getModId() {
+            return FluidTank.modID;
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "QuarryPlus Test";
+        }
+
+        @Override
+        public String getDescription() {
+            return getDisplayName();
+        }
+
+        @Override
+        public ArtifactVersion getVersion() {
+            return new DefaultArtifactVersion("1.0");
+        }
+
+        @Override
+        public List<? extends ModVersion> getDependencies() {
+            return List.of();
+        }
+
+        @Override
+        public String getNamespace() {
+            return getModId();
+        }
+
+        @Override
+        public Map<String, Object> getModProperties() {
+            return Map.of();
+        }
+
+        @Override
+        public Optional<URL> getUpdateURL() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<String> getLogoFile() {
+            return Optional.empty();
+        }
+
+        @Override
+        public boolean getLogoBlur() {
+            return false;
+        }
+
+        @Override
+        public IConfigurable getConfig() {
+            return this;
+        }
+
+        @Override
+        public <T> Optional<T> getConfigElement(String... key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public List<? extends IConfigurable> getConfigList(String... key) {
+            return List.of();
+        }
     }
 }
