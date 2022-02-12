@@ -40,7 +40,7 @@ import com.kotori316.fluidtank.tank.TankBlock;
 import com.kotori316.fluidtank.tank.Tiers;
 
 public class TierRecipe extends ShapedRecipe {
-    public static final com.kotori316.fluidtank.recipe.TierRecipe.Serializer SERIALIZER = new com.kotori316.fluidtank.recipe.TierRecipe.Serializer();
+    public static final RecipeSerializer<?> SERIALIZER = new TierRecipe.Serializer();
     public static final String GROUP = ModTank.modID + ":tank_recipes";
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
     private static final int[] SUB_SLOTS = {1, 3, 5, 7};
@@ -262,7 +262,7 @@ public class TierRecipe extends ShapedRecipe {
     private class TierFinishedRecipe implements FinishedRecipe {
         @Override
         public void serializeRecipeData(JsonObject jsonObject) {
-            jsonObject.addProperty("tier", TierRecipe.this.tier.toString());
+            jsonObject.addProperty("tier", tier.toString());
         }
 
         @Override
@@ -272,7 +272,7 @@ public class TierRecipe extends ShapedRecipe {
 
         @Override
         public RecipeSerializer<?> getType() {
-            return SERIALIZER;
+            return getSerializer();
         }
 
         @Override
