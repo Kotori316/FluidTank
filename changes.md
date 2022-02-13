@@ -1,5 +1,6 @@
-## v18.3.0
+## v18.4.0
 
-* Build for Jade.
-* Added AE2 integration.
-  * I know there is a dupe bug in fluid inserting, but it can't be fixed from this mod.
+* Removed unused code
+* Update dependencies.
+  * A duplication bug is fixed as the version up of AE2
+* Fixed fluid duplication in my mod.
