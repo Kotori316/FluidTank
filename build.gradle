@@ -48,10 +48,6 @@ compileScala {
     //noinspection SpellCheckingInspection
     options.forkOptions.jvmArgs += ["-Duser.language=en", "-Duser.country=US"]
 }
-compileTestScala {
-    //noinspection SpellCheckingInspection
-    options.forkOptions.jvmArgs += ["-Duser.language=en", "-Duser.country=US"]
-}
 
 String forgeVersion() {
     String versionNumber
@@ -128,7 +124,6 @@ repositories {
 //        name "BuildCraft"
 //        url = "https://mod-buildcraft.com/maven"
 //    }
-    mavenCentral()
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
@@ -145,13 +140,6 @@ repositories {
         url = "https://modmaven.dev/"
         content {
             includeGroup 'appeng'
-        }
-    }
-    maven { // The One Probe
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-        content {
-            it.includeModule("mcjty.theoneprobe", "TheOneProbe-1.16")
         }
     }
     maven {
@@ -173,12 +161,11 @@ repositories {
     maven {
         name = "Mixin"
         url = 'https://repo.spongepowered.org/maven'
-    }
-    repositories.stream().filter { it instanceof MavenArtifactRepository }.forEach { repo ->
-        repo.content {
-            excludeVersionByRegex(".*", ".*", ".*_mapped_snapshot_.*")
+        content {
+            it.includeGroup("org.spongepowered")
         }
     }
+    mavenCentral()
 }
 
 private boolean hasGitHubToken() {
