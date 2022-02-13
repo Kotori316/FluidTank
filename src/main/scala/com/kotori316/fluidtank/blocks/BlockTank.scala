@@ -14,8 +14,7 @@ import net.minecraft.world.level.{BlockGetter, Level}
 import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import net.minecraft.world.{InteractionHand, InteractionResult}
-import net.minecraftforge.fluids.{FluidStack, FluidUtil}
-import net.minecraftforge.items.ItemHandlerHelper
+import net.minecraftforge.fluids.FluidStack
 import org.jetbrains.annotations.Nullable
 
 import scala.annotation.nowarn
@@ -51,13 +50,16 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
           }
           InteractionResult.SUCCESS
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
-          val copiedStack = if (stack.getCount == 1) stack else ItemHandlerHelper.copyStackWithSize(stack, 1)
-          FluidUtil.getFluidHandler(copiedStack).asScala.value.value match {
-            case Some(handlerItem) if !stack.isEmpty =>
-              if (!level.isClientSide) {
-                val tankHandler = tileTank.connection.handler
-                BucketEventHandler.transferFluid(level, pos, player, hand, tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY), stack, handlerItem, tankHandler)
-              }
+          val result = for {
+            r <- if (!level.isClientSide) BucketEventHandler.transferFluid(tileTank.connection.handler,
+              tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY),
+              stack)
+            else BucketEventHandler.checkStack(stack)
+            if r.result.isSuccess
+          } yield r
+          result match {
+            case Some(value) =>
+              if (!level.isClientSide) BucketEventHandler.setItem(level, pos, player, hand, value, stack)
               InteractionResult.SUCCESS
             case _ => InteractionResult.PASS
           }
