@@ -45,6 +45,12 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 compileScala {
     scalaCompileOptions.additionalParameters = ["-Wconf:cat=deprecation:w,any:e"]
+    //noinspection SpellCheckingInspection
+    options.forkOptions.jvmArgs += ["-Duser.language=en", "-Duser.country=US"]
+}
+compileTestScala {
+    //noinspection SpellCheckingInspection
+    options.forkOptions.jvmArgs += ["-Duser.language=en", "-Duser.country=US"]
 }
 
 String forgeVersion() {
@@ -191,7 +197,7 @@ dependencies {
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
-    implementation(fg.deobf("mezz.jei:jei-1.18:" + project.jeiVersion))
+    implementation(fg.deobf("mezz.jei:jei-1.18.1:" + project.jeiVersion))
     implementation fg.deobf("curse.maven:jade-324717:${project.jade_id}")
     implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
     implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
