@@ -197,7 +197,7 @@ class TileTank(var tier: Tiers, t: BlockEntityType[_ <: TileTank], pos: BlockPos
 
     /**
      * @param fluidAmount the fluid representing the kind and maximum amount to drain.
-     *                    Empty Fluid means fluid type can be anything.
+     *                    Empty Fluid means fluid type can be anything, but currently this is not supported.
      * @param doDrain     false means simulating.
      * @param min         minimum amount to drain.
      * @return the fluid and amount that is (or will be) drained.
