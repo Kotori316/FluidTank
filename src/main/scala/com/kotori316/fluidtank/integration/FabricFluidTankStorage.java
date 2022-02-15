@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.integration;
 
+import java.util.stream.Stream;
+
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -11,6 +13,8 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.tank.Connection;
+import com.kotori316.fluidtank.tank.TankBlock;
+import com.kotori316.fluidtank.tank.TankBlockItem;
 import com.kotori316.fluidtank.tank.TileTank;
 
 @SuppressWarnings({"UnstableApiUsage"})
@@ -79,7 +83,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
         connection.handler().fill(snapshot, true, 0);
     }
 
-    private static FluidAmount getFluidAmount(FluidVariant resource, long amount) {
+    static FluidAmount getFluidAmount(FluidVariant resource, long amount) {
         return FluidAmount.apply(FluidKeys.get(resource.getFluid()).withAmount(asBCAmount(amount)));
     }
 
@@ -99,5 +103,16 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
                 return null;
             }
         }, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, ModTank.Entries.CREATIVE_BLOCK_ENTITY_TYPE, ModTank.Entries.VOID_BLOCK_ENTITY_TYPE);
+
+        var items = Stream.concat(Stream.of(ModTank.Entries.WOOD_TANK), ModTank.Entries.TANK_BLOCKS.stream())
+            .map(TankBlock::blockItem)
+            .toArray(TankBlockItem[]::new);
+        FluidStorage.ITEM.registerForItems((itemStack, context) -> {
+            if (itemStack.getItem() instanceof TankBlockItem)
+                // Don't allow subclasses.
+                return new FabricTankItemStorage(context);
+            else
+                return null;
+        }, items);
     }
 }

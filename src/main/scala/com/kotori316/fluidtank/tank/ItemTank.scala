@@ -6,6 +6,7 @@ import net.minecraft.nbt.{CompoundTag, Tag}
 import org.jetbrains.annotations.Nullable
 
 import scala.math.Ordering.Implicits._
+import scala.util.chaining.scalaUtilChainingOps
 
 /**
  * This class represent single slot tank.
@@ -15,7 +16,7 @@ import scala.math.Ordering.Implicits._
  * @param fluid    represents current internal status. mutable.
  * @param capacity immutable
  */
-class ItemTank(private var fluid: FluidAmount, capacity: Long) extends FluidAmount.Tank {
+class ItemTank(private var fluid: FluidAmount, capacity: Long, tier: Tiers) extends FluidAmount.Tank {
   def getFluid: FluidAmount = this.fluid
 
   def getCapacity: Long = this.capacity
@@ -69,21 +70,37 @@ class ItemTank(private var fluid: FluidAmount, capacity: Long) extends FluidAmou
 
   private def capacityInBC: BCAmount = BCAmount.of(capacity, FluidAmount.AMOUNT_BUCKET)
 
+  def createTag(id: String): Option[CompoundTag] = {
+    // Use `/data get entity @s SelectedItem` to see nbt of item in your hand.
+    if (fluid.nonEmpty) {
+      val parent = new CompoundTag()
+      parent.putString("id", id)
+      parent.put(TileTank.NBT_Tier, tier.toNBTTag)
+      parent.put(TankBlock.NBT_Tank, new CompoundTag()
+        .tap(fluid.write)
+        .tap(nbt => nbt.putInt(TankBlock.NBT_Capacity, capacity.toInt))
+      )
+      Option(parent)
+    } else {
+      Option.empty
+    }
+  }
 }
 
 object ItemTank {
-  def empty(capacity: Long): ItemTank = new ItemTank(FluidAmount.EMPTY, capacity)
+  def empty(capacity: Long, tier: Tiers): ItemTank = new ItemTank(FluidAmount.EMPTY, capacity, tier)
 
   def from(@Nullable tag: CompoundTag, tier: Tiers): ItemTank = {
     if (tag == null) {
-      empty(tier.amount())
+      empty(tier.amount(), tier)
     } else {
-      val fluid = FluidAmount.fromNBT(tag.getCompound(TankBlock.NBT_Tank))
+      val fluidTag = tag.getCompound(TankBlock.NBT_Tank)
+      val fluid = FluidAmount.fromNBT(fluidTag)
       val capacity: Long =
-        if (tag.contains(TankBlock.NBT_Capacity, Tag.TAG_INT))
-          tag.getInt(TankBlock.NBT_Capacity)
+        if (fluidTag.contains(TankBlock.NBT_Capacity, Tag.TAG_INT))
+          fluidTag.getInt(TankBlock.NBT_Capacity)
         else tier.amount()
-      new ItemTank(fluid, capacity)
+      new ItemTank(fluid, capacity, tier)
     }
   }
 }
