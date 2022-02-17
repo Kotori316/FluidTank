@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.integration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
@@ -25,12 +24,19 @@ public final class FluidInteractions {
         if (FabricLoader.getInstance().isModLoaded("TechReborn".toLowerCase())) {
             list.add(techRebornInteraction());
         }
+        if (FabricLoader.getInstance().isModLoaded("fabric-transfer-api-v1")) {
+            list.add(fabricStorageInteraction());
+        }
 
-        FLUID_INTERACTIONS = Collections.unmodifiableList(list);
+        FLUID_INTERACTIONS = List.copyOf(list);
     }
 
     private static FluidInteraction techRebornInteraction() {
         return new TechRebornCellInteraction();
+    }
+
+    private static FluidInteraction fabricStorageInteraction() {
+        return new FabricInteraction();
     }
 
     public static InteractionResult interact(Connection connection, Player player, InteractionHand hand, ItemStack stack) {
