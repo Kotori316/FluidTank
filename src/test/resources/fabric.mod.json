@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "fluidtank-test",
+  "name": "FluidTank GameTest",
+  "version": "1.0.0",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.kotori316.fluidtank.gametest.PlaceTest"
+    ]
+  }
+}
