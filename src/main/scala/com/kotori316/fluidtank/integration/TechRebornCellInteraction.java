@@ -2,16 +2,14 @@ package com.kotori316.fluidtank.integration;
 
 import java.math.RoundingMode;
 
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
+import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
+import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
+import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import reborncore.common.fluid.container.ItemFluidInfo;
 
 import com.kotori316.fluidtank.FluidAmount;
@@ -52,7 +50,7 @@ class TechRebornCellInteraction implements FluidInteraction {
                     player.spawnAtLocation(full);
                 }
                 connection.handler().drain(toFill, true, 0);
-                player.playNotifySound(getSoundEvent(toFill, true), SoundSource.BLOCKS, 1.0f, 1.0f);
+                player.playNotifySound(FluidInteraction.getSoundEvent(toFill, true), SoundSource.BLOCKS, 1.0f, 1.0f);
             }
             return new FluidVolumeUtil.FluidTankInteraction(toFill.fluidVolume(), false,
                 FluidVolumeUtil.ItemContainerStatus.NOT_CHECKED, FluidVolumeUtil.ItemContainerStatus.VALID);
@@ -69,20 +67,11 @@ class TechRebornCellInteraction implements FluidInteraction {
                     player.spawnAtLocation(empty);
                 }
                 connection.handler().fill(fluidAmount.setAmount(simulation.fluidVolume().amount()), true, 0);
-                player.playNotifySound(getSoundEvent(fluidAmount, false), SoundSource.BLOCKS, 1.0f, 1.0f);
+                player.playNotifySound(FluidInteraction.getSoundEvent(fluidAmount, false), SoundSource.BLOCKS, 1.0f, 1.0f);
             } else {
                 return FluidVolumeUtil.FluidTankInteraction.none(FluidVolumeUtil.ItemContainerStatus.VALID, FluidVolumeUtil.ItemContainerStatus.NOT_CHECKED);
             }
         }
         return FluidVolumeUtil.FluidTankInteraction.NONE;
-    }
-
-    private static SoundEvent getSoundEvent(FluidAmount toFill, boolean fill) {
-        final SoundEvent soundEvent;
-        if (toFill.fluidEqual(FluidAmount.BUCKET_LAVA()))
-            soundEvent = fill ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_EMPTY_LAVA;
-        else
-            soundEvent = fill ? SoundEvents.BUCKET_FILL : SoundEvents.BUCKET_EMPTY;
-        return soundEvent;
     }
 }
