@@ -38,6 +38,8 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew compileScala
       - name: Data Generation
         run: chmod +x ./gradlew && ./gradlew runData
+      - name: Prepare Test dir
+        run: mkdir -p build/test-results/test
       - name: Test with Gradle
         if: ${{ contains(github.event.head_commit.message, '[skip release]') }}
         run: chmod +x ./gradlew && ./gradlew build
