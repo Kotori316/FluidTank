@@ -51,5 +51,11 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AZURE_USER_NAME: 'Kotori316'
           AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
+      - name: Upload failed test report
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/test-results/test/*.xml
+          name: Test-Report-${{ matrix.java }}-${{ github.run_number }}
       - name: Check artifacts
         run: ls -alF build/libs

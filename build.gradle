@@ -53,6 +53,17 @@ loom {
             ideConfigGenerated = true
             runDir "run-server"
         }
+        gameTest {
+            name "GameTest"
+            server()
+            vmArg "-ea"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.gametest"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/test-results/test/game_test.xml"
+            runDir = "build/game_test"
+            source sourceSets.test
+        }
     }
 }
 
@@ -188,6 +199,7 @@ sourcesJar {
 test {
     useJUnitPlatform()
 }
+test.dependsOn runGameTest
 
 def BRANCH = "1.18-fabric"
 
