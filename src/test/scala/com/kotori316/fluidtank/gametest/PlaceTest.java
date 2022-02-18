@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.gametest;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -63,13 +64,12 @@ public final class PlaceTest implements FabricGameTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void place2Tanks(GameTestHelper helper) {
-        helper.setBlock(BlockPos.ZERO, ModTank.Entries.WOOD_TANK);
-        var tank = (TileTank) helper.getBlockEntity(BlockPos.ZERO);
+        var pos = BlockPos.ZERO.above();
+        placeTank(helper, pos, ModTank.Entries.WOOD_TANK);
+        var tank = (TileTank) helper.getBlockEntity(pos);
         assert tank != null : "Tank must not be null. %s at %s"
-            .formatted(helper.getBlockState(BlockPos.ZERO), BlockPos.ZERO);
-        tank.onBlockPlacedBy();
-        helper.setBlock(BlockPos.ZERO.above(), ModTank.Entries.WOOD_TANK);
-        ((TileTank) Objects.requireNonNull(helper.getBlockEntity(BlockPos.ZERO.above()))).onBlockPlacedBy();
+            .formatted(helper.getBlockState(pos), pos);
+        placeTank(helper, pos.above(), ModTank.Entries.WOOD_TANK);
 
         assert tank.connection().capacity() == 8000 : "Wood + Wood, " + tank.connection();
         helper.succeed();
@@ -104,17 +104,32 @@ public final class PlaceTest implements FabricGameTest {
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
+    public void place3Tanks1(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
+        var block = ModTank.Entries.TANK_BLOCKS.get(1);
+        List.of(pos, pos.above(1), pos.above(2)).forEach(p -> placeTank(helper, p, block));
+
+        var tile = (TileTank) Objects.requireNonNull(helper.getBlockEntity(pos));
+        var connection = tile.connection();
+        assert connection.capacity() == tile.tank().capacity() * 3L :
+            "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.tank().capacity(), connection.capacity());
+        assert 3 == connection.seq().length() : "Connection must contain 3 tanks. seq=" + connection.seq();
+
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
     public void interactWithBucket(GameTestHelper helper) {
-        helper.setBlock(BlockPos.ZERO, ModTank.Entries.WOOD_TANK);
-        helper.setBlock(BlockPos.ZERO.above(), ModTank.Entries.WOOD_TANK);
-        var tank = (TileTank) helper.getBlockEntity(BlockPos.ZERO);
+        var pos = BlockPos.ZERO.above();
+        placeTank(helper, pos, ModTank.Entries.WOOD_TANK);
+        placeTank(helper, pos.above(), ModTank.Entries.WOOD_TANK);
+        var tank = (TileTank) helper.getBlockEntity(pos);
         assert tank != null;
-        tank.onBlockPlacedBy();
 
         var player = helper.makeMockPlayer();
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
-        var result = helper.getBlockState(BlockPos.ZERO).use(helper.getLevel(), player, InteractionHand.MAIN_HAND,
-            new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(BlockPos.ZERO)), Direction.NORTH, helper.absolutePos(BlockPos.ZERO), true));
+        var result = helper.getBlockState(pos).use(helper.getLevel(), player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(pos)), Direction.NORTH, helper.absolutePos(pos), true));
         assert result.consumesAction() : "Interact must success.";
         assert tank.connection().getFluidStack().filter(f -> FluidAmount.BUCKET_WATER().equals(f)).isDefined() : "Connection must have 1 bucket of Water";
 
