@@ -6,7 +6,8 @@
   "environment": "*",
   "entrypoints": {
     "fabric-gametest": [
-      "com.kotori316.fluidtank.gametest.PlaceTest"
+      "com.kotori316.fluidtank.gametest.PlaceTest",
+      "com.kotori316.fluidtank.gametest.DropTest"
     ]
   }
 }
