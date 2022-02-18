@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.gametest;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -21,9 +20,10 @@ import net.minecraft.world.phys.Vec3;
 import com.kotori316.fluidtank.FluidAmount;
 import com.kotori316.fluidtank.ModTank;
 import com.kotori316.fluidtank.tank.Connection;
-import com.kotori316.fluidtank.tank.TankBlock;
 import com.kotori316.fluidtank.tank.Tiers;
 import com.kotori316.fluidtank.tank.TileTank;
+
+import static com.kotori316.fluidtank.gametest.Utils.placeTank;
 
 public final class PlaceTest implements FabricGameTest {
     @GameTest(template = EMPTY_STRUCTURE)
@@ -94,13 +94,6 @@ public final class PlaceTest implements FabricGameTest {
                     "Tank capacity must be Wood + Stone. %s, %s".formatted(tank1.tank(), tank2.tank());
             })
             .thenSucceed();
-    }
-
-    private static void placeTank(GameTestHelper helper, BlockPos pos, TankBlock block) {
-        helper.setBlock(pos, block);
-        Optional.ofNullable(helper.getBlockEntity(pos))
-            .map(TileTank.class::cast)
-            .ifPresent(TileTank::onBlockPlacedBy);
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
