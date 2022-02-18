@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.gametest;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -23,6 +24,7 @@ import com.kotori316.fluidtank.tank.Connection;
 import com.kotori316.fluidtank.tank.Tiers;
 import com.kotori316.fluidtank.tank.TileTank;
 
+import static com.kotori316.fluidtank.gametest.Utils.getConnection;
 import static com.kotori316.fluidtank.gametest.Utils.placeTank;
 
 public final class PlaceTest implements FabricGameTest {
@@ -60,6 +62,24 @@ public final class PlaceTest implements FabricGameTest {
             throw new GameTestAssertException("Expected TileTank but " + entity);
         }
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void placeTank3(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
+        helper.startSequence()
+            .thenExecute(() -> {
+                helper.setBlock(pos, ModTank.Entries.WOOD_TANK);
+                // Make unloaded flag on.
+                Optional.ofNullable((TileTank) helper.getBlockEntity(pos))
+                    .ifPresent(t -> t.load(t.saveWithoutMetadata()));
+            })
+            .thenIdle(2)
+            .thenExecute(() -> {
+                var c = getConnection(helper, pos);
+                assert c.capacity() == 4000L : "Connection is not created.";
+            })
+            .thenSucceed();
     }
 
     @GameTest(template = EMPTY_STRUCTURE)
