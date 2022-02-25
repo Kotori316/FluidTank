@@ -106,13 +106,39 @@ minecraft {
             with commonRunSetting
             workingDirectory file('run-server')
         }
+
         data {
             with commonRunSetting
             workingDirectory file('run-server')
             setForceExit(false)
             args('--mod', "fluidtank", '--all')
         }
+
+        gameTestServer {
+            with commonRunSetting
+            workingDirectory file("${project.buildDir}/game_test")
+            setForceExit(false)
+            property 'forge.enabledGameTestNamespaces', 'fluidtank'
+            jvmArgs("-EnableAssertions".toLowerCase())
+
+            mods {
+                fluidtank {
+                    source sourceSets.test
+                }
+            }
+        }
     }
+}
+
+task deleteGateTestWorld(type: Delete) {
+    delete("${project.buildDir}/game_test")
+    onlyIf { file("${project.buildDir}/game_test").exists() }
+}
+
+task copyGameTestTemplate(type: Copy, dependsOn: deleteGateTestWorld) {
+    //noinspection SpellCheckingInspection
+    from("src/test/resources/data/fluidtank/gameteststructures/")
+    into("${project.buildDir}/game_test/gameteststructures/")
 }
 
 processResources {
