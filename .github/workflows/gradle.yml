@@ -42,16 +42,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        forge: [ 1.18.0, 1.18, default ]
+        forge: [ 1.18, default ]
     steps:
       - name: Get latest version
         if: ${{ matrix.forge != 'default' }}
         run: echo "CI_FORGE=$(java -jar $(find / -maxdepth 1 -name "fictional*.jar") ${{ matrix.forge }})" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Java Toolchains
-        run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon --stacktrace --warning-mode all
+        run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon --stacktrace
       - name: Test with JUnit
-        run: chmod +x ./gradlew && ./gradlew --no-daemon test --info --stacktrace
+        run: chmod +x ./gradlew && ./gradlew --no-daemon test copyGameTestTemplate runGameTestServer --stacktrace
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload failed test report
