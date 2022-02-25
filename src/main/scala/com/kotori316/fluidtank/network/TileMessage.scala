@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraftforge.network.NetworkEvent
 
+import scala.jdk.javaapi.OptionConverters
+
 /**
  * To both client and server.
  */
@@ -23,7 +25,7 @@ class TileMessage(pos: BlockPos, dim: ResourceKey[Level], tag: CompoundTag) {
 
   def onReceive(supplier: Supplier[NetworkEvent.Context]): Unit = {
     for {
-      world <- FluidTank.proxy.getLevel(supplier.get())
+      world <- OptionConverters.toScala(FluidTank.proxy.getLevel(supplier.get()))
       if world.dimension() == dim
       tile <- Option(world.getBlockEntity(pos))
     } {

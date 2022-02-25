@@ -10,7 +10,6 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -23,9 +22,7 @@ import scala.jdk.javaapi.CollectionConverters;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
-import com.kotori316.fluidtank.network.ClientProxy;
 import com.kotori316.fluidtank.network.PacketHandler;
-import com.kotori316.fluidtank.network.ServerProxy;
 import com.kotori316.fluidtank.network.SideProxy;
 import com.kotori316.fluidtank.recipes.CombineRecipe;
 import com.kotori316.fluidtank.recipes.FluidTankConditions;
@@ -39,7 +36,7 @@ public class FluidTank {
     public static final String MOD_NAME = "FluidTank";
     public static final String modID = "fluidtank";
     public static final Logger LOGGER = Utils.getLogger(MOD_NAME);
-    public static final SideProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+    public static final SideProxy proxy = SideProxy.get();
 
     public FluidTank() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());

@@ -12,7 +12,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
-import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
@@ -45,7 +44,7 @@ public class FluidCacheMessage {
     }
 
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
-        OptionConverters.toJava(FluidTank.proxy.getLevel(ctx.get()))
+        FluidTank.proxy.getLevel(ctx.get())
             .filter(w -> w.dimension().equals(dimensionId))
             .map(w -> w.getBlockEntity(pos))
             .filter(CATTile.class::isInstance)

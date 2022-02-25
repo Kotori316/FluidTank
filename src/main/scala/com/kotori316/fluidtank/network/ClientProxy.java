@@ -26,9 +26,7 @@ import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.network.NetworkEvent;
-import scala.Option;
 import scala.jdk.javaapi.CollectionConverters;
-import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -49,11 +47,9 @@ public class ClientProxy extends SideProxy {
     public static TextureAtlasSprite whiteTexture;
 
     @Override
-    public Option<Level> getLevel(NetworkEvent.Context context) {
-        Optional<Level> serverWorld = Optional.ofNullable(context.getSender()).map(Entity::getCommandSenderWorld);
-        scala.Function0<Option<Level>> clientWorldGetter = () ->
-            OptionConverters.toScala(LogicalSidedProvider.CLIENTWORLD.get(context.getDirection().getReceptionSide()));
-        return OptionConverters.toScala(serverWorld).orElse(clientWorldGetter);
+    public Optional<Level> getLevel(NetworkEvent.Context context) {
+        var serverWorld = Optional.ofNullable(context.getSender()).map(Entity::getCommandSenderWorld);
+        return serverWorld.or(() -> LogicalSidedProvider.CLIENTWORLD.get(context.getDirection().getReceptionSide()));
     }
 
     @Override
