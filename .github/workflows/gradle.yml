@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        forge: [ 1.18, default ]
+        forge: [ 1.18.0, 1.18, default ]
     steps:
       - name: Get latest version
         if: ${{ matrix.forge != 'default' }}
@@ -51,7 +51,7 @@ jobs:
       - name: Java Toolchains
         run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon --stacktrace
       - name: Test with JUnit
-        run: chmod +x ./gradlew && ./gradlew --no-daemon test copyGameTestTemplate runGameTestServer --stacktrace
+        run: chmod +x ./gradlew && ./gradlew --no-daemon test --stacktrace
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload failed test report
@@ -71,4 +71,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Test with runData
-        run: chmod +x ./gradlew && ( ./gradlew --no-daemon runData --stacktrace || ./gradlew --no-daemon runData)
+        run: chmod +x ./gradlew && ./gradlew --no-daemon runData copyGameTestTemplate runGameTestServer --stacktrace
