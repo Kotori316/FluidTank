@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 
@@ -35,11 +34,5 @@ final class Utils {
             "defaultBatch", name, FluidTank.modID + ":" + EMPTY_STRUCTURE, 100, 0L,
             true, test
         );
-    }
-
-    static void assertTrue(boolean condition, String message) throws GameTestAssertException {
-        if (!condition) {
-            throw new GameTestAssertException(message);
-        }
     }
 }

@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.gametest;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
@@ -22,14 +21,16 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Connection;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
-import static com.kotori316.fluidtank.gametest.Utils.assertTrue;
 import static com.kotori316.fluidtank.gametest.Utils.getConnection;
 import static com.kotori316.fluidtank.gametest.Utils.placeTank;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
@@ -61,8 +62,8 @@ public final class PlaceTest {
         if (entity instanceof TileTank tank) {
             tank.onBlockPlacedBy();
             var connection = tank.connection();
-            assertTrue(connection.capacity() == Tier.WOOD.amount(), "Capacity of Wood Tank is 4000. " + connection);
-            assertTrue(connection.amount() == 0, "Amount must be 0.");
+            assertEquals(connection.capacity(), Tier.WOOD.amount(), "Capacity of Wood Tank is 4000. " + connection);
+            assertEquals(0, connection.amount(), "Amount must be 0.");
             assertTrue(connection.getFluidStack().isEmpty(), "Fluid must be empty. " + connection.getFluidStack());
         } else {
             throw new GameTestAssertException("Expected TileTank but " + entity);
@@ -78,7 +79,7 @@ public final class PlaceTest {
             .thenIdle(2)
             .thenExecute(() -> {
                 var c = getConnection(helper, pos.above());
-                assertTrue(c.capacity() == 4000L, "Connection is not created.");
+                assertEquals(4000L, c.capacity(), "Connection is not created.");
             })
             .thenSucceed();
     }
@@ -88,10 +89,10 @@ public final class PlaceTest {
         var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.blockTanks().head());
         var tank = (TileTank) helper.getBlockEntity(pos);
-        assertTrue(tank != null, "Tank must not be null. %s at %s".formatted(helper.getBlockState(pos), pos));
+        assertNotNull(tank, "Tank must not be null. %s at %s".formatted(helper.getBlockState(pos), pos));
         placeTank(helper, pos.above(), ModObjects.blockTanks().head());
 
-        assertTrue(tank.connection().capacity() == 8000, "Wood + Wood, " + tank.connection());
+        assertEquals(8000, tank.connection().capacity(), "Wood + Wood, " + tank.connection());
         helper.succeed();
     }
 
@@ -107,10 +108,10 @@ public final class PlaceTest {
             .thenWaitUntil(() -> {
                 var tank1 = (TileTank) helper.getBlockEntity(BlockPos.ZERO);
                 var tank2 = (TileTank) helper.getBlockEntity(BlockPos.ZERO.above());
-                assertTrue(tank1 != null && tank2 != null, "Tanks must not be null");
-                assertTrue(tank1.connection() == tank2.connection(),
-                    "Connection of tanks must be same instance. %s, %s".formatted(tank1.connection(), tank2.connection()));
-                assertTrue(tank1.connection().capacity() == 20000,
+                assertNotNull(tank1, "Tank1 must not be null");
+                assertNotNull(tank2, "Tank2 must not be null");
+                assertSame(tank1.connection(), tank2.connection(), "Connection of tanks must be same instance. %s, %s".formatted(tank1.connection(), tank2.connection()));
+                assertEquals(20000, tank1.connection().capacity(),
                     "Tank capacity must be Wood + Stone. %s, %s".formatted(tank1.internalTank().getTank(), tank2.internalTank().getTank()));
             })
             .thenSucceed();
@@ -124,9 +125,9 @@ public final class PlaceTest {
 
         var tile = (TileTank) Objects.requireNonNull(helper.getBlockEntity(pos));
         var connection = tile.connection();
-        assertTrue(connection.capacity() == tile.internalTank().getTank().capacity() * 3L,
+        assertEquals(tile.internalTank().getTank().capacity() * 3L, connection.capacity(),
             "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.internalTank().getTank().capacity(), connection.capacity()));
-        assertTrue(3 == connection.seq().length(), "Connection must contain 3 tanks. seq=" + connection.seq());
+        assertEquals(3, connection.seq().length(), "Connection must contain 3 tanks. seq=" + connection.seq());
 
         helper.succeed();
     }
@@ -137,7 +138,7 @@ public final class PlaceTest {
         placeTank(helper, pos, ModObjects.blockTanks().head());
         placeTank(helper, pos.above(), ModObjects.blockTanks().head());
         var tank = (TileTank) helper.getBlockEntity(pos);
-        assertTrue(tank != null, "Tank should not be null");
+        assertNotNull(tank, "Tank should not be null");
 
         var player = helper.makeMockPlayer();
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
@@ -151,7 +152,7 @@ public final class PlaceTest {
 
     @GameTest(template = EMPTY_STRUCTURE)
     public void dummy(GameTestHelper helper) {
-        // assert false : "Fail Test";
+        // fail("Fail Test");
         helper.succeed();
     }
 }

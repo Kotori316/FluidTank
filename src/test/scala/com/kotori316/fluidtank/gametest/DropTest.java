@@ -21,9 +21,10 @@ import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 
 import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
-import static com.kotori316.fluidtank.gametest.Utils.assertTrue;
 import static com.kotori316.fluidtank.gametest.Utils.getConnection;
 import static com.kotori316.fluidtank.gametest.Utils.placeTank;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
@@ -36,10 +37,10 @@ public final class DropTest {
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
-        assertTrue(drops.size() == 1, "Drop was " + drops);
+        assertEquals(1, drops.size(), "Drop was " + drops);
         var stack = drops.get(0);
-        assertTrue(stack.getItem() == ModObjects.blockTanks().head().itemBlock(), "Dropped item was " + stack);
-        assertTrue(!stack.hasTag(), "Stack must not have tag if dropped from empty tank. " + stack);
+        assertEquals(ModObjects.blockTanks().head().itemBlock(), stack.getItem(), "Dropped item was " + stack);
+        assertFalse(stack.hasTag(), "Stack must not have tag if dropped from empty tank. " + stack);
 
         helper.succeed();
     }
@@ -62,11 +63,11 @@ public final class DropTest {
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
-        assertTrue(drops.size() == 1, "Drop was " + drops);
+        assertEquals(1, drops.size(), "Drop was " + drops);
         var stack = drops.get(0);
-        assertTrue(stack.getItem() == ModObjects.blockTanks().head().itemBlock(), "Dropped item was " + stack);
+        assertEquals(ModObjects.blockTanks().head().itemBlock(), stack.getItem(), "Dropped item was " + stack);
         var itemTank = RecipeInventoryUtil.getFluidHandler(stack);
-        assertTrue(itemTank.getFluid().equals(amount), "Fluid must be given fluid. " + itemTank.getFluid());
+        assertEquals(amount, itemTank.getFluid(), "Fluid must be given fluid. " + itemTank.getFluid());
 
         helper.succeed();
     }
