@@ -80,7 +80,8 @@ def commonRunSetting = {
 }
 
 minecraft {
-    mappings channel: 'parchment', version: (project.parchmentMapping as String)
+    // mappings channel: 'parchment', version: (project.parchmentMapping as String)
+    mappings channel: 'official', version: (project.minecraftVersion as String)
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
         client {
