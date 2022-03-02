@@ -149,10 +149,6 @@ processResources {
 }
 
 repositories {
-//    maven {
-//        name "BuildCraft"
-//        url = "https://mod-buildcraft.com/maven"
-//    }
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
@@ -168,17 +164,17 @@ repositories {
         name = "ModMaven.k-4u.nl"
         url = "https://modmaven.dev/"
         content {
-            includeGroup 'appeng'
+            it.includeGroup("appeng")
         }
     }
     maven {
         name = "Azure-SLP"
         url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
         content {
-            includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
-            includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
-            it.includeVersion("org.typelevel", "cats-core_2.13", "2.8.0-kotori")
-            it.includeVersion("org.typelevel", "cats-kernel_2.13", "2.8.0-kotori")
+            it.includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
+            it.includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
+            it.includeVersion("org.typelevel", "cats-core_2.13", project.cats_version as String)
+            it.includeVersion("org.typelevel", "cats-kernel_2.13", project.cats_version as String)
         }
     }
     maven {
@@ -194,7 +190,6 @@ repositories {
             it.includeGroup("org.spongepowered")
         }
     }
-    mavenCentral()
 }
 
 private boolean hasGitHubToken() {
@@ -210,7 +205,7 @@ dependencies {
     minecraft(versionNumber)
     System.out.println("Detected $versionNumber with Minecraft ${project.minecraftVersion}" as String)
     implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.8')
-    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.8.0-kotori')
+    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: project.cats_version)
 
     /*if (!isInCI()) {
         runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
