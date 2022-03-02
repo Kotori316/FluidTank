@@ -76,3 +76,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Test with runData
         run: chmod +x ./gradlew && ./gradlew --no-daemon runData copyGameTestTemplate runGameTestServer --stacktrace
+        env:
+          IGNORE_OTHER_MODS_IN_RUNTIME: true
