@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
 import cats.Eval
+import com.kotori316.fluidtank.Utils
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.{SoundEvent, SoundEvents, SoundSource}
 import net.minecraft.tags.FluidTags
@@ -82,13 +83,13 @@ object BucketEventHandler {
 
   private def getEmptySound(fluidStack: FluidStack): SoundEvent = {
     Option(fluidStack.getFluid.getAttributes.getEmptySound(fluidStack)).getOrElse(
-      if (fluidStack.getFluid is FluidTags.LAVA) SoundEvents.BUCKET_EMPTY_LAVA else SoundEvents.BUCKET_EMPTY
+      if (Utils.getTagElements(FluidTags.LAVA) contains fluidStack.getFluid) SoundEvents.BUCKET_EMPTY_LAVA else SoundEvents.BUCKET_EMPTY
     )
   }
 
   private def getFillSound(fluidStack: FluidStack): SoundEvent = {
     Option(fluidStack.getFluid.getAttributes.getFillSound(fluidStack)).getOrElse(
-      if (fluidStack.getFluid.is(FluidTags.LAVA)) SoundEvents.BUCKET_FILL_LAVA else SoundEvents.BUCKET_FILL
+      if (Utils.getTagElements(FluidTags.LAVA) contains fluidStack.getFluid) SoundEvents.BUCKET_FILL_LAVA else SoundEvents.BUCKET_FILL
     )
   }
 }

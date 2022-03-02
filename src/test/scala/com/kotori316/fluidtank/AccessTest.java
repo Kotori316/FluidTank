@@ -1,8 +1,5 @@
 package com.kotori316.fluidtank;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.ItemStack;
@@ -38,15 +35,10 @@ final class AccessTest extends BeforeAllTest {
         assertNotNull(ForgeRegistries.FLUIDS.getValue(new ResourceLocation("lava")), "Lava");
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     @Disabled("Test Disabled: Accessing tag before bounding will cause crash.")
     void tag() {
-        var a = Registry.FLUID.getTag(FluidTags.WATER)
-            .stream()
-            .flatMap(HolderSet.Named::stream)
-            .map(Holder::value)
-            .toList();
+        var a = Utils.getTagElements(FluidTags.WATER);
         assertTrue(a.isEmpty(), "Tag is empty.");
     }
 
