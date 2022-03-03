@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This test calls {@link ListTankHandler} from Java.
  */
 @SuppressWarnings("unused")
-final class ListTankHandlerTestJava extends BeforeAllTest {
+final class ListTankHandlerJavaTest extends BeforeAllTest {
     static final Tank EMPTY_TANK = new Tank(FluidAmount.EMPTY(), 4000L);
 
     //-------------------- PARAMETER PROVIDERS --------------------
@@ -54,7 +54,7 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         );
     }
 
-    static class Fill extends BeforeAllTest {
+    static class FillTest extends BeforeAllTest {
 
         static Object[] fluidWithAmount8() {
             return Stream.of(fluids())
@@ -130,9 +130,9 @@ final class ListTankHandlerTestJava extends BeforeAllTest {
         }
     }
 
-    static class Drain extends BeforeAllTest {
+    static class DrainTest extends BeforeAllTest {
         static Object[] fluidWithAmount24() {
-            return ListTankHandlerTestJava.fluidWithAmount24();
+            return ListTankHandlerJavaTest.fluidWithAmount24();
         }
 
         @ParameterizedTest
