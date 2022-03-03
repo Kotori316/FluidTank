@@ -20,8 +20,15 @@ object TankHandlerTest extends BeforeAllTest {
   def keyFillFluidMode: Array[Array[AnyRef]] = for {
     key <- FluidAmountTest.fluidKeys()
     fluid <- Seq(new FluidStack(Fluids.WATER, 4000), new FluidStack(Fluids.LAVA, 4000))
-    mode <- Seq(IFluidHandler.FluidAction.SIMULATE, IFluidHandler.FluidAction.EXECUTE)
+    mode <- IFluidHandler.FluidAction.values()
   } yield Array(key, fluid, mode)
+
+  def stackType(): Array[Array[AnyRef]] = {
+    for {
+      fluid: FluidAmount <- FluidAmountTest.stackFluids()
+      fluidAction: IFluidHandler.FluidAction <- IFluidHandler.FluidAction.values()
+    } yield Array[AnyRef](fluid, fluidAction)
+  }
 
   object NormalFill extends BeforeAllTest {
     @ParameterizedTest
@@ -211,67 +218,80 @@ object TankHandlerTest extends BeforeAllTest {
   }
 
   object SpecialHandlers extends BeforeAllTest {
-    @Test
-    def emptyHandler(): Unit = {
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
+    def fillEmptyHandlerTest(fluid: FluidAmount, action: IFluidHandler.FluidAction): Unit = {
       val h: TankHandler = EmptyTankHandler
-      locally {
-        val filled = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertEquals(0, filled)
-      }
-      locally {
-        val filled = h.fill(FluidAmount.BUCKET_LAVA.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertEquals(0, filled)
-      }
-      locally {
-        val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertTrue(drained.isEmpty)
-      }
-      locally {
-        val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertTrue(drained.isEmpty)
-      }
-      locally {
-        val drained = h.drain(1000, IFluidHandler.FluidAction.SIMULATE)
-        assertTrue(drained.isEmpty)
-      }
+      val filled = h.fill(fluid.toStack, action)
+      assertEquals(0, filled)
     }
 
-    @Test
-    def voidHandler(): Unit = {
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
+    def drainEmptyHandlerTest(fluid: FluidAmount, action: IFluidHandler.FluidAction): Unit = {
+      val h: TankHandler = EmptyTankHandler
+      val drained = h.drain(fluid.toStack, action)
+      assertTrue(drained.isEmpty)
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
+    def drainEmptyHandlerTest2(fluid: FluidAmount, action: IFluidHandler.FluidAction): Unit = {
+      val h: TankHandler = EmptyTankHandler
+      val drained = h.drain(fluid.toStack.getAmount, action)
+      assertTrue(drained.isEmpty)
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
+    def fillVoidHandlerTest(fluid: FluidAmount, action: IFluidHandler.FluidAction): Unit = {
       val h: TankHandler = new VoidTankHandler
-      locally {
-        val filled = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertEquals(1000, filled)
-      }
-      locally {
-        val filled = h.fill(FluidAmount.BUCKET_LAVA.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertEquals(1000, filled)
-      }
-      locally {
-        val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertTrue(drained.isEmpty)
-      }
-      locally {
-        val drained = h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-        assertTrue(drained.isEmpty)
-      }
-      locally {
-        val drained = h.drain(1000, IFluidHandler.FluidAction.SIMULATE)
-        assertTrue(drained.isEmpty)
-      }
+      val filled = h.fill(fluid.toStack, action)
+      assertEquals(fluid.amount.toInt, filled)
     }
 
-    @Test
-    def fillCreativeHandler(): Unit = {
-      val h: TankHandler = new CreativeTankHandler
-      val filled = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE)
-      assertEquals(FluidAmount.BUCKET_WATER.amount, filled)
-      assertTrue(h.getTank.fluidAmount.isEmpty)
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
+    def drainVoidHandlerTest(fluid: FluidAmount, action: IFluidHandler.FluidAction): Unit = {
+      val h: TankHandler = new VoidTankHandler
+      val drained = h.drain(fluid.toStack, action)
+      assertTrue(drained.isEmpty)
+    }
 
-      val filled2 = h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
-      assertEquals(FluidAmount.BUCKET_WATER.amount, filled2)
-      assertEquals(FluidKey.from(FluidAmount.BUCKET_WATER), FluidKey.from(h.getTank.fluidAmount))
-      assertEquals(Long.MaxValue, h.getTank.fluidAmount.amount)
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
+    def drainVoidHandlerTest2(fluid: FluidAmount, action: IFluidHandler.FluidAction): Unit = {
+      val h: TankHandler = new VoidTankHandler
+      val drained = h.drain(fluid.toStack.getAmount, action)
+      assertTrue(drained.isEmpty)
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
+    def fillCreativeHandlerSimulation(amount: Long, key: FluidKey): Unit = {
+      val h: TankHandler = new CreativeTankHandler
+      val filled = h.fill(key.toAmount(amount), IFluidHandler.FluidAction.SIMULATE)
+      if (key.isEmpty) {
+        assertEquals(key.toAmount(0), filled, "If fluid is empty, filled amount must be 0.")
+      } else {
+        assertEquals(key.toAmount(amount), filled, "If fluid is not empty, all fluid must be filled.")
+      }
+      assertTrue(h.getTank.fluidAmount.isEmpty, s"Simulation shouldn't change the content. ${h.getTank}")
+    }
+
+    @ParameterizedTest
+    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
+    def fillCreativeHandlerExecution(amount: Long, key: FluidKey): Unit = {
+      val h: TankHandler = new CreativeTankHandler
+      val filled = h.fill(key.toAmount(amount), IFluidHandler.FluidAction.EXECUTE)
+      if (key.isEmpty) {
+        assertEquals(key.toAmount(0), filled, "If fluid is empty, filled amount must be 0.")
+      } else {
+        assertEquals(key.toAmount(amount), filled, "If fluid is not empty, all fluid must be filled.")
+      }
+      assertEquals(FluidKey.from(FluidAmount.BUCKET_WATER), FluidKey.from(h.getTank.fluidAmount), s"Execution must change the content. ${h.getTank}")
+      assertEquals(Long.MaxValue, h.getTank.fluidAmount.amount, s"Inserting to creative tank must fill all tanks to max. ${h.getTank}")
     }
 
     @Test

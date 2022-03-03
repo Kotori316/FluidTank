@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.{MethodSource, ValueSource}
 import scala.jdk.CollectionConverters._
 
 //noinspection DuplicatedCode It's test!
-object TransferOperationTest extends BeforeAllTest{
+object TransferOperationTest extends BeforeAllTest {
   private[this] final val waterTank = Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000)
   private[this] final val lavaTank = Tank(FluidAmount.BUCKET_LAVA.setAmount(4000), 16000)
 
