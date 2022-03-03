@@ -284,14 +284,15 @@ object TankHandlerTest extends BeforeAllTest {
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
     def fillCreativeHandlerExecution(amount: Long, key: FluidKey): Unit = {
       val h: TankHandler = new CreativeTankHandler
-      val filled = h.fill(key.toAmount(amount), IFluidHandler.FluidAction.EXECUTE)
-      if (key.isEmpty) {
+      val fluidAmount = key.toAmount(amount)
+      val filled = h.fill(fluidAmount, IFluidHandler.FluidAction.EXECUTE)
+      if (fluidAmount.isEmpty) {
         assertEquals(key.toAmount(0), filled, "If fluid is empty, filled amount must be 0.")
       } else {
-        assertEquals(key.toAmount(amount), filled, "If fluid is not empty, all fluid must be filled.")
+        assertEquals(fluidAmount, filled, "If fluid is not empty, all fluid must be filled.")
+        assertEquals(key, FluidKey.from(h.getTank.fluidAmount), s"Execution must change the content. ${h.getTank}")
+        assertEquals(Long.MaxValue, h.getTank.fluidAmount.amount, s"Inserting to creative tank must fill all tanks to max. ${h.getTank}")
       }
-      assertEquals(FluidKey.from(FluidAmount.BUCKET_WATER), FluidKey.from(h.getTank.fluidAmount), s"Execution must change the content. ${h.getTank}")
-      assertEquals(Long.MaxValue, h.getTank.fluidAmount.amount, s"Inserting to creative tank must fill all tanks to max. ${h.getTank}")
     }
 
     @Test
