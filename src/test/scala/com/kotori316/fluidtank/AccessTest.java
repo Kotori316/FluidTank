@@ -38,7 +38,8 @@ final class AccessTest extends BeforeAllTest {
     @Test
     @Disabled("Test Disabled: Accessing tag before bounding will cause crash.")
     void tag() {
-        assertTrue(FluidTags.WATER.getValues().isEmpty(), "Tag is empty.");
+        var a = Utils.getTagElements(FluidTags.WATER);
+        assertTrue(a.isEmpty(), "Tag is empty.");
     }
 
     @Test

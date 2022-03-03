@@ -282,7 +282,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier) {
             this.recipeId = recipeId;
             this.tier = tier;
-            this.ingredient = Ingredient.of(ItemTags.bind(this.tier.tagName()));
+            this.ingredient = Ingredient.of(ItemTags.create(new ResourceLocation(this.tier.tagName())));
         }
 
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier, Ingredient ingredient) {

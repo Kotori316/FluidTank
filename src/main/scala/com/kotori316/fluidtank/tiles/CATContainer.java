@@ -46,7 +46,7 @@ public class CATContainer extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return catTile.getBlockPos().distSqr(player.position(), true) < 64;
+        return catTile.getBlockPos().distToCenterSqr(player.position()) < 64;
     }
 
     @Override

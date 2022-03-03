@@ -22,7 +22,7 @@ class BlockVoidTank extends BlockTank(Tier.VOID) {
       .foreach(stack.setHoverName)
   }
 
-  override val itemBlock: ItemBlockTank = new ItemBlockTank(this) {
+  override protected def createTankItem() = new ItemBlockTank(this) {
     @OnlyIn(Dist.CLIENT)
     override def appendHoverText(stack: ItemStack, worldIn: Level, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = ()
 

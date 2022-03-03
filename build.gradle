@@ -80,7 +80,8 @@ def commonRunSetting = {
 }
 
 minecraft {
-    mappings channel: 'parchment', version: (project.parchmentMapping as String)
+    // mappings channel: 'parchment', version: (project.parchmentMapping as String)
+    mappings channel: 'official', version: (project.minecraftVersion as String)
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
         client {
@@ -212,10 +213,18 @@ dependencies {
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
-    implementation(fg.deobf("mezz.jei:jei-1.18.1:" + project.jeiVersion))
-    implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
-    implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
-    implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+    if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null) {
+        implementation(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
+        implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
+        implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
+        implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+    } else {
+        compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
+        compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
+        compileOnly(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
+        compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+    }
+
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
     runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.8-build-2', classifier: 'with-library') {

@@ -28,6 +28,7 @@ import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.GameData;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.BeforeAll;
@@ -55,6 +56,7 @@ public abstract class BeforeAllTest {
             setHandler();
             assertEquals(Dist.CLIENT, FMLEnvironment.dist);
             Bootstrap.bootStrap();
+            GameData.unfreezeData();
             ModLoadingContext.get().setActiveContainer(new DummyModContainer());
             Map<String, Object> map = new HashMap<>(CollectionConverters.asJava(Config.defaultConfig()));
             map.put("debug", true);

@@ -29,7 +29,9 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
    */
   setRegistryName(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
   registerDefaultState(this.getStateDefinition.any.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
-  val itemBlock = new ItemBlockTank(this)
+  final val itemBlock: ItemBlockTank = createTankItem()
+
+  protected def createTankItem(): ItemBlockTank = new ItemBlockTank(this)
 
   override final def asItem(): Item = itemBlock
 

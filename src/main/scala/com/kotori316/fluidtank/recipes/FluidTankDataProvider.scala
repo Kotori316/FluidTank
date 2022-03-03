@@ -9,10 +9,11 @@ import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
 import com.kotori316.fluidtank.recipes.TierRecipe.TierFinishedRecipe
 import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.advancements.critereon.{EntityPredicate, FilledBucketTrigger, InventoryChangeTrigger, ItemPredicate, MinMaxBounds}
+import net.minecraft.core.Registry
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.data.{DataGenerator, DataProvider, HashCache}
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.tags.{ItemTags, SerializationTags, Tag}
+import net.minecraft.tags.{ItemTags, TagKey}
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Blocks
@@ -41,10 +42,7 @@ object FluidTankDataProvider {
 
   private[this] final def ID(s: String) = new ResourceLocation(FluidTank.modID, s)
 
-  private def tag(name: ResourceLocation): Tag.Named[Item] = SerializationTags.getInstance.getOrEmpty(ForgeRegistries.Keys.ITEMS).getTag(name) match {
-    case tag: Tag.Named[_] => tag.asInstanceOf[Tag.Named[Item]]
-    case _ => ItemTags.createOptional(name)
-  }
+  private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registry.ITEM_REGISTRY, name)
 
   class AdvancementProvider(generatorIn: DataGenerator) extends DataProvider {
     override def run(cache: HashCache): Unit = {
@@ -111,7 +109,7 @@ object FluidTankDataProvider {
           .pattern("xxx"))
         .addCondition(configCondition)
         .addCondition(new NotCondition(easyCondition))
-        .addCondition(new TagCondition(Tags.Items.GLASS.getName))
+        .addCondition(new TagCondition(Tags.Items.GLASS.location))
       val EASY_WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(tankWoodItem)
           .define('x', Tags.Items.GLASS).define('p', ItemTags.PLANKS)
@@ -120,7 +118,7 @@ object FluidTankDataProvider {
           .pattern("xpx"), saveName = ID("tank_wood_easy"))
         .addCondition(configCondition)
         .addCondition(easyCondition)
-        .addCondition(new TagCondition(Tags.Items.GLASS.getName))
+        .addCondition(new TagCondition(Tags.Items.GLASS.location))
       val VOID = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(ForgeRegistries.ITEMS.getValue(ID("tank_void")))
           .define('o', Tags.Items.OBSIDIAN).define('t', woodTanks)

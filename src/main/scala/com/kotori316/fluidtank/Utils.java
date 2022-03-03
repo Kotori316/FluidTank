@@ -2,10 +2,16 @@ package com.kotori316.fluidtank;
 
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
@@ -109,6 +115,21 @@ public class Utils {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> Set<T> getTagElements(TagKey<T> tag) {
+        return Registry.REGISTRY.entrySet().stream()
+            .filter(e -> tag.isFor(e.getKey()))
+            .map(Map.Entry::getValue)
+            .findFirst()
+            .map(r -> (Registry<T>) r) // Unchecked, but it must pass.
+            .flatMap(r -> r.getTag(tag))
+            .stream()
+            .flatMap(HolderSet.Named::stream)
+            .map(Holder::value)
+            .collect(Collectors.toSet());
+    }
+
+    @SuppressWarnings("ClassCanBeRecord")
     public static class TestConfig implements IContent {
         private final Map<String, Object> configs;
 

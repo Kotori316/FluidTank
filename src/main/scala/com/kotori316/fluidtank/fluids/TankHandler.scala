@@ -6,6 +6,10 @@ import com.kotori316.fluidtank._
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
+/**
+ * Mutable, because forge requires to be.
+ * The handler will be cached, so mutable is the easiest way to tell the change of content to the holder.
+ */
 class TankHandler extends IFluidHandler {
 
   private[this] final var tank: Tank = Tank.EMPTY
