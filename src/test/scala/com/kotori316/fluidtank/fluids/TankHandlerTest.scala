@@ -5,8 +5,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.material.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
-import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
-import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
 import org.junit.jupiter.api.{DisplayName, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -265,78 +264,6 @@ object TankHandlerTest extends BeforeAllTest {
       val h: TankHandler = new VoidTankHandler
       val drained = h.drain(fluid.toStack.getAmount, action)
       assertTrue(drained.isEmpty)
-    }
-
-    @ParameterizedTest
-    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
-    def fillCreativeHandlerSimulation(amount: Long, key: FluidKey): Unit = {
-      val h: TankHandler = new CreativeTankHandler
-      val filled = h.fill(key.toAmount(amount), IFluidHandler.FluidAction.SIMULATE)
-      if (key.isEmpty) {
-        assertEquals(key.toAmount(0), filled, "If fluid is empty, filled amount must be 0.")
-      } else {
-        assertEquals(key.toAmount(amount), filled, "If fluid is not empty, all fluid must be filled.")
-      }
-      assertTrue(h.getTank.fluidAmount.isEmpty, s"Simulation shouldn't change the content. ${h.getTank}")
-    }
-
-    @ParameterizedTest
-    @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeyAmount"))
-    def fillCreativeHandlerExecution(amount: Long, key: FluidKey): Unit = {
-      val h: TankHandler = new CreativeTankHandler
-      val fluidAmount = key.toAmount(amount)
-      val filled = h.fill(fluidAmount, IFluidHandler.FluidAction.EXECUTE)
-      if (fluidAmount.isEmpty) {
-        assertEquals(key.toAmount(0), filled, "If fluid is empty, filled amount must be 0.")
-      } else {
-        assertEquals(fluidAmount, filled, "If fluid is not empty, all fluid must be filled.")
-        assertEquals(key, FluidKey.from(h.getTank.fluidAmount), s"Execution must change the content. ${h.getTank}")
-        assertEquals(Long.MaxValue, h.getTank.fluidAmount.amount, s"Inserting to creative tank must fill all tanks to max. ${h.getTank}")
-      }
-    }
-
-    @Test
-    def drainCreativeHandler(): Unit = {
-      val h: TankHandler = new CreativeTankHandler
-      assertAll(
-        () => assertTrue(h.drain(1000, IFluidHandler.FluidAction.SIMULATE).isEmpty),
-        () => assertTrue(h.drain(FluidAmount.EMPTY.toStack, IFluidHandler.FluidAction.SIMULATE).isEmpty),
-        () => assertTrue(h.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.SIMULATE).isEmpty),
-      )
-      h.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
-      assertAll(
-        Range(1, 10).map(i => Math.pow(10, i).toLong).map(FluidAmount.BUCKET_WATER.setAmount)
-          .map[Executable](f => () => assertEquals(f, FluidAmount.fromStack(h.drain(f.toStack, IFluidHandler.FluidAction.SIMULATE)), s"Drain $f Simulation")): _*
-      )
-      assertAll(
-        Range(1, 10).map(i => Math.pow(10, i).toLong).map(FluidAmount.BUCKET_WATER.setAmount)
-          .map[Executable](f => () => assertEquals(f, FluidAmount.fromStack(h.drain(f.toStack, IFluidHandler.FluidAction.EXECUTE)), s"Drain $f Execution")): _*
-      )
-      assertAll(
-        Range(1, 10).map(i => Math.pow(10, i).toLong).map(FluidAmount.BUCKET_LAVA.setAmount)
-          .map[Executable](f => () => assertTrue(FluidAmount.fromStack(h.drain(f.toStack, IFluidHandler.FluidAction.SIMULATE)).isEmpty, s"Drain $f Simulation")): _*
-      )
-    }
-
-    @Test
-    @DisplayName("Drain Empty from Creative")
-    def drainEmptyFromCreativeHandler(): Unit = {
-      val h: TankHandler = new CreativeTankHandler
-      h.fill(FluidAmount.BUCKET_WATER, IFluidHandler.FluidAction.EXECUTE)
-      assertEquals(FluidAmount.BUCKET_WATER, h.drain(FluidAmount.EMPTY.setAmount(1000L), IFluidHandler.FluidAction.SIMULATE))
-      assertTrue(h.getTank.amount > 0)
-    }
-
-    @Test
-    def emptyCreativeHandler(): Unit = {
-      val h: TankHandler = new CreativeTankHandler
-      assertAll(
-        () => assertEquals(0, h.fill(FluidStack.EMPTY, IFluidHandler.FluidAction.SIMULATE), "Filling EMPTY"),
-        () => assertEquals(0, h.fill(FluidStack.EMPTY, IFluidHandler.FluidAction.EXECUTE), "Filling EMPTY"),
-        () => assertTrue(h.getTank.fluidAmount.isEmpty, "Fill with 0 cause no changes."),
-        () => assertEquals(FluidAmount.EMPTY, FluidAmount.fromStack(h.drain(FluidStack.EMPTY, IFluidHandler.FluidAction.SIMULATE)), "Drain empty fluid to get EMPTY."),
-        () => assertEquals(FluidAmount.EMPTY, FluidAmount.fromStack(h.drain(0, IFluidHandler.FluidAction.SIMULATE)), "Drain 0 fluid to get EMPTY."),
-      )
     }
 
   }
