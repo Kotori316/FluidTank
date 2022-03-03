@@ -21,29 +21,30 @@ public enum Tier {
     CREATIVE(8, Long.MAX_VALUE, "Creative"),
     VOID(0, 0, "Void"),
     COPPER(2, 40, "Copper", "forge:ingots/copper", true),
-    TIN(2, 48, "Tin", "forge:ingots/tin", true),
-    BRONZE(3, 384, "Bronze", "forge:ingots/bronze", true),
-    LEAD(3, 192, "Lead", "forge:ingots/lead", true),
-    SILVER(3, 1024, "Silver", "forge:ingots/silver", true),
+    TIN(2, 48, "Tin", "forge:ingots/tin", false),
+    BRONZE(3, 384, "Bronze", "forge:ingots/bronze", false),
+    LEAD(3, 192, "Lead", "forge:ingots/lead", false),
+    SILVER(3, 1024, "Silver", "forge:ingots/silver", false),
     ;
+    private static final String UNKNOWN_TAG = "Unknown";
     private final int rank;
     private final long amount;
     private final String string;
     private final String lowerName;
     private final String tagName;
-    private final boolean hasTagRecipe;
+    private final boolean availableInVanilla;
 
     Tier(int rank, int buckets, String name) {
-        this(rank, buckets, name, "Unknown", false);
+        this(rank, buckets, name, UNKNOWN_TAG, true);
     }
 
-    Tier(int rank, int buckets, String name, String tagName, boolean hasTagRecipe) {
+    Tier(int rank, int buckets, String name, String tagName, boolean availableInVanilla) {
         this.rank = rank;
         this.amount = buckets * 1000L;
         this.string = name;
         this.lowerName = name.toLowerCase(Locale.ROOT);
         this.tagName = tagName;
-        this.hasTagRecipe = hasTagRecipe;
+        this.availableInVanilla = availableInVanilla;
     }
 
     Tier(int rank, long amount, String name) {
@@ -51,8 +52,8 @@ public enum Tier {
         this.amount = amount;
         this.string = name;
         this.lowerName = name.toLowerCase(Locale.ROOT);
-        this.tagName = "Unknown";
-        this.hasTagRecipe = false;
+        this.tagName = UNKNOWN_TAG;
+        this.availableInVanilla = true;
     }
 
     public int rank() {
@@ -64,7 +65,7 @@ public enum Tier {
     }
 
     public boolean hasTagRecipe() {
-        return hasTagRecipe;
+        return !UNKNOWN_TAG.equals(this.tagName);
     }
 
     public String tagName() {
@@ -80,11 +81,15 @@ public enum Tier {
     }
 
     public boolean hasWayToCreate() {
-        return !hasTagRecipe || new TagCondition(tagName).test();
+        return !hasTagRecipe() || new TagCondition(tagName).test();
     }
 
     public boolean isNormalTier() {
         return 0 < this.rank && this.rank < CREATIVE.rank;
+    }
+
+    public boolean isAvailableInVanilla() {
+        return availableInVanilla;
     }
 
     @Override
