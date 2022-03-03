@@ -1,3 +1,11 @@
+## v18.5.0
+
+* Release for 1.18.2
+* Now recipes of vanilla tanks are enabled.
+* Non-vanilla recipe is disabled.
+
+Build with 1.18.2-40.0.2, Mapping: Official 1.18.2
+
 ## v18.4.0
 
 * Removed unused code
