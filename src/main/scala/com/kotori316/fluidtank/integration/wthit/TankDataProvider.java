@@ -8,14 +8,13 @@ import javax.annotation.Nonnull;
 import mcp.mobius.waila.api.IBlockAccessor;
 import mcp.mobius.waila.api.IBlockComponentProvider;
 import mcp.mobius.waila.api.IPluginConfig;
+import mcp.mobius.waila.api.IServerAccessor;
 import mcp.mobius.waila.api.IServerDataProvider;
 import mcp.mobius.waila.api.ITooltip;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.FluidAmount;
@@ -96,7 +95,7 @@ public class TankDataProvider implements IServerDataProvider<TileTank>, IBlockCo
                 }
             }
 
-            list.forEach(tooltip::add);
+            list.forEach(tooltip::addLine);
         }
     }
 
@@ -106,7 +105,8 @@ public class TankDataProvider implements IServerDataProvider<TileTank>, IBlockCo
     }
 
     @Override
-    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world, TileTank tank) {
+    public void appendServerData(CompoundTag tag, IServerAccessor<TileTank> accessor, IPluginConfig config) {
+        var tank = accessor.getTarget();
         tag.putString(NBT_Tier, tank.tier().toString());
         if (tank instanceof TileTankVoid) return;
         tag.putString(NBT_ConnectionFluidName,
