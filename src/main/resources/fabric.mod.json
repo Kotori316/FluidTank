@@ -36,9 +36,9 @@
     "fabric": ">=0.46.1+1.18",
     "minecraft": "1.18.x",
     "fabric-language-scala": ">=0.3.0",
-    "libblockattributes": ">=0.10.0",
-    "libblockattributes_items": ">=0.10.0",
-    "libblockattributes_fluids": ">=0.10.0"
+    "libblockattributes": ">=0.10.2",
+    "libblockattributes_items": ">=0.10.2",
+    "libblockattributes_fluids": ">=0.10.2"
   },
   "custom": {
     "waila:plugins": [
