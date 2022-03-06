@@ -129,7 +129,7 @@ dependencies {
     modImplementation "alexiil.mc.lib:libblockattributes-all:${project.bc_attribute_version}"
 
     //noinspection SpellCheckingInspection
-    modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
+    if (!System.getenv("RUN_GAME_TEST")) modRuntimeOnly("alexiil.mc.mod:simplepipes-all:${project.simple_pipe_version}")
     //noinspection SpellCheckingInspection
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
     modImplementation("RebornCore:RebornCore-1.18:${project.RebornCore_version}") {
@@ -205,6 +205,9 @@ task removeTestWorld(type: Delete) {
     onlyIf {
         file("${project.buildDir}/game_test/world").exists()
     }
+    doLast {
+        mkdir("${project.buildDir}/test-results/test")
+    }
 }
 runGameTest.dependsOn(removeTestWorld)
 test.dependsOn runGameTest
@@ -248,7 +251,7 @@ curseforge {
         id = '411564'
         changelogType = 'markdown'
         addGameVersion 'Fabric'
-        addGameVersion '1.18.1'
+        addGameVersion project.minecraft_version
         changelog = joinedLog
         releaseType = isInCI() ? 'alpha' : 'release'
         mainArtifact remapJar

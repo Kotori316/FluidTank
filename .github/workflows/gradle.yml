@@ -45,6 +45,7 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew build
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_GAME_TEST: true
       - name: Build and Publish with Gradle
         if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
         run: chmod +x ./gradlew && ./gradlew build curseforge publishAllPublicationsToAzureRepositoryRepository --stacktrace
@@ -53,6 +54,7 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AZURE_USER_NAME: 'Kotori316'
           AZURE_TOKEN: ${{ secrets.AZURE_TOKEN }}
+          RUN_GAME_TEST: true
       - name: Upload failed test report
         if: failure()
         uses: actions/upload-artifact@v2
