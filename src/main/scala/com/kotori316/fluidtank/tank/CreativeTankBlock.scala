@@ -19,7 +19,7 @@ class CreativeTankBlock extends TankBlock(Tiers.CREATIVE) {
       .foreach(stack.setHoverName)
   }
 
-  override val blockItem: TankBlockItem = new TankBlockItem(this) {
+  override def createTankItem(): TankBlockItem = new TankBlockItem(this) {
     override def appendHoverText(stack: ItemStack, world: Level, tooltip: util.List[Component], context: TooltipFlag): Unit = {
       tooltip.add(new TextComponent("Creative"))
     }

@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.render
 
 import java.util.Objects
 
+import com.kotori316.fluidtank.Utils
 import com.kotori316.fluidtank.tank.TileTank
 import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.{EnvType, Environment}
@@ -69,7 +70,7 @@ object RenderTank {
     val fluidAmount = tile.tank.fluid
     val (world, pos) = getWorldAndPos(tile)
     val c = FluidRenderHandlerRegistry.INSTANCE.get(fluidAmount.fluid).getFluidColor(world, pos, fluidAmount.fluid.defaultFluidState())
-    if (fluidAmount.fluid.is(FluidTags.WATER)) {
+    if (Utils.fluidIs(fluidAmount.fluid, FluidTags.WATER)) {
       c | 0xFF000000
     } else {
       c

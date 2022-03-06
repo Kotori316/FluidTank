@@ -2,6 +2,8 @@ package com.kotori316.fluidtank;
 
 import java.util.Optional;
 
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.Fluid;
 import scala.Option;
 
 public class Utils {
@@ -20,6 +22,11 @@ public class Utils {
         } else {
             return Optional.empty();
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean fluidIs(Fluid fluid, TagKey<Fluid> key) {
+        return fluid.is(key);
     }
 
     @SuppressWarnings({"unused", "SpellCheckingInspection"})

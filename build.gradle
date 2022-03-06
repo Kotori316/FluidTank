@@ -148,7 +148,7 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modImplementation("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
+    modCompileOnly("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
         transitive(false)
     }
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.

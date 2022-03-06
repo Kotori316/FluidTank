@@ -36,7 +36,7 @@ public class TankBlock extends BaseEntityBlock {
     public TankBlock(Tiers tiers) {
         super(Properties.of(TankConstant.MATERIAL).noOcclusion().strength(1f, 1f));
         this.tiers = tiers;
-        this.blockItem = new TankBlockItem(this);
+        this.blockItem = createTankItem();
     }
 
     @Override
@@ -134,8 +134,12 @@ public class TankBlock extends BaseEntityBlock {
         return super.getAnalogOutputSignal(state, world, pos);
     }
 
-    public TankBlockItem blockItem() {
+    public final TankBlockItem blockItem() {
         return blockItem;
+    }
+
+    protected TankBlockItem createTankItem() {
+        return new TankBlockItem(this);
     }
 
     @org.jetbrains.annotations.Nullable

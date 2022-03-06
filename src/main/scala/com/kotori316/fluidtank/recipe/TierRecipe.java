@@ -10,7 +10,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.RequirementsStrategy;
@@ -22,7 +21,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.SerializationTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
@@ -234,9 +233,12 @@ public class TierRecipe extends ShapedRecipe {
         }
 
         private static Ingredient getSubItems(Tiers tier) {
-            return Optional.ofNullable(SerializationTags.getInstance().getOrEmpty(Registry.ITEM_REGISTRY).getTag(new ResourceLocation(tier.tagName)))
-                .map(Ingredient::of)
-                .orElse(tier.getAlternative());
+            var tag = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tier.tagName));
+            if (Registry.ITEM.isKnownTagName(tag)) {
+                return Ingredient.of(tag);
+            } else {
+                return tier.getAlternative();
+            }
         }
 
     }
@@ -279,7 +281,7 @@ public class TierRecipe extends ShapedRecipe {
         public JsonObject serializeAdvancement() {
             var advancement = Advancement.Builder.advancement();
             var inventoryCriterion = tier.getAlternative().isEmpty()
-                ? RecipeProvider.has(TagFactory.ITEM.create(new ResourceLocation(tier.tagName)))
+                ? RecipeProvider.has(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tier.tagName)))
                 : RecipeProvider.has(tier.getAlternative().getItems()[0].getItem());
             advancement.parent(new ResourceLocation("recipes/root"))
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(getId()))

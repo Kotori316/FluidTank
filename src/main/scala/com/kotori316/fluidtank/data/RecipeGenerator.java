@@ -3,17 +3,17 @@ package com.kotori316.fluidtank.data;
 import java.util.function.Consumer;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipesProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.advancements.critereon.FilledBucketTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
@@ -22,7 +22,7 @@ import com.kotori316.fluidtank.recipe.RecipeConfigCondition;
 import com.kotori316.fluidtank.recipe.TierRecipe;
 import com.kotori316.fluidtank.tank.Tiers;
 
-final class RecipeGenerator extends FabricRecipesProvider {
+final class RecipeGenerator extends FabricRecipeProvider {
     RecipeGenerator(FabricDataGenerator dataGenerator) {
         super(dataGenerator);
     }
@@ -39,7 +39,7 @@ final class RecipeGenerator extends FabricRecipesProvider {
             .pattern("xxx")
             .define('x', Items.GLASS)
             .define('p', ItemTags.LOGS)
-            .unlockedBy("has_glass", FabricRecipesProvider.has(Items.GLASS))
+            .unlockedBy("has_glass", FabricRecipeProvider.has(Items.GLASS))
             .unlockedBy("has_bucket", FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.WATER_BUCKET).build()))
             .save(withConditions(exporter, new RecipeConfigCondition.Provider()));
         ShapedRecipeBuilder.shaped(ModTank.Entries.VOID_TANK)
@@ -48,8 +48,8 @@ final class RecipeGenerator extends FabricRecipesProvider {
             .pattern("ooo")
             .define('o', Items.OBSIDIAN)
             .define('t', ModTank.Entries.WOOD_TANK)
-            .unlockedBy("has_obsidian", FabricRecipesProvider.has(Items.OBSIDIAN))
-            .unlockedBy("has_tank", FabricRecipesProvider.has(ModTank.Entries.WOOD_TANK))
+            .unlockedBy("has_obsidian", FabricRecipeProvider.has(Items.OBSIDIAN))
+            .unlockedBy("has_tank", FabricRecipeProvider.has(ModTank.Entries.WOOD_TANK))
             .save(exporter);
     }
 
@@ -59,7 +59,7 @@ final class RecipeGenerator extends FabricRecipesProvider {
             ConditionJsonProvider[] conditions;
             if (recipePair.shouldUseTagCondition()) {
                 var tag = recipePair.tier.tagName;
-                var tagCondition = tagProvider(TagFactory.ITEM.create(new ResourceLocation(tag)));
+                var tagCondition = tagProvider(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tag)));
                 conditions = new ConditionJsonProvider[]{configCondition, tagCondition};
             } else {
                 conditions = new ConditionJsonProvider[]{configCondition};
@@ -80,7 +80,7 @@ final class RecipeGenerator extends FabricRecipesProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private static ConditionJsonProvider tagProvider(Tag.Named<Item> tag) {
+    private static ConditionJsonProvider tagProvider(TagKey<Item> tag) {
         return DefaultResourceConditions.itemTagsPopulated(tag);
     }
 
