@@ -80,8 +80,8 @@ def commonRunSetting = {
 }
 
 minecraft {
-    // mappings channel: 'parchment', version: (project.parchmentMapping as String)
-    mappings channel: 'official', version: (project.minecraftVersion as String)
+    mappings channel: 'parchment', version: ((project.parchmentMapping + "-" + project.minecraftVersion) as String)
+    // mappings channel: 'official', version: (project.minecraftVersion as String)
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
         client {
@@ -216,7 +216,7 @@ dependencies {
     if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null) {
         implementation(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
         implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
-        implementation(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
+        implementation(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
     } else {
         compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
