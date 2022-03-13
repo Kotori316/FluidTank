@@ -14,8 +14,6 @@ import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-import scala.jdk.CollectionConverters._
-
 object ReservoirRecipeTest extends BeforeAllTest {
   val wood = ModObjects.blockTanks.head
   val stone = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
@@ -30,7 +28,7 @@ object ReservoirRecipeTest extends BeforeAllTest {
 
   @Test
   private[recipes] def matchTest1(): Unit = {
-    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE, List(Ingredient.of(Items.BUCKET)).asJava)
+    val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE, List(Ingredient.of(Items.BUCKET)))
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
     assertFalse(recipe.assemble(inv).hasTag)
@@ -56,7 +54,7 @@ object ReservoirRecipeTest extends BeforeAllTest {
   def matchTest3(): Unit = {
     val item = Items.ACACIA_PLANKS
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tier.WOOD,
-      List(Ingredient.of(item)).asJava)
+      List(Ingredient.of(item)))
     locally {
       val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(wood), 'b' -> new ItemStack(item)))
       assertTrue(recipe.matches(inv, null))
@@ -75,7 +73,7 @@ object ReservoirRecipeTest extends BeforeAllTest {
     val item1 = new ItemStack(Items.ACACIA_LOG)
     val item2 = new ItemStack(Items.APPLE)
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "wood"), Tier.WOOD,
-      List(Ingredient.of(item1), Ingredient.of(item2)).asJava)
+      List(Ingredient.of(item1), Ingredient.of(item2)))
     val itemMap = Map('t' -> new ItemStack(wood), 'l' -> item1, 'a' -> item2)
     locally {
       val inv = RecipeInventoryUtil.getInv("tla", itemMap = itemMap)

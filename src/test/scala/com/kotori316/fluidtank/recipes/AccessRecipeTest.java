@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.recipes;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.FluidTank;
@@ -38,7 +39,7 @@ final class AccessRecipeTest extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource("tiers")
     void createTierRecipeInstance(Tier tier) {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE));
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID(), "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE));
         assertNotNull(recipe);
     }
 
@@ -46,12 +47,12 @@ final class AccessRecipeTest extends BeforeAllTest {
     void dummy() {
         assertTrue(tiers().findAny().isPresent());
         assertTrue(TierRecipeTest.fluids1().length > 0);
-        assertTrue(ReservoirRecipeSerialize.tierAndIngredient().findAny().isPresent());
+        assertTrue(ReservoirRecipeSerializeTest.tierAndIngredient().findAny().isPresent());
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
         assertNotNull(buffer);
     }
 
-    static final class ReservoirRecipeSerialize extends BeforeAllTest {
+    static final class ReservoirRecipeSerializeTest extends BeforeAllTest {
         static Stream<Object> tierAndIngredient() {
             return Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
                 .flatMap(t -> Stream.of(Items.BUCKET, Items.APPLE).map(Ingredient::of)
@@ -61,14 +62,15 @@ final class AccessRecipeTest extends BeforeAllTest {
         @ParameterizedTest
         @MethodSource("tierAndIngredient")
         void serializePacket(Tier t, Ingredient sub) {
-            ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
+            ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t,
+                CollectionConverters.asScala(List.of(sub)).toSeq());
 
             FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
-            ReservoirRecipe.SERIALIZER.toNetwork(buffer, recipe);
-            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.fromNetwork(recipe.getId(), buffer);
+            ReservoirRecipe.SERIALIZER().toNetwork(buffer, recipe);
+            ReservoirRecipe read = ReservoirRecipe.SERIALIZER().fromNetwork(recipe.getId(), buffer);
             assertNotNull(read);
             assertAll(
-                () -> assertEquals(recipe.getTier(), read.getTier()),
+                () -> assertEquals(recipe.tier(), read.tier()),
                 () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
                 () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
             );
@@ -78,14 +80,15 @@ final class AccessRecipeTest extends BeforeAllTest {
         @MethodSource("tierAndIngredient")
         @Disabled("Deserialization of Ingredient is not available in test environment.")
         void serializeJson(Tier t, Ingredient sub) {
-            ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
+            ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t,
+                CollectionConverters.asScala(List.of(sub)).toSeq());
 
             JsonObject object = new JsonObject();
             new ReservoirRecipe.ReservoirFinishedRecipe(recipe).serializeRecipeData(object);
-            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.fromJson(recipe.getId(), object);
+            ReservoirRecipe read = ReservoirRecipe.SERIALIZER().fromJson(recipe.getId(), object);
             assertNotNull(read);
             assertAll(
-                () -> assertEquals(recipe.getTier(), read.getTier()),
+                () -> assertEquals(recipe.tier(), read.tier()),
                 () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
                 () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
             );

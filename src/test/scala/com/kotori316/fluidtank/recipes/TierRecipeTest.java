@@ -45,7 +45,7 @@ final class TierRecipeTest extends BeforeAllTest {
 
     @BeforeEach
     void setupEach() {
-        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.of(Blocks.STONE));
+        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID(), "access_tier"), Tier.STONE, Ingredient.of(Blocks.STONE));
         inventory = new CraftingContainer(new AccessRecipeTest.DummyContainer(), 3, 3);
     }
 
@@ -169,12 +169,12 @@ final class TierRecipeTest extends BeforeAllTest {
     @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
     @Disabled("Accessing tag before bounded is not allowed.")
     void serializeJson(Tier tier) {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID(), "test_" + tier.lowerName()),
             tier, Ingredient.of(Blocks.STONE));
         JsonObject object = new JsonObject();
         TierRecipe.TierFinishedRecipe tierFinishedRecipe = new TierRecipe.TierFinishedRecipe(recipe.getId(), tier);
         tierFinishedRecipe.serializeRecipeData(object);
-        TierRecipe read = TierRecipe.SERIALIZER.fromJson(recipe.getId(), object);
+        TierRecipe read = TierRecipe.SERIALIZER().fromJson(recipe.getId(), object);
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
@@ -187,11 +187,11 @@ final class TierRecipeTest extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
     void serializePacket(Tier tier) {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID(), "test_" + tier.lowerName()),
             tier, Ingredient.of(Blocks.STONE));
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
-        TierRecipe.SERIALIZER.toNetwork(buffer, recipe);
-        TierRecipe read = TierRecipe.SERIALIZER.fromNetwork(recipe.getId(), buffer);
+        TierRecipe.SERIALIZER().toNetwork(buffer, recipe);
+        TierRecipe read = TierRecipe.SERIALIZER().fromNetwork(recipe.getId(), buffer);
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),

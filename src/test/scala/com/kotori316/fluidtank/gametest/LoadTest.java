@@ -16,19 +16,20 @@ import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
 import static com.kotori316.fluidtank.gametest.Utils.TANK2_STRUCTURE;
+import static com.kotori316.fluidtank.gametest.Utils.modID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@GameTestHolder(value = FluidTank.modID)
+@GameTestHolder(value = modID)
 @PrefixGameTestTemplate(value = false)
 public final class LoadTest {
     static final Block STONE_TANK;
 
     static {
         STONE_TANK = Objects.requireNonNull(
-            ForgeRegistries.BLOCKS.getValue(new ResourceLocation(FluidTank.modID, "tank_stone"))
+            ForgeRegistries.BLOCKS.getValue(new ResourceLocation(FluidTank.modID(), "tank_stone"))
         );
     }
 

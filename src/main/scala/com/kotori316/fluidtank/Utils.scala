@@ -112,11 +112,11 @@ object Utils {
       .asJava
   }
 
-  object TestConfig {
-    def getTestInstance(configs: Map[String, Any]) = new Utils.TestConfig(configs)
-  }
+  def getTestInstance(configs: Map[String, Any]): TestConfig = new Utils.TestConfig(configs)
 
-  class TestConfig private(val configs: Map[String, Any]) extends IContent {
+  def getTestInstance(configs: java.util.Map[String, Any]): TestConfig = getTestInstance(configs.asScala.toMap)
+
+  class TestConfig(configs: Map[String, Any]) extends IContent {
     private def createBool(): Config.BoolSupplier = {
       val methodName = Thread.currentThread.getStackTrace.apply(2).getMethodName
       new Config.BoolSupplier() {
@@ -129,28 +129,28 @@ object Utils {
       () => configs.getOrElse(methodName, 0).asInstanceOf[T]
     }
 
-    override val removeRecipe: Config.BoolSupplier = createBool()
+    override def removeRecipe: Config.BoolSupplier = createBool()
 
-    override val debug: Config.BoolSupplier = createBool()
+    override def debug: Config.BoolSupplier = createBool()
 
-    override val easyRecipe: Config.BoolSupplier = createBool()
+    override def easyRecipe: Config.BoolSupplier = createBool()
 
-    override val usableUnavailableTankInRecipe: Config.BoolSupplier = createBool()
+    override def usableUnavailableTankInRecipe: Config.BoolSupplier = createBool()
 
-    override val showInvisibleTank: Config.BoolSupplier = createBool()
+    override def showInvisibleTank: Config.BoolSupplier = createBool()
 
-    override val showTOP: Config.BoolSupplier = createBool()
+    override def showTOP: Config.BoolSupplier = createBool()
 
-    override val enableWailaAndTOP: Config.BoolSupplier = createBool()
+    override def enableWailaAndTOP: Config.BoolSupplier = createBool()
 
-    override val enableFluidSupplier: Config.BoolSupplier = createBool()
+    override def enableFluidSupplier: Config.BoolSupplier = createBool()
 
-    override val enablePipeRainbowRenderer: Config.BoolSupplier = createBool()
+    override def enablePipeRainbowRenderer: Config.BoolSupplier = createBool()
 
-    override val pipeColor: Supplier[JInt] = createGeneric
+    override def pipeColor: Supplier[JInt] = createGeneric
 
-    override val renderLowerBound: Supplier[JDouble] = createGeneric
+    override def renderLowerBound: Supplier[JDouble] = createGeneric
 
-    override val renderUpperBound: Supplier[JDouble] = createGeneric
+    override def renderUpperBound: Supplier[JDouble] = createGeneric
   }
 }

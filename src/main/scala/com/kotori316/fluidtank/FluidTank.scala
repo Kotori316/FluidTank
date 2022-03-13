@@ -4,6 +4,7 @@ import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy}
 import com.kotori316.fluidtank.recipes.{CombineRecipe, FluidTankConditions, FluidTankDataProvider, ReservoirRecipe, TagCondition, TierRecipe}
+import cpw.mods.modlauncher.Launcher
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.item.Item
@@ -29,10 +30,13 @@ object FluidTank {
   final val LOGGER: Logger = Utils.getLogger(MOD_NAME)
   final val proxy: SideProxy = SideProxy.get
 
-  ModLoadingContext.get.registerConfig(ModConfig.Type.COMMON, Config.sync())
-  ForgeMod.enableMilkFluid()
-  FMLJavaModLoadingContext.get.getModEventBus.register(FluidTank.Register)
-  FMLJavaModLoadingContext.get.getModEventBus.register(FluidTank.proxy)
+  if (Launcher.INSTANCE != null) {
+    // Do not call initialization methods in test environment.
+    ModLoadingContext.get.registerConfig(ModConfig.Type.COMMON, Config.sync())
+    ForgeMod.enableMilkFluid()
+    FMLJavaModLoadingContext.get.getModEventBus.register(FluidTank.Register)
+    FMLJavaModLoadingContext.get.getModEventBus.register(FluidTank.proxy)
+  }
 
   object Register {
     //noinspection ScalaUnusedSymbol

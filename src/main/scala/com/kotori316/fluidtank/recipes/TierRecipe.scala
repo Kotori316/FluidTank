@@ -23,7 +23,7 @@ import net.minecraftforge.registries.ForgeRegistryEntry
 
 object TierRecipe {
   private final val LOGGER = Utils.getLogger(classOf[TierRecipe])
-  final val SERIALIZER: RecipeSerializer[_] = new TierRecipe.Serializer
+  final val SERIALIZER: RecipeSerializer[TierRecipe] = new TierRecipe.Serializer
   private final val recipeWidth = 3
   private final val recipeHeight = 3
 

@@ -23,7 +23,7 @@ object Config {
     "renderUpperBound" -> (1 - 0.001d),
   )
   private var mContent: IContent = _
-  var dummyContent: IContent = Utils.TestConfig.getTestInstance(defaultConfig)
+  var dummyContent: IContent = Utils.getTestInstance(defaultConfig)
 
   def content: IContent = if (mContent == null) dummyContent else mContent
 
@@ -100,16 +100,17 @@ trait IContent {
 
   import com.kotori316.fluidtank.Config.BoolSupplier
 
-  val removeRecipe: BoolSupplier
-  val debug: BoolSupplier
-  val easyRecipe: BoolSupplier
-  val usableUnavailableTankInRecipe: BoolSupplier
-  val showInvisibleTank: BoolSupplier
-  val showTOP: BoolSupplier
-  val enableWailaAndTOP: BoolSupplier
-  val enableFluidSupplier: BoolSupplier
-  val enablePipeRainbowRenderer: BoolSupplier
-  val pipeColor: Supplier[Integer]
-  val renderLowerBound: Supplier[JDouble]
-  val renderUpperBound: Supplier[JDouble]
+  //noinspection MutatorLikeMethodIsParameterless
+  def removeRecipe: BoolSupplier
+  def debug: BoolSupplier
+  def easyRecipe: BoolSupplier
+  def usableUnavailableTankInRecipe: BoolSupplier
+  def showInvisibleTank: BoolSupplier
+  def showTOP: BoolSupplier
+  def enableWailaAndTOP: BoolSupplier
+  def enableFluidSupplier: BoolSupplier
+  def enablePipeRainbowRenderer: BoolSupplier
+  def pipeColor: Supplier[Integer]
+  def renderLowerBound: Supplier[JDouble]
+  def renderUpperBound: Supplier[JDouble]
 }

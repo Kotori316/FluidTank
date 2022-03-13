@@ -15,18 +15,18 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 
 import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
 import static com.kotori316.fluidtank.gametest.Utils.getConnection;
+import static com.kotori316.fluidtank.gametest.Utils.modID;
 import static com.kotori316.fluidtank.gametest.Utils.placeTank;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@GameTestHolder(value = FluidTank.modID)
+@GameTestHolder(value = modID)
 @PrefixGameTestTemplate(value = false)
 public final class DropTest {
 

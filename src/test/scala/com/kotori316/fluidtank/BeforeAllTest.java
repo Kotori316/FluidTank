@@ -60,7 +60,7 @@ public abstract class BeforeAllTest {
             ModLoadingContext.get().setActiveContainer(new DummyModContainer());
             Map<String, Object> map = new HashMap<>(CollectionConverters.asJava(Config.defaultConfig()));
             map.put("debug", true);
-            Config.dummyContent_$eq(Utils.TestConfig.getTestInstance(map));
+            Config.dummyContent_$eq(Utils.getTestInstance(map));
             mockCapability();
         }
     }
@@ -144,12 +144,12 @@ public abstract class BeforeAllTest {
 
         @Override
         public String getModId() {
-            return FluidTank.modID;
+            return "fluidtank";
         }
 
         @Override
         public String getDisplayName() {
-            return "QuarryPlus Test";
+            return "FluidTank Test";
         }
 
         @Override

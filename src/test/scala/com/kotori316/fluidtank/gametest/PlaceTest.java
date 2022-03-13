@@ -18,7 +18,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tier;
@@ -26,13 +25,14 @@ import com.kotori316.fluidtank.tiles.TileTank;
 
 import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
 import static com.kotori316.fluidtank.gametest.Utils.getConnection;
+import static com.kotori316.fluidtank.gametest.Utils.modID;
 import static com.kotori316.fluidtank.gametest.Utils.placeTank;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@GameTestHolder(value = FluidTank.modID)
+@GameTestHolder(value = modID)
 @PrefixGameTestTemplate(value = false)
 public final class PlaceTest {
     @GameTest(template = EMPTY_STRUCTURE)

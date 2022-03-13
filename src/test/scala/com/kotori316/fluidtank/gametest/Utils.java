@@ -10,7 +10,6 @@ import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import org.junit.jupiter.api.Assertions;
 
-import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.tiles.Connection;
 import com.kotori316.fluidtank.tiles.TileTank;
@@ -18,6 +17,7 @@ import com.kotori316.fluidtank.tiles.TileTank;
 final class Utils {
     public static final String EMPTY_STRUCTURE = "empty";
     public static final String TANK2_STRUCTURE = "tank2";
+    public static final String modID = "fluidtank";
 
     static void placeTank(GameTestHelper helper, BlockPos pos, BlockTank block) {
         helper.setBlock(pos, block);
@@ -35,7 +35,7 @@ final class Utils {
 
     static TestFunction create(String name, Consumer<GameTestHelper> test) {
         return new TestFunction(
-            "defaultBatch", name, FluidTank.modID + ":" + EMPTY_STRUCTURE, 100, 0L,
+            "defaultBatch", name, modID + ":" + EMPTY_STRUCTURE, 100, 0L,
             true, test
         );
     }
