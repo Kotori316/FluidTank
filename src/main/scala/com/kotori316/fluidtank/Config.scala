@@ -5,8 +5,6 @@ import java.util.function.Supplier
 
 import net.minecraftforge.common.ForgeConfigSpec
 
-import scala.jdk.javaapi.CollectionConverters
-
 object Config {
   final val CATEGORY_RECIPE = "recipe"
   final val defaultConfig: Map[String, AnyVal] = Map(
@@ -25,7 +23,7 @@ object Config {
     "renderUpperBound" -> (1 - 0.001d),
   )
   private var mContent: IContent = _
-  var dummyContent: IContent = Utils.TestConfig.getTestInstance(CollectionConverters.asJava(defaultConfig))
+  var dummyContent: IContent = Utils.TestConfig.getTestInstance(defaultConfig)
 
   def content: IContent = if (mContent == null) dummyContent else mContent
 

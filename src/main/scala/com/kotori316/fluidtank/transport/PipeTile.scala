@@ -1,8 +1,8 @@
 package com.kotori316.fluidtank.transport
 
 import cats.implicits._
-import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.Tier
+import com.kotori316.fluidtank.{transport, _}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.common.capabilities.Capability
@@ -50,7 +50,7 @@ final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
     if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
       if (side != null &&
-        (!hasLevel || getBlockState.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
+        (!hasLevel || getBlockState.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlockConnection.CONNECTED, transport.PipeBlockConnection.INPUT))) {
         LazyOptional.of(() => handler.asInstanceOf[T])
       } else {
         LazyOptional.empty()

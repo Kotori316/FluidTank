@@ -42,7 +42,7 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
     Cap.empty
   }
 
-  protected def fluidType: FluidAmount = {
+   def fluidType: FluidAmount = {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
   }
 

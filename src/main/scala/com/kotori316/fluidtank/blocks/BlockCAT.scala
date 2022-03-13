@@ -42,8 +42,8 @@ class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.M
       val result = for {
         cat <- level.getBlockEntity(pos, ModObjects.CAT_TYPE).toScala
         if !stack.isEmpty
-        catHandler <- cat.getFluidHandler(state.getValue(FACING)).resolve().toScala
-        r <- if (!level.isClientSide) BucketEventHandler.transferFluid(catHandler, catHandler.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack, stack)
+        catHandler <- cat.getFluidHandler(state.getValue(FACING))
+        r <- if (!level.isClientSide) BucketEventHandler.transferFluid(catHandler, catHandler.getFluidAmountStream.headOption.getOrElse(FluidAmount.EMPTY).toStack, stack)
         else BucketEventHandler.checkStack(stack)
         if r.result.isSuccess
       } yield r

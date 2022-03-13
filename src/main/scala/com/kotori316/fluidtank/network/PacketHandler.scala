@@ -20,7 +20,7 @@ object PacketHandler {
   def init(): Unit = {
     val counter = new AtomicInteger(1)
     INSTANCE.registerMessage[TileMessage](counter.getAndIncrement(), classOf[TileMessage], (m, b) => m.write(b), TileMessage.apply, (m, s) => m.onReceive(s))
-    INSTANCE.registerMessage[FluidCacheMessage](counter.getAndIncrement(), classOf[FluidCacheMessage], (m, b) => m.write(b), b => new FluidCacheMessage(b), (m, s) => m.onReceive(s))
+    INSTANCE.registerMessage[FluidCacheMessage](counter.getAndIncrement(), classOf[FluidCacheMessage], (m, b) => m.write(b), b => FluidCacheMessage(b), (m, s) => m.onReceive(s))
   }
 
   def sendToClient(message: TileMessage, world: Level): Unit = {

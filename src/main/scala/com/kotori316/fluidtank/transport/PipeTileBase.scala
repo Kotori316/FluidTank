@@ -39,7 +39,7 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
         if checked.add(pos) // True means it's first time to check the pos. False means the pos already checked.
         state = getLevel.getBlockState(pos)
         if state.getBlock == this.getBlockState.getBlock
-        if state.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(d.getOpposite)) == PipeBlock.Connection.CONNECTED
+        if state.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(d.getOpposite)) == PipeBlockConnection.CONNECTED
         pos2 <- pos :: makePosList(pos)
       } yield pos2
     }

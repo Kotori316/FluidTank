@@ -7,6 +7,7 @@ import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPip
 import com.mojang.datafixers.DSL
 import net.minecraft.core.{BlockPos, Registry}
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.item.{CreativeModeTab, ItemStack}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
@@ -15,6 +16,7 @@ import net.minecraft.world.level.material.{Material, MaterialColor, PushReaction
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.shapes.Shapes
+import net.minecraftforge.common.extensions.IForgeMenuType
 import org.apache.logging.log4j.MarkerManager
 
 import scala.reflect.ClassTag
@@ -70,7 +72,11 @@ object ModObjects {
 
   //---------- Containers ----------
 
-  final val CAT_CONTAINER_TYPE = CATContainer.makeType()
+  final val CAT_CONTAINER_TYPE: MenuType[CATContainer] = {
+    val t: MenuType[CATContainer] = IForgeMenuType.create((windowId1, inv, data) => new CATContainer(windowId1, inv.player, data.readBlockPos))
+    t.setRegistryName(CATContainer.GUI_ID)
+    t
+  }
 
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
