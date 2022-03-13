@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.transport
 
-import com.kotori316.fluidtank.{ModObjects, Utils}
+import com.kotori316.fluidtank.{BlockPosHelper, ModObjects, Utils}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.Container
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType, HopperBlockEntity}
@@ -14,7 +14,7 @@ class ItemPipeBlock extends PipeBlock {
 
   override protected def isHandler(level: BlockGetter, pos: BlockPos, property: EnumProperty[PipeBlockConnection]): Boolean = {
     val d = PipeBlock.FACING_TO_PROPERTY_MAP.inverse.get(property)
-    val maybeTilePos = pos.relative(d)
+    val maybeTilePos = pos.offset(d)
     val maybeTile = level.getBlockEntity(maybeTilePos)
     if (maybeTile != null) {
       val cap = maybeTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite)

@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.transport
 
 import com.google.common.collect.ImmutableBiMap
-import com.kotori316.fluidtank.{Config, FluidTank, ModObjects, Utils}
+import com.kotori316.fluidtank.{BlockPosHelper, Config, FluidTank, ModObjects, Utils}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
 import net.minecraft.world.entity.player.Player
@@ -196,7 +196,7 @@ abstract class PipeBlock extends Block(BlockBehaviour.Properties.of(ModObjects.M
     val fromState = worldIn.getBlockState(fromPos)
     // Update connection between pipes.
     if (fromState.getBlock != this) {
-      val vec = fromPos.subtract(pos)
+      val vec = fromPos.sub(pos)
       val direction = Direction.fromNormal(vec.getX, vec.getY, vec.getZ)
       if (direction != null) {
         if (fromState.getValue(PipeBlock.getPropertyFromDirection(direction.getOpposite)) == PipeBlockConnection.NO_CONNECTION)

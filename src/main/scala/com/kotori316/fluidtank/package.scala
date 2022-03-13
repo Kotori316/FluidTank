@@ -44,5 +44,7 @@ package object fluidtank extends CapConverter {
      * @return the pos moved 1 to the direction.
      */
     def offset(direction: Direction): BlockPos = pos relative direction
+
+    def sub(p: BlockPos): BlockPos = pos subtract p
   }
 }
