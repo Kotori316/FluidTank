@@ -22,6 +22,7 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 public class Utils {
 
@@ -45,6 +46,11 @@ public class Utils {
             return inDev.get() == 1;
         }
         return i == 1;
+    }
+
+    @VisibleForTesting
+    public static void setInDev(boolean inDev) {
+        Utils.inDev.set(inDev ? 1 : 0);
     }
 
     @SuppressWarnings({"unused", "SpellCheckingInspection"})
