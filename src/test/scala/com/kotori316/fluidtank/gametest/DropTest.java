@@ -6,12 +6,15 @@ import java.util.stream.Stream;
 
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.AfterBatch;
+import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -35,8 +38,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
 public final class DropTest {
+    static final String BATCH = "dropTestBatch";
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @BeforeBatch(batch = BATCH)
+    public void beforeTest(ServerLevel level) {
+        com.kotori316.fluidtank.Utils.setInDev(false);
+    }
+
+    @AfterBatch(batch = BATCH)
+    public void afterTest(ServerLevel level) {
+        com.kotori316.fluidtank.Utils.setInDev(true);
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void dropOfEmptyTank(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.blockTanks().head());
@@ -57,7 +71,7 @@ public final class DropTest {
                 FluidAmount.BUCKET_WATER(),
                 FluidAmount.BUCKET_LAVA()
             ).flatMap(f -> IntStream.of(500, 1000, 1500, 2000, 3000, 4000).mapToObj(f::setAmount))
-            .map(f -> Utils.create("dropOfFilledTank" + f, g -> dropOfWaterTank1(g, f)))
+            .map(f -> Utils.create("dropOfFilledTank" + f, BATCH, g -> dropOfWaterTank1(g, f)))
             .toList();
     }
 
@@ -78,7 +92,7 @@ public final class DropTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void dropOfLavaTank2(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.blockTanks().head());
@@ -107,7 +121,7 @@ public final class DropTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void pickLavaTank3(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.blockTanks().head());

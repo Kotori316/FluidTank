@@ -2,9 +2,12 @@ package com.kotori316.fluidtank.gametest;
 
 import java.util.Objects;
 
+import net.minecraft.gametest.framework.AfterBatch;
+import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.gametest.GameTestHolder;
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 @PrefixGameTestTemplate(value = false)
 public final class LoadTest {
     static final Block STONE_TANK;
+    static final String BATCH = "loadTestBatch";
 
     static {
         STONE_TANK = Objects.requireNonNull(
@@ -32,7 +36,17 @@ public final class LoadTest {
         );
     }
 
-    @GameTest(template = TANK2_STRUCTURE)
+    @BeforeBatch(batch = BATCH)
+    public void beforeTest(ServerLevel level) {
+        com.kotori316.fluidtank.Utils.setInDev(false);
+    }
+
+    @AfterBatch(batch = BATCH)
+    public void afterTest(ServerLevel level) {
+        com.kotori316.fluidtank.Utils.setInDev(true);
+    }
+
+    @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void stoneTankPresent(GameTestHelper helper) {
         var pos = Utils.getBasePos(helper).offset(1, 0, 0);
         helper.assertBlockPresent(STONE_TANK, pos);
@@ -40,7 +54,7 @@ public final class LoadTest {
         helper.succeed();
     }
 
-    @GameTest(template = TANK2_STRUCTURE)
+    @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void stoneTankTile(GameTestHelper helper) {
         var pos = Utils.getBasePos(helper).offset(1, 0, 0);
         var bottomTank = helper.getBlockEntity(pos);
@@ -52,7 +66,7 @@ public final class LoadTest {
         helper.succeed();
     }
 
-    @GameTest(template = TANK2_STRUCTURE)
+    @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void stoneTankTile2(GameTestHelper helper) {
         var pos = Utils.getBasePos(helper).offset(1, 0, 0);
         var bottomTank = helper.getBlockEntity(pos);
@@ -68,7 +82,7 @@ public final class LoadTest {
         helper.succeed();
     }
 
-    @GameTest(template = TANK2_STRUCTURE)
+    @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void woodTank1(GameTestHelper helper) {
         var pos = Utils.getBasePos(helper).offset(1, 1, 2);
         var bottomTank = helper.getBlockEntity(pos);
