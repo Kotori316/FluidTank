@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.integration.jade;
 
-import mcp.mobius.waila.api.IRegistrar;
+import mcp.mobius.waila.api.IWailaClientRegistration;
+import mcp.mobius.waila.api.IWailaCommonRegistration;
 import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.WailaPlugin;
@@ -36,12 +37,18 @@ public class TankWailaPlugin implements IWailaPlugin {
     static final ResourceLocation KEY_SHORT_INFO = new ResourceLocation(FluidTank.modID, WAILA_SHORT_INFO);
 
     @Override
-    public void register(IRegistrar registrar) {
+    @SuppressWarnings("UnstableApiUsage")
+    public void register(IWailaCommonRegistration registrar) {
         TankDataProvider tankDataProvider = new TankDataProvider();
         registrar.registerBlockDataProvider(tankDataProvider, BlockEntity.class);
-        registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, BlockTank.class);
-
         registrar.addConfig(KEY_TANK_INFO, true);
         registrar.addConfig(KEY_SHORT_INFO, true);
+    }
+
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
+    public void registerClient(IWailaClientRegistration registrar) {
+        TankDataProvider tankDataProvider = new TankDataProvider();
+        registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, BlockTank.class);
     }
 }

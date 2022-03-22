@@ -40,7 +40,12 @@ import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_Tier;
 import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.TIER;
 import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.WAILA_SHORT;
 
-public class TankDataProvider implements IServerDataProvider<BlockEntity>, IComponentProvider {
+/**
+ * Add details of tank with data from server.
+ * This class must not contain any fields because the instance is not same in client side and server side.
+ * The data should be transferred via packets with NBT, just added to given tag.
+ */
+final class TankDataProvider implements IServerDataProvider<BlockEntity>, IComponentProvider {
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (accessor.getBlockEntity() instanceof TileTank tank && config.get(KEY_TANK_INFO)) {
