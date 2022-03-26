@@ -6,9 +6,12 @@ import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.gametest.framework.AfterBatch;
+import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -35,14 +38,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @GameTestHolder(value = modID)
 @PrefixGameTestTemplate(value = false)
 public final class PlaceTest {
-    @GameTest(template = EMPTY_STRUCTURE)
+    static final String BATCH = "placeTestBatch";
+
+    @BeforeBatch(batch = BATCH)
+    public void beforeTest(ServerLevel level) {
+        com.kotori316.fluidtank.Utils.setInDev(false);
+    }
+
+    @AfterBatch(batch = BATCH)
+    public void afterTest(ServerLevel level) {
+        com.kotori316.fluidtank.Utils.setInDev(true);
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeStone(GameTestHelper helper) {
         helper.setBlock(new BlockPos(0, 1, 0), Blocks.STONE);
         helper.assertBlock(new BlockPos(0, 1, 0), Predicate.isEqual(Blocks.STONE), "Stone");
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeTank1(GameTestHelper helper) {
         helper.setBlock(BlockPos.ZERO, ModObjects.blockTanks().head());
         var entity = helper.getBlockEntity(BlockPos.ZERO);
@@ -55,7 +70,7 @@ public final class PlaceTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeTank2(GameTestHelper helper) {
         helper.setBlock(BlockPos.ZERO, ModObjects.blockTanks().head());
         var entity = helper.getBlockEntity(BlockPos.ZERO);
@@ -71,7 +86,7 @@ public final class PlaceTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeTank3(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
         helper.startSequence()
@@ -84,7 +99,7 @@ public final class PlaceTest {
             .thenSucceed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place2Tanks(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.blockTanks().head());
@@ -96,7 +111,7 @@ public final class PlaceTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place2Tanks2(GameTestHelper helper) {
         helper.startSequence()
             .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO, ModObjects.blockTanks().head()))
@@ -117,7 +132,7 @@ public final class PlaceTest {
             .thenSucceed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place3Tanks1(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
         var block = ModObjects.blockTanks().apply(2);
@@ -132,7 +147,7 @@ public final class PlaceTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void interactWithBucket(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.blockTanks().head());

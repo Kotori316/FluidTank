@@ -33,9 +33,9 @@ final class Utils {
             .orElseThrow(() -> new IllegalArgumentException("No tank at " + pos));
     }
 
-    static TestFunction create(String name, Consumer<GameTestHelper> test) {
+    static TestFunction create(String testName, String batchName, Consumer<GameTestHelper> test) {
         return new TestFunction(
-            "defaultBatch", name, modID + ":" + EMPTY_STRUCTURE, 100, 0L,
+            batchName, testName, modID + ":" + EMPTY_STRUCTURE, 100, 0L,
             true, test
         );
     }
