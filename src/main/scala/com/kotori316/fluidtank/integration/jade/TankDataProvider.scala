@@ -12,7 +12,12 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 
-class TankDataProvider extends IServerDataProvider[BlockEntity] with IComponentProvider {
+/**
+ * Add details of tank with data from server.
+ * This class must not contain any fields because the instance is not same in client side and server side.
+ * The data should be transferred via packets with NBT, just added to given tag.
+ */
+final class TankDataProvider extends IServerDataProvider[BlockEntity] with IComponentProvider {
   override def appendTooltip(tooltip: ITooltip, accessor: BlockAccessor, config: IPluginConfig): Unit = {
     accessor.getBlockEntity match {
       case tank: TileTank if config.get(KEY_TANK_INFO) =>
@@ -73,7 +78,7 @@ class TankDataProvider extends IServerDataProvider[BlockEntity] with IComponentP
   }
 
   @Nonnull
-  private def getCreativeFluidName(tank: TileTank): String =
+  private def getCreativeFluidName(tank: TileTank) =
     Option(tank.internalTank.getTank.fluidAmount).filter(_.nonEmpty).map(_.getLocalizedName).getOrElse(FLUID_NULL)
 
 }

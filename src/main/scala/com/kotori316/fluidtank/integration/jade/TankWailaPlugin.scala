@@ -4,7 +4,7 @@ import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.TileTank
-import mcp.mobius.waila.api.{IRegistrar, IWailaPlugin, TooltipPosition, WailaPlugin}
+import mcp.mobius.waila.api.{IWailaClientRegistration, IWailaCommonRegistration, IWailaPlugin, TooltipPosition, WailaPlugin}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.entity.BlockEntity
 
@@ -19,11 +19,17 @@ object TankWailaPlugin extends IWailaPlugin {
   final val KEY_TANK_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_TANK_INFO)
   final val KEY_SHORT_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_SHORT_INFO)
 
-  override def register(registrar: IRegistrar): Unit = {
+  //noinspection UnstableApiUsage
+  override def register(registrar: IWailaCommonRegistration): Unit = {
     val tankDataProvider = new TankDataProvider
     registrar.registerBlockDataProvider(tankDataProvider, classOf[BlockEntity])
+    registrar.addConfig(KEY_TANK_INFO, true)
+    registrar.addConfig(KEY_SHORT_INFO, true)
+  }
+
+  //noinspection UnstableApiUsage
+  override def registerClient(registrar: IWailaClientRegistration): Unit = {
+    val tankDataProvider = new TankDataProvider
     registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, classOf[BlockTank])
-    registrar.addConfig(TankWailaPlugin.KEY_TANK_INFO, true)
-    registrar.addConfig(TankWailaPlugin.KEY_SHORT_INFO, true)
   }
 }
