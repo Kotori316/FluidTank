@@ -74,7 +74,7 @@ class ClientProxy extends SideProxy {
   @SubscribeEvent
   def onBake(event: ModelBakeEvent): Unit = {
     ModObjects.itemReservoirs
-      .map(_.getRegistryName).filter(_ != null)
+      .map(_.getRegistryName)
       .map(n => new ModelResourceLocation(n, "inventory"))
       .foreach(n => event.getModelRegistry.put(n, new ModelWrapper(event.getModelManager.getModel(n))))
   }

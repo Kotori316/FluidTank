@@ -21,20 +21,20 @@ import scala.annotation.nowarn
 import scala.jdk.CollectionConverters._
 
 object PipeBlock {
-  val BOX_AABB: VoxelShape = Shapes.box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75)
-  val North_AABB: VoxelShape = Shapes.box(0.25, 0.25, 0, 0.75, 0.75, 0.25)
-  val South_AABB: VoxelShape = Shapes.box(0.25, 0.25, .75, 0.75, 0.75, 1)
-  val West_AABB: VoxelShape = Shapes.box(0, 0.25, 0.25, .25, 0.75, 0.75)
-  val East_AABB: VoxelShape = Shapes.box(.75, 0.25, 0.25, 1, 0.75, 0.75)
-  val UP_AABB: VoxelShape = Shapes.box(0.25, .75, 0.25, 0.75, 1, 0.75)
-  val Down_AABB: VoxelShape = Shapes.box(0.25, 0, 0.25, 0.75, .25, 0.75)
-  val NORTH: EnumProperty[PipeBlockConnection] = EnumProperty.create("north", classOf[PipeBlockConnection])
-  val SOUTH: EnumProperty[PipeBlockConnection] = EnumProperty.create("south", classOf[PipeBlockConnection])
-  val WEST: EnumProperty[PipeBlockConnection] = EnumProperty.create("west", classOf[PipeBlockConnection])
-  val EAST: EnumProperty[PipeBlockConnection] = EnumProperty.create("east", classOf[PipeBlockConnection])
-  val UP: EnumProperty[PipeBlockConnection] = EnumProperty.create("up", classOf[PipeBlockConnection])
-  val DOWN: EnumProperty[PipeBlockConnection] = EnumProperty.create("down", classOf[PipeBlockConnection])
-  private val SHAPE_MAP = ImmutableBiMap.of(
+  final val BOX_AABB: VoxelShape = Shapes.box(0.25, 0.25, 0.25, 0.75, 0.75, 0.75)
+  final val North_AABB: VoxelShape = Shapes.box(0.25, 0.25, 0, 0.75, 0.75, 0.25)
+  final val South_AABB: VoxelShape = Shapes.box(0.25, 0.25, .75, 0.75, 0.75, 1)
+  final val West_AABB: VoxelShape = Shapes.box(0, 0.25, 0.25, .25, 0.75, 0.75)
+  final val East_AABB: VoxelShape = Shapes.box(.75, 0.25, 0.25, 1, 0.75, 0.75)
+  final val UP_AABB: VoxelShape = Shapes.box(0.25, .75, 0.25, 0.75, 1, 0.75)
+  final val Down_AABB: VoxelShape = Shapes.box(0.25, 0, 0.25, 0.75, .25, 0.75)
+  final val NORTH: EnumProperty[PipeBlockConnection] = EnumProperty.create("north", classOf[PipeBlockConnection])
+  final val SOUTH: EnumProperty[PipeBlockConnection] = EnumProperty.create("south", classOf[PipeBlockConnection])
+  final val WEST: EnumProperty[PipeBlockConnection] = EnumProperty.create("west", classOf[PipeBlockConnection])
+  final val EAST: EnumProperty[PipeBlockConnection] = EnumProperty.create("east", classOf[PipeBlockConnection])
+  final val UP: EnumProperty[PipeBlockConnection] = EnumProperty.create("up", classOf[PipeBlockConnection])
+  final val DOWN: EnumProperty[PipeBlockConnection] = EnumProperty.create("down", classOf[PipeBlockConnection])
+  private final val SHAPE_MAP = ImmutableBiMap.of(
     PipeBlock.NORTH, North_AABB,
     PipeBlock.SOUTH, South_AABB,
     PipeBlock.WEST, West_AABB,
@@ -42,7 +42,7 @@ object PipeBlock {
     PipeBlock.UP, UP_AABB,
     PipeBlock.DOWN, Down_AABB,
   )
-  val FACING_TO_PROPERTY_MAP: ImmutableBiMap[Direction, EnumProperty[PipeBlockConnection]] = ImmutableBiMap.of(
+  final val FACING_TO_PROPERTY_MAP: ImmutableBiMap[Direction, EnumProperty[PipeBlockConnection]] = ImmutableBiMap.of(
     Direction.NORTH, NORTH,
     Direction.SOUTH, SOUTH,
     Direction.WEST, WEST,
@@ -65,10 +65,8 @@ abstract class PipeBlock extends Block(BlockBehaviour.Properties.of(ModObjects.M
     .setValue(PipeBlock.DOWN, PipeBlockConnection.NO_CONNECTION)
     //            .with(WATERLOGGED, false)
   )
-  private final val blockItem = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
-  blockItem.setRegistryName(FluidTank.modID, getRegName)
-
-  def itemBlock: BlockItem = blockItem
+  final val itemBlock = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
+  itemBlock.setRegistryName(FluidTank.modID, getRegName)
 
   protected def getRegName: String
 

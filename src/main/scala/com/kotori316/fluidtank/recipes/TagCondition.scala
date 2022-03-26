@@ -8,8 +8,8 @@ import net.minecraft.util.GsonHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, IConditionSerializer, TagEmptyCondition}
 
 object TagCondition {
-  val LOCATION = new ResourceLocation(FluidTank.modID, "tag")
-  val SERIALIZER = new TagCondition.Serializer
+  final val LOCATION = new ResourceLocation(FluidTank.modID, "tag")
+  final val SERIALIZER = new TagCondition.Serializer
 
   class Serializer extends IConditionSerializer[TagCondition] {
     override def write(json: JsonObject, value: TagCondition): Unit = json.addProperty("tag", value.tagName.toString)

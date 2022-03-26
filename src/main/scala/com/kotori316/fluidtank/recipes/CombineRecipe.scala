@@ -113,7 +113,7 @@ final class CombineRecipe(location: ResourceLocation) extends CustomRecipe(locat
 }
 
 object CombineRecipe {
-  private val LOGGER = Utils.getLogger(classOf[CombineRecipe])
+  private final val LOGGER = Utils.getLogger(classOf[CombineRecipe])
   final val SERIALIZER = new SimpleRecipeSerializer(new CombineRecipe(_))
   final val LOCATION = "fluidtank:combine_tanks"
 }
