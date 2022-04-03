@@ -22,7 +22,13 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
     }
 
     @Override
-    public abstract boolean test();
+    @SuppressWarnings("removal")
+    public final boolean test() {
+        return this.test(IContext.EMPTY);
+    }
+
+    @Override
+    public abstract boolean test(IContext context);
 
     private class Serializer implements IConditionSerializer<FluidTankConditions<T>> {
         @Override
@@ -47,7 +53,7 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
         }
 
         @Override
-        public boolean test() {
+        public boolean test(IContext context) {
             return !Config.content().removeRecipe().get();
         }
     }
@@ -59,7 +65,7 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
         }
 
         @Override
-        public boolean test() {
+        public boolean test(IContext context) {
             return Config.content().easyRecipe().get();
         }
     }

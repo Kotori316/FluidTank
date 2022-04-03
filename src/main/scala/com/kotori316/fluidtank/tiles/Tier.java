@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 
 import com.kotori316.fluidtank.recipes.TagCondition;
 
@@ -80,8 +81,8 @@ public enum Tier {
         return StringTag.valueOf(lowerName);
     }
 
-    public boolean hasWayToCreate() {
-        return !hasTagRecipe() || new TagCondition(tagName).test();
+    public boolean hasWayToCreate(ICondition.IContext context) {
+        return isAvailableInVanilla() || new TagCondition(tagName).test(context);
     }
 
     public boolean isNormalTier() {

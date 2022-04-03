@@ -181,7 +181,7 @@ object FluidTankDataProvider {
           .define('g', Tags.Items.INGOTS_GOLD)
           .define('I', Tags.Items.STORAGE_BLOCKS_IRON)
           .define('d', Blocks.DIRT))
-      val COMBINE = RecipeSerializeHelper.bySpecial(CombineRecipe.SERIALIZER, CombineRecipe.LOCATION)
+      val COMBINE = RecipeSerializeHelper(new CombineRecipe.CombineFinishedRecipe(new ResourceLocation(CombineRecipe.LOCATION)))
         .addCondition(configCondition)
       val RESERVOIRS = List(Tier.WOOD, Tier.STONE, Tier.IRON)
         .map(t => new ReservoirRecipe(ID("reservoir_" + t.lowerName), t))

@@ -7,17 +7,21 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -34,18 +38,19 @@ import com.kotori316.fluidtank.items.TankItemFluidHandler;
 
 public class CombineRecipe extends CustomRecipe {
     private static final Logger LOGGER = Utils.getLogger(CombineRecipe.class);
-    public static final SimpleRecipeSerializer<CombineRecipe> SERIALIZER = new SimpleRecipeSerializer<>(CombineRecipe::new);
+    public static final RecipeSerializer<CombineRecipe> SERIALIZER = new Serializer();
     public static final String LOCATION = "fluidtank:combine_tanks";
+    private final Ingredient tanks;
 
-    public CombineRecipe(ResourceLocation location) {
+    public CombineRecipe(ResourceLocation location, Ingredient tanks) {
         super(location);
+        this.tanks = tanks;
         LOGGER.debug("Recipe instance of ConvertInvisibleRecipe({}) was created.", location);
     }
 
     @Override
     public boolean matches(CraftingContainer inv, @Nullable Level worldIn) {
         // Check all items are tanks.
-        Ingredient tanks = tankList();
         boolean allTanks = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem).filter(s -> !s.isEmpty()).allMatch(tanks);
         if (!allTanks) return false;
@@ -67,15 +72,6 @@ public class CombineRecipe extends CustomRecipe {
         if (!allSameFluid) return false;
         long totalAmount = fluids.stream().mapToLong(FluidAmount::amount).sum();
         return getMaxCapacityTank(inv).map(p -> p.getRight() >= totalAmount).orElse(false);
-    }
-
-    private static Ingredient tankList() {
-        Stream<BlockTank> tankStream = StreamConverters.asJavaSeqStream(ModObjects.blockTanks());
-        Predicate<BlockTank> filter = t -> t.tier().isNormalTier();
-        if (!Config.content().usableUnavailableTankInRecipe().get()) {
-            filter = filter.and(t -> t.tier().hasWayToCreate());
-        }
-        return Ingredient.of(tankStream.filter(filter).map(ItemStack::new));
     }
 
     private static Optional<Pair<ItemStack, Long>> getMaxCapacityTank(CraftingContainer inv) {
@@ -148,6 +144,68 @@ public class CombineRecipe extends CustomRecipe {
             return Optional.of(new TankItemFluidHandler(tankItem.blockTank().tier(), stack));
         } else {
             return Optional.empty();
+        }
+    }
+
+    private static final class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<CombineRecipe> {
+        @Override
+        public CombineRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
+            LOGGER.warn("Trying to load recipe({}) without ICondition.IContext, which should not happen.", pRecipeId);
+            return fromJson(pRecipeId, pSerializedRecipe, ICondition.IContext.EMPTY);
+        }
+
+        @Override
+        public CombineRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
+            var tanks = Ingredient.fromNetwork(pBuffer);
+            return new CombineRecipe(pRecipeId, tanks);
+        }
+
+        @Override
+        public void toNetwork(FriendlyByteBuf pBuffer, CombineRecipe recipe) {
+            recipe.tanks.toNetwork(pBuffer);
+        }
+
+        @Override
+        public CombineRecipe fromJson(ResourceLocation recipeLoc, JsonObject recipeJson, ICondition.IContext context) {
+            var tanks = tankList(context);
+            return new CombineRecipe(recipeLoc, tanks);
+        }
+
+        private static Ingredient tankList(ICondition.IContext context) {
+            Stream<BlockTank> tankStream = StreamConverters.asJavaSeqStream(ModObjects.blockTanks());
+            Predicate<BlockTank> filter = t -> t.tier().isNormalTier();
+            if (!Config.content().usableUnavailableTankInRecipe().get()) {
+                filter = filter.and(t -> t.tier().hasWayToCreate(context));
+            }
+            return Ingredient.of(tankStream.filter(filter).map(ItemStack::new));
+        }
+    }
+
+    public record CombineFinishedRecipe(ResourceLocation recipeId) implements FinishedRecipe {
+        @Override
+        public void serializeRecipeData(JsonObject pJson) {
+
+        }
+
+        @Override
+        public ResourceLocation getId() {
+            return recipeId;
+        }
+
+        @Override
+        public RecipeSerializer<?> getType() {
+            return SERIALIZER;
+        }
+
+        @Nullable
+        @Override
+        public JsonObject serializeAdvancement() {
+            return null;
+        }
+
+        @Override
+        public ResourceLocation getAdvancementId() {
+            return new ResourceLocation("");
         }
     }
 }

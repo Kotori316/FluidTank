@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.recipes;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import com.google.gson.JsonObject;
@@ -11,7 +10,6 @@ import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.tiles.Tier;
 
 public class TagCondition implements ICondition {
     public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "tag");
@@ -33,13 +31,15 @@ public class TagCondition implements ICondition {
     }
 
     @Override
+    @SuppressWarnings("removal")
+    @Deprecated(forRemoval = true, since = "1.18.2")
     public boolean test() {
-        // return !condition.test();
-        return Arrays.stream(Tier.values())
-            .filter(t -> t.tagName().equals(tagName.toString()))
-            .findFirst()
-            .map(Tier::isAvailableInVanilla)
-            .orElse(true); // FIXME the tag is loaded AFTER recipe loading so tags are not available in this context.
+        return this.test(IContext.EMPTY);
+    }
+
+    @Override
+    public boolean test(IContext context) {
+        return !this.condition.test(context);
     }
 
     @Override

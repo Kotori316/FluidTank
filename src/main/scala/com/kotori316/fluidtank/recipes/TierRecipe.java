@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +26,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.IShapedRecipe;
+import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
@@ -55,16 +58,25 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
     private static final int recipeWidth = 3;
     private static final int recipeHeight = 3;
 
-    public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems) {
-        id = idIn;
+    public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems, ICondition.IContext context) {
+        this(idIn, tier, subItems, getTankSet(tier, context));
+    }
+
+    public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems, Set<BlockTank> normalTankSet) {
+        this.id = idIn;
         this.tier = tier;
         this.subItems = subItems;
 
         result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
-        Set<Tier> tierSet = Arrays.stream(Tier.values()).filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
-        normalTankSet = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tierSet.contains(b.tier()))
-            .filter(TierRecipe::filterTier).collect(Collectors.toSet());
+        this.normalTankSet = normalTankSet;
         LOGGER.debug("Recipe instance({}) created for Tier {}.", idIn, tier);
+    }
+
+    static Set<BlockTank> getTankSet(Tier tier, ICondition.IContext context) {
+        Set<Tier> tierSet = Arrays.stream(Tier.values()).filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
+        return CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tierSet.contains(b.tier()))
+            .filter(blockTank -> Config.content().usableUnavailableTankInRecipe().get() || blockTank.tier().hasWayToCreate(context))
+            .collect(Collectors.toSet());
     }
 
     @Override
@@ -205,13 +217,6 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         return tier;
     }
 
-    private static boolean filterTier(BlockTank blockTank) {
-        if (Config.content().usableUnavailableTankInRecipe().get())
-            return true;
-        else
-            return blockTank.tier().hasWayToCreate();
-    }
-
     public Stream<Pair<Integer, Ingredient>> tankItemWithSlot() {
         return IntStream.of(TANK_SLOTS).mapToObj(value -> Pair.of(value, getTankItems()));
     }
@@ -245,13 +250,19 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         }
 
         @Override
-        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json, ICondition.IContext context) {
             Tier tier = Tier.byName(GsonHelper.getAsString(json, KEY_TIER)).orElse(Tier.Invalid);
             Ingredient subItem = Ingredient.fromJson(json.get(KEY_SUB_ITEM));
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, json);
             LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, subItem);
-            return new TierRecipe(recipeId, tier, subItem);
+            return new TierRecipe(recipeId, tier, subItem, context);
+        }
+
+        @Override
+        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            LOGGER.warn("Trying to load recipe({}) without ICondition.IContext, which should not happen.", recipeId);
+            return fromJson(recipeId, json, ICondition.IContext.EMPTY);
         }
 
         @Override
@@ -261,14 +272,21 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             Ingredient subItem = Ingredient.fromNetwork(buffer);
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
-            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}..", recipeId, tier, subItem);
-            return new TierRecipe(recipeId, tier, subItem);
+            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, subItem);
+            var ingredientTanks = buffer.readCollection(ArrayList::new, FriendlyByteBuf::readResourceLocation)
+                .stream()
+                .map(ForgeRegistries.BLOCKS::getValue)
+                .mapMulti(Utils.cast(BlockTank.class))
+                .collect(Collectors.toSet());
+            return new TierRecipe(recipeId, tier, subItem, ingredientTanks);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buffer, TierRecipe recipe) {
             buffer.writeUtf(recipe.getTier().toString());
             recipe.getSubItems().toNetwork(buffer);
+            var ingredientTanks = recipe.normalTankSet.stream().map(BlockTank::getRegistryName).toList();
+            buffer.writeCollection(ingredientTanks, FriendlyByteBuf::writeResourceLocation);
             LOGGER.debug("Serialized {} to packet for tier {}.", recipe.id, recipe.tier);
         }
 
