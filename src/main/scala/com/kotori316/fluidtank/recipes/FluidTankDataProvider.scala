@@ -46,7 +46,7 @@ object FluidTankDataProvider {
   private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registry.ITEM_REGISTRY, name)
 
   private def saveData(pGson: Gson, pCache: HashCache, pJsonElement: JsonElement, pPath: Path): Unit = {
-    val path = pPath.toAbsolutePath.normalize()
+    val path = pPath.normalize
     FluidTank.LOGGER.info("Save {}", path)
     DataProvider.save(pGson, pCache, pJsonElement, path)
   }
