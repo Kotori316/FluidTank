@@ -8,6 +8,7 @@ import mcp.mobius.waila.api.WailaPlugin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.tiles.TileTank;
@@ -39,16 +40,20 @@ public class TankWailaPlugin implements IWailaPlugin {
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void register(IWailaCommonRegistration registrar) {
-        TankDataProvider tankDataProvider = new TankDataProvider();
-        registrar.registerBlockDataProvider(tankDataProvider, BlockEntity.class);
-        registrar.addConfig(KEY_TANK_INFO, true);
-        registrar.addConfig(KEY_SHORT_INFO, true);
+        if (Config.content().enableWailaAndTOP().get()) {
+            TankDataProvider tankDataProvider = new TankDataProvider();
+            registrar.registerBlockDataProvider(tankDataProvider, BlockEntity.class);
+            registrar.addConfig(KEY_TANK_INFO, true);
+            registrar.addConfig(KEY_SHORT_INFO, true);
+        }
     }
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void registerClient(IWailaClientRegistration registrar) {
-        TankDataProvider tankDataProvider = new TankDataProvider();
-        registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, BlockTank.class);
+        if (Config.content().enableWailaAndTOP().get()) {
+            TankDataProvider tankDataProvider = new TankDataProvider();
+            registrar.registerComponentProvider(tankDataProvider, TooltipPosition.BODY, BlockTank.class);
+        }
     }
 }

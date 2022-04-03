@@ -50,8 +50,8 @@ final class AccessTest extends BeforeAllTest {
 
     @Test
     void configAccess() {
-        assertTrue(Config.content().debug());
-        assertFalse(Config.content().removeRecipe());
+        assertTrue(Config.content().debug().get());
+        assertFalse(Config.content().removeRecipe().get());
     }
 
     @Nested

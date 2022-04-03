@@ -1,36 +1,14 @@
 package com.kotori316.fluidtank
 
-import java.lang.{Double => JDouble}
-import java.util.function.Supplier
-
 import net.minecraftforge.common.ForgeConfigSpec
-
-import scala.jdk.javaapi.CollectionConverters
 
 object Config {
   final val CATEGORY_RECIPE = "recipe"
-  final val defaultConfig: Map[String, AnyVal] = Map(
-    "removeRecipe" -> false,
-    "debug" -> false,
-    "easyRecipe" -> false,
-    "usableInvisibleInRecipe" -> true,
-    "usableUnavailableTankInRecipe" -> true,
-    "showInvisibleTank" -> true,
-    "showTOP" -> true,
-    "enableWailaAndTOP" -> true,
-    "enableFluidSupplier" -> false,
-    "enablePipeRainbowRenderer" -> false,
-    "pipeColor" -> (0xF0000000 + 0xFFFFFF),
-    "renderLowerBound" -> 0.001d,
-    "renderUpperBound" -> (1 - 0.001d),
-  )
-  private var mContent: IContent = _
-  var dummyContent: IContent = Utils.TestConfig.getTestInstance(CollectionConverters.asJava(defaultConfig))
+  private var mContent: Content = _
 
-  def content: IContent = if (mContent == null) dummyContent else mContent
+  def content: Content = mContent
 
-  def sync(): ForgeConfigSpec = {
-    val builder = new ForgeConfigSpec.Builder
+  def sync(builder: ForgeConfigSpec.Builder): ForgeConfigSpec = {
     mContent = new Content(builder)
     val spec = builder.build()
     spec
@@ -41,77 +19,49 @@ object Config {
       sync()
     }
   }*/
-  trait BoolSupplier extends java.util.function.BooleanSupplier {
-    def get(): Boolean
 
-    override def getAsBoolean: Boolean = get()
-  }
-
-
-  class Content(builder: ForgeConfigSpec.Builder) extends IContent {
-    private def asSupplier(b: ForgeConfigSpec.BooleanValue): BoolSupplier = () => b.get()
-
-    private def asSupplier[T](b: ForgeConfigSpec.ConfigValue[T]): java.util.function.Supplier[T] = () => b.get()
-
+  class Content(builder: ForgeConfigSpec.Builder) {
     builder.comment("Settings for FluidTank.").push("common")
-    val removeRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("Remove all recipe to make tanks.")
-      .define("RemoveRecipe", false))
-    val debug: BoolSupplier = asSupplier(builder.comment("Debug Mode").define("debug", false))
+    val removeRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipe to make tanks.")
+      .define("RemoveRecipe", false)
+    val debug: ForgeConfigSpec.BooleanValue = builder.comment("Debug Mode").define("debug", false)
 
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
-    val easyRecipe: BoolSupplier = asSupplier(builder.worldRestart().comment("True to use easy recipe.")
-      .define("easyRecipe", false))
-    val usableUnavailableTankInRecipe: BoolSupplier = asSupplier(builder.worldRestart()
+    val easyRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("True to use easy recipe.")
+      .define("easyRecipe", false)
+    val usableUnavailableTankInRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart()
       .comment("False to prohibit tanks with no recipe from being used in recipes of other tanks.")
-      .define("usableUnavailableTankInRecipe", true))
+      .define("usableUnavailableTankInRecipe", true)
 
     builder.pop()
 
-    val showInvisibleTank: BoolSupplier = asSupplier(builder.worldRestart()
+    val showInvisibleTank: ForgeConfigSpec.BooleanValue = builder.worldRestart()
       .comment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
-      .define("showInvisibleTankInTab", false))
+      .define("showInvisibleTankInTab", false)
 
-    val showTOP: BoolSupplier = asSupplier(builder.comment("Show tank info on TOP tooltip.")
-      .define("showTOP", true))
+    val showTOP: ForgeConfigSpec.BooleanValue = builder.comment("Show tank info on TOP tooltip.")
+      .define("showTOP", true)
 
-    val enableWailaAndTOP: BoolSupplier = asSupplier(builder.comment("True to enable waila and top to show tank info.")
-      .define("showToolTipOnMods", true))
+    val enableWailaAndTOP: ForgeConfigSpec.BooleanValue = builder.comment("True to enable waila and top to show tank info.")
+      .define("showToolTipOnMods", true)
 
-    val enableFluidSupplier: BoolSupplier = asSupplier(builder.comment("True to allow fluid supplier to work.")
-      .define("enableFluidSupplier", false))
+    val enableFluidSupplier: ForgeConfigSpec.BooleanValue = builder.comment("True to allow fluid supplier to work.")
+      .define("enableFluidSupplier", false)
 
-    val enablePipeRainbowRenderer: BoolSupplier = asSupplier(builder.worldRestart()
-      .comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false))
-    val pipeColor: Supplier[Integer] = asSupplier(builder.worldRestart()
+    val enablePipeRainbowRenderer: ForgeConfigSpec.BooleanValue = builder.worldRestart()
+      .comment("False to disable rainbow renderer for pipe.").define("enablePipeRainbowRenderer", false)
+    val pipeColor: ForgeConfigSpec.ConfigValue[Integer] = builder.worldRestart()
       .comment("Default color of pipe. Works only if \'enablePipeRainbowRenderer\' is false.")
-      .define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF)))
-    val renderLowerBound: Supplier[JDouble] = asSupplier(builder.worldRestart()
+      .define("pipeColor", Int.box(0xF0000000 + 0xFFFFFF))
+    val renderLowerBound: ForgeConfigSpec.DoubleValue = builder.worldRestart()
       .comment("The lower bound of position of fluid rendering. Default 0.001")
-      .defineInRange("renderLowerBound", 0.001d, 0d, 1d))
-    val renderUpperBound: Supplier[JDouble] = asSupplier(builder.worldRestart()
+      .defineInRange("renderLowerBound", 0.001d, 0d, 1d)
+    val renderUpperBound: ForgeConfigSpec.DoubleValue = builder.worldRestart()
       .comment("The upper bound of position of fluid rendering. Default 0.999")
-      .defineInRange("renderUpperBound", 1d - 0.001d, 0d, 1d))
+      .defineInRange("renderUpperBound", 1d - 0.001d, 0d, 1d)
     builder.pop()
 
   }
 
-}
-
-trait IContent {
-
-  import com.kotori316.fluidtank.Config.BoolSupplier
-
-  val removeRecipe: BoolSupplier
-  val debug: BoolSupplier
-  val easyRecipe: BoolSupplier
-  val usableUnavailableTankInRecipe: BoolSupplier
-  val showInvisibleTank: BoolSupplier
-  val showTOP: BoolSupplier
-  val enableWailaAndTOP: BoolSupplier
-  val enableFluidSupplier: BoolSupplier
-  val enablePipeRainbowRenderer: BoolSupplier
-  val pipeColor: Supplier[Integer]
-  val renderLowerBound: Supplier[JDouble]
-  val renderUpperBound: Supplier[JDouble]
 }

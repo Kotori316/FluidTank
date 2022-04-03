@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
@@ -39,7 +40,7 @@ public class FluidTank {
     public static final SideProxy proxy = SideProxy.get();
 
     public FluidTank() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync());
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync(new ForgeConfigSpec.Builder()));
         ForgeMod.enableMilkFluid();
         FMLJavaModLoadingContext.get().getModEventBus().register(Register.class);
         FMLJavaModLoadingContext.get().getModEventBus().register(proxy);

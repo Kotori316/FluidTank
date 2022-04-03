@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import net.minecraft.core.Holder;
@@ -146,94 +145,5 @@ public class Utils {
             .flatMap(HolderSet.Named::stream)
             .map(Holder::value)
             .collect(Collectors.toSet());
-    }
-
-    @SuppressWarnings("ClassCanBeRecord")
-    public static class TestConfig implements IContent {
-        private final Map<String, Object> configs;
-
-        public static IContent getTestInstance(Map<String, Object> configs) {
-            return new TestConfig(configs);
-        }
-
-        private TestConfig(Map<String, Object> configs) {
-            this.configs = configs;
-        }
-
-        private Config.BoolSupplier createBool() {
-            String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-            return new Config.BoolSupplier() {
-                @Override
-                public boolean get() {
-                    return ((boolean) configs.getOrDefault(methodName, false));
-                }
-            };
-        }
-
-        @SuppressWarnings("unchecked")
-        private <T> Supplier<T> createGeneric() {
-            String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-            return () -> ((T) configs.getOrDefault(methodName, 0));
-        }
-
-        @Override
-        public Config.BoolSupplier removeRecipe() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier debug() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier easyRecipe() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier usableUnavailableTankInRecipe() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier showInvisibleTank() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier showTOP() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier enableWailaAndTOP() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier enableFluidSupplier() {
-            return createBool();
-        }
-
-        @Override
-        public Config.BoolSupplier enablePipeRainbowRenderer() {
-            return createBool();
-        }
-
-        @Override
-        public Supplier<Integer> pipeColor() {
-            return createGeneric();
-        }
-
-        @Override
-        public Supplier<Double> renderLowerBound() {
-            return createGeneric();
-        }
-
-        @Override
-        public Supplier<Double> renderUpperBound() {
-            return createGeneric();
-        }
     }
 }

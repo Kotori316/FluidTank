@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.integration.top
 
 import cats.data.{Kleisli, Reader}
+import com.kotori316.fluidtank.Config
 import mcjty.theoneprobe.api.ITheOneProbe
 import net.minecraftforge.fml.{InterModComms, ModList}
 
@@ -9,7 +10,7 @@ object FluidTankTOPPlugin {
 
   private class Function extends java.util.function.Function[ITheOneProbe, Void] {
     override def apply(t: ITheOneProbe): Void = {
-      t.registerProvider(new TankDataProvider)
+      if (Config.content.enableWailaAndTOP.get()) t.registerProvider(new TankDataProvider)
       null
     }
   }
