@@ -1,9 +1,12 @@
 package com.kotori316.fluidtank;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -120,6 +123,15 @@ public class Utils {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Can't access to LOGGER in loader.", e);
         }
+    }
+
+    public static <FROM, TO extends FROM> BiConsumer<FROM, Consumer<TO>> cast(Class<TO> toClass) {
+        Objects.requireNonNull(toClass);
+        return (from, toConsumer) -> {
+            if (toClass.isInstance(from)) {
+                toConsumer.accept(toClass.cast(from));
+            }
+        };
     }
 
     @SuppressWarnings("unchecked")
