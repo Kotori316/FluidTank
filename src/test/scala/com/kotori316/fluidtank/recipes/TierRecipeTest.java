@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Set;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
@@ -45,7 +46,7 @@ final class TierRecipeTest extends BeforeAllTest {
 
     @BeforeEach
     void setupEach() {
-        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.of(Blocks.STONE));
+        recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.of(Blocks.STONE), Set.of(woodTank));
         inventory = new CraftingContainer(new AccessRecipeTest.DummyContainer(), 3, 3);
     }
 
@@ -170,7 +171,7 @@ final class TierRecipeTest extends BeforeAllTest {
     @Disabled("Accessing tag before bounded is not allowed.")
     void serializeJson(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
-            tier, Ingredient.of(Blocks.STONE));
+            tier, Ingredient.of(Blocks.STONE), Set.of(woodTank));
         JsonObject object = new JsonObject();
         TierRecipe.TierFinishedRecipe tierFinishedRecipe = new TierRecipe.TierFinishedRecipe(recipe.getId(), tier);
         tierFinishedRecipe.serializeRecipeData(object);
@@ -188,7 +189,7 @@ final class TierRecipeTest extends BeforeAllTest {
     @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
     void serializePacket(Tier tier) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
-            tier, Ingredient.of(Blocks.STONE));
+            tier, Ingredient.of(Blocks.STONE), Set.of(woodTank));
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
         TierRecipe.SERIALIZER.toNetwork(buffer, recipe);
         TierRecipe read = TierRecipe.SERIALIZER.fromNetwork(recipe.getId(), buffer);

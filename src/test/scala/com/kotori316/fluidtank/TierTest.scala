@@ -59,7 +59,7 @@ class TierTest extends BeforeAllTest {
   }
 
   @ParameterizedTest
-  @EnumSource(classOf[Tier], names = Array("WOOD", "STONE", "IRON", "GOLD", "DIAMOND", "EMERALD", "STAR", "CREATIVE", "VOID", "COPPER"))
+  @EnumSource(value = classOf[Tier], names = Array("WOOD", "STONE", "IRON", "GOLD", "DIAMOND", "EMERALD", "STAR", "CREATIVE", "VOID", "COPPER"))
   def availableInVanilla(tier: Tier): Unit = {
     assertTrue(tier.isAvailableInVanilla, s"$tier must be available in vanilla.")
   }

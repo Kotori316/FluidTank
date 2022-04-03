@@ -8,6 +8,7 @@ import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects, hashTier}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE
 import org.junit.jupiter.api.Assertions._
@@ -22,7 +23,8 @@ object CombineRecipeTest extends BeforeAllTest {
   private final val woodTank = ModObjects.blockTanks.head
   private final val stoneTank = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
   private final val emeraldTank = ModObjects.blockTanks.find(_.tier === Tier.EMERALD).get
-  private final val recipe = new CombineRecipe(new ResourceLocation(FluidTank.modID, "CombineRecipeTest".toLowerCase))
+  private final val recipe = new CombineRecipe(new ResourceLocation(FluidTank.modID, "CombineRecipeTest".toLowerCase),
+    Ingredient.of(ModObjects.blockTanks.filter(b => b.tier.isNormalTier && b.tier.isAvailableInVanilla): _*))
 
   @ParameterizedTest
   @ValueSource(ints = Array(1, 2, 5, 10, 64))
