@@ -3,16 +3,17 @@ package com.kotori316.fluidtank;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import cpw.mods.modlauncher.Launcher;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -32,7 +33,6 @@ import net.minecraftforge.registries.GameData;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.BeforeAll;
-import scala.jdk.javaapi.CollectionConverters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,9 +58,7 @@ public abstract class BeforeAllTest {
             Bootstrap.bootStrap();
             GameData.unfreezeData();
             ModLoadingContext.get().setActiveContainer(new DummyModContainer());
-            Map<String, Object> map = new HashMap<>(CollectionConverters.asJava(Config.defaultConfig()));
-            map.put("debug", true);
-            Config.dummyContent_$eq(Utils.TestConfig.getTestInstance(map));
+            setConfig();
             mockCapability();
         }
     }
@@ -115,6 +113,16 @@ public abstract class BeforeAllTest {
         assertNotNull(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
         assertNotNull(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
         assertNotNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    }
+
+    private static void setConfig() {
+        var builder = new ForgeConfigSpec.Builder();
+        Config.sync(builder);
+        var config = builder.build();
+        var commentedConfig = CommentedConfig.inMemory();
+        config.correct(commentedConfig);
+        config.acceptConfig(commentedConfig);
+        Config.content().debug().set(true);
     }
 
     private static class DummyModContainer extends ModContainer {
