@@ -74,7 +74,11 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Test with runData
-        run: chmod +x ./gradlew && ./gradlew --no-daemon runData copyGameTestTemplate runGameTestServer --stacktrace
+      - name: RunData
+        run: chmod +x ./gradlew && ./gradlew runData
+        env:
+          IGNORE_OTHER_MODS_IN_RUNTIME: true
+      - name: GameTest
+        run: chmod +x ./gradlew && ./gradlew copyGameTestTemplate runGameTestServer
         env:
           IGNORE_OTHER_MODS_IN_RUNTIME: true
