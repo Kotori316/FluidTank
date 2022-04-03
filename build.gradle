@@ -523,7 +523,7 @@ static void printProperties() {
     System.getProperties().entrySet().stream()
             .map { e -> Map.entry(String.valueOf(e.getKey()), e.getValue()) }
             .sorted(Map.Entry.comparingByKey())
-            .forEach { e -> System.out.println(e.getKey() + ": " + e.getValue().toString()) }
+            .forEach { e -> System.out.println((e.getKey() + ": " + e.getValue()) as String) }
     System.out.println("PRINT_PROPERTIES_END")
 }
 

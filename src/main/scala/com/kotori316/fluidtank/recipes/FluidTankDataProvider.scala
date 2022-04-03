@@ -1,9 +1,10 @@
 package com.kotori316.fluidtank.recipes
 
 import java.io.IOException
+import java.nio.file.Path
 
 import cats.syntax.eq._
-import com.google.gson.{GsonBuilder, JsonArray}
+import com.google.gson.{Gson, GsonBuilder, JsonArray, JsonElement}
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
 import com.kotori316.fluidtank.recipes.TierRecipe.TierFinishedRecipe
@@ -44,6 +45,12 @@ object FluidTankDataProvider {
 
   private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registry.ITEM_REGISTRY, name)
 
+  private def saveData(pGson: Gson, pCache: HashCache, pJsonElement: JsonElement, pPath: Path): Unit = {
+    val path = pPath.toAbsolutePath.normalize()
+    FluidTank.LOGGER.info("Save {}", path)
+    DataProvider.save(pGson, pCache, pJsonElement, path)
+  }
+
   class AdvancementProvider(generatorIn: DataGenerator) extends DataProvider {
     override def run(cache: HashCache): Unit = {
       val path = generatorIn.getOutputFolder
@@ -82,7 +89,7 @@ object FluidTankDataProvider {
       for (advancement <- recipeAdvancements) {
         val out = path.resolve(s"data/${advancement.location.getNamespace}/advancements/recipes/tank/${advancement.location.getPath}.json")
         try {
-          DataProvider.save(GSON, cache, advancement.build, out)
+          saveData(GSON, cache, advancement.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save advancement ${advancement.location}.", e)
         }
@@ -195,7 +202,7 @@ object FluidTankDataProvider {
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
         try {
-          DataProvider.save(GSON, cache, recipe.build, out)
+          saveData(GSON, cache, recipe.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}.", e)
           case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}. Check the serializer registered.", e)
@@ -220,7 +227,7 @@ object FluidTankDataProvider {
       for (model <- models) {
         val out = path.resolve(s"assets/${model.location.getNamespace}/blockstates/${model.location.getPath}.json")
         try {
-          DataProvider.save(GSON, cache, model.build, out)
+          saveData(GSON, cache, model.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}.", e)
           case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}. Check the serializer registered.", e)
