@@ -46,12 +46,12 @@ final class AccessRecipeTest extends BeforeAllTest {
     void dummy() {
         assertTrue(tiers().findAny().isPresent());
         assertTrue(TierRecipeTest.fluids1().length > 0);
-        assertTrue(ReservoirRecipeSerialize.tierAndIngredient().findAny().isPresent());
+        assertTrue(ReservoirRecipeSerializeTest.tierAndIngredient().findAny().isPresent());
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
         assertNotNull(buffer);
     }
 
-    static final class ReservoirRecipeSerialize extends BeforeAllTest {
+    static final class ReservoirRecipeSerializeTest extends BeforeAllTest {
         static Stream<Object> tierAndIngredient() {
             return Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
                 .flatMap(t -> Stream.of(Items.BUCKET, Items.APPLE).map(Ingredient::of)
