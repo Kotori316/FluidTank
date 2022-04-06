@@ -1,8 +1,9 @@
 package com.kotori316.fluidtank.recipes
 
 import com.kotori316.fluidtank.items.{ItemBlockTank, ReservoirItem, TankItemFluidHandler}
-import com.kotori316.fluidtank.recipes.AccessRecipeTest.DummyContainer
-import net.minecraft.world.inventory.CraftingContainer
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.{AbstractContainerMenu, CraftingContainer, Slot}
 import net.minecraft.world.item.ItemStack
 
 object RecipeInventoryUtil {
@@ -28,5 +29,14 @@ object RecipeInventoryUtil {
     case tank: ItemBlockTank => new TankItemFluidHandler(tank.blockTank.tier, stack)
     case reservoir: ReservoirItem => new TankItemFluidHandler(reservoir.tier, stack)
     case _ => throw new IllegalArgumentException(s"Stack $stack has no valid handler")
+  }
+
+  final class DummyContainer extends AbstractContainerMenu(null, 35) {
+    val inventory = new SimpleContainer(9)
+    for (i <- 0 until inventory.getContainerSize) {
+      addSlot(new Slot(inventory, i, 0, 0))
+    }
+
+    override def stillValid(player: Player) = false
   }
 }

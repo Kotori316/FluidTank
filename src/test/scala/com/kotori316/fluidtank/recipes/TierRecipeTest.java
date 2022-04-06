@@ -50,7 +50,7 @@ final class TierRecipeTest extends BeforeAllTest {
     @BeforeEach
     void setupEach() {
         recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "access_tier"), Tier.STONE, Ingredient.of(Blocks.STONE), Set.of(woodTank));
-        inventory = new CraftingContainer(new AccessRecipeTest.DummyContainer(), 3, 3);
+        inventory = new CraftingContainer(new RecipeInventoryUtil.DummyContainer(), 3, 3);
     }
 
     @ParameterizedTest
@@ -105,6 +105,12 @@ final class TierRecipeTest extends BeforeAllTest {
 
     static Stream<Object[]> tierWithContext() {
         return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe).map(t -> new Object[]{t, ICondition.IContext.EMPTY});
+    }
+
+    @Test
+    void dummy() {
+        assertTrue(tierWithContext().findAny().isPresent());
+        assertTrue(fluids1().length > 0);
     }
 
     @ParameterizedTest

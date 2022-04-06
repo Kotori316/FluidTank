@@ -8,6 +8,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
-public final class TierRecipeGameTest {
+public final class RecipeGameTest {
     static final String BATCH = "recipeTestBatch";
 
     @GameTestGenerator
@@ -70,5 +71,14 @@ public final class TierRecipeGameTest {
         } finally {
             Config.content().usableUnavailableTankInRecipe().set(true);
         }
+    }
+
+    @GameTestGenerator
+    public List<TestFunction> reservoirRecipeSerialize() {
+        return ReservoirRecipeSerializeTest.tierAndIngredient()
+            .map(o -> Utils.create("reservoirRecipeSerialize" + o[0], BATCH, g -> {
+                new ReservoirRecipeSerializeTest().serializeJson((Tier) o[0], (Ingredient) o[1], Utils.getContext(g));
+                g.succeed();
+            })).toList();
     }
 }
