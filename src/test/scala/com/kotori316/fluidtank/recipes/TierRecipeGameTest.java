@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public final class TierRecipeGameTest {
 
     @GameTestGenerator
     public List<TestFunction> tierRecipeSerialize() {
-        return AccessRecipeTest.tiers()
+        return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe)
             .map(t -> Utils.create("tierRecipeSerialize" + t, BATCH, g -> {
                 new TierRecipeTest().serializeJson(t, Utils.getContext(g));
                 g.succeed();

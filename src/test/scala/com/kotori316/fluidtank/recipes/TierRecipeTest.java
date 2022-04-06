@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -52,6 +53,13 @@ final class TierRecipeTest extends BeforeAllTest {
         inventory = new CraftingContainer(new AccessRecipeTest.DummyContainer(), 3, 3);
     }
 
+    @ParameterizedTest
+    @MethodSource("tierWithContext")
+    void createTierRecipeInstance(Tier tier, ICondition.IContext context) {
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE), context);
+        assertNotNull(recipe);
+    }
+
     @Test
     void fromEmptyTank() {
         ItemStack stack = new ItemStack(woodTank);
@@ -93,6 +101,10 @@ final class TierRecipeTest extends BeforeAllTest {
         return LongStream.of(500, 1000, 2000, 3000, 4000).boxed().flatMap(l ->
             Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA())
                 .map(f -> f.setAmount(l))).toArray(FluidAmount[]::new);
+    }
+
+    static Stream<Object[]> tierWithContext() {
+        return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe).map(t -> new Object[]{t, ICondition.IContext.EMPTY});
     }
 
     @ParameterizedTest
@@ -169,7 +181,7 @@ final class TierRecipeTest extends BeforeAllTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tierWithContext")
+    @MethodSource("tierWithContext")
     @Disabled("Accessing tag before bounded is not allowed.")
     void serializeJson(Tier tier, ICondition.IContext context) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
@@ -188,8 +200,8 @@ final class TierRecipeTest extends BeforeAllTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
-    void serializePacket(Tier tier) {
+    @MethodSource("tierWithContext")
+    void serializePacket(Tier tier, ICondition.IContext ignore) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
             tier, Ingredient.of(Blocks.STONE), Set.of(woodTank));
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());

@@ -1,7 +1,9 @@
 package com.kotori316.fluidtank.recipes;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonElement;
@@ -15,7 +17,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.kotori316.fluidtank.BeforeAllTest;
-import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.tiles.Tier;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -33,25 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class AccessRecipeTest extends BeforeAllTest {
-    static Stream<Tier> tiers() {
-        return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe);
-    }
-
-    static Stream<Object[]> tierWithContext() {
-        return tiers().map(t -> new Object[]{t, ICondition.IContext.EMPTY});
-    }
-
-    @ParameterizedTest
-    @MethodSource("tierWithContext")
-    void createTierRecipeInstance(Tier tier, ICondition.IContext context) {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE), context);
-        assertNotNull(recipe);
-    }
 
     @Test
     void dummy() {
-        assertTrue(tiers().findAny().isPresent());
-        assertTrue(tierWithContext().findAny().isPresent());
+        assertTrue(TierRecipeTest.tierWithContext().findAny().isPresent());
         assertTrue(TierRecipeTest.fluids1().length > 0);
         assertTrue(ReservoirRecipeSerializeTest.tierAndIngredient().findAny().isPresent());
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
