@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.network.FriendlyByteBuf;
@@ -76,6 +77,7 @@ final class AccessRecipeTest extends BeforeAllTest {
             assertAll(
                 () -> assertEquals(recipe.getTier(), read.getTier()),
                 () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+                () -> assertEquals(convertIngredients(recipe.getIngredients()), convertIngredients(read.getIngredients()), "All ingredients must be same."),
                 () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
             );
         }
@@ -93,8 +95,13 @@ final class AccessRecipeTest extends BeforeAllTest {
             assertAll(
                 () -> assertEquals(recipe.getTier(), read.getTier()),
                 () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+                () -> assertEquals(convertIngredients(recipe.getIngredients()), convertIngredients(read.getIngredients()), "All ingredients must be same."),
                 () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
             );
+        }
+
+        static Set<JsonElement> convertIngredients(Collection<Ingredient> ingredients) {
+            return ingredients.stream().map(Ingredient::toJson).collect(Collectors.toSet());
         }
     }
 
