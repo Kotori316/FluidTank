@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.google.gson.JsonArray;
@@ -30,7 +29,6 @@ import scala.jdk.javaapi.CollectionConverters;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
-import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tier;
 
@@ -82,9 +80,8 @@ public class ReservoirRecipe extends ShapelessRecipe {
 
     private static NonNullList<Ingredient> findIngredients(Tier tier, List<Ingredient> subIngredients) {
         NonNullList<Ingredient> recipeItemsIn = NonNullList.create();
-        Stream<BlockTank> tankStream = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier);
 
-        Ingredient tankIngredient = Ingredient.of(tankStream.map(ItemStack::new));
+        Ingredient tankIngredient = Ingredient.of(new ItemStack(ModObjects.tierToBlock().apply(tier)));
         recipeItemsIn.add(tankIngredient);
         recipeItemsIn.addAll(subIngredients);
         return recipeItemsIn;

@@ -1,7 +1,6 @@
 package com.kotori316.fluidtank.recipes
 
 import cats.implicits._
-import com.kotori316.fluidtank.blocks.{BlockCreativeTank, BlockVoidTank}
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.Tier
@@ -147,7 +146,7 @@ object CombineRecipeTest extends BeforeAllTest {
   def cantCombine1(): Unit = {
     val wood = new ItemStack(woodTank)
     RecipeInventoryUtil.getFluidHandler(wood).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
-    val creative = new ItemStack(ModObjects.blockTanks.find(_.isInstanceOf[BlockCreativeTank]).get)
+    val creative = new ItemStack(ModObjects.tierToBlock(Tier.CREATIVE))
 
     val inventory = RecipeInventoryUtil.getInv("ws", itemMap = Map('s' -> creative, 'w' -> wood))
     assertFalse(recipe.matches(inventory, null))
@@ -167,7 +166,7 @@ object CombineRecipeTest extends BeforeAllTest {
   @Test
   @DisplayName("Failed to combine Stone tank with 1000 mB of water and Void Tank")
   def cantCombine3(): Unit = {
-    val voidTank = new ItemStack(ModObjects.blockTanks.find(_.isInstanceOf[BlockVoidTank]).get)
+    val voidTank = new ItemStack(ModObjects.tierToBlock(Tier.VOID))
     val stone = new ItemStack(stoneTank)
     RecipeInventoryUtil.getFluidHandler(stone).fill(FluidAmount.BUCKET_WATER.toStack, EXECUTE)
 

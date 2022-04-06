@@ -13,7 +13,7 @@ import org.junit.jupiter.api.{DisplayName, Test}
 
 //noinspection DuplicatedCode It's a test.
 object ItemFluidHandlerTest extends BeforeAllTest {
-  private def woodTank = ModObjects.blockTanks.head
+  private final val woodTank = ModObjects.tierToBlock(Tier.WOOD)
 
   @Test
   def woodTankIsWood(): Unit = {

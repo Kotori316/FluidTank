@@ -33,6 +33,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
@@ -67,9 +68,9 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         this.tier = tier;
         this.subItems = subItems;
 
-        result = CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> b.tier() == tier).findFirst().map(ItemStack::new).orElse(ItemStack.EMPTY);
+        result = OptionConverters.toJava(ModObjects.tierToBlock().get(tier)).map(ItemStack::new).orElse(ItemStack.EMPTY);
         this.normalTankSet = normalTankSet;
-        LOGGER.debug("Recipe instance({}) created for Tier {}.", idIn, tier);
+        LOGGER.debug("Recipe instance({}) created for Tier {}({}).", idIn, tier, result);
     }
 
     static Set<BlockTank> getTankSet(Tier tier, ICondition.IContext context) {

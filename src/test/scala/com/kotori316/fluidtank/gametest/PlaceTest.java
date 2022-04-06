@@ -116,9 +116,9 @@ public final class PlaceTest {
         helper.startSequence()
             .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD)))
             .thenIdle(2)
-            .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO.above(), ModObjects.blockTanks().apply(1)))
+            .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO.above(), ModObjects.tierToBlock().apply(Tier.STONE)))
             .thenExecuteAfter(2, () -> helper.assertBlockPresent(ModObjects.tierToBlock().apply(Tier.WOOD), BlockPos.ZERO))
-            .thenWaitUntil(() -> helper.assertBlockPresent(ModObjects.blockTanks().apply(1), BlockPos.ZERO.above()))
+            .thenWaitUntil(() -> helper.assertBlockPresent(ModObjects.tierToBlock().apply(Tier.STONE), BlockPos.ZERO.above()))
             .thenIdle(2)
             .thenWaitUntil(() -> {
                 var tank1 = (TileTank) helper.getBlockEntity(BlockPos.ZERO);
@@ -135,7 +135,7 @@ public final class PlaceTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place3Tanks1(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
-        var block = ModObjects.blockTanks().apply(2);
+        var block = ModObjects.tierToBlock().apply(Tier.IRON);
         List.of(pos, pos.above(1), pos.above(2)).forEach(p -> placeTank(helper, p, block));
 
         var tile = (TileTank) Objects.requireNonNull(helper.getBlockEntity(pos));
