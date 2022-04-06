@@ -1,9 +1,8 @@
 package com.kotori316.fluidtank.recipes
 
-import cats.implicits._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.Tier
-import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects, hashTier}
+import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.{ItemStack, Items}
@@ -17,8 +16,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import scala.jdk.CollectionConverters._
 
 object ReservoirRecipeTest extends BeforeAllTest {
-  val wood = ModObjects.blockTanks.head
-  val stone = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
+  private final val wood = ModObjects.tierToBlock(Tier.WOOD)
+  private final val stone = ModObjects.tierToBlock(Tier.STONE)
 
   @Test
   private[recipes] def matchTest(): Unit = {

@@ -40,6 +40,7 @@ object ModObjects {
   private[this] final val creativeTank = new BlockCreativeTank
   private[this] final val voidTank = new BlockVoidTank
   final val blockTanks = woodTank +: normalTanks.toList :+ creativeTank :+ voidTank
+  final val tierToBlock = blockTanks.groupMapReduce(_.tier)(identity) { case (a, _) => a }
   final val blockCat = new BlockCAT
   final val blockFluidPipe = new FluidPipeBlock
   final val blockItemPipe = new ItemPipeBlock

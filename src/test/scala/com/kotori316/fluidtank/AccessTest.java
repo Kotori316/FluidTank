@@ -18,6 +18,7 @@ import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.Tank;
 import com.kotori316.fluidtank.fluids.TankHandler;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
+import com.kotori316.fluidtank.tiles.Tier;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,7 +86,7 @@ final class AccessTest extends BeforeAllTest {
     class AccessFluidUtilTest {
         @Test
         void mock1() {
-            var stack = new ItemStack(ModObjects.blockTanks().head());
+            var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
             var handler = RecipeInventoryUtil.getFluidHandler(stack);
             try (var mocked = mockStatic(FluidUtil.class)) {
                 mocked.when(() -> FluidUtil.getFluidHandler(stack)).thenReturn(LazyOptional.of(() -> handler));
@@ -98,7 +99,7 @@ final class AccessTest extends BeforeAllTest {
 
         @Test
         void mock2() {
-            var stack = new ItemStack(ModObjects.blockTanks().head(), 5);
+            var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD), 5);
             var handler = RecipeInventoryUtil.getFluidHandler(stack);
             try (var mocked = mockStatic(FluidUtil.class)) {
                 mocked.when(() -> FluidUtil.getFluidHandler(any(ItemStack.class))).thenReturn(LazyOptional.of(() -> handler));
@@ -112,7 +113,7 @@ final class AccessTest extends BeforeAllTest {
         @Test
         @Disabled("Test Disabled: This doesn't work because FluidUtil.tryFillContainer returns null as the class is mocked.")
         void fillMock() {
-            var stack = new ItemStack(ModObjects.blockTanks().head());
+            var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
             var handler = RecipeInventoryUtil.getFluidHandler(stack);
             var tank = TankHandler.apply(Tank.apply(FluidAmount.BUCKET_WATER().setAmount(3000L), 8000L));
             try (var mocked = mockStatic(FluidUtil.class)) {
@@ -130,13 +131,13 @@ final class AccessTest extends BeforeAllTest {
 
         @Test
         void mockCapability() {
-            var stack = new ItemStack(ModObjects.blockTanks().head());
+            var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
             assertDoesNotThrow(() -> stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY));
         }
 
         @Test
         void mockCapability2() {
-            var stack = new ItemStack(ModObjects.blockTanks().head());
+            var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
             var tank = TankHandler.apply(Tank.apply(FluidAmount.BUCKET_WATER().setAmount(3000L), 8000L));
             var result = FluidUtil.tryFillContainer(stack, tank, 2000, null, false);
 
@@ -147,7 +148,7 @@ final class AccessTest extends BeforeAllTest {
 
         @Test
         void mockCapability3() {
-            var stack = new ItemStack(ModObjects.blockTanks().head());
+            var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
             var tank = TankHandler.apply(Tank.apply(FluidAmount.BUCKET_WATER().setAmount(3000L), 8000L));
             var result = FluidUtil.tryFillContainer(stack, tank, 2000, null, true);
 

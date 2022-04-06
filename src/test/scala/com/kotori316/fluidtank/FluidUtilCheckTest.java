@@ -17,13 +17,14 @@ import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.TankHandler;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
+import com.kotori316.fluidtank.tiles.Tier;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class FluidUtilCheckTest extends BeforeAllTest {
-    private static final BlockTank BLOCK_TANK = ModObjects.blockTanks().head();
+    private static final BlockTank BLOCK_TANK = ModObjects.tierToBlock().apply(Tier.WOOD);
 
     record ItemTransferLog(int slot, ItemStack stack, boolean add) {
         ItemTransferLog append(ItemTransferLog that) {

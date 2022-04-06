@@ -59,7 +59,7 @@ public final class PlaceTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeTank1(GameTestHelper helper) {
-        helper.setBlock(BlockPos.ZERO, ModObjects.blockTanks().head());
+        helper.setBlock(BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD));
         var entity = helper.getBlockEntity(BlockPos.ZERO);
         if (entity instanceof TileTank tank) {
             var connection = tank.connection();
@@ -72,7 +72,7 @@ public final class PlaceTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeTank2(GameTestHelper helper) {
-        helper.setBlock(BlockPos.ZERO, ModObjects.blockTanks().head());
+        helper.setBlock(BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD));
         var entity = helper.getBlockEntity(BlockPos.ZERO);
         if (entity instanceof TileTank tank) {
             tank.onBlockPlacedBy();
@@ -90,7 +90,7 @@ public final class PlaceTest {
     public void placeTank3(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
         helper.startSequence()
-            .thenExecute(() -> placeTank(helper, pos.above(), ModObjects.blockTanks().head()))
+            .thenExecute(() -> placeTank(helper, pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD)))
             .thenIdle(2)
             .thenExecute(() -> {
                 var c = getConnection(helper, pos.above());
@@ -102,10 +102,10 @@ public final class PlaceTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place2Tanks(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
-        placeTank(helper, pos, ModObjects.blockTanks().head());
+        placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var tank = (TileTank) helper.getBlockEntity(pos);
         assertNotNull(tank, "Tank must not be null. %s at %s".formatted(helper.getBlockState(pos), pos));
-        placeTank(helper, pos.above(), ModObjects.blockTanks().head());
+        placeTank(helper, pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
 
         assertEquals(8000, tank.connection().capacity(), "Wood + Wood, " + tank.connection());
         helper.succeed();
@@ -114,10 +114,10 @@ public final class PlaceTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place2Tanks2(GameTestHelper helper) {
         helper.startSequence()
-            .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO, ModObjects.blockTanks().head()))
+            .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD)))
             .thenIdle(2)
             .thenWaitUntil(() -> placeTank(helper, BlockPos.ZERO.above(), ModObjects.blockTanks().apply(1)))
-            .thenExecuteAfter(2, () -> helper.assertBlockPresent(ModObjects.blockTanks().head(), BlockPos.ZERO))
+            .thenExecuteAfter(2, () -> helper.assertBlockPresent(ModObjects.tierToBlock().apply(Tier.WOOD), BlockPos.ZERO))
             .thenWaitUntil(() -> helper.assertBlockPresent(ModObjects.blockTanks().apply(1), BlockPos.ZERO.above()))
             .thenIdle(2)
             .thenWaitUntil(() -> {
@@ -150,8 +150,8 @@ public final class PlaceTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void interactWithBucket(GameTestHelper helper) {
         var pos = BlockPos.ZERO.above();
-        placeTank(helper, pos, ModObjects.blockTanks().head());
-        placeTank(helper, pos.above(), ModObjects.blockTanks().head());
+        placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
+        placeTank(helper, pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
         var tank = (TileTank) helper.getBlockEntity(pos);
         assertNotNull(tank, "Tank should not be null");
 

@@ -27,6 +27,7 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
+import com.kotori316.fluidtank.tiles.Tier;
 
 import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
 import static com.kotori316.fluidtank.gametest.Utils.getConnection;
@@ -53,13 +54,13 @@ public final class DropTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void dropOfEmptyTank(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
-        placeTank(helper, pos, ModObjects.blockTanks().head());
+        placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
         assertEquals(1, drops.size(), "Drop was " + drops);
         var stack = drops.get(0);
-        assertEquals(ModObjects.blockTanks().head().itemBlock(), stack.getItem(), "Dropped item was " + stack);
+        assertEquals(ModObjects.tierToBlock().apply(Tier.WOOD).itemBlock(), stack.getItem(), "Dropped item was " + stack);
         assertFalse(stack.hasTag(), "Stack must not have tag if dropped from empty tank. " + stack);
 
         helper.succeed();
@@ -77,7 +78,7 @@ public final class DropTest {
 
     void dropOfWaterTank1(GameTestHelper helper, FluidAmount amount) {
         var pos = BlockPos.ZERO.east();
-        placeTank(helper, pos, ModObjects.blockTanks().head());
+        placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
         connection.handler().fill(amount, IFluidHandler.FluidAction.EXECUTE);
 
@@ -85,7 +86,7 @@ public final class DropTest {
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
         assertEquals(1, drops.size(), "Drop was " + drops);
         var stack = drops.get(0);
-        assertEquals(ModObjects.blockTanks().head().itemBlock(), stack.getItem(), "Dropped item was " + stack);
+        assertEquals(ModObjects.tierToBlock().apply(Tier.WOOD).itemBlock(), stack.getItem(), "Dropped item was " + stack);
         var itemTank = RecipeInventoryUtil.getFluidHandler(stack);
         assertEquals(amount, itemTank.getFluid(), "Fluid must be given fluid. " + itemTank.getFluid());
 
@@ -95,7 +96,7 @@ public final class DropTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void dropOfLavaTank2(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
-        placeTank(helper, pos, ModObjects.blockTanks().head());
+        placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
         connection.handler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
@@ -124,12 +125,12 @@ public final class DropTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void pickLavaTank3(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
-        placeTank(helper, pos, ModObjects.blockTanks().head());
+        placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
         connection.handler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
 
-        var stack = new ItemStack(ModObjects.blockTanks().head());
-        ModObjects.blockTanks().head().saveTankNBT(helper.getBlockEntity(pos), stack);
+        var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
+        ModObjects.tierToBlock().apply(Tier.WOOD).saveTankNBT(helper.getBlockEntity(pos), stack);
 
         var entityTag = BlockItem.getBlockEntityData(stack);
         assertNotNull(entityTag, "BE tag must not be null. " + stack);

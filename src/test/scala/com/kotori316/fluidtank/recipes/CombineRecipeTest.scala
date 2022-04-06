@@ -20,9 +20,9 @@ import org.junit.jupiter.params.provider.ValueSource
 import scala.jdk.CollectionConverters._
 
 object CombineRecipeTest extends BeforeAllTest {
-  private final val woodTank = ModObjects.blockTanks.head
-  private final val stoneTank = ModObjects.blockTanks.find(_.tier === Tier.STONE).get
-  private final val emeraldTank = ModObjects.blockTanks.find(_.tier === Tier.EMERALD).get
+  private final val woodTank = ModObjects.tierToBlock(Tier.WOOD)
+  private final val stoneTank = ModObjects.tierToBlock(Tier.STONE)
+  private final val emeraldTank = ModObjects.tierToBlock(Tier.EMERALD)
   private final val recipe = new CombineRecipe(new ResourceLocation(FluidTank.modID, "CombineRecipeTest".toLowerCase),
     Ingredient.of(ModObjects.blockTanks.filter(b => b.tier.isNormalTier && b.tier.isAvailableInVanilla): _*))
 
