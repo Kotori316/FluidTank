@@ -260,6 +260,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         }
 
         @Override
+        @Deprecated
         public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             LOGGER.warn("Trying to load recipe({}) without ICondition.IContext, which should not happen.", recipeId);
             return fromJson(recipeId, json, ICondition.IContext.EMPTY);

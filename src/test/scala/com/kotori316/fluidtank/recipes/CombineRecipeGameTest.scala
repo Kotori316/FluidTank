@@ -1,11 +1,10 @@
-package com.kotori316.fluidtank.gametest
+package com.kotori316.fluidtank.recipes
 
-import com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE
-import com.kotori316.fluidtank.recipes.CombineRecipe
+import com.kotori316.fluidtank.gametest.Utils.{EMPTY_STRUCTURE, getContext}
 import com.kotori316.fluidtank.{Config, FluidTank, ModObjects}
 import net.minecraft.gametest.framework.{GameTest, GameTestAssertException, GameTestHelper}
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.crafting.{Ingredient, RecipeManager}
+import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.conditions.ICondition
@@ -18,7 +17,7 @@ import scala.util.Try
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
-class RecipeTest {
+class CombineRecipeGameTest {
   final val BATCH = "recipeTestBatch"
 
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
@@ -71,12 +70,4 @@ class RecipeTest {
     }
     helper.succeed()
   }
-
-  private def getContext(helper: GameTestHelper): ICondition.IContext =
-    org.junit.platform.commons.function.Try.success(helper.getLevel)
-      .andThenTry(_.getServer)
-      .andThenTry(_.getRecipeManager)
-      .andThen((r: RecipeManager) => ReflectionUtils.tryToReadFieldValue(classOf[RecipeManager], "context", r))
-      .andThenTry(classOf[ICondition.IContext].cast _)
-      .getOrThrow(new RuntimeException(_))
 }

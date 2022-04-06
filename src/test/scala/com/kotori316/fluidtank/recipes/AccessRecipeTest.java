@@ -36,16 +36,21 @@ final class AccessRecipeTest extends BeforeAllTest {
         return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe);
     }
 
+    static Stream<Object[]> tierWithContext() {
+        return tiers().map(t -> new Object[]{t, ICondition.IContext.EMPTY});
+    }
+
     @ParameterizedTest
-    @MethodSource("tiers")
-    void createTierRecipeInstance(Tier tier) {
-        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE), ICondition.IContext.EMPTY);
+    @MethodSource("tierWithContext")
+    void createTierRecipeInstance(Tier tier, ICondition.IContext context) {
+        TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()), tier, Ingredient.of(Blocks.STONE), context);
         assertNotNull(recipe);
     }
 
     @Test
     void dummy() {
         assertTrue(tiers().findAny().isPresent());
+        assertTrue(tierWithContext().findAny().isPresent());
         assertTrue(TierRecipeTest.fluids1().length > 0);
         assertTrue(ReservoirRecipeSerializeTest.tierAndIngredient().findAny().isPresent());
         FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
@@ -56,12 +61,12 @@ final class AccessRecipeTest extends BeforeAllTest {
         static Stream<Object> tierAndIngredient() {
             return Stream.of(Tier.WOOD, Tier.STONE, Tier.IRON)
                 .flatMap(t -> Stream.of(Items.BUCKET, Items.APPLE).map(Ingredient::of)
-                    .map(i -> new Object[]{t, i}));
+                    .map(i -> new Object[]{t, i, ICondition.IContext.EMPTY}));
         }
 
         @ParameterizedTest
         @MethodSource("tierAndIngredient")
-        void serializePacket(Tier t, Ingredient sub) {
+        void serializePacket(Tier t, Ingredient sub, ICondition.IContext ignore1) {
             ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
             FriendlyByteBuf buffer = new FriendlyByteBuf(ByteBufAllocator.DEFAULT.buffer());
@@ -78,12 +83,12 @@ final class AccessRecipeTest extends BeforeAllTest {
         @ParameterizedTest
         @MethodSource("tierAndIngredient")
         @Disabled("Deserialization of Ingredient is not available in test environment.")
-        void serializeJson(Tier t, Ingredient sub) {
+        void serializeJson(Tier t, Ingredient sub, ICondition.IContext context) {
             ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
             JsonObject object = new JsonObject();
             new ReservoirRecipe.ReservoirFinishedRecipe(recipe).serializeRecipeData(object);
-            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.fromJson(recipe.getId(), object);
+            ReservoirRecipe read = ReservoirRecipe.SERIALIZER.fromJson(recipe.getId(), object, context);
             assertNotNull(read);
             assertAll(
                 () -> assertEquals(recipe.getTier(), read.getTier()),

@@ -9,12 +9,14 @@ import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class TierRecipeTest extends BeforeAllTest {
 
-    private static final BlockTank woodTank = ModObjects.blockTanks().head();
+    private static final BlockTank woodTank = ModObjects.tierToBlock().apply(Tier.WOOD);
 
     TierRecipe recipe;
     CraftingContainer inventory;
@@ -167,15 +169,15 @@ final class TierRecipeTest extends BeforeAllTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tiers")
+    @MethodSource("com.kotori316.fluidtank.recipes.AccessRecipeTest#tierWithContext")
     @Disabled("Accessing tag before bounded is not allowed.")
-    void serializeJson(Tier tier) {
+    void serializeJson(Tier tier, ICondition.IContext context) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
-            tier, Ingredient.of(Blocks.STONE), Set.of(woodTank));
+            tier, Ingredient.of(ItemTags.create(new ResourceLocation(tier.tagName()))), Set.of(woodTank));
         JsonObject object = new JsonObject();
         TierRecipe.TierFinishedRecipe tierFinishedRecipe = new TierRecipe.TierFinishedRecipe(recipe.getId(), tier);
         tierFinishedRecipe.serializeRecipeData(object);
-        TierRecipe read = TierRecipe.SERIALIZER.fromJson(recipe.getId(), object);
+        TierRecipe read = TierRecipe.SERIALIZER.fromJson(recipe.getId(), object, context);
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
