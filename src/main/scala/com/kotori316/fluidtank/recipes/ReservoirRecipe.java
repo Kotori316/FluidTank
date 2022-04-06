@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.recipes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -117,10 +118,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         public ReservoirRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             String tierName = buffer.readUtf();
             Tier tier = Tier.byName(tierName).orElseThrow(IllegalArgumentException::new);
-            int subIngredientCount = buffer.readVarInt();
-            List<Ingredient> ingredients = IntStream.range(0, subIngredientCount)
-                .mapToObj(i -> Ingredient.fromNetwork(buffer))
-                .collect(Collectors.toList());
+            List<Ingredient> ingredients = buffer.readCollection(ArrayList::new, Ingredient::fromNetwork);
             LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, ingredients);
             return new ReservoirRecipe(recipeId, tier, ingredients);
         }
@@ -128,8 +126,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         @Override
         public void toNetwork(FriendlyByteBuf buffer, ReservoirRecipe recipe) {
             buffer.writeUtf(recipe.tier.toString());
-            buffer.writeVarInt(recipe.subIngredients.size());
-            recipe.subIngredients.forEach(i -> i.toNetwork(buffer));
+            buffer.writeCollection(recipe.subIngredients, (buf, ingredient) -> ingredient.toNetwork(buf));
             LOGGER.debug("Serialized {} to packet for tier {}.", recipe.getId(), recipe.getTier());
         }
     }
