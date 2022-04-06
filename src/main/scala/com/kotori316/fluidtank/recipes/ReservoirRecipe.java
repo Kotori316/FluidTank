@@ -23,6 +23,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -33,6 +34,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tier;
 
 public class ReservoirRecipe extends ShapelessRecipe {
+    private static final Logger LOGGER = Utils.getLogger(ReservoirRecipe.class);
     public static final RecipeSerializer<ReservoirRecipe> SERIALIZER = new Serializer();
     public static final String GROUP = "fluidtank:reservoirs";
     private final Tier tier;
@@ -42,6 +44,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         super(idIn, GROUP, findOutput(tier), findIngredients(tier, subIngredients));
         this.tier = tier;
         this.subIngredients = subIngredients;
+        LOGGER.debug("{} instance({}) created for Tier {}({}).", getClass().getSimpleName(), idIn, tier, getResultItem());
     }
 
     ReservoirRecipe(ResourceLocation idIn, Tier tier) {
@@ -103,9 +106,10 @@ public class ReservoirRecipe extends ShapelessRecipe {
             else
                 ingredientList = Collections.singletonList(Ingredient.of(Items.BUCKET));
             if (ingredientList.isEmpty() || ingredientList.size() > 8) {
-                FluidTank.LOGGER.error("Too many or too few items to craft reservoir. Size: {}, {}, Recipe: {}",
+                LOGGER.error("Too many or too few items to craft reservoir. Size: {}, {}, Recipe: {}",
                     ingredientList.size(), ingredientList, recipeId);
             }
+            LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, ingredientList);
             return new ReservoirRecipe(recipeId, tier, ingredientList);
         }
 
@@ -117,6 +121,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             List<Ingredient> ingredients = IntStream.range(0, subIngredientCount)
                 .mapToObj(i -> Ingredient.fromNetwork(buffer))
                 .collect(Collectors.toList());
+            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, ingredients);
             return new ReservoirRecipe(recipeId, tier, ingredients);
         }
 
@@ -125,6 +130,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             buffer.writeUtf(recipe.tier.toString());
             buffer.writeVarInt(recipe.subIngredients.size());
             recipe.subIngredients.forEach(i -> i.toNetwork(buffer));
+            LOGGER.debug("Serialized {} to packet for tier {}.", recipe.getId(), recipe.getTier());
         }
     }
 

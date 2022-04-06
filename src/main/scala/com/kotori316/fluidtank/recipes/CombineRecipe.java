@@ -45,7 +45,7 @@ public class CombineRecipe extends CustomRecipe {
     public CombineRecipe(ResourceLocation location, Ingredient tanks) {
         super(location);
         this.tanks = tanks;
-        LOGGER.debug("Recipe instance of ConvertInvisibleRecipe({}) was created.", location);
+        LOGGER.debug("{} instance({}) created", getClass().getSimpleName(), location);
     }
 
     @Override

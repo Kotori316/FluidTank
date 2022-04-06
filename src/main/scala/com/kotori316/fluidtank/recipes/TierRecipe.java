@@ -70,7 +70,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
 
         result = OptionConverters.toJava(ModObjects.tierToBlock().get(tier)).map(ItemStack::new).orElse(ItemStack.EMPTY);
         this.normalTankSet = normalTankSet;
-        LOGGER.debug("Recipe instance({}) created for Tier {}({}).", idIn, tier, result);
+        LOGGER.debug("{} instance({}) created for Tier {}({}).", getClass().getSimpleName(), idIn, tier, result);
     }
 
     static Set<BlockTank> getTankSet(Tier tier, ICondition.IContext context) {
