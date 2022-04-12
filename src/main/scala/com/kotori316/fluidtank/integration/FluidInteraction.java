@@ -1,8 +1,9 @@
 package com.kotori316.fluidtank.integration;
 
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -17,12 +18,11 @@ public interface FluidInteraction {
 
     FluidVolumeUtil.FluidTankInteraction interact(Connection connection, Player player, InteractionHand hand, ItemStack stack);
 
+    @SuppressWarnings("UnstableApiUsage")
     static SoundEvent getSoundEvent(FluidAmount toFill, boolean fill) {
-        final SoundEvent soundEvent;
-        if (toFill.fluidEqual(FluidAmount.BUCKET_LAVA()))
-            soundEvent = fill ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_EMPTY_LAVA;
+        if (fill)
+            return FluidVariantAttributes.getFillSound(FluidVariant.of(toFill.fluid()));
         else
-            soundEvent = fill ? SoundEvents.BUCKET_FILL : SoundEvents.BUCKET_EMPTY;
-        return soundEvent;
+            return FluidVariantAttributes.getEmptySound(FluidVariant.of(toFill.fluid()));
     }
 }
