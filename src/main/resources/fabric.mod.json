@@ -33,7 +33,7 @@
   },
   "depends": {
     "fabricloader": ">=0.12.0",
-    "fabric": ">=0.46.1+1.18",
+    "fabric": ">=0.50.0+1.18.2",
     "minecraft": "1.18.x",
     "fabric-language-scala": ">=0.3.0",
     "libblockattributes": ">=0.10.2",
