@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.gametest;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
@@ -23,13 +24,13 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.tiles.Connection;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
-import static com.kotori316.fluidtank.gametest.Utils.getConnection;
-import static com.kotori316.fluidtank.gametest.Utils.placeTank;
+import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -39,6 +40,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @PrefixGameTestTemplate(value = false)
 public final class PlaceTest {
     static final String BATCH = "placeTestBatch";
+
+    public static void placeTank(GameTestHelper helper, BlockPos pos, BlockTank block) {
+        helper.setBlock(pos, block);
+        Optional.ofNullable(helper.getBlockEntity(pos))
+            .map(TileTank.class::cast)
+            .ifPresent(TileTank::onBlockPlacedBy);
+    }
+
+    public static Connection getConnection(GameTestHelper helper, BlockPos pos) {
+        return Optional.ofNullable(helper.getBlockEntity(pos))
+            .map(TileTank.class::cast)
+            .map(TileTank::connection)
+            .orElseThrow(() -> new IllegalArgumentException("No tank at " + pos));
+    }
+
 
     @BeforeBatch(batch = BATCH)
     public void beforeTest(ServerLevel level) {

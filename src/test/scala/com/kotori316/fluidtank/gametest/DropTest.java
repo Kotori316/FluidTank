@@ -28,10 +28,11 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 import com.kotori316.fluidtank.tiles.Tier;
+import com.kotori316.testutil.GameTestUtil;
 
-import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
-import static com.kotori316.fluidtank.gametest.Utils.getConnection;
-import static com.kotori316.fluidtank.gametest.Utils.placeTank;
+import static com.kotori316.fluidtank.gametest.PlaceTest.getConnection;
+import static com.kotori316.fluidtank.gametest.PlaceTest.placeTank;
+import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -72,7 +73,7 @@ public final class DropTest {
                 FluidAmount.BUCKET_WATER(),
                 FluidAmount.BUCKET_LAVA()
             ).flatMap(f -> IntStream.of(500, 1000, 1500, 2000, 3000, 4000).mapToObj(f::setAmount))
-            .map(f -> Utils.create("dropOfFilledTank" + f, BATCH, g -> dropOfWaterTank1(g, f)))
+            .map(f -> GameTestUtil.create(FluidTank.modID, BATCH, "dropOfFilledTank" + f, g -> dropOfWaterTank1(g, f)))
             .toList();
     }
 

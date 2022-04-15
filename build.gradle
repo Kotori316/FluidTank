@@ -176,6 +176,7 @@ repositories {
             it.includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
             it.includeVersion("org.typelevel", "cats-core_2.13", project.cats_version as String)
             it.includeVersion("org.typelevel", "cats-kernel_2.13", project.cats_version as String)
+            it.includeVersion("com.kotori316", "test_utility", project.testUtilVersion as String)
         }
     }
     maven {
@@ -240,6 +241,7 @@ dependencies {
     testImplementation(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.8.2')
     testImplementation(group: 'org.mockito', name: 'mockito-core', version: '3.+')
     testImplementation(group: 'org.mockito', name: 'mockito-inline', version: '3.+')
+    testImplementation(fg.deobf(group: "com.kotori316", name: "test_utility", version: project.testUtilVersion))
 
     game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
     game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)

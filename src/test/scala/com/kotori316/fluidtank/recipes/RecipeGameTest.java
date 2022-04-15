@@ -15,10 +15,10 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
-import com.kotori316.fluidtank.gametest.Utils;
 import com.kotori316.fluidtank.tiles.Tier;
+import com.kotori316.testutil.GameTestUtil;
 
-import static com.kotori316.fluidtank.gametest.Utils.EMPTY_STRUCTURE;
+import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @GameTestHolder(value = FluidTank.modID)
@@ -29,15 +29,15 @@ public final class RecipeGameTest {
     @GameTestGenerator
     public List<TestFunction> tierRecipeSerialize() {
         return Arrays.stream(Tier.values()).filter(Tier::hasTagRecipe)
-            .map(t -> Utils.create("tierRecipeSerialize" + t, BATCH, g -> {
-                new TierRecipeTest().serializeJson(t, Utils.getContext(g));
+            .map(t -> GameTestUtil.create(FluidTank.modID, BATCH, "tierRecipeSerialize" + t, g -> {
+                new TierRecipeTest().serializeJson(t, GameTestUtil.getContext(g));
                 g.succeed();
             })).toList();
     }
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void tanksForStone(GameTestHelper helper) {
-        var tanks = TierRecipe.getTankSet(Tier.STONE, Utils.getContext(helper));
+        var tanks = TierRecipe.getTankSet(Tier.STONE, GameTestUtil.getContext(helper));
         assertEquals(Set.of(ModObjects.tierToBlock().apply(Tier.WOOD)), tanks);
         helper.succeed();
     }
@@ -46,7 +46,7 @@ public final class RecipeGameTest {
     public void tanksForIronUnavailableOK(GameTestHelper helper) {
         try {
             Config.content().usableUnavailableTankInRecipe().set(true);
-            var tanks = TierRecipe.getTankSet(Tier.IRON, Utils.getContext(helper));
+            var tanks = TierRecipe.getTankSet(Tier.IRON, GameTestUtil.getContext(helper));
             assertEquals(Set.of(
                 ModObjects.tierToBlock().apply(Tier.STONE),
                 ModObjects.tierToBlock().apply(Tier.COPPER),
@@ -62,7 +62,7 @@ public final class RecipeGameTest {
     public void tanksForIronUnavailableNG(GameTestHelper helper) {
         try {
             Config.content().usableUnavailableTankInRecipe().set(false);
-            var tanks = TierRecipe.getTankSet(Tier.IRON, Utils.getContext(helper));
+            var tanks = TierRecipe.getTankSet(Tier.IRON, GameTestUtil.getContext(helper));
             assertEquals(Set.of(
                 ModObjects.tierToBlock().apply(Tier.STONE),
                 ModObjects.tierToBlock().apply(Tier.COPPER)
@@ -76,8 +76,8 @@ public final class RecipeGameTest {
     @GameTestGenerator
     public List<TestFunction> reservoirRecipeSerialize() {
         return ReservoirRecipeSerializeTest.tierAndIngredient()
-            .map(o -> Utils.create("reservoirRecipeSerialize" + o[0], BATCH, g -> {
-                new ReservoirRecipeSerializeTest().serializeJson((Tier) o[0], (Ingredient) o[1], Utils.getContext(g));
+            .map(o -> GameTestUtil.create(FluidTank.modID, BATCH, "reservoirRecipeSerialize" + o[0], g -> {
+                new ReservoirRecipeSerializeTest().serializeJson((Tier) o[0], (Ingredient) o[1], GameTestUtil.getContext(g));
                 g.succeed();
             })).toList();
     }

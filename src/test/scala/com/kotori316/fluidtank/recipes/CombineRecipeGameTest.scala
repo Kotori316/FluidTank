@@ -1,7 +1,8 @@
 package com.kotori316.fluidtank.recipes
 
-import com.kotori316.fluidtank.gametest.Utils.{EMPTY_STRUCTURE, getContext}
 import com.kotori316.fluidtank.{Config, FluidTank, ModObjects}
+import com.kotori316.testutil.GameTestUtil
+import com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE
 import net.minecraft.gametest.framework.{GameTest, GameTestAssertException, GameTestHelper}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
@@ -29,7 +30,7 @@ class CombineRecipeGameTest {
 
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
   def noUnavailableTank(helper: GameTestHelper): Unit = {
-    val context = getContext(helper)
+    val context = GameTestUtil.getContext(helper)
     try {
       Config.content.usableUnavailableTankInRecipe.set(false)
       val ingredient = Try(CombineRecipe.SERIALIZER.getClass.getDeclaredMethod("tankList", classOf[ICondition.IContext]))
@@ -51,7 +52,7 @@ class CombineRecipeGameTest {
 
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
   def okUnavailableTank(helper: GameTestHelper): Unit = {
-    val context = getContext(helper)
+    val context = GameTestUtil.getContext(helper)
     try {
       Config.content.usableUnavailableTankInRecipe.set(true)
       val ingredient = Try(CombineRecipe.SERIALIZER.getClass.getDeclaredMethod("tankList", classOf[ICondition.IContext]))

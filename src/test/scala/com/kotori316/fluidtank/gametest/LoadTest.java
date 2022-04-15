@@ -17,8 +17,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
+import com.kotori316.testutil.GameTestUtil;
 
-import static com.kotori316.fluidtank.gametest.Utils.TANK2_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public final class LoadTest {
     static final Block STONE_TANK;
     static final String BATCH = "loadTestBatch";
+    static final String TANK2_STRUCTURE = "tank2";
 
     static {
         STONE_TANK = Objects.requireNonNull(
@@ -48,7 +49,7 @@ public final class LoadTest {
 
     @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void stoneTankPresent(GameTestHelper helper) {
-        var pos = Utils.getBasePos(helper).offset(1, 0, 0);
+        var pos = GameTestUtil.getBasePos(helper).offset(1, 0, 0);
         helper.assertBlockPresent(STONE_TANK, pos);
         helper.assertBlockPresent(STONE_TANK, pos.above());
         helper.succeed();
@@ -56,7 +57,7 @@ public final class LoadTest {
 
     @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void stoneTankTile(GameTestHelper helper) {
-        var pos = Utils.getBasePos(helper).offset(1, 0, 0);
+        var pos = GameTestUtil.getBasePos(helper).offset(1, 0, 0);
         var bottomTank = helper.getBlockEntity(pos);
         if (bottomTank instanceof TileTank tank) {
             assertTrue(tank.connection().isDummy());
@@ -68,7 +69,7 @@ public final class LoadTest {
 
     @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void stoneTankTile2(GameTestHelper helper) {
-        var pos = Utils.getBasePos(helper).offset(1, 0, 0);
+        var pos = GameTestUtil.getBasePos(helper).offset(1, 0, 0);
         var bottomTank = helper.getBlockEntity(pos);
         if (bottomTank instanceof TileTank tank) {
             tank.onBlockPlacedBy();
@@ -84,7 +85,7 @@ public final class LoadTest {
 
     @GameTest(template = TANK2_STRUCTURE, batch = BATCH)
     public void woodTank1(GameTestHelper helper) {
-        var pos = Utils.getBasePos(helper).offset(1, 1, 2);
+        var pos = GameTestUtil.getBasePos(helper).offset(1, 1, 2);
         var bottomTank = helper.getBlockEntity(pos);
         if (bottomTank instanceof TileTank tank) {
             tank.onBlockPlacedBy();
