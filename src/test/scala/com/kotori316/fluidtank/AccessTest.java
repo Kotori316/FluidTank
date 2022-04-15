@@ -2,7 +2,11 @@ package com.kotori316.fluidtank;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -157,6 +161,29 @@ final class AccessTest extends BeforeAllTest {
             assertTrue(result.isSuccess());
             var after = RecipeInventoryUtil.getFluidHandler(result.getResult());
             assertEquals(FluidAmount.BUCKET_WATER().setAmount(2000L), after.getFluid());
+        }
+    }
+
+    @Nested
+    class AccessIngredient {
+        @Test
+        void itemIngredient() {
+            var ingredient = Ingredient.of(Items.APPLE);
+            var expect = GsonHelper.parse("""
+                {
+                  "item": "minecraft:apple"
+                }""");
+            assertEquals(expect, ingredient.toJson());
+        }
+
+        @Test
+        void tagIngredient() {
+            var ingredient = Ingredient.of(ItemTags.DIRT);
+            var expect = GsonHelper.parse("""
+                {
+                  "tag": "minecraft:dirt"
+                }""");
+            assertEquals(expect, ingredient.toJson());
         }
     }
 }
