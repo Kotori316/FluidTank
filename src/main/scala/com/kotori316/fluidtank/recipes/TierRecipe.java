@@ -256,7 +256,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             Ingredient subItem = Ingredient.fromJson(json.get(KEY_SUB_ITEM));
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, json);
-            LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, subItem);
+            LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(subItem));
             return new TierRecipe(recipeId, tier, subItem, context);
         }
 
@@ -274,7 +274,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             Ingredient subItem = Ingredient.fromNetwork(buffer);
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}", recipeId);
-            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, subItem);
+            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(subItem));
             var ingredientTanks = buffer.readCollection(ArrayList::new, FriendlyByteBuf::readResourceLocation)
                 .stream()
                 .map(ForgeRegistries.BLOCKS::getValue)

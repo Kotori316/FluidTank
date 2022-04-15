@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -9,6 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonElement;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -17,6 +19,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -145,5 +148,16 @@ public class Utils {
             .flatMap(HolderSet.Named::stream)
             .map(Holder::value)
             .collect(Collectors.toSet());
+    }
+
+    public static String convertIngredientToString(Collection<Ingredient> ingredients) {
+        return ingredients.stream()
+            .map(Ingredient::toJson)
+            .map(JsonElement::toString)
+            .collect(Collectors.joining(", ", "[", "]"));
+    }
+
+    public static String convertIngredientToString(Ingredient ingredient) {
+        return "[%s]".formatted(ingredient.toJson());
     }
 }

@@ -108,9 +108,9 @@ public class ReservoirRecipe extends ShapelessRecipe {
                 ingredientList = Collections.singletonList(Ingredient.of(Items.BUCKET));
             if (ingredientList.isEmpty() || ingredientList.size() > 8) {
                 LOGGER.error("Too many or too few items to craft reservoir. Size: {}, {}, Recipe: {}",
-                    ingredientList.size(), ingredientList, recipeId);
+                    ingredientList.size(), Utils.convertIngredientToString(ingredientList), recipeId);
             }
-            LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, ingredientList);
+            LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(ingredientList));
             return new ReservoirRecipe(recipeId, tier, ingredientList);
         }
 
@@ -119,7 +119,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             String tierName = buffer.readUtf();
             Tier tier = Tier.byName(tierName).orElseThrow(IllegalArgumentException::new);
             List<Ingredient> ingredients = buffer.readCollection(ArrayList::new, Ingredient::fromNetwork);
-            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, ingredients);
+            LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(ingredients));
             return new ReservoirRecipe(recipeId, tier, ingredients);
         }
 
