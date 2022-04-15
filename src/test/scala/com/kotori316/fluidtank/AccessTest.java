@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank;
 
+import com.google.gson.JsonArray;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
@@ -165,7 +166,7 @@ final class AccessTest extends BeforeAllTest {
     }
 
     @Nested
-    class AccessIngredient {
+    class AccessIngredientTest {
         @Test
         void itemIngredient() {
             var ingredient = Ingredient.of(Items.APPLE);
@@ -184,6 +185,14 @@ final class AccessTest extends BeforeAllTest {
                   "tag": "minecraft:dirt"
                 }""");
             assertEquals(expect, ingredient.toJson());
+        }
+
+        @Test
+        void emptyIngredient() {
+            var ingredient = Ingredient.EMPTY;
+            var expect = new JsonArray();
+            assertEquals(expect, ingredient.toJson());
+            assertDoesNotThrow(() -> Utils.convertIngredientToString(ingredient));
         }
     }
 }
