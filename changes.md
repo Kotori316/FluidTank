@@ -1,5 +1,5 @@
-## v18.5.0
+## v18.5.1
 
-* Release for 1.18.2
-* Now recipes of vanilla tanks are enabled.
-* Non-vanilla recipe is disabled.
+* Enabled non-vanilla tanks because condition of tags works fine now.
+* Respect enableWailaAndTOP config.
+* Changed required version of Forge.

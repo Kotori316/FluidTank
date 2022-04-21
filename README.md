@@ -26,7 +26,7 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
 ## APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.18.2, newer than 1.18.2-40.0.0
+  * For Minecraft 1.18.2, newer than 1.18.2-40.1.0
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.8

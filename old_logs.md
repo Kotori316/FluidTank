@@ -1,3 +1,11 @@
+## v18.5.1
+
+* Enabled non-vanilla tanks because condition of tags works fine now.
+* Respect enableWailaAndTOP config.
+* Changed required version of Forge.
+
+Build with 1.18.2-40.1.0, Mapping: Official 1.18.2
+
 ## v18.5.0
 
 * Release for 1.18.2

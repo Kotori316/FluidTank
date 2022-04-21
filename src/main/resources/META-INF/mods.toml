@@ -1,5 +1,5 @@
 modLoader="kotori_scala"
-loaderVersion="[2.13.6-build-3, ),[37,)"
+loaderVersion="[2.13.8-build-1, ),[37,)"
 issueTrackerURL = "https://github.com/Kotori316/FluidTank/issues"
 license = "All Rights Reserved."
 [[mods]]
@@ -15,12 +15,12 @@ Add large fluid tanks.'''
 [[dependencies.fluidtank]]
     modId = "forge"
     mandatory = true
-    versionRange = "[38.0.0,)"
+    versionRange = "[40.1.0,)"
     ordering = "NONE"
     side = "BOTH"
 [[dependencies.fluidtank]]
     modId = "minecraft"
     mandatory = true
-    versionRange = "[1.18, )"
+    versionRange = "[1.18.2, )"
     ordering = "NONE"
     side = "BOTH"
