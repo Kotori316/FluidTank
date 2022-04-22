@@ -7,5 +7,6 @@ public final class FluidTankGenerator implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         fabricDataGenerator.addProvider(RecipeGenerator::new);
+        fabricDataGenerator.addProvider(MaterialTagGenerator::new);
     }
 }

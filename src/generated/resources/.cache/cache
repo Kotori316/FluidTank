@@ -1,3 +1,4 @@
+b08a50294206c7ab337f8a80f54e80b2e6ee0354 data\fluidtank\tags\items\material_star.json
 feab513cc0525f47b5ad4cd48181e21038518308 data\fluidtank\recipes\tank_gold.json
 bfa931870f9fc8819239b33561a9a51c244ed2e7 data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_emerald.json
 a572fa0cd46d3a6a9357fd764722d75bb097a37c data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_stone.json
@@ -18,9 +19,10 @@ b769b2bf6469266969928cfc95254489dd8b6ba0 data\fluidtank\recipes\tank_star.json
 e06ee04f3f4cf4d107c8bafb29efb26fa84a6301 data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_tin.json
 0ba100b44b323aa1202e857a7369afa86dbc33b2 data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_wood.json
 4754566779434d2725fbaeeba5157cb66213ec67 data\fluidtank\recipes\tank_emerald.json
+e08fb8b538605e8927eb9fef651c06cf4f900f74 data\fluidtank\tags\items\material_stone.json
 b23bcb593bff138a94bc549f48afc5d24d0a14a2 data\fluidtank\recipes\tank_tin.json
 09f47f1c926836d21442737226bf2095960ec850 data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_gold.json
 3c17690987c302a38c83703e3e26aa2742266287 data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_silver.json
-b37b67d8975c638d4299ad6594370f3f9095fbc3 data\fluidtank\recipes\tank_wood.json
+dfa471b6c20aa00cbcaa78fbba193987d4af24dc data\fluidtank\recipes\tank_wood.json
 9aa09ff3517d85bae532235140c7cf499d2165fd data\fluidtank\recipes\tank_iron.json
 2cbde09b492c33e44d2ea9e94f90b4395d26174b data\fluidtank\advancements\recipes\fluidtank.fluidtank\tank_iron.json
