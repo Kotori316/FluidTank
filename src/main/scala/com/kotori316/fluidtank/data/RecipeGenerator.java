@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.advancements.critereon.FilledBucketTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.Registry;
@@ -37,7 +38,7 @@ final class RecipeGenerator extends FabricRecipeProvider {
             .pattern("x x")
             .pattern("xpx")
             .pattern("xxx")
-            .define('x', Items.GLASS)
+            .define('x', ConventionalItemTags.GLASS_BLOCKS)
             .define('p', ItemTags.LOGS)
             .unlockedBy("has_glass", FabricRecipeProvider.has(Items.GLASS))
             .unlockedBy("has_bucket", FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.WATER_BUCKET).build()))

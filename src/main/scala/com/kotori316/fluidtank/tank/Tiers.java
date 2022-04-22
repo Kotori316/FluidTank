@@ -18,13 +18,13 @@ import com.kotori316.fluidtank.TankConstant;
 public enum Tiers {
     Invalid(0, 0, "Invalid", "Unknown", false),
     WOOD(1, 1 << 2, "Wood", "minecraft:logs", false),
-    STONE(2, 1 << 4, "Stone", "forge:stone", true, () ->
+    STONE(2, 1 << 4, "Stone", MaterialTags.MATERIAL_STONE.location().toString(), true, () ->
         Ingredient.of(Blocks.STONE, Blocks.ANDESITE, Blocks.GRANITE, Blocks.DIORITE, Blocks.TUFF, Blocks.DEEPSLATE)),
-    IRON(3, 1 << 8, "Iron", "forge:ingots/iron", true, () -> Ingredient.of(Items.IRON_INGOT)),
-    GOLD(4, 1 << 12, "Gold", "forge:ingots/gold", true, () -> Ingredient.of(Items.GOLD_INGOT)),
-    DIAMOND(5, 1 << 14, "Diamond", "forge:gems/diamond", true, () -> Ingredient.of(Items.DIAMOND)),
-    EMERALD(6, 1 << 16, "Emerald", "forge:gems/emerald", true, () -> Ingredient.of(Items.EMERALD)),
-    STAR(7, 1 << 20, "Star", "forge:nether_stars", true, () -> Ingredient.of(Items.NETHER_STAR)),
+    IRON(3, 1 << 8, "Iron", "c:iron_ingots", true, () -> Ingredient.of(Items.IRON_INGOT)),
+    GOLD(4, 1 << 12, "Gold", "c:gold_ingots", true, () -> Ingredient.of(Items.GOLD_INGOT)),
+    DIAMOND(5, 1 << 14, "Diamond", "c:diamonds", true, () -> Ingredient.of(Items.DIAMOND)),
+    EMERALD(6, 1 << 16, "Emerald", "c:emeralds", true, () -> Ingredient.of(Items.EMERALD)),
+    STAR(7, 1 << 20, "Star", MaterialTags.MATERIAL_STAR.location().toString(), true, () -> Ingredient.of(Items.NETHER_STAR)),
     CREATIVE(8, 0, "Creative", "Unknown", false) {
         @Override
         public long amount() {
