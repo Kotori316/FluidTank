@@ -234,11 +234,7 @@ public class TierRecipe extends ShapedRecipe {
 
         private static Ingredient getSubItems(Tiers tier) {
             var tag = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tier.tagName));
-            if (Registry.ITEM.isKnownTagName(tag)) {
-                return Ingredient.of(tag);
-            } else {
-                return tier.getAlternative();
-            }
+            return Ingredient.of(tag);
         }
 
     }
