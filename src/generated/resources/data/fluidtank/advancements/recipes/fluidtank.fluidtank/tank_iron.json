@@ -17,9 +17,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:iron_ingot"
-            ]
+            "tag": "c:iron_ingots"
           }
         ]
       }
@@ -34,6 +32,12 @@
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config_update_recipe"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:iron_ingots"
+      ]
     }
   ]
 }

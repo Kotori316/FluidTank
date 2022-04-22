@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.advancements.critereon.FilledBucketTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -59,8 +58,7 @@ final class RecipeGenerator extends FabricRecipeProvider {
         return recipePair -> {
             ConditionJsonProvider[] conditions;
             if (recipePair.shouldUseTagCondition()) {
-                var tag = recipePair.tier.tagName;
-                var tagCondition = tagProvider(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tag)));
+                var tagCondition = tagProvider(recipePair.tier.getTag());
                 conditions = new ConditionJsonProvider[]{configCondition, tagCondition};
             } else {
                 conditions = new ConditionJsonProvider[]{configCondition};
@@ -76,7 +74,7 @@ final class RecipeGenerator extends FabricRecipeProvider {
 
     private record TierFinished(FinishedRecipe recipe, Tiers tier) {
         boolean shouldUseTagCondition() {
-            return tier.getAlternative().isEmpty();
+            return tier.hasTagRecipe();
         }
     }
 

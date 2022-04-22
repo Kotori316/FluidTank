@@ -15,13 +15,11 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
@@ -233,8 +231,7 @@ public class TierRecipe extends ShapedRecipe {
         }
 
         private static Ingredient getSubItems(Tiers tier) {
-            var tag = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tier.tagName));
-            return Ingredient.of(tag);
+            return Ingredient.of(tier.getTag());
         }
 
     }
@@ -276,9 +273,7 @@ public class TierRecipe extends ShapedRecipe {
         @Override
         public JsonObject serializeAdvancement() {
             var advancement = Advancement.Builder.advancement();
-            var inventoryCriterion = tier.getAlternative().isEmpty()
-                ? RecipeProvider.has(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tier.tagName)))
-                : RecipeProvider.has(tier.getAlternative().getItems()[0].getItem());
+            var inventoryCriterion = RecipeProvider.has(tier.getTag());
             advancement.parent(new ResourceLocation("recipes/root"))
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(getId()))
                 .addCriterion("has_" + tier.toString().toLowerCase(Locale.ROOT), inventoryCriterion)

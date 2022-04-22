@@ -17,9 +17,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:nether_star"
-            ]
+            "tag": "fluidtank:material_star"
           }
         ]
       }
@@ -34,6 +32,12 @@
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config_update_recipe"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "fluidtank:material_star"
+      ]
     }
   ]
 }
