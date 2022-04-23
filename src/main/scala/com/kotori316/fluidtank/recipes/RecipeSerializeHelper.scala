@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.recipes
 
 import com.google.gson.JsonObject
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger
-import net.minecraft.data.recipes.{FinishedRecipe, ShapedRecipeBuilder, SpecialRecipeBuilder}
+import net.minecraft.data.recipes.{FinishedRecipe, RecipeBuilder, SpecialRecipeBuilder}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.crafting.SimpleRecipeSerializer
@@ -11,7 +11,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition
 case class RecipeSerializeHelper(recipe: FinishedRecipe,
                                  conditions: List[ICondition] = Nil,
                                  saveName: ResourceLocation = null) {
-  def this(c: ShapedRecipeBuilder, saveName: ResourceLocation) = {
+  def this(c: RecipeBuilder, saveName: ResourceLocation) = {
     this(RecipeSerializeHelper.getConsumeValue(c), saveName = saveName)
   }
 
@@ -33,7 +33,7 @@ case class RecipeSerializeHelper(recipe: FinishedRecipe,
 }
 
 object RecipeSerializeHelper {
-  def by(c: ShapedRecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
+  def by(c: RecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
 
   def bySpecial(serializer: SimpleRecipeSerializer[_], recipeId: String, saveName: ResourceLocation = null): RecipeSerializeHelper = {
     val c = SpecialRecipeBuilder.special(serializer)
@@ -42,8 +42,8 @@ object RecipeSerializeHelper {
     new RecipeSerializeHelper(t, Nil, saveName)
   }
 
-  private def getConsumeValue(c: ShapedRecipeBuilder): FinishedRecipe = {
-    val fixed: ShapedRecipeBuilder = c.unlockedBy("dummy", RecipeUnlockedTrigger.unlocked(new ResourceLocation("dummy:dummy")))
+  private def getConsumeValue(c: RecipeBuilder): FinishedRecipe = {
+    val fixed: RecipeBuilder = c.unlockedBy("dummy", RecipeUnlockedTrigger.unlocked(new ResourceLocation("dummy:dummy")))
     var t: FinishedRecipe = null
     fixed.save(p => t = p)
     t
