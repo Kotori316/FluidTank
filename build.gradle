@@ -10,7 +10,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
@@ -47,11 +47,7 @@ String forgeVersion() {
     if (isInCI() && System.getenv("CI_FORGE") != null && "default" != System.getenv("CI_FORGE")) {
         return "net.minecraftforge:forge:" + System.getenv("CI_FORGE")
     } else {
-        // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-        // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-        // The user-dev artifact is a special name and will get all sorts of transformations applied to it.
-        def forge_prop = loadProperties("forge_version.properties")
-        return forge_prop.get("forge_version")
+        return "net.minecraftforge:forge:" + project.forgeVersion
     }
 }
 
@@ -284,7 +280,6 @@ curseforge {
         changelogType = 'markdown'
         changelog = getAllChangeLog()
         releaseType = 'release'
-        addGameVersion '1.16.4'
         addGameVersion '1.16.5'
         mainArtifact jar
         addArtifact deobfJar
@@ -368,7 +363,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${loadProperties("forge_version.properties").getProperty("forge_version")}, Mapping: ${projectMappingVersion()}" +
+                "Build with ${forgeVersion()}, Mapping: ${projectMappingVersion()}" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)
