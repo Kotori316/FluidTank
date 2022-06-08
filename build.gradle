@@ -5,13 +5,11 @@ import java.time.format.DateTimeFormatter
 
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
         maven { url = 'https://repo.spongepowered.org/maven' }
         maven { url = 'https://maven.parchmentmc.org' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         // classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
         classpath 'org.parchmentmc:librarian:1.+'
     }
@@ -20,10 +18,10 @@ buildscript {
 plugins {
     id("maven-publish")
     id("scala")
+    id 'net.minecraftforge.gradle' version '5.+'
     id "com.github.breadmoirai.github-release" version "2.2.12"
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
-apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 // apply plugin: 'org.spongepowered.mixin'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
@@ -247,13 +245,6 @@ dependencies {
     game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
     game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
     game_test(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.8.2')
-}
-
-configurations.all {
-    resolutionStrategy {
-        force(group: "org.apache.logging.log4j", name: "log4j-api", version: "2.17.+")
-        force(group: "org.apache.logging.log4j", name: "log4j-core", version: "2.17.+")
-    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
