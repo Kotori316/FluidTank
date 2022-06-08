@@ -21,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -66,9 +65,9 @@ public class CombineRecipe extends CustomRecipe {
                 .orElse(FluidAmount.EMPTY()))
             .toList();
         boolean allSameFluid = fluids.stream()
-            .map(FluidKey::from)
-            .filter(FluidKey::isDefined)
-            .distinct().count() == 1;
+                                   .map(FluidKey::from)
+                                   .filter(FluidKey::isDefined)
+                                   .distinct().count() == 1;
         if (!allSameFluid) return false;
         long totalAmount = fluids.stream().mapToLong(FluidAmount::amount).sum();
         return getMaxCapacityTank(inv).map(p -> p.getRight() >= totalAmount).orElse(false);
@@ -147,7 +146,7 @@ public class CombineRecipe extends CustomRecipe {
         }
     }
 
-    private static final class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<CombineRecipe> {
+    private static final class Serializer implements RecipeSerializer<CombineRecipe> {
         @Override
         public CombineRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
             LOGGER.warn("Trying to load recipe({}) without ICondition.IContext, which should not happen.", pRecipeId);

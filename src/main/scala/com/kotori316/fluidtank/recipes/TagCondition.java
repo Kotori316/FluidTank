@@ -31,13 +31,6 @@ public class TagCondition implements ICondition {
     }
 
     @Override
-    @SuppressWarnings("removal")
-    @Deprecated(forRemoval = true, since = "1.18.2")
-    public boolean test() {
-        return this.test(IContext.EMPTY);
-    }
-
-    @Override
     public boolean test(IContext context) {
         return !this.condition.test(context);
     }

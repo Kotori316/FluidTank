@@ -6,8 +6,8 @@ import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTileBase}
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 @OnlyIn(Dist.CLIENT)

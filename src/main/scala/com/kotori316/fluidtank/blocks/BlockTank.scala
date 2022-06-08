@@ -4,6 +4,7 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.{Item, ItemStack}
@@ -27,7 +28,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
   Invisible tank -> "fluidtank:invisible_tank_wood"
   Creative Tank -> "fluidtank:creative"
    */
-  setRegistryName(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
+  final val registryName = new ResourceLocation(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
   registerDefaultState(this.getStateDefinition.any.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
   final val itemBlock: ItemBlockTank = createTankItem()
 

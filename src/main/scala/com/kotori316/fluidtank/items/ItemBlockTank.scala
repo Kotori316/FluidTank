@@ -11,7 +11,8 @@ import com.kotori316.fluidtank.tiles.TileTank
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.{Component, TranslatableComponent}
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
@@ -26,7 +27,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 import org.jetbrains.annotations.Nullable
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, FluidTank.proxy.getTankProperties) {
-  setRegistryName(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
+  final val registryName = new ResourceLocation(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
 
   override def getRarity(stack: ItemStack): Rarity =
     if (BlockItem.getBlockEntityData(stack) != null) Rarity.RARE
@@ -41,9 +42,9 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
       val tankNBT = nbt.getCompound(TileTank.NBT_Tank)
       val fluid = FluidAmount.fromNBT(tankNBT)
       val c = tankNBT.getLong(TileTank.NBT_Capacity)
-      tooltip.add(new TranslatableComponent(Localize.TOOLTIP, fluid.toStack.getDisplayName, fluid.amount, c))
+      tooltip.add(Component.translatable(Localize.TOOLTIP, fluid.toStack.getDisplayName, fluid.amount, c))
     } else {
-      tooltip.add(new TranslatableComponent(Localize.CAPACITY, blockTank.tier.amount))
+      tooltip.add(Component.translatable(Localize.CAPACITY, blockTank.tier.amount))
     }
   }
 
@@ -106,5 +107,5 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     })
   }
 
-  override def toString: String = String.valueOf(getRegistryName)
+  override def toString: String = String.valueOf(registryName)
 }

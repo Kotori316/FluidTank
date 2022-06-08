@@ -6,7 +6,7 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import net.minecraft.core.{BlockPos, Direction}
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.level.BlockGetter
 import net.minecraftforge.common.MinecraftForge
@@ -122,12 +122,12 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
 
   def getTextComponent: Component = {
     if (hasCreative)
-      new TranslatableComponent("chat.fluidtank.connection_creative",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
+      Component.translatable("chat.fluidtank.connection_creative",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
         Int.box(getComparatorLevel))
     else
-      new TranslatableComponent("chat.fluidtank.connection",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
+      Component.translatable("chat.fluidtank.connection",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
         Long.box(amount),
         Long.box(capacity),
         Int.box(getComparatorLevel))
@@ -195,7 +195,7 @@ object Connection {
 
     override def remove(tileTank: TileTank): Unit = ()
 
-    override def getTextComponent = new TextComponent(toString)
+    override def getTextComponent = Component.literal(toString)
   }
 
   val stackFromTile: TileTank => Option[FluidAmount] = (t: TileTank) => Option(t.internalTank.getFluid).filter(_.nonEmpty)

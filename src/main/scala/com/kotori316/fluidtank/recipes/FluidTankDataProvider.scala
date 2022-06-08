@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.recipes
 import java.io.IOException
 import java.nio.file.Path
 
-import com.google.gson.{Gson, GsonBuilder, JsonArray, JsonElement}
+import com.google.gson.{GsonBuilder, JsonArray, JsonElement}
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
 import com.kotori316.fluidtank.recipes.TierRecipe.TierFinishedRecipe
@@ -11,7 +11,7 @@ import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.advancements.critereon.{EntityPredicate, FilledBucketTrigger, InventoryChangeTrigger, ItemPredicate, MinMaxBounds}
 import net.minecraft.core.Registry
 import net.minecraft.data.recipes.ShapedRecipeBuilder
-import net.minecraft.data.{DataGenerator, DataProvider, HashCache}
+import net.minecraft.data.{CachedOutput, DataGenerator, DataProvider}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.{ItemTags, TagKey}
 import net.minecraft.world.item.crafting.Ingredient
@@ -31,29 +31,24 @@ object FluidTankDataProvider {
   private final val MARKER = MarkerManager.getMarker("FluidTankDataProvider")
 
   def gatherData(event: GatherDataEvent): Unit = {
-    if (event.includeServer()) {
-      event.getGenerator.addProvider(new AdvancementProvider(event.getGenerator))
-      event.getGenerator.addProvider(new RecipeProvider(event.getGenerator))
-    }
-    if (event.includeClient()) {
-      event.getGenerator.addProvider(new ModelProvider(event.getGenerator))
-    }
+    event.getGenerator.addProvider(event.includeServer, new AdvancementProvider(event.getGenerator))
+    event.getGenerator.addProvider(event.includeServer, new RecipeProvider(event.getGenerator))
+    event.getGenerator.addProvider(event.includeClient, new ModelProvider(event.getGenerator))
   }
 
   private[this] final def ID(s: String) = new ResourceLocation(FluidTank.modID, s)
 
   private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registry.ITEM_REGISTRY, name)
 
-  private def saveData(pGson: Gson, pCache: HashCache, pJsonElement: JsonElement, pPath: Path): Unit = {
+  private def saveData(pCache: CachedOutput, pJsonElement: JsonElement, pPath: Path): Unit = {
     val path = pPath.normalize
     FluidTank.LOGGER.info("Save {}", path)
-    DataProvider.save(pGson, pCache, pJsonElement, path)
+    DataProvider.saveStable(pCache, pJsonElement, path)
   }
 
   class AdvancementProvider(generatorIn: DataGenerator) extends DataProvider {
-    override def run(cache: HashCache): Unit = {
+    override def run(cache: CachedOutput): Unit = {
       val path = generatorIn.getOutputFolder
-      val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val easyCondition = new FluidTankConditions.EasyCondition()
       val woodLocation = ID("tank_wood")
@@ -88,7 +83,7 @@ object FluidTankDataProvider {
       for (advancement <- recipeAdvancements) {
         val out = path.resolve(s"data/${advancement.location.getNamespace}/advancements/recipes/tank/${advancement.location.getPath}.json")
         try {
-          saveData(GSON, cache, advancement.build, out)
+          saveData(cache, advancement.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save advancement ${advancement.location}.", e)
         }
@@ -99,7 +94,7 @@ object FluidTankDataProvider {
   }
 
   class RecipeProvider(generatorIn: DataGenerator) extends DataProvider {
-    override def run(cache: HashCache): Unit = {
+    override def run(cache: CachedOutput): Unit = {
       val path = generatorIn.getOutputFolder
       val GSON = (new GsonBuilder).setPrettyPrinting().create
 
@@ -201,7 +196,7 @@ object FluidTankDataProvider {
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
         try {
-          saveData(GSON, cache, recipe.build, out)
+          saveData(cache, recipe.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}.", e)
           case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}. Check the serializer registered.", e)
@@ -215,7 +210,7 @@ object FluidTankDataProvider {
 
   class ModelProvider(generatorIn: DataGenerator) extends DataProvider {
     //noinspection SpellCheckingInspection
-    override def run(cache: HashCache): Unit = {
+    override def run(cache: CachedOutput): Unit = {
       val path = generatorIn.getOutputFolder
       val GSON = (new GsonBuilder).setPrettyPrinting().disableHtmlEscaping().create
       val models: mutable.Buffer[ModelSerializerHelper] = mutable.Buffer.empty
@@ -226,7 +221,7 @@ object FluidTankDataProvider {
       for (model <- models) {
         val out = path.resolve(s"assets/${model.location.getNamespace}/blockstates/${model.location.getPath}.json")
         try {
-          saveData(GSON, cache, model.build, out)
+          saveData(cache, model.build, out)
         } catch {
           case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}.", e)
           case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}. Check the serializer registered.", e)

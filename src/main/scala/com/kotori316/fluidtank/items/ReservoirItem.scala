@@ -9,7 +9,8 @@ import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.{Component, TranslatableComponent}
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.{BlockItem, Item, ItemStack, Rarity, TooltipFlag}
@@ -24,7 +25,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
 class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirProperties.stacksTo(1)) {
-  setRegistryName(FluidTank.modID, "reservoir_" + tier.lowerName)
+  final val registryName = new ResourceLocation(FluidTank.modID, "reservoir_" + tier.lowerName)
 
   // ---------- Fluid Interaction ----------
   override def useOn(context: UseOnContext): InteractionResult = {
@@ -95,7 +96,7 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
         .collect { case h: TankItemFluidHandler => h.getFluid -> h.getCapacity }
         .filter(_._1.nonEmpty)
       fluid.value.value.foreach { case (f, capacity) =>
-        tooltip.add(new TranslatableComponent(Localize.TOOLTIP, f.toStack.getDisplayName, f.amount, capacity))
+        tooltip.add(Component.translatable(Localize.TOOLTIP, f.toStack.getDisplayName, f.amount, capacity))
       }
     }
   }

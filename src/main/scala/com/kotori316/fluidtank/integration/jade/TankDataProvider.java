@@ -12,8 +12,6 @@ import mcp.mobius.waila.api.ITooltip;
 import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -57,14 +55,14 @@ final class TankDataProvider implements IServerDataProvider<BlockEntity>, ICompo
                 } else {
                     if (!nbtData.contains(NBT_Creative)) {
                         list = Collections.singletonList(
-                            new TranslatableComponent(WAILA_SHORT,
+                            Component.translatable(WAILA_SHORT,
                                 tank.internalTank().getTank().fluidAmount().getLocalizedName(),
                                 tank.internalTank().getTank().amount(),
                                 tank.internalTank().getTank().capacity())
                         );
                     } else if (!nbtData.getBoolean(NBT_Creative)) {
                         list = Collections.singletonList(
-                            new TranslatableComponent(WAILA_SHORT,
+                            Component.translatable(WAILA_SHORT,
                                 nbtData.getString(NBT_ConnectionFluidName),
                                 nbtData.getLong(NBT_ConnectionAmount),
                                 nbtData.getLong(NBT_ConnectionCapacity))
@@ -73,7 +71,7 @@ final class TankDataProvider implements IServerDataProvider<BlockEntity>, ICompo
                         String fluidName = getCreativeFluidName(tank);
                         list = java.util.Optional.of(fluidName)
                             .filter(s -> !FLUID_NULL.equals(s))
-                            .map(TextComponent::new)
+                            .map(Component::literal)
                             .map(Collections::singletonList)
                             .orElse(Collections.emptyList());
                     }
@@ -81,21 +79,21 @@ final class TankDataProvider implements IServerDataProvider<BlockEntity>, ICompo
             } else {
                 Tier tier = tank.tier();
                 if (tank instanceof TileTankVoid) {
-                    list = Collections.singletonList(new TranslatableComponent(TIER, tier.toString()));
+                    list = Collections.singletonList(Component.translatable(TIER, tier.toString()));
                 } else {
                     if (!nbtData.getBoolean(NBT_Creative)) {
                         list = Arrays.asList(
-                            new TranslatableComponent(TIER, tier.toString()),
-                            new TranslatableComponent(CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
-                            new TranslatableComponent(AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
-                            new TranslatableComponent(CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
-                            new TranslatableComponent(COMPARATOR, nbtData.getInt(NBT_ConnectionComparator))
+                            Component.translatable(TIER, tier.toString()),
+                            Component.translatable(CONTENT, nbtData.getString(NBT_ConnectionFluidName)),
+                            Component.translatable(AMOUNT, nbtData.getLong(NBT_ConnectionAmount)),
+                            Component.translatable(CAPACITY, nbtData.getLong(NBT_ConnectionCapacity)),
+                            Component.translatable(COMPARATOR, nbtData.getInt(NBT_ConnectionComparator))
                         );
                     } else {
                         String fluidName = getCreativeFluidName(tank);
                         list = Arrays.asList(
-                            new TranslatableComponent(TIER, tier.toString()),
-                            new TranslatableComponent(CONTENT, fluidName)
+                            Component.translatable(TIER, tier.toString()),
+                            Component.translatable(CONTENT, fluidName)
                         );
                     }
                 }

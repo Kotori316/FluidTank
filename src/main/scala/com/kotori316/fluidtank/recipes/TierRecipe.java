@@ -28,7 +28,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -125,13 +124,13 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             .filter(this.getTankItems())
             .toList();
         return tankStacks.size() == 4 &&
-            tankStacks.stream().map(BlockItem::getBlockEntityData)
-                .filter(Objects::nonNull)
-                .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
-                .filter(FluidAmount::nonEmpty)
-                .map(FluidKey::from)
-                .distinct()
-                .count() <= 1;
+               tankStacks.stream().map(BlockItem::getBlockEntityData)
+                   .filter(Objects::nonNull)
+                   .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
+                   .filter(FluidAmount::nonEmpty)
+                   .map(FluidKey::from)
+                   .distinct()
+                   .count() <= 1;
     }
 
     @Override
@@ -243,12 +242,8 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
-    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<TierRecipe> {
+    public static class Serializer implements RecipeSerializer<TierRecipe> {
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "crafting_grade_up");
-
-        public Serializer() {
-            setRegistryName(LOCATION);
-        }
 
         @Override
         public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json, ICondition.IContext context) {
@@ -287,7 +282,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         public void toNetwork(FriendlyByteBuf buffer, TierRecipe recipe) {
             buffer.writeUtf(recipe.getTier().toString());
             recipe.getSubItems().toNetwork(buffer);
-            var ingredientTanks = recipe.normalTankSet.stream().map(BlockTank::getRegistryName).toList();
+            var ingredientTanks = recipe.normalTankSet.stream().map(BlockTank::registryName).toList();
             buffer.writeCollection(ingredientTanks, FriendlyByteBuf::writeResourceLocation);
             LOGGER.debug("Serialized {} to packet for tier {}.", recipe.id, recipe.tier);
         }

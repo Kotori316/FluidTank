@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tier, TileTankCreative}
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.{Component, TextComponent}
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.{ItemStack, TooltipFlag}
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -28,7 +28,7 @@ class BlockCreativeTank extends BlockTank(Tier.CREATIVE) {
   override protected def createTankItem() = new ItemBlockTank(this) {
     @OnlyIn(Dist.CLIENT)
     override def appendHoverText(stack: ItemStack, worldIn: Level, tooltip: util.List[Component], flagIn: TooltipFlag): Unit = {
-      tooltip.add(new TextComponent("Creative"))
+      tooltip.add(Component.literal("Creative"))
     }
 
     override def hasInvisibleRecipe: Boolean = false

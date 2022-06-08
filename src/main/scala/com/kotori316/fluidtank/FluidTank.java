@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank;
 
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -9,7 +10,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -17,6 +17,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -31,6 +32,7 @@ import com.kotori316.fluidtank.recipes.FluidTankDataProvider;
 import com.kotori316.fluidtank.recipes.ReservoirRecipe;
 import com.kotori316.fluidtank.recipes.TagCondition;
 import com.kotori316.fluidtank.recipes.TierRecipe;
+import com.kotori316.fluidtank.tiles.CATContainer;
 
 @Mod(FluidTank.modID)
 public class FluidTank {
@@ -55,42 +57,46 @@ public class FluidTank {
         }
 
         @SubscribeEvent
-        public static void registerBlocks(RegistryEvent.Register<Block> event) {
-            CollectionConverters.asJava(ModObjects.blockTanks()).forEach(event.getRegistry()::register);
-            event.getRegistry().register(ModObjects.blockCat());
-            event.getRegistry().register(ModObjects.blockFluidPipe());
-            event.getRegistry().register(ModObjects.blockItemPipe());
-            event.getRegistry().register(ModObjects.blockSource());
+        public static void register(RegisterEvent event) {
+            event.register(Registry.BLOCK_REGISTRY, Register::registerBlocks);
+            event.register(Registry.ITEM_REGISTRY, Register::registerItems);
+            event.register(Registry.BLOCK_ENTITY_TYPE_REGISTRY, Register::registerTiles);
+            event.register(Registry.MENU_REGISTRY, Register::registerContainerType);
+            event.register(Registry.RECIPE_SERIALIZER_REGISTRY, Register::registerSerializer);
         }
 
-        @SubscribeEvent
-        public static void registerItems(RegistryEvent.Register<Item> event) {
-            CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(event.getRegistry()::register);
-            event.getRegistry().register(ModObjects.blockCat().itemBlock());
-            event.getRegistry().register(ModObjects.blockFluidPipe().itemBlock());
-            event.getRegistry().register(ModObjects.blockItemPipe().itemBlock());
-            event.getRegistry().register(ModObjects.blockSource().itemBlock());
-            CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(event.getRegistry()::register);
+        public static void registerBlocks(RegisterEvent.RegisterHelper<Block> helper) {
+            CollectionConverters.asJava(ModObjects.blockTanks()).forEach(b -> helper.register(b.registryName(), b));
+            helper.register(ModObjects.blockCat().registryName(), ModObjects.blockCat());
+            helper.register(ModObjects.blockFluidPipe().registryName, ModObjects.blockFluidPipe());
+            helper.register(ModObjects.blockItemPipe().registryName, ModObjects.blockItemPipe());
+            helper.register(ModObjects.blockSource().registryName(), ModObjects.blockSource());
         }
 
-        @SubscribeEvent
-        public static void registerTiles(RegistryEvent.Register<BlockEntityType<?>> event) {
-            CollectionConverters.asJava(ModObjects.getTileTypes()).forEach(event.getRegistry()::register);
+        public static void registerItems(RegisterEvent.RegisterHelper<Item> helper) {
+            CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(b -> helper.register(b.registryName(), b));
+            helper.register(ModObjects.blockCat().registryName(), ModObjects.blockCat().itemBlock());
+            helper.register(ModObjects.blockFluidPipe().registryName, ModObjects.blockFluidPipe().itemBlock());
+            helper.register(ModObjects.blockItemPipe().registryName, ModObjects.blockItemPipe().itemBlock());
+            helper.register(ModObjects.blockSource().registryName(), ModObjects.blockSource().itemBlock());
+            CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(b -> helper.register(b.registryName(), b));
         }
 
-        @SubscribeEvent
-        public static void registerSerializer(RegistryEvent.Register<RecipeSerializer<?>> event) {
-            event.getRegistry().register(CombineRecipe.SERIALIZER.setRegistryName(new ResourceLocation(CombineRecipe.LOCATION)));
-            event.getRegistry().register(TierRecipe.SERIALIZER);
-            event.getRegistry().register(ReservoirRecipe.SERIALIZER);
+        public static void registerTiles(RegisterEvent.RegisterHelper<BlockEntityType<?>> helper) {
+            CollectionConverters.asJava(ModObjects.getTileTypes()).forEach(e -> helper.register(e.name(), e.t()));
+        }
+
+        public static void registerSerializer(RegisterEvent.RegisterHelper<RecipeSerializer<?>> helper) {
+            helper.register(new ResourceLocation(CombineRecipe.LOCATION), CombineRecipe.SERIALIZER);
+            helper.register(TierRecipe.Serializer.LOCATION, TierRecipe.SERIALIZER);
+            helper.register(ReservoirRecipe.Serializer.LOCATION, ReservoirRecipe.SERIALIZER);
             CraftingHelper.register(new FluidTankConditions.ConfigCondition().serializer);
             CraftingHelper.register(new FluidTankConditions.EasyCondition().serializer);
             CraftingHelper.register(TagCondition.Serializer.INSTANCE);
         }
 
-        @SubscribeEvent
-        public static void registerContainerType(RegistryEvent.Register<MenuType<?>> event) {
-            event.getRegistry().register(ModObjects.CAT_CONTAINER_TYPE());
+        public static void registerContainerType(RegisterEvent.RegisterHelper<MenuType<?>> helper) {
+            helper.register(new ResourceLocation(CATContainer.GUI_ID), ModObjects.CAT_CONTAINER_TYPE());
         }
 
         @SubscribeEvent

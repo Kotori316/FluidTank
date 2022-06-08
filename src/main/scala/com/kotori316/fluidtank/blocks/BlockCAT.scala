@@ -4,6 +4,7 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.CATTile
 import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
@@ -21,9 +22,8 @@ import scala.jdk.OptionConverters.RichOptional
 
 class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(0.7f)) {
   // Chest as Tank
-  setRegistryName(FluidTank.modID, BlockCAT.NAME)
+  final val registryName = new ResourceLocation(FluidTank.modID, BlockCAT.NAME)
   val itemBlock = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
-  itemBlock.setRegistryName(FluidTank.modID, BlockCAT.NAME)
   registerDefaultState(this.getStateDefinition.any.setValue(FACING, Direction.NORTH))
 
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = builder.add(FACING)

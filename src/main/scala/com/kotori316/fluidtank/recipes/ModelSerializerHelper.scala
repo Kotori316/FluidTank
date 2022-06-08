@@ -32,7 +32,7 @@ object ModelSerializerHelper {
       .select(TankPos.MIDDLE, model)
       .select(TankPos.BOTTOM, model)
       .select(TankPos.SINGLE, model)
-    ModelSerializerHelper(block.getRegistryName, MultiVariantGenerator.multiVariant(block).`with`(variantBuilder))
+    ModelSerializerHelper(block.registryName, MultiVariantGenerator.multiVariant(block).`with`(variantBuilder))
   }
 
   def getFluidSourceModel(block: FluidSourceBlock): ModelSerializerHelper = {
@@ -42,7 +42,7 @@ object ModelSerializerHelper {
     val variantBuilder = PropertyDispatch.property(FluidSourceBlock.CHEAT_MODE)
       .select(JBool.TRUE, modelCheat)
       .select(JBool.FALSE, modelNonCheat)
-    ModelSerializerHelper(block.getRegistryName, MultiVariantGenerator.multiVariant(block).`with`(variantBuilder))
+    ModelSerializerHelper(block.registryName, MultiVariantGenerator.multiVariant(block).`with`(variantBuilder))
   }
 
   def getCatModel(blockCAT: BlockCAT): ModelSerializerHelper = {
@@ -55,6 +55,6 @@ object ModelSerializerHelper {
       .select(Direction.WEST, modelBase().`with`(VariantProperties.Y_ROT, VariantProperties.Rotation.R270))
       .select(Direction.UP, modelBase().`with`(VariantProperties.X_ROT, VariantProperties.Rotation.R270))
       .select(Direction.DOWN, modelBase().`with`(VariantProperties.X_ROT, VariantProperties.Rotation.R90))
-    ModelSerializerHelper(blockCAT.getRegistryName, MultiVariantGenerator.multiVariant(blockCAT).`with`(variantBuilder))
+    ModelSerializerHelper(blockCAT.registryName, MultiVariantGenerator.multiVariant(blockCAT).`with`(variantBuilder))
   }
 }

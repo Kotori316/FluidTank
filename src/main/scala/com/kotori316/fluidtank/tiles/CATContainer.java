@@ -23,9 +23,7 @@ public class CATContainer extends AbstractContainerMenu {
      * Only for internal use. Use instance in {@link com.kotori316.fluidtank.ModObjects}.
      */
     public static MenuType<CATContainer> makeType() {
-        MenuType<CATContainer> t = IForgeMenuType.create((windowId1, inv, data) -> new CATContainer(windowId1, inv.player, data.readBlockPos()));
-        t.setRegistryName(GUI_ID);
-        return t;
+        return IForgeMenuType.create((windowId1, inv, data) -> new CATContainer(windowId1, inv.player, data.readBlockPos()));
     }
 
     public CATContainer(int id, Player player, BlockPos pos) {

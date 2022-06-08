@@ -22,12 +22,6 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
     }
 
     @Override
-    @SuppressWarnings("removal")
-    public final boolean test() {
-        return this.test(IContext.EMPTY);
-    }
-
-    @Override
     public abstract boolean test(IContext context);
 
     private class Serializer implements IConditionSerializer<FluidTankConditions<T>> {

@@ -7,7 +7,7 @@ import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.{Component, TextComponent}
+import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.server.TickTask
 import net.minecraft.util.Mth
@@ -138,7 +138,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
   def getStackName: Option[Component] = Option(stackName)
 
   override def getName: Component = getStackName
-    .getOrElse(new TextComponent(tier.toString + " Tank"))
+    .getOrElse(Component.literal(tier.toString + " Tank"))
 
   override def hasCustomName: Boolean = stackName != null
 

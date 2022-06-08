@@ -23,7 +23,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
@@ -91,10 +90,8 @@ public class ReservoirRecipe extends ShapelessRecipe {
         return recipeItemsIn;
     }
 
-    public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<ReservoirRecipe> {
-        public Serializer() {
-            setRegistryName(new ResourceLocation(FluidTank.modID, "reservoir_recipe"));
-        }
+    public static class Serializer implements RecipeSerializer<ReservoirRecipe> {
+        public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "reservoir_recipe");
 
         @Override
         public ReservoirRecipe fromJson(ResourceLocation recipeId, JsonObject json) {

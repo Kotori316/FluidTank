@@ -4,6 +4,7 @@ import cats.{Hash, Show}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.material.{Fluid, Fluids}
 import net.minecraftforge.fluids.FluidStack
+import net.minecraftforge.registries.ForgeRegistries
 
 case class FluidKey(fluid: Fluid, tag: Option[CompoundTag]) {
   def toAmount(amount: Long): FluidAmount = FluidAmount(fluid, amount, tag)
@@ -25,7 +26,7 @@ object FluidKey {
   implicit val FluidKeyHash: Hash[FluidKey] = Hash.fromUniversalHashCode
   implicit val FluidKeyShow: Show[FluidKey] = key =>
     key.tag match {
-      case Some(tag) => f"FluidKey(${key.fluid.getRegistryName}, $tag)"
-      case None => f"FluidKey(${key.fluid.getRegistryName})"
+      case Some(tag) => f"FluidKey(${ForgeRegistries.FLUIDS.getKey(key.fluid)}, $tag)"
+      case None => f"FluidKey(${ForgeRegistries.FLUIDS.getKey(key.fluid)})"
     }
 }

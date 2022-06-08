@@ -11,7 +11,8 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -87,11 +88,12 @@ public abstract class PipeBlock extends Block implements EntityBlock {
     }
 
     private final BlockItem blockItem;
+    public final ResourceLocation registryName;
 
     public PipeBlock() {
         super(Block.Properties.of(ModObjects.MATERIAL_PIPE())
             .strength(0.5f));
-        setRegistryName(FluidTank.modID, getRegName());
+        registryName = new ResourceLocation(FluidTank.modID, getRegName());
         this.registerDefaultState(getStateDefinition().any()
                 .setValue(NORTH, Connection.NO_CONNECTION)
                 .setValue(SOUTH, Connection.NO_CONNECTION)
@@ -102,7 +104,6 @@ public abstract class PipeBlock extends Block implements EntityBlock {
 //            .with(WATERLOGGED, false)
         );
         blockItem = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS()));
-        blockItem.setRegistryName(FluidTank.modID, getRegName());
     }
 
     @NotNull
@@ -199,10 +200,10 @@ public abstract class PipeBlock extends Block implements EntityBlock {
             if (!worldIn.isClientSide) {
                 Optional.ofNullable(worldIn.getBlockEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(maybeColor.getAsInt()));
                 Object colorName = Stream.of(DyeColor.values()).filter(d -> d.getMaterialColor().col == maybeColor.getAsInt()).findFirst()
-                    .map(c -> (Object) new TranslatableComponent("color.minecraft." + c))
+                    .map(c -> (Object) Component.translatable("color.minecraft." + c))
                     .orElse(String.format("#%06x", maybeColor.getAsInt()));
                 player.displayClientMessage(
-                    new TranslatableComponent("chat.fluidtank.change_color", colorName),
+                    Component.translatable("chat.fluidtank.change_color", colorName),
                     false);
             }
             return InteractionResult.SUCCESS;

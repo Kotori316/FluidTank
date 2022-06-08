@@ -5,7 +5,8 @@ import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
 import net.minecraft.core.{BlockPos, NonNullList}
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.{CreativeModeTab, Item, ItemStack, Items, TooltipFlag}
@@ -20,9 +21,8 @@ import net.minecraft.world.{InteractionHand, InteractionResult}
 import org.jetbrains.annotations.Nullable
 
 class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Material.METAL).strength(0.5f)) {
-  setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
+  final val registryName = new ResourceLocation(FluidTank.modID, FluidSourceBlock.NAME)
   val itemBlock = new FluidSourceItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
-  itemBlock.setRegistryName(FluidTank.modID, FluidSourceBlock.NAME)
   registerDefaultState(this.getStateDefinition.any.setValue(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
 
   //noinspection ScalaDeprecation
@@ -84,7 +84,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
         InteractionResult.SUCCESS
       }
     } else {
-      if (!player.isCrouching) player.displayClientMessage(new TextComponent("Fluid Supplier is disabled."), true)
+      if (!player.isCrouching) player.displayClientMessage(Component.literal("Fluid Supplier is disabled."), true)
       InteractionResult.PASS
     }
   }
@@ -103,7 +103,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
           }
         s.fluid = replace
         if (!s.locked || fluid.fluidEqual(FluidAmount.BUCKET_WATER) || fluid.isEmpty)
-          player.displayClientMessage(new TranslatableComponent(FluidSourceBlock.CHANGE_SOURCE, s.fluid), false)
+          player.displayClientMessage(Component.translatable(FluidSourceBlock.CHANGE_SOURCE, s.fluid), false)
       case _ =>
     }
   }
@@ -112,7 +112,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
     world.getBlockEntity(pos) match {
       case s: FluidSourceTile =>
         s.interval = Math.max(1, s.interval + dt)
-        player.displayClientMessage(new TranslatableComponent(FluidSourceBlock.CHANGE_INTERVAL, s.interval), false)
+        player.displayClientMessage(Component.translatable(FluidSourceBlock.CHANGE_INTERVAL, s.interval), false)
       case _ =>
     }
   }
@@ -126,13 +126,13 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
     if (Config.content.enableFluidSupplier.get()) {
       tooltip.add(
         if (FluidSourceBlock.isCheatStack(stack)) {
-          new TranslatableComponent(FluidSourceBlock.TOOLTIP_INF)
+          Component.translatable(FluidSourceBlock.TOOLTIP_INF)
         } else {
-          new TranslatableComponent(FluidSourceBlock.TOOLTIP)
+          Component.translatable(FluidSourceBlock.TOOLTIP)
         }
       )
     } else {
-      tooltip.add(new TranslatableComponent(FluidSourceBlock.TOOLTIP_DISABLED))
+      tooltip.add(Component.translatable(FluidSourceBlock.TOOLTIP_DISABLED))
     }
   }
 

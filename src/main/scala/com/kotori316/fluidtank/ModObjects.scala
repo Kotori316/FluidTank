@@ -51,7 +51,7 @@ object ModObjects {
 
   //---------- TileEntities ----------
 
-  private[this] final var types: List[BlockEntityType[_ <: BlockEntity]] = Nil
+  private[this] final var types: List[NamedEntry[BlockEntityType[_ <: BlockEntity]]] = Nil
   final val TANK_TYPE = createTileType((p, s) => new TileTank(p, s), blockTanks)
   final val TANK_CREATIVE_TYPE = createTileType((p, s) => new TileTankCreative(p, s), List(creativeTank))
   final val TANK_VOID_TYPE = createTileType((p, s) => new TileTankVoid(p, s), List(voidTank))
@@ -62,12 +62,11 @@ object ModObjects {
 
   def createTileType[T <: BlockEntity](supplier: (BlockPos, BlockState) => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): BlockEntityType[T] = {
     val t = BlockEntityType.Builder.of[T]((p, s) => supplier(p, s), blocks: _*).build(DSL.emptyPartType())
-    t.setRegistryName(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase)
-    types = t :: types
+    types = new NamedEntry(new ResourceLocation(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase), t) :: types
     t
   }
 
-  def getTileTypes: List[BlockEntityType[_ <: BlockEntity]] = types
+  def getTileTypes: List[NamedEntry[BlockEntityType[_ <: BlockEntity]]] = types
 
   //---------- Containers ----------
 
@@ -87,4 +86,6 @@ object ModObjects {
   final val MARKER_TankHandler = MarkerManager.getMarker("TankHandler")
   final val MARKER_ListTankHandler = MarkerManager.getMarker("ListTankHandler")
   final val MARKER_DebugFluidHandler = MarkerManager.getMarker("DebugFluidHandler")
+
+  class NamedEntry[+T](val name: ResourceLocation, val t: T)
 }

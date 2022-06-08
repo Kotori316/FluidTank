@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraftforge.common.crafting.conditions.ICondition
+import net.minecraftforge.registries.ForgeRegistries
 
 case class AdvancementSerializeHelper(location: ResourceLocation,
                                       criterionList: List[(String, CriterionTriggerInstance)] = Nil,
@@ -16,7 +17,7 @@ case class AdvancementSerializeHelper(location: ResourceLocation,
     copy(criterionList = (name, criterion) :: criterionList)
 
   def addItemCriterion(item: Item): AdvancementSerializeHelper =
-    addCriterion(s"has_${item.getRegistryName.getPath}", InventoryChangeTrigger.TriggerInstance.hasItems(item))
+    addCriterion(s"has_${ForgeRegistries.ITEMS.getKey(item).getPath}", InventoryChangeTrigger.TriggerInstance.hasItems(item))
 
   def addItemCriterion(tag: TagKey[Item]): AdvancementSerializeHelper =
     addCriterion(s"has_${tag.location.getPath}", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(tag).build()))
