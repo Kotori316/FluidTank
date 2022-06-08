@@ -17,7 +17,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
 
   @Test
   def woodTankIsWood(): Unit = {
-    assertEquals(new ResourceLocation(FluidTank.modID, "tank_wood"), woodTank.getRegistryName)
+    assertEquals(new ResourceLocation(FluidTank.modID, "tank_wood"), woodTank.registryName)
   }
 
   @Test

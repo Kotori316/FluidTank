@@ -38,5 +38,7 @@ object RecipeInventoryUtil {
     }
 
     override def stillValid(player: Player) = false
+
+    override def quickMoveStack(pPlayer: Player, pIndex: Int): ItemStack = ItemStack.EMPTY
   }
 }

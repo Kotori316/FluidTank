@@ -36,7 +36,7 @@ final class FluidUtilPRTest {
         FluidActionResult result = FluidUtil.tryEmptyContainer(bucket, tank, 1000, /*player*/ null, /*doDrain*/ false);
         assertTrue(result.isSuccess(), "Insertion must success, but it failed."); // Pass
         assertEquals(Items.BUCKET, result.getResult().getItem(), "Result item isn't empty bucket. " + result.getResult()); // Pass
-        assertTrue(tank.isEmpty(), "Tank has %s@%dmb".formatted(tank.getFluid().getFluid().getRegistryName(), tank.getFluid().getAmount())); // Fail
+        assertTrue(tank.isEmpty(), "Tank has %s@%dmb".formatted(tank.getFluid().getFluid(), tank.getFluid().getAmount())); // Fail
     }
 
     @Test
@@ -49,7 +49,7 @@ final class FluidUtilPRTest {
         assertTrue(result.isSuccess(), "Insertion must success, but it failed.");
         assertEquals(Items.BUCKET, result.getResult().getItem(), "Result item isn't empty bucket. " + result.getResult());
         FluidStack content = tank.getFluid();
-        assertTrue(content.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)), "Tank has %s@%dmb".formatted(content.getFluid().getRegistryName(), content.getAmount()));
+        assertTrue(content.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)), "Tank has %s@%dmb".formatted(content.getFluid(), content.getAmount()));
     }
 
     @Test
@@ -61,7 +61,7 @@ final class FluidUtilPRTest {
         FluidActionResult result = FluidUtilPRTest.tryEmptyContainer(bucket, tank, 1000, /*player*/ null, /*doDrain*/ false);
         assertTrue(result.isSuccess(), "Insertion must success, but it failed.");
         assertEquals(Items.BUCKET, result.getResult().getItem(), "Result item isn't empty bucket. " + result.getResult());
-        assertTrue(tank.isEmpty(), "Tank has %s@%dmb".formatted(tank.getFluid().getFluid().getRegistryName(), tank.getFluid().getAmount()));
+        assertTrue(tank.isEmpty(), "Tank has %s@%dmb".formatted(tank.getFluid().getFluid(), tank.getFluid().getAmount()));
         assertEquals(Items.WATER_BUCKET, bucket.getItem(), "Original stack must not be changed");
     }
 
@@ -75,7 +75,7 @@ final class FluidUtilPRTest {
         assertTrue(result.isSuccess(), "Insertion must success, but it failed.");
         assertEquals(Items.BUCKET, result.getResult().getItem(), "Result item isn't empty bucket. " + result.getResult());
         FluidStack content = tank.getFluid();
-        assertTrue(content.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)), "Tank has %s@%dmb".formatted(content.getFluid().getRegistryName(), content.getAmount()));
+        assertTrue(content.isFluidStackIdentical(new FluidStack(Fluids.WATER, 1000)), "Tank has %s@%dmb".formatted(content.getFluid(), content.getAmount()));
         assertEquals(Items.WATER_BUCKET, bucket.getItem(), "Original stack must not be changed");
     }
 
