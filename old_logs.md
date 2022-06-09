@@ -1,3 +1,10 @@
+## v19.0
+
+* First release for 1.19
+* **Not tested manually.**
+
+Build with 1.19-41.0.1, Mapping: Official 1.19
+
 ## v18.5.1
 
 * Enabled non-vanilla tanks because condition of tags works fine now.

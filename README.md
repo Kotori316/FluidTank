@@ -1,6 +1,6 @@
 # FluidTank
 
-For Minecraft 1.18.2 (1.18 branch)
+For Minecraft 1.19 (1.19 branch)
 
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)][CurseForge]
 [![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)][CurseForge]
@@ -26,7 +26,7 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
 ## APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.18.2, newer than 1.18.2-40.1.0
+  * For Minecraft 1.19
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.8

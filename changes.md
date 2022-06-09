@@ -1,5 +1,4 @@
-## v18.5.1
+## v19.0
 
-* Enabled non-vanilla tanks because condition of tags works fine now.
-* Respect enableWailaAndTOP config.
-* Changed required version of Forge.
+* First release for 1.19
+* **Not tested manually.**
