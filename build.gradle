@@ -184,6 +184,15 @@ repositories {
         }
     }
     maven {
+        name = "What The Hell Is That"
+        url = "https://maven.bai.lol"
+        content {
+            it.includeModule("mcp.mobius.waila", "wthit-api")
+            it.includeModule("mcp.mobius.waila", "wthit")
+            it.includeModule("lol.bai", "badpackets")
+        }
+    }
+    maven {
         name = "Mixin"
         url = 'https://repo.spongepowered.org/maven'
         content {
@@ -212,17 +221,23 @@ dependencies {
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }*/
-    if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null && false) {
-        implementation(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
+    if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null) {
+        // All dependencies must be either `implementation` or `runtimeOnly`.
+        // `compileOnly` means the mod is not released for this MC version.
+        compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
         implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         implementation(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
-        implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+        compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+        runtimeOnly(fg.deobf("mcp.mobius.waila:wthit:forge-${project.wthit_version}"))
+        runtimeOnly(fg.deobf("lol.bai:badpackets:forge-${project.badpackets_version}"))
     } else {
+        // All dependencies must be `compileOnly`
         compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
-        compileOnly(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
+        compileOnly(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
     }
+    compileOnly(fg.deobf("mcp.mobius.waila:wthit-api:forge-${project.wthit_version}"))
 
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 

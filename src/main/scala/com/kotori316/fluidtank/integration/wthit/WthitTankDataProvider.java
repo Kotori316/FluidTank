@@ -1,20 +1,19 @@
-package com.kotori316.fluidtank.integration.jade;
+package com.kotori316.fluidtank.integration.wthit;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IComponentProvider;
+import mcp.mobius.waila.api.IBlockAccessor;
+import mcp.mobius.waila.api.IBlockComponentProvider;
+import mcp.mobius.waila.api.IPluginConfig;
+import mcp.mobius.waila.api.IServerAccessor;
 import mcp.mobius.waila.api.IServerDataProvider;
 import mcp.mobius.waila.api.ITooltip;
-import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.fluids.FluidAmount;
@@ -22,34 +21,32 @@ import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
 
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.AMOUNT;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.CAPACITY;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.COMPARATOR;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.CONTENT;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.FLUID_NULL;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.KEY_SHORT_INFO;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.KEY_TANK_INFO;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_ConnectionAmount;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_ConnectionCapacity;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_ConnectionComparator;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_ConnectionFluidName;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_Creative;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.NBT_Tier;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.TIER;
-import static com.kotori316.fluidtank.integration.jade.TankWailaPlugin.WAILA_SHORT;
+import static com.kotori316.fluidtank.integration.Localize.AMOUNT;
+import static com.kotori316.fluidtank.integration.Localize.CAPACITY;
+import static com.kotori316.fluidtank.integration.Localize.COMPARATOR;
+import static com.kotori316.fluidtank.integration.Localize.CONTENT;
+import static com.kotori316.fluidtank.integration.Localize.FLUID_NULL;
+import static com.kotori316.fluidtank.integration.Localize.NBT_ConnectionAmount;
+import static com.kotori316.fluidtank.integration.Localize.NBT_ConnectionCapacity;
+import static com.kotori316.fluidtank.integration.Localize.NBT_ConnectionComparator;
+import static com.kotori316.fluidtank.integration.Localize.NBT_ConnectionFluidName;
+import static com.kotori316.fluidtank.integration.Localize.NBT_Creative;
+import static com.kotori316.fluidtank.integration.Localize.NBT_Tier;
+import static com.kotori316.fluidtank.integration.Localize.TIER;
+import static com.kotori316.fluidtank.integration.Localize.WAILA_SHORT;
 
 /**
  * Add details of tank with data from server.
  * This class must not contain any fields because the instance is not same in client side and server side.
  * The data should be transferred via packets with NBT, just added to given tag.
  */
-final class TankDataProvider implements IServerDataProvider<BlockEntity>, IComponentProvider {
+final class WthitTankDataProvider implements IServerDataProvider<BlockEntity>, IBlockComponentProvider {
     @Override
-    public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-        if (accessor.getBlockEntity() instanceof TileTank tank && config.get(KEY_TANK_INFO)) {
+    public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
+        if (accessor.getBlockEntity() instanceof TileTank tank && config.getBoolean(WthitTankWailaPlugin.KEY_TANK_INFO)) {
             CompoundTag nbtData = accessor.getServerData();
             List<? extends Component> list;
-            if (config.get(KEY_SHORT_INFO)) {
+            if (config.getBoolean(WthitTankWailaPlugin.KEY_SHORT_INFO)) {
                 if (tank instanceof TileTankVoid) {
                     list = Collections.emptyList();
                 } else {
@@ -99,18 +96,18 @@ final class TankDataProvider implements IServerDataProvider<BlockEntity>, ICompo
                 }
             }
 
-            list.forEach(tooltip::add);
+            list.forEach(tooltip::addLine);
         }
     }
 
-    @Nonnull
+    @NotNull
     private static String getCreativeFluidName(TileTank tank) {
         return java.util.Optional.ofNullable(tank.internalTank().getTank().fluidAmount()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL);
     }
 
     @Override
-    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world, BlockEntity e, boolean b) {
-        if (!(e instanceof TileTank tank)) return;
+    public void appendServerData(CompoundTag tag, IServerAccessor<BlockEntity> accessor, IPluginConfig config) {
+        if (!(accessor.getTarget() instanceof TileTank tank)) return;
         tag.putString(NBT_Tier, tank.tier().toString());
         if (tank instanceof TileTankVoid) return;
         tag.putString(NBT_ConnectionFluidName,
@@ -124,4 +121,5 @@ final class TankDataProvider implements IServerDataProvider<BlockEntity>, ICompo
             tag.putBoolean(NBT_Creative, true);
         }
     }
+
 }
