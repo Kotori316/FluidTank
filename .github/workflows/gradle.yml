@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
     branches:
-      - "1.18-fabric"
+      - "1.19-fabric"
 
 jobs:
   build:
