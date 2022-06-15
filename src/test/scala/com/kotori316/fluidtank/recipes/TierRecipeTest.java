@@ -21,7 +21,6 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -188,7 +187,6 @@ final class TierRecipeTest extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource("tierWithContext")
-    @Disabled("Accessing tag before bounded is not allowed.")
     void serializeJson(Tier tier, ICondition.IContext context) {
         TierRecipe recipe = new TierRecipe(new ResourceLocation(FluidTank.modID, "test_" + tier.lowerName()),
             tier, Ingredient.of(ItemTags.create(new ResourceLocation(tier.tagName()))), Set.of(woodTank));

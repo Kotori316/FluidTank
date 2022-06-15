@@ -14,7 +14,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.crafting.conditions.ICondition;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -62,7 +61,6 @@ final class ReservoirRecipeSerializeTest extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource("tierAndIngredient")
-    @Disabled("Deserialization of Ingredient is not available in test environment.")
     void serializeJson(Tier t, Ingredient sub, ICondition.IContext context) {
         ReservoirRecipe recipe = new ReservoirRecipe(new ResourceLocation("test:reservoir_" + t.lowerName()), t, Collections.singletonList(sub));
 
