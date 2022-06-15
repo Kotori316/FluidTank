@@ -301,10 +301,6 @@ object ListTankHandlerTest extends BeforeAllTest {
     @Test
     def fillGas(): Unit = {
       val fluid = new WaterFluid.Source()
-      /*val attribute = FluidAttributes.builder(new ResourceLocation("minecraft", "blocks/milk_still"),
-        new ResourceLocation("minecraft", "blocks/milk_still"))
-        .translationKey("key")
-        .gaseous()*/
       val attribute = FluidType.Properties.create().density(999)
       UnsafeHacks.setField(classOf[Fluid].getDeclaredField("forgeFluidType"), fluid, new FluidType(attribute))
 
