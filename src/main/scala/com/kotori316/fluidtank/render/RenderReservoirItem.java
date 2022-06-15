@@ -13,6 +13,8 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.IFluidTypeRenderProperties;
+import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,9 +55,10 @@ public class RenderReservoirItem extends BlockEntityWithoutLevelRenderer {
     }
 
     private static void renderFluid(FluidStack stack, int capacity, PoseStack matrixStack, MultiBufferSource buffer, int light, int overlay) {
-        ResourceLocation textureName = stack.getFluid().getAttributes().getStillTexture(stack);
+        IFluidTypeRenderProperties properties = RenderProperties.get(stack.getFluid());
+        ResourceLocation textureName = properties.getStillTexture(stack);
         TextureAtlasSprite texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(textureName);
-        int color = stack.getFluid().getAttributes().getColor(stack);
+        int color = properties.getColorTint(stack);
         Wrapper wrapper = new Wrapper(buffer.getBuffer(RenderType.translucent()));
         int alpha = (color >> 24 & 0xFF) > 0 ? color >> 24 & 0xFF : 0xFF;
         int red = color >> 16 & 0xFF, green = color >> 8 & 0xFF, blue = color & 0xFF;

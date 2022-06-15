@@ -3,10 +3,9 @@ package com.kotori316.fluidtank.fluids
 import cats.data.Chain
 import cats.implicits._
 import com.kotori316.fluidtank._
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.material.{Fluid, Fluids, WaterFluid}
 import net.minecraftforge.fluids.capability.IFluidHandler
-import net.minecraftforge.fluids.{FluidAttributes, FluidStack}
+import net.minecraftforge.fluids.{FluidStack, FluidType}
 import net.minecraftforge.fml.unsafe.UnsafeHacks
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
 import org.junit.jupiter.api.Test
@@ -15,7 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 //noinspection DuplicatedCode
-object ListTankHandlerTest extends BeforeAllTest{
+object ListTankHandlerTest extends BeforeAllTest {
   private final val WOOD = Tank(FluidAmount.EMPTY, 4000L)
   private final val STONE = Tank(FluidAmount.EMPTY, 16000L)
 
@@ -176,6 +175,22 @@ object ListTankHandlerTest extends BeforeAllTest{
     }
 
     @Test
+    def drainWater4(): Unit = {
+      val before = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(6000), STONE.capacity))
+      val h = new ListTankHandler(before.map(TankHandler.apply))
+      locally {
+        val drained = h.drain(FluidAmount.EMPTY.setAmount(5000), IFluidHandler.FluidAction.SIMULATE)
+        assertEquals(FluidAmount.BUCKET_WATER.setAmount(5000), drained)
+        assertEquals(before, h.getTankList)
+      }
+      locally {
+        val drained = h.drain(FluidAmount.EMPTY.setAmount(5000), IFluidHandler.FluidAction.EXECUTE)
+        assertEquals(FluidAmount.BUCKET_WATER.setAmount(5000), drained)
+        assertEquals(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(1000), STONE.capacity)), h.getTankList)
+      }
+    }
+
+    @Test
     def drainFailLava(): Unit = {
       val before = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(6000), STONE.capacity))
       val h = new ListTankHandler(before.map(TankHandler.apply))
@@ -286,11 +301,12 @@ object ListTankHandlerTest extends BeforeAllTest{
     @Test
     def fillGas(): Unit = {
       val fluid = new WaterFluid.Source()
-      val attribute = FluidAttributes.builder(new ResourceLocation("minecraft", "blocks/milk_still"),
+      /*val attribute = FluidAttributes.builder(new ResourceLocation("minecraft", "blocks/milk_still"),
         new ResourceLocation("minecraft", "blocks/milk_still"))
         .translationKey("key")
-        .gaseous()
-      UnsafeHacks.setField(classOf[Fluid].getDeclaredField("forgeFluidAttributes"), fluid, attribute.build(fluid))
+        .gaseous()*/
+      val attribute = FluidType.Properties.create().density(999)
+      UnsafeHacks.setField(classOf[Fluid].getDeclaredField("forgeFluidType"), fluid, new FluidType(attribute))
 
       val fa = FluidAmount(fluid, 1000L, None)
 

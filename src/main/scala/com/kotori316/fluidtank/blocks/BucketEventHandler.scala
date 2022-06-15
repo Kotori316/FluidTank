@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.minecraftforge.common.SoundActions
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidActionResult, FluidStack, FluidUtil}
 import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
@@ -82,13 +83,13 @@ object BucketEventHandler {
   }
 
   private def getEmptySound(fluidStack: FluidStack): SoundEvent = {
-    Option(fluidStack.getFluid.getAttributes.getEmptySound(fluidStack)).getOrElse(
+    Option(fluidStack.getFluid.getFluidType.getSound(fluidStack, SoundActions.BUCKET_EMPTY)).getOrElse(
       if (Utils.getTagElements(FluidTags.LAVA) contains fluidStack.getFluid) SoundEvents.BUCKET_EMPTY_LAVA else SoundEvents.BUCKET_EMPTY
     )
   }
 
   private def getFillSound(fluidStack: FluidStack): SoundEvent = {
-    Option(fluidStack.getFluid.getAttributes.getFillSound(fluidStack)).getOrElse(
+    Option(fluidStack.getFluid.getFluidType.getSound(fluidStack, SoundActions.BUCKET_FILL)).getOrElse(
       if (Utils.getTagElements(FluidTags.LAVA) contains fluidStack.getFluid) SoundEvents.BUCKET_FILL_LAVA else SoundEvents.BUCKET_FILL
     )
   }

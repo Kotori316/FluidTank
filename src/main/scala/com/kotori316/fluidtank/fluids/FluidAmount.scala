@@ -7,7 +7,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BucketItem, ItemStack, Items}
 import net.minecraft.world.level.material.{Fluid, Fluids}
-import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
+import net.minecraftforge.common.Tags
+import net.minecraftforge.fluids.{FluidStack, FluidType, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
@@ -34,7 +35,7 @@ case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option
 
   def isEmpty: Boolean = !nonEmpty
 
-  def isGaseous: Boolean = fluid.getAttributes.isGaseous
+  def isGaseous: Boolean = Utils.isInTag(fluid, Tags.Fluids.GASEOUS)
 
   def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
 
@@ -71,7 +72,7 @@ object FluidAmount {
   final val NBT_fluid = "fluid"
   final val NBT_amount = "amount"
   final val NBT_tag = "tag"
-  final val AMOUNT_BUCKET = FluidAttributes.BUCKET_VOLUME
+  final val AMOUNT_BUCKET = FluidType.BUCKET_VOLUME
   val EMPTY: FluidAmount = FluidAmount(Fluids.EMPTY, 0, None)
   val BUCKET_LAVA: FluidAmount = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
   val BUCKET_WATER: FluidAmount = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)

@@ -7,7 +7,7 @@ import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.MEStorage;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.OptionConverters;
@@ -62,7 +62,7 @@ record AEFluidInv(TileTank tank) implements MEStorage {
                 if (tankKey.tag().isEmpty() && !fluidKey.hasTag())
                     return true; // No NBT is in stack.
                 else
-                    return fluidKey.matches(tankKey.createStack(FluidAttributes.BUCKET_VOLUME)); // Check NBT as FluidStack
+                    return fluidKey.matches(tankKey.createStack(FluidType.BUCKET_VOLUME)); // Check NBT as FluidStack
             }
         }
         return false;

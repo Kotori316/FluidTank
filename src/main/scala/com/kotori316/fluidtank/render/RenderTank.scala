@@ -9,7 +9,8 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.level.Level
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.fluids.FluidAttributes
+import net.minecraftforge.client.RenderProperties
+import net.minecraftforge.fluids.FluidType
 
 @OnlyIn(Dist.CLIENT)
 class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[TileTank] {
@@ -25,7 +26,7 @@ class RenderTank(d: BlockEntityRendererProvider.Context) extends BlockEntityRend
         val texture = Minecraft.getInstance.getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(resource)
         val color = RenderTank.color(te)
 
-        val value = Box.LightValue(light).overrideBlock(te.internalTank.getFluid.fluid.getAttributes.getLuminosity(te.internalTank.getFluid.toStack))
+        val value = Box.LightValue(light).overrideBlock(te.internalTank.getFluid.fluid.getFluidType.getLightLevel(te.internalTank.getFluid.toStack))
         val alpha = if ((color >> 24 & 0xFF) > 0) color >> 24 & 0xFF else 0xFF
         tank.box.render(b, matrix, texture, alpha, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF)(value)
       }
@@ -39,21 +40,22 @@ object RenderTank {
   private def textureName(tile: TileTank) = {
     val world = getTankWorld(tile)
     val pos = getTankPos(tile)
-    tile.internalTank.getFluid.fluid.getAttributes.getStillTexture(world, pos)
+    val attributes = RenderProperties.get(tile.internalTank.getFluid.fluid)
+    attributes.getStillTexture(tile.internalTank.getFluid.fluid.defaultFluidState, world, pos)
   }
 
   private def color(tile: TileTank) = {
     val fluidAmount = tile.internalTank.getFluid
-    val attributes = fluidAmount.fluid.getAttributes
-    val normal = attributes.getColor
-    if (attributes.getClass == classOf[FluidAttributes]) {
+    val attributes = RenderProperties.get(fluidAmount.fluid)
+    val normal = attributes.getColorTint
+    if (attributes.getClass == classOf[FluidType]) {
       normal
     } else {
-      val stackColor = attributes.getColor(fluidAmount.toStack)
+      val stackColor = attributes.getColorTint(fluidAmount.toStack)
       if (normal == stackColor) {
         val world = getTankWorld(tile)
         val pos = getTankPos(tile)
-        val worldColor = attributes.getColor(world, pos)
+        val worldColor = attributes.getColorTint(fluidAmount.fluid.defaultFluidState, world, pos)
         worldColor
       } else {
         stackColor

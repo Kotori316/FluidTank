@@ -6,12 +6,19 @@ import java.util.Optional;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fml.unsafe.UnsafeHacks;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -39,6 +46,7 @@ public abstract class BeforeAllTest {
         setConfig();
         mockCapability();
         mockRegistries();
+        setFluidType();
     }
 
     @SuppressWarnings("unchecked")
@@ -102,4 +110,48 @@ public abstract class BeforeAllTest {
         Config.content().debug().set(true);
     }
 
+    private static void setFluidType() {
+        var airType = new FluidType(FluidType.Properties.create()
+            .descriptionId("block.minecraft.air")
+            .motionScale(1D)
+            .canPushEntity(false)
+            .canSwim(false)
+            .canDrown(false)
+            .fallDistanceModifier(1F)
+            .pathType(null)
+            .adjacentPathType(null)
+            .density(0)
+            .temperature(0)
+            .viscosity(0));
+        var waterType = new FluidType(FluidType.Properties.create()
+            .descriptionId("block.minecraft.water")
+            .fallDistanceModifier(0F)
+            .canExtinguish(true)
+            .canConvertToSource(true)
+            .supportsBoating(true)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+            .sound(SoundActions.FLUID_VAPORIZE, SoundEvents.FIRE_EXTINGUISH)
+            .canHydrate(true));
+        var lavaType = new FluidType(FluidType.Properties.create()
+            .descriptionId("block.minecraft.lava")
+            .canSwim(false)
+            .canDrown(false)
+            .pathType(BlockPathTypes.LAVA)
+            .adjacentPathType(null)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
+            .lightLevel(15)
+            .density(3000)
+            .viscosity(6000)
+            .temperature(1300));
+        try {
+            var field = Fluid.class.getDeclaredField("forgeFluidType");
+            UnsafeHacks.setField(field, Fluids.EMPTY, airType);
+            UnsafeHacks.setField(field, Fluids.WATER, waterType);
+            UnsafeHacks.setField(field, Fluids.LAVA, lavaType);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
+        }
+    }
 }

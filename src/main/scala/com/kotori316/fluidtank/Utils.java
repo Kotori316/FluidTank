@@ -23,6 +23,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -148,6 +149,11 @@ public class Utils {
             .flatMap(HolderSet.Named::stream)
             .map(Holder::value)
             .collect(Collectors.toSet());
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean isInTag(Fluid fluid, TagKey<Fluid> tagKey) {
+        return fluid.is(tagKey);
     }
 
     public static String convertIngredientToString(Collection<Ingredient> ingredients) {
