@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: build/reports/tests/*
-          name: Test-Report-${{ matrix.java }}
+          name: Test-Report-${{ github.run_number }}-${{ matrix.forge }}
 
   run-data:
     runs-on: ubuntu-latest
