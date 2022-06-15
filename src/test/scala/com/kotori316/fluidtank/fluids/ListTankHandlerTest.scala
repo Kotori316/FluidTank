@@ -4,6 +4,7 @@ import cats.data.Chain
 import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.world.level.material.{Fluid, Fluids, WaterFluid}
+import net.minecraftforge.common.Tags
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidStack, FluidType}
 import net.minecraftforge.fml.unsafe.UnsafeHacks
@@ -303,6 +304,8 @@ object ListTankHandlerTest extends BeforeAllTest {
       val fluid = new WaterFluid.Source()
       val attribute = FluidType.Properties.create().density(999)
       UnsafeHacks.setField(classOf[Fluid].getDeclaredField("forgeFluidType"), fluid, new FluidType(attribute))
+      //noinspection ScalaDeprecation
+      fluid.builtInRegistryHolder().bindTags(java.util.List.of(Tags.Fluids.GASEOUS))
 
       val fa = FluidAmount(fluid, 1000L, None)
 
