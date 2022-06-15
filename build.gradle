@@ -163,7 +163,7 @@ repositories {
         name = "ModMaven.k-4u.nl"
         url = "https://modmaven.dev/"
         content {
-            it.includeGroup("appeng")
+            it.includeModule("appeng", "appliedenergistics2")
         }
     }
     maven {
