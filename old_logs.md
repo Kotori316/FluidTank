@@ -1,3 +1,9 @@
+## v19.1
+
+* Follow changes of Forge Fluid API
+
+Build with 1.19-41.0.30, Mapping: Official 1.19
+
 ## v19.0
 
 * First release for 1.19
