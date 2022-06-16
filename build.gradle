@@ -224,7 +224,9 @@ dependencies {
     if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null) {
         // All dependencies must be either `implementation` or `runtimeOnly`.
         // `compileOnly` means the mod is not released for this MC version.
-        compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
+        implementation(fg.deobf(group: "mezz.jei", name: "jei-1.19-forge", version: project.jeiVersion) {
+            transitive(false)
+        })
         implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         implementation(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
@@ -232,7 +234,9 @@ dependencies {
         runtimeOnly(fg.deobf("lol.bai:badpackets:forge-${project.badpackets_version}"))
     } else {
         // All dependencies must be `compileOnly`
-        compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
+        compileOnly(fg.deobf(group: "mezz.jei", name: "jei-1.19-forge", version: project.jeiVersion) {
+            transitive(false)
+        })
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
