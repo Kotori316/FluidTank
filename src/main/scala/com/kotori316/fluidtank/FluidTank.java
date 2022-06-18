@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.gametest.ForgeGameTestHooks;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
@@ -42,7 +44,15 @@ public class FluidTank {
     public static final SideProxy proxy = SideProxy.get();
 
     public FluidTank() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.sync(new ForgeConfigSpec.Builder()));
+        var configSpec = Config.sync(new ForgeConfigSpec.Builder());
+        if (ForgeGameTestHooks.isGametestServer()) {
+            // In game test. Use in-memory config.
+            final CommentedConfig commentedConfig = CommentedConfig.inMemory();
+            configSpec.correct(commentedConfig);
+            configSpec.acceptConfig(commentedConfig);
+        } else {
+            ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, configSpec);
+        }
         ForgeMod.enableMilkFluid();
         FMLJavaModLoadingContext.get().getModEventBus().register(Register.class);
         FMLJavaModLoadingContext.get().getModEventBus().register(proxy);
