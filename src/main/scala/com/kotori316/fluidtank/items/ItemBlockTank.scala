@@ -15,14 +15,13 @@ import net.minecraft.network.chat.{Component, TranslatableComponent}
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.item.{BlockItem, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.client.IItemRenderProperties
 import net.minecraftforge.common.capabilities.ICapabilityProvider
-import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 import org.jetbrains.annotations.Nullable
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, FluidTank.proxy.getTankProperties) {
@@ -90,15 +89,11 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     }
   }
 
-  override def getContainerItem(itemStack: ItemStack): ItemStack = {
-    import com.kotori316.fluidtank._
-    FluidUtil.getFluidHandler(itemStack.copy()).asScala
-      .map { f => f.drain(FluidAmount.AMOUNT_BUCKET, FluidAction.EXECUTE); f.getContainer }
-      .getOrElse(itemStack)
-      .value
-  }
+  override def getContainerItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
 
   override def hasContainerItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
+
+  override def getBurnTime(itemStack: ItemStack, recipeType: RecipeType[_]): Int = ItemUtil.getTankBurnTime(blockTank.tier, itemStack, recipeType)
 
   override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {
     consumer.accept(new IItemRenderProperties {

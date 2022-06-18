@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.items
 
 import java.util.function.Consumer
 
-import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.network.ClientProxy
 import com.kotori316.fluidtank.tiles.Tier
@@ -12,6 +11,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TranslatableComponent}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.item.{BlockItem, Item, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.HitResult
@@ -21,7 +21,6 @@ import net.minecraftforge.client.IItemRenderProperties
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
 class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirProperties.stacksTo(1)) {
   setRegistryName(FluidTank.modID, "reservoir_" + tier.lowerName)
@@ -77,14 +76,11 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
     new TankItemFluidHandler(tier, stack)
   }
 
-  override def getContainerItem(itemStack: ItemStack): ItemStack = {
-    FluidUtil.getFluidHandler(itemStack.copy()).asScala
-      .map { f => f.drain(FluidAmount.AMOUNT_BUCKET, FluidAction.EXECUTE); f.getContainer }
-      .getOrElse(itemStack)
-      .value
-  }
+  override def getContainerItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
 
   override def hasContainerItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
+
+  override def getBurnTime(itemStack: ItemStack, recipeType: RecipeType[_]): Int = ItemUtil.getTankBurnTime(tier, itemStack, recipeType)
 
   // ---------- Information ----------
   @OnlyIn(Dist.CLIENT)
