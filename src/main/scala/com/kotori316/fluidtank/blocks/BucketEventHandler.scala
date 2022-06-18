@@ -1,10 +1,8 @@
 package com.kotori316.fluidtank.blocks
 
 import cats.Eval
-import com.kotori316.fluidtank.Utils
 import net.minecraft.core.BlockPos
-import net.minecraft.sounds.{SoundEvent, SoundEvents, SoundSource}
-import net.minecraft.tags.FluidTags
+import net.minecraft.sounds.{SoundEvent, SoundSource}
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -17,7 +15,7 @@ import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
 import scala.jdk.OptionConverters._
 
 object BucketEventHandler {
-  case class TransferResult(result: FluidActionResult, sound: SoundEvent)
+  case class TransferResult(result: FluidActionResult, sound: Option[SoundEvent])
 
   def transferFluid(tank: IFluidHandler, tankContent: => FluidStack, stack: ItemStack): Option[TransferResult] = {
     // Fill tank and drain from item
@@ -79,18 +77,14 @@ object BucketEventHandler {
         originalStack.shrink(1)
       }
     }
-    level.playSound(null, pos, result.sound, SoundSource.BLOCKS, 1f, 1f)
+    result.sound.foreach(s => level.playSound(null, pos, s, SoundSource.BLOCKS, 1f, 1f))
   }
 
-  private def getEmptySound(fluidStack: FluidStack): SoundEvent = {
-    Option(fluidStack.getFluid.getFluidType.getSound(fluidStack, SoundActions.BUCKET_EMPTY)).getOrElse(
-      if (Utils.getTagElements(FluidTags.LAVA) contains fluidStack.getFluid) SoundEvents.BUCKET_EMPTY_LAVA else SoundEvents.BUCKET_EMPTY
-    )
+  private def getEmptySound(fluidStack: FluidStack): Option[SoundEvent] = {
+    Option(fluidStack.getFluid.getFluidType.getSound(fluidStack, SoundActions.BUCKET_EMPTY))
   }
 
-  private def getFillSound(fluidStack: FluidStack): SoundEvent = {
-    Option(fluidStack.getFluid.getFluidType.getSound(fluidStack, SoundActions.BUCKET_FILL)).getOrElse(
-      if (Utils.getTagElements(FluidTags.LAVA) contains fluidStack.getFluid) SoundEvents.BUCKET_FILL_LAVA else SoundEvents.BUCKET_FILL
-    )
+  private def getFillSound(fluidStack: FluidStack): Option[SoundEvent] = {
+    Option(fluidStack.getFluid.getFluidType.getSound(fluidStack, SoundActions.BUCKET_FILL))
   }
 }
