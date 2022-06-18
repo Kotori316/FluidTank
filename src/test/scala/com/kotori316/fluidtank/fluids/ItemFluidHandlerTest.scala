@@ -10,6 +10,8 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{DisplayName, Test}
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 //noinspection DuplicatedCode It's a test.
 object ItemFluidHandlerTest extends BeforeAllTest {
@@ -137,5 +139,34 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val stack = new ItemStack(woodTank, 2)
     val handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
     assertTrue(handler.isPresent)
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = Array(1, 10, 100, 500, 999, 1000))
+  def tankContainer1(amount: Int): Unit = {
+    val stack = new ItemStack(woodTank)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
+    handler.fill(FluidAmount.BUCKET_WATER.setAmount(amount).toStack, IFluidHandler.FluidAction.EXECUTE)
+
+    val container = stack.getContainerItem
+    assertEquals(woodTank.itemBlock, container.getItem)
+    val containerContent = RecipeInventoryUtil.getFluidHandler(container).getFluid
+    assertTrue(containerContent.isEmpty)
+    assertEquals(0L, containerContent.amount)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount), handler.getFluid)
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = Array(1001, 2000, 2500, 3257))
+  def tankContainer2(amount: Int): Unit = {
+    val stack = new ItemStack(woodTank)
+    val handler = RecipeInventoryUtil.getFluidHandler(stack)
+    handler.fill(FluidAmount.BUCKET_WATER.setAmount(amount).toStack, IFluidHandler.FluidAction.EXECUTE)
+
+    val container = stack.getContainerItem
+    assertEquals(woodTank.itemBlock, container.getItem)
+    val containerContent = RecipeInventoryUtil.getFluidHandler(container).getFluid
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount - 1000), containerContent)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount), handler.getFluid)
   }
 }
