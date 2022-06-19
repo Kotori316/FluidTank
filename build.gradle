@@ -336,7 +336,7 @@ task signJar2() {
 
 if (!isInCI()) {
     // Runs this task automatically when build is ran.
-    assemble.dependsOn(signJar2)
+    assemble.finalizedBy(signJar2)
 } else {
     // In CI
     tasks.withType(JavaExec) {
