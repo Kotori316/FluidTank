@@ -1,14 +1,14 @@
 package com.kotori316.fluidtank.items
 
-import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.{Tiers, TileTankNoDisplay}
 import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.crafting.IRecipeType
 import net.minecraft.item.{Item, ItemStack, ItemUseContext, Rarity}
 import net.minecraft.nbt.CompoundNBT
-import net.minecraft.util.math.{BlockRayTraceResult, RayTraceContext, RayTraceResult}
+import net.minecraft.util.math.{RayTraceContext, RayTraceResult}
 import net.minecraft.util.text.{ITextComponent, TranslationTextComponent}
 import net.minecraft.util.{ActionResult, ActionResultType, Hand}
 import net.minecraft.world.World
@@ -16,7 +16,6 @@ import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
 class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirProperties.maxStackSize(1)) {
   setRegistryName(FluidTank.modID, "reservoir_" + tier.lowerName)
@@ -45,7 +44,7 @@ class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirPr
     val stack = playerIn.getHeldItem(handIn)
     val rayTraceResult = Item.rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY)
     if (rayTraceResult.getType == RayTraceResult.Type.BLOCK) {
-      val blockRayTraceResult = rayTraceResult.asInstanceOf[BlockRayTraceResult]
+      val blockRayTraceResult = rayTraceResult
       val pos = blockRayTraceResult.getPos
       val direction = blockRayTraceResult.getFace
       if (worldIn.isBlockModifiable(playerIn, pos)) {
@@ -73,15 +72,11 @@ class ReservoirItem(val tier: Tiers) extends Item(FluidTank.proxy.getReservoirPr
     new TankItemFluidHandler(tier, stack)
   }
 
-  override def getContainerItem(itemStack: ItemStack): ItemStack = {
-    import com.kotori316.fluidtank._
-    FluidUtil.getFluidHandler(itemStack.copy()).asScala
-      .map { f => f.drain(FluidAmount.AMOUNT_BUCKET, FluidAction.EXECUTE); f.getContainer }
-      .getOrElse(itemStack)
-      .value
-  }
+  override def getContainerItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
 
   override def hasContainerItem(stack: ItemStack): Boolean = stack.getChildTag(TileTankNoDisplay.NBT_BlockTag) != null
+
+  override def getBurnTime(itemStack: ItemStack, recipeType: IRecipeType[_]): Int = ItemUtil.getTankBurnTime(tier, itemStack, recipeType)
 
   // ---------- Information ----------
   @OnlyIn(Dist.CLIENT)
