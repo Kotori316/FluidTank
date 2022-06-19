@@ -191,8 +191,8 @@ private boolean hasGitHubToken() {
 
 dependencies {
     minecraft(forgeVersion())
-    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.5')
-    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.4.2')
+    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.8')
+    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: '2.7.0')
 
     if (!isInCI()) {
         implementation(fg.deobf("mcp.mobius.waila:Hwyla:1.10.11-B78_1.16.2"))
@@ -200,12 +200,12 @@ dependencies {
         runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
         runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
     }
-    implementation(fg.deobf("mezz.jei:jei-1.16.5:7.7.0.99"))
+    implementation fg.deobf(group: "mezz.jei", name: "jei-1.16.5", version: project.jeiVersion)
     implementation(fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22"))
     implementation(fg.deobf("appeng:appliedenergistics2:8.2.0-alpha.2"))
     compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
-    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.5-build-1', classifier: 'dev')
+    implementation(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.8-build-3', classifier: 'dev')
     // Mixin
     annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
     // Test Dependencies.
