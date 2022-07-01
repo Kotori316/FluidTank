@@ -1,6 +1,13 @@
 package com.kotori316.fluidtank.gametest;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestGenerator;
+import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.fluids.FluidUtil;
@@ -13,6 +20,7 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tier;
+import com.kotori316.testutil.GameTestUtil;
 
 import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
 
@@ -52,10 +60,9 @@ public final class TankFuelTest {
         Assertions.assertEquals(-1, stack.getBurnTime(RecipeType.SMELTING));
     }
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
-    void checkFuelValueOfLava() {
-        var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.BRONZE));
-        FluidUtil.getFluidHandler(stack).ifPresent(h -> h.fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE));
+    void checkFuelValueOfLava(int amount, Tier tier) {
+        var stack = new ItemStack(ModObjects.tierToBlock().apply(tier));
+        FluidUtil.getFluidHandler(stack).ifPresent(h -> h.fill(FluidAmount.BUCKET_LAVA().setAmount(amount).toStack(), IFluidHandler.FluidAction.EXECUTE));
 
         Assertions.assertEquals(100 * 200, stack.getBurnTime(RecipeType.SMELTING));
     }
@@ -74,5 +81,22 @@ public final class TankFuelTest {
         FluidUtil.getFluidHandler(stack).ifPresent(h -> h.fill(FluidAmount.BUCKET_LAVA().setAmount(100).toStack(), IFluidHandler.FluidAction.EXECUTE));
 
         Assertions.assertEquals(10 * 200, stack.getBurnTime(RecipeType.SMELTING));
+    }
+
+    @GameTestGenerator
+    List<TestFunction> checkFuelValueOfLavaManyBuckets() {
+        return IntStream.of(1000, 1001, 2000, 5000, 10000)
+            .mapToObj(i -> GameTestUtil.create(FluidTank.modID, BATCH, "checkFuelValueOfLavaManyBuckets" + i,
+                () -> this.checkFuelValueOfLava(i, Tier.BRONZE)))
+            .toList();
+    }
+
+    @GameTestGenerator
+    List<TestFunction> checkFuelValueOfLavaTier() {
+        return Stream.of(Tier.values())
+            .filter(Predicate.not(Predicate.isEqual(Tier.Invalid).or(Predicate.isEqual(Tier.VOID)).or(Predicate.isEqual(Tier.CREATIVE))))
+            .map(t -> GameTestUtil.create(FluidTank.modID, BATCH, "checkFuelValueOfLavaTier" + t,
+                () -> this.checkFuelValueOfLava(1000, t)))
+            .toList();
     }
 }
