@@ -1,3 +1,10 @@
+## v19.2
+
+* You can now use tanks and reservoirs as fuel.
+* Stop sound if no sound is registered for the fluid.
+
+Build with 1.19-41.0.62, Mapping: Official 1.19
+
 ## v19.1
 
 * Follow changes of Forge Fluid API
