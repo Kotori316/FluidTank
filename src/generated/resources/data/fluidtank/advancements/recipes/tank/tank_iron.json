@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:recipes/root",
+  "conditions": [
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/iron"
+    }
+  ],
+  "criteria": {
+    "has_ingots/iron": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/iron"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "fluidtank:tank_iron"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ingots/iron"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_iron"
+    ]
+  }
+}

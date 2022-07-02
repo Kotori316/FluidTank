@@ -1,0 +1,9 @@
+{
+  "type": "fluidtank:reservoir_recipe",
+  "sub": [
+    {
+      "item": "minecraft:bucket"
+    }
+  ],
+  "tier": "wood"
+}

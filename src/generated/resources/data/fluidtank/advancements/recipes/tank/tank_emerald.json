@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:recipes/root",
+  "conditions": [
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:gems/emerald"
+    }
+  ],
+  "criteria": {
+    "has_gems/emerald": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:gems/emerald"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "fluidtank:tank_emerald"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_gems/emerald"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_emerald"
+    ]
+  }
+}

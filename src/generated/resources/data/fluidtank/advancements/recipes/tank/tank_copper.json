@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:recipes/root",
+  "conditions": [
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/copper"
+    }
+  ],
+  "criteria": {
+    "has_ingots/copper": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/copper"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "fluidtank:tank_copper"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ingots/copper"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_copper"
+    ]
+  }
+}

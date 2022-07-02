@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:glass"
+    },
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "fluidtank:easy"
+      }
+    },
+    {
+      "type": "fluidtank:config"
+    }
+  ],
+  "key": {
+    "p": {
+      "tag": "minecraft:logs"
+    },
+    "x": {
+      "tag": "forge:glass"
+    }
+  },
+  "pattern": [
+    "x x",
+    "xpx",
+    "xxx"
+  ],
+  "result": {
+    "item": "fluidtank:tank_wood"
+  }
+}

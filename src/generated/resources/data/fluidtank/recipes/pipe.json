@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "fluidtank:config_pipe"
+    },
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "fluidtank:easy"
+      }
+    }
+  ],
+  "key": {
+    "e": [
+      {
+        "tag": "forge:ender_pearls"
+      },
+      {
+        "item": "minecraft:ender_eye"
+      }
+    ],
+    "g": {
+      "tag": "forge:glass"
+    },
+    "t": {
+      "item": "fluidtank:tank_wood"
+    }
+  },
+  "pattern": [
+    "gtg",
+    " e ",
+    "gtg"
+  ],
+  "result": {
+    "item": "fluidtank:pipe"
+  }
+}

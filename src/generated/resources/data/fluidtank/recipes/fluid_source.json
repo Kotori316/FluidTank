@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": {
+      "tag": "forge:storage_blocks/iron"
+    },
+    "d": {
+      "item": "minecraft:dirt"
+    },
+    "g": {
+      "tag": "forge:ingots/gold"
+    },
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "w": {
+      "item": "minecraft:water_bucket"
+    }
+  },
+  "pattern": [
+    "wiw",
+    "gIg",
+    "wdw"
+  ],
+  "result": {
+    "item": "fluidtank:fluid_source"
+  }
+}

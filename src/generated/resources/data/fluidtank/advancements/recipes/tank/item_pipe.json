@@ -1,0 +1,58 @@
+{
+  "parent": "minecraft:recipes/root",
+  "conditions": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "fluidtank:easy"
+      }
+    }
+  ],
+  "criteria": {
+    "has_pearl": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:ender_eye"
+            ]
+          },
+          {
+            "tag": "forge:ender_pearls"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_tank_wood": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "fluidtank:tank_wood"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "fluidtank:item_pipe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tank_wood",
+      "has_pearl"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:item_pipe"
+    ]
+  }
+}

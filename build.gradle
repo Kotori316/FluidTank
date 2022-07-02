@@ -110,7 +110,7 @@ minecraft {
             with commonRunSetting
             workingDirectory file('run-server')
             setForceExit(false)
-            args('--mod', "fluidtank", '--all')
+            args('--mod', "fluidtank", '--all', '--output', file('src/generated/resources/'))
         }
 
         gameTestServer {
@@ -280,6 +280,15 @@ def jarAttributeMap = [
 jar {
     manifest {
         attributes(jarAttributeMap)
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/resources'
+            srcDir 'src/generated/resources'
+        }
     }
 }
 

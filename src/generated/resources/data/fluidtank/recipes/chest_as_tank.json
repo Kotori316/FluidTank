@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "p": [
+      {
+        "tag": "forge:chests"
+      },
+      {
+        "item": "minecraft:barrel"
+      }
+    ],
+    "x": {
+      "item": "fluidtank:tank_wood"
+    }
+  },
+  "pattern": [
+    "x x",
+    "xpx",
+    "xxx"
+  ],
+  "result": {
+    "item": "fluidtank:chest_as_tank"
+  }
+}

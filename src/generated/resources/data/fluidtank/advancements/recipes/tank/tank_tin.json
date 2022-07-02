@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:recipes/root",
+  "conditions": [
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/tin"
+    }
+  ],
+  "criteria": {
+    "has_ingots/tin": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:ingots/tin"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "fluidtank:tank_tin"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ingots/tin"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_tin"
+    ]
+  }
+}

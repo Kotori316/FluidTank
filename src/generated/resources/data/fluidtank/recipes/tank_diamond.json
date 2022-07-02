@@ -1,0 +1,16 @@
+{
+  "type": "fluidtank:crafting_grade_up",
+  "conditions": [
+    {
+      "type": "fluidtank:config"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:gems/diamond"
+    }
+  ],
+  "sub_item": {
+    "tag": "forge:gems/diamond"
+  },
+  "tier": "diamond"
+}

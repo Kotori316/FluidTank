@@ -25,3 +25,4 @@ FILES
 run-server
 library
 logs/
+.cache
