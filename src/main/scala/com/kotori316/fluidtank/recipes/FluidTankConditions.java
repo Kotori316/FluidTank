@@ -52,6 +52,18 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
         }
     }
 
+    public static final class PipeConfigCondition extends FluidTankConditions<PipeConfigCondition> {
+
+        public PipeConfigCondition() {
+            super(new ResourceLocation(FluidTank.modID, "config_pipe"));
+        }
+
+        @Override
+        public boolean test(IContext context) {
+            return !Config.content().removePipeRecipes().get();
+        }
+    }
+
     public static final class EasyCondition extends FluidTankConditions<EasyCondition> {
 
         public EasyCondition() {

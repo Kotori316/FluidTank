@@ -5,7 +5,7 @@ import java.nio.file.Path
 
 import com.google.gson.{GsonBuilder, JsonArray, JsonElement}
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.recipes.FluidTankConditions.TankConfigCondition
+import com.kotori316.fluidtank.recipes.FluidTankConditions.{PipeConfigCondition, TankConfigCondition}
 import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
 import com.kotori316.fluidtank.recipes.TierRecipe.TierFinishedRecipe
 import com.kotori316.fluidtank.tiles.Tier
@@ -102,6 +102,7 @@ object FluidTankDataProvider {
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
       val woodTanks = Ingredient.of(ModObjects.tierToBlock(Tier.WOOD))
       val tankConfigCondition = new TankConfigCondition()
+      val pipeConfigCondition = new PipeConfigCondition()
       val easyCondition = new FluidTankConditions.EasyCondition()
       val WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(tankWoodItem)
@@ -144,6 +145,7 @@ object FluidTankDataProvider {
           .pattern(" e ")
           .pattern("gtg"))
         .addCondition(new NotCondition(easyCondition))
+        .addCondition(pipeConfigCondition)
       val PIPE_EASY = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(ModObjects.blockFluidPipe, 2)
           .define('t', woodTanks)
@@ -152,6 +154,7 @@ object FluidTankDataProvider {
           .pattern("   ")
           .pattern("gtg"), saveName = ID("pipe_easy"))
         .addCondition(easyCondition)
+        .addCondition(pipeConfigCondition)
       val ITEM_PIPE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(ModObjects.blockItemPipe, 4)
           .define('t', woodTanks)
@@ -161,6 +164,7 @@ object FluidTankDataProvider {
           .pattern("tet")
           .pattern("g g"))
         .addCondition(new NotCondition(easyCondition))
+        .addCondition(pipeConfigCondition)
       val ITEM_PIPE_EASY = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(ModObjects.blockItemPipe, 8)
           .define('t', woodTanks)
@@ -169,6 +173,7 @@ object FluidTankDataProvider {
           .pattern("t t")
           .pattern("g g"), saveName = ID("item_pipe_easy"))
         .addCondition(easyCondition)
+        .addCondition(pipeConfigCondition)
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierFinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
           .addTagCondition(tag(new ResourceLocation(tier.tagName)))

@@ -22,13 +22,15 @@ object Config {
 
   class Content(builder: ForgeConfigSpec.Builder) {
     builder.comment("Settings for FluidTank.").push("common")
-    val removeTankRecipes: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipe to make tanks.")
+    val removeTankRecipes: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipes to make tanks.")
       .define("RemoveRecipe", false)
+    val removePipeRecipes: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all pipe recipes.")
+      .define("RemovePipeRecipe", false)
     val debug: ForgeConfigSpec.BooleanValue = builder.comment("Debug Mode").define("debug", false)
 
     builder.comment("Recipe settings").push(CATEGORY_RECIPE)
 
-    val easyRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("True to use easy recipe.")
+    val easyRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("True to use easy recipes.")
       .define("easyRecipe", false)
     val usableUnavailableTankInRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart()
       .comment("False to prohibit tanks with no recipe from being used in recipes of other tanks.")
@@ -37,7 +39,7 @@ object Config {
     builder.pop()
 
     val showInvisibleTank: ForgeConfigSpec.BooleanValue = builder.worldRestart()
-      .comment("True to show invisible tank in creative tabs. Recipe and block aren't removed.")
+      .comment("NOT USED. (True to show invisible tank in creative tabs. Recipe and block aren't removed.)")
       .define("showInvisibleTankInTab", false)
 
     val showTOP: ForgeConfigSpec.BooleanValue = builder.comment("Show tank info on TOP tooltip.")
