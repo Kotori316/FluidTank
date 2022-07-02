@@ -40,15 +40,15 @@ public abstract class FluidTankConditions<T extends FluidTankConditions<T>> impl
         }
     }
 
-    public static final class ConfigCondition extends FluidTankConditions<ConfigCondition> {
+    public static final class TankConfigCondition extends FluidTankConditions<TankConfigCondition> {
 
-        public ConfigCondition() {
+        public TankConfigCondition() {
             super(new ResourceLocation(FluidTank.modID, "config"));
         }
 
         @Override
         public boolean test(IContext context) {
-            return !Config.content().removeRecipe().get();
+            return !Config.content().removeTankRecipes().get();
         }
     }
 

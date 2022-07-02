@@ -100,7 +100,7 @@ public class FluidTank {
             helper.register(new ResourceLocation(CombineRecipe.LOCATION), CombineRecipe.SERIALIZER);
             helper.register(TierRecipe.Serializer.LOCATION, TierRecipe.SERIALIZER);
             helper.register(ReservoirRecipe.Serializer.LOCATION, ReservoirRecipe.SERIALIZER);
-            CraftingHelper.register(new FluidTankConditions.ConfigCondition().serializer);
+            CraftingHelper.register(new FluidTankConditions.TankConfigCondition().serializer);
             CraftingHelper.register(new FluidTankConditions.EasyCondition().serializer);
             CraftingHelper.register(TagCondition.Serializer.INSTANCE);
         }

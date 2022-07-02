@@ -5,6 +5,7 @@ import java.nio.file.Path
 
 import com.google.gson.{GsonBuilder, JsonArray, JsonElement}
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.recipes.FluidTankConditions.TankConfigCondition
 import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
 import com.kotori316.fluidtank.recipes.TierRecipe.TierFinishedRecipe
 import com.kotori316.fluidtank.tiles.Tier
@@ -100,7 +101,7 @@ object FluidTankDataProvider {
 
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
       val woodTanks = Ingredient.of(ModObjects.tierToBlock(Tier.WOOD))
-      val configCondition = new FluidTankConditions.ConfigCondition()
+      val tankConfigCondition = new TankConfigCondition()
       val easyCondition = new FluidTankConditions.EasyCondition()
       val WOOD = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(tankWoodItem)
@@ -108,7 +109,7 @@ object FluidTankDataProvider {
           .pattern("x x")
           .pattern("xpx")
           .pattern("xxx"))
-        .addCondition(configCondition)
+        .addCondition(tankConfigCondition)
         .addCondition(new NotCondition(easyCondition))
         .addCondition(new TagCondition(Tags.Items.GLASS.location))
       val EASY_WOOD = RecipeSerializeHelper.by(
@@ -117,7 +118,7 @@ object FluidTankDataProvider {
           .pattern("p p")
           .pattern("p p")
           .pattern("xpx"), saveName = ID("tank_wood_easy"))
-        .addCondition(configCondition)
+        .addCondition(tankConfigCondition)
         .addCondition(easyCondition)
         .addCondition(new TagCondition(Tags.Items.GLASS.location))
       val VOID = RecipeSerializeHelper.by(
@@ -126,7 +127,7 @@ object FluidTankDataProvider {
           .pattern("ooo")
           .pattern("oto")
           .pattern("ooo"))
-        .addCondition(configCondition)
+        .addCondition(tankConfigCondition)
       val CAT = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(ModObjects.blockCat)
           .define('x', woodTanks)
@@ -171,7 +172,7 @@ object FluidTankDataProvider {
       val TANKS = ModObjects.blockTanks.collect { case b if b.tier.hasTagRecipe => b.tier }
         .map(tier => RecipeSerializeHelper(new TierFinishedRecipe(ID("tank_" + tier.toString.toLowerCase), tier))
           .addTagCondition(tag(new ResourceLocation(tier.tagName)))
-          .addCondition(configCondition))
+          .addCondition(tankConfigCondition))
       val FLUID_SOURCE = RecipeSerializeHelper.by(
         ShapedRecipeBuilder.shaped(ModObjects.blockSource)
           .pattern("wiw")
@@ -183,13 +184,13 @@ object FluidTankDataProvider {
           .define('I', Tags.Items.STORAGE_BLOCKS_IRON)
           .define('d', Blocks.DIRT))
       val COMBINE = RecipeSerializeHelper(new CombineRecipe.CombineFinishedRecipe(new ResourceLocation(CombineRecipe.LOCATION)))
-        .addCondition(configCondition)
+        .addCondition(tankConfigCondition)
       val RESERVOIRS = List(Tier.WOOD, Tier.STONE, Tier.IRON)
         .map(t => new ReservoirRecipe(ID("reservoir_" + t.lowerName), t))
         .map(r => new ReservoirFinishedRecipe(r))
         .map(r => RecipeSerializeHelper(r))
       val COPPER = RecipeSerializeHelper(new TierFinishedRecipe(ID("tank_copper_vanilla"), Tier.COPPER, Ingredient.of(Items.COPPER_INGOT)))
-        .addCondition(configCondition)
+        .addCondition(tankConfigCondition)
 
       val recipes = RESERVOIRS ::: COMBINE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: COPPER :: TANKS
 

@@ -22,7 +22,7 @@ object Config {
 
   class Content(builder: ForgeConfigSpec.Builder) {
     builder.comment("Settings for FluidTank.").push("common")
-    val removeRecipe: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipe to make tanks.")
+    val removeTankRecipes: ForgeConfigSpec.BooleanValue = builder.worldRestart().comment("Remove all recipe to make tanks.")
       .define("RemoveRecipe", false)
     val debug: ForgeConfigSpec.BooleanValue = builder.comment("Debug Mode").define("debug", false)
 
