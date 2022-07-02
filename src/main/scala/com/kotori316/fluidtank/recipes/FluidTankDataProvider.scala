@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.recipes
 import java.io.IOException
 import java.nio.file.Path
 
-import com.google.gson.{GsonBuilder, JsonArray, JsonElement}
+import com.google.gson.{JsonArray, JsonElement}
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.recipes.FluidTankConditions.{PipeConfigCondition, TankConfigCondition}
 import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
@@ -97,7 +97,6 @@ object FluidTankDataProvider {
   class RecipeProvider(generatorIn: DataGenerator) extends DataProvider {
     override def run(cache: CachedOutput): Unit = {
       val path = generatorIn.getOutputFolder
-      val GSON = (new GsonBuilder).setPrettyPrinting().create
 
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
       val woodTanks = Ingredient.of(ModObjects.tierToBlock(Tier.WOOD))
@@ -218,7 +217,6 @@ object FluidTankDataProvider {
     //noinspection SpellCheckingInspection
     override def run(cache: CachedOutput): Unit = {
       val path = generatorIn.getOutputFolder
-      val GSON = (new GsonBuilder).setPrettyPrinting().disableHtmlEscaping().create
       val models: mutable.Buffer[ModelSerializerHelper] = mutable.Buffer.empty
       models ++= ModObjects.blockTanks.map(ModelSerializerHelper.getTankModel)
       models += ModelSerializerHelper.getFluidSourceModel(ModObjects.blockSource)
