@@ -74,8 +74,8 @@ object ModObjects {
 
   //---------- LootFunction ----------
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
-    new ResourceLocation(FluidTank.modID, "content_tank"),
-    new LootItemFunctionType(new ContentTankSerializer))
+    new ResourceLocation(FluidTank.modID, ContentLootFunction.NAME),
+    new LootItemFunctionType(new ContentLootFunction.ContentTankSerializer()))
 
   // ---------- Markers ----------
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")

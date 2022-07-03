@@ -35,6 +35,7 @@ object FluidTankDataProvider {
     event.getGenerator.addProvider(event.includeServer, new AdvancementProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeServer, new RecipeProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeClient, new ModelProvider(event.getGenerator))
+    event.getGenerator.addProvider(event.includeServer, new LootTableProvider(event.getGenerator))
   }
 
   private[this] final def ID(s: String) = new ResourceLocation(FluidTank.modID, s)
@@ -234,6 +235,28 @@ object FluidTankDataProvider {
     }
 
     override def getName: String = "Models of FluidTank"
+  }
+
+  class LootTableProvider(generatorIn: DataGenerator) extends DataProvider {
+    override def run(cache: CachedOutput): Unit = {
+      val path = generatorIn.getOutputFolder
+      val lootTables: mutable.Buffer[LootTableSerializerHelper] = mutable.Buffer.empty
+      lootTables ++= ModObjects.blockTanks.map(LootTableSerializerHelper.withTankContent)
+      lootTables ++= Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe)
+        .map(LootTableSerializerHelper.withDrop)
+
+      for (table <- lootTables) {
+        val out = path.resolve(s"data/${table.location.getNamespace}/loot_tables/blocks/${table.location.getPath}.json")
+        try {
+          saveData(cache, table.build, out)
+        } catch {
+          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${table.location}.", e)
+          case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${table.location}. Check the condition registered.", e)
+        }
+      }
+    }
+
+    override def getName: String = "LootTables of FluidTank"
   }
 
   def makeConditionArray(conditions: List[ICondition]): JsonArray = {

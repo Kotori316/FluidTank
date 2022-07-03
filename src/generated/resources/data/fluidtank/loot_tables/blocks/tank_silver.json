@@ -2,23 +2,24 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "name": "fluidtank:tank_gold",
-          "functions": [
-            {
-              "function": "fluidtank:content_tank"
-            }
-          ]
-        }
-      ],
+      "bonus_rolls": 0.0,
       "conditions": [
         {
           "condition": "minecraft:survives_explosion"
         }
-      ]
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "fluidtank:content_tank"
+            }
+          ],
+          "name": "fluidtank:tank_silver"
+        }
+      ],
+      "rolls": 1.0
     }
   ]
 }
