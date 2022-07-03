@@ -20,7 +20,7 @@ import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
-import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition}
+import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
@@ -196,6 +196,7 @@ object FluidTankDataProvider {
         .map(r => RecipeSerializeHelper(r))
       val COPPER = RecipeSerializeHelper(new TierFinishedRecipe(ID("tank_copper_vanilla"), Tier.COPPER, Ingredient.of(Items.COPPER_INGOT)))
         .addCondition(tankConfigCondition)
+        .addCondition(new TagEmptyCondition("forge", "ingots/copper"))
 
       val recipes = RESERVOIRS ::: COMBINE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: COPPER :: TANKS
 

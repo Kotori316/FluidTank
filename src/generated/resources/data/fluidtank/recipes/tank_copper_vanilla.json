@@ -2,6 +2,10 @@
   "type": "fluidtank:crafting_grade_up",
   "conditions": [
     {
+      "type": "forge:tag_empty",
+      "tag": "forge:ingots/copper"
+    },
+    {
       "type": "fluidtank:config"
     }
   ],
