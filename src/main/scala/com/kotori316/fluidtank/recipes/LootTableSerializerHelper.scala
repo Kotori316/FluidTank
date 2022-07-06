@@ -6,7 +6,7 @@ import net.minecraft.data.loot.BlockLoot
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.storage.loot.entries.{LootItem, LootPoolSingletonContainer}
-import net.minecraft.world.level.storage.loot.functions.LootItemFunction
+import net.minecraft.world.level.storage.loot.functions.{FunctionUserBuilder, LootItemFunction}
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
 import net.minecraft.world.level.storage.loot.{LootPool, LootTable, LootTables}
@@ -17,7 +17,7 @@ case class LootTableSerializerHelper(block: Block, functions: List[LootItemFunct
 
   def build: JsonElement = {
     val value: LootPoolSingletonContainer.Builder[_] = LootItem.lootTableItem(block)
-    this.functions.foreach(value.apply)
+    this.functions.foreach(f => value.asInstanceOf[FunctionUserBuilder[_]].apply(f))
     val builder = LootTable.lootTable.withPool(BlockLoot.applyExplosionCondition(block, LootPool.lootPool.setRolls(ConstantValue.exactly(1)).add(value)))
     builder.setParamSet(LootContextParamSets.BLOCK)
 
