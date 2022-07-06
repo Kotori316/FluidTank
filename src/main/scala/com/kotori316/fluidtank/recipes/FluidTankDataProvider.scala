@@ -223,6 +223,8 @@ object FluidTankDataProvider {
       models ++= ModObjects.blockTanks.map(ModelSerializerHelper.getTankModel)
       models += ModelSerializerHelper.getFluidSourceModel(ModObjects.blockSource)
       models += ModelSerializerHelper.getCatModel(ModObjects.blockCat)
+      models += ModelSerializerHelper.getPipeModel(ModObjects.blockFluidPipe)
+      models += ModelSerializerHelper.getPipeModel(ModObjects.blockItemPipe)
 
       for (model <- models) {
         val out = path.resolve(s"assets/${model.location.getNamespace}/blockstates/${model.location.getPath}.json")
