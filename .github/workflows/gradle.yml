@@ -41,13 +41,13 @@ jobs:
       - name: Prepare Test dir
         run: mkdir -p build/test-results/test
       - name: Test with Gradle
-        if: ${{ contains(github.event.head_commit.message, '[skip release]') }}
+        if: ${{ contains(github.event.head_commit.message, '[skip release]') }} || true
         run: chmod +x ./gradlew && ./gradlew build
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_GAME_TEST: true
       - name: Build and Publish with Gradle
-        if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
+        if: ${{ !contains(github.event.head_commit.message, '[skip release]') }} && false
         run: chmod +x ./gradlew && ./gradlew build curseforge publishAllPublicationsToAzureRepositoryRepository --stacktrace
         env:
           CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_KEY }}
@@ -63,3 +63,8 @@ jobs:
           name: Test-Report-${{ matrix.java }}-${{ github.run_number }}
       - name: Check artifacts
         run: ls -alF build/libs
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/libs/*
+          name: ${{ github.event.repository.name }}-${{ github.run_number }}
