@@ -26,6 +26,9 @@
     ],
     "ae2": [
       "com.kotori316.fluidtank.integration.ae2.TankAE2Plugin"
+    ],
+    "jade": [
+      "com.kotori316.fluidtank.integration.jade.JadeTankWailaPlugin"
     ]
   },
   "depends": {
@@ -38,7 +41,7 @@
     "waila:plugins": [
       {
         "id": "fluidtank:wthit_plugin",
-        "initializer": "com.kotori316.fluidtank.integration.wthit.TankWailaPlugin"
+        "initializer": "com.kotori316.fluidtank.integration.wthit.WthitTankWailaPlugin"
       }
     ]
   }
