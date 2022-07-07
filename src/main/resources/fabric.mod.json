@@ -32,13 +32,10 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.12.0",
-    "fabric": ">=0.51.1+1.18.2",
-    "minecraft": "1.18.x",
-    "fabric-language-scala": ">=0.3.0",
-    "libblockattributes": ">=0.10.2",
-    "libblockattributes_items": ">=0.10.2",
-    "libblockattributes_fluids": ">=0.10.2"
+    "fabricloader": ">=0.14.0",
+    "fabric": ">=0.55.3+1.19",
+    "minecraft": "1.19.x",
+    "fabric-language-scala": ">=0.3.0"
   },
   "custom": {
     "waila:plugins": [
