@@ -290,7 +290,6 @@ private class BoxZ(startZ: Double,
   }
 }
 
-//noinspection DuplicatedCode
 private class BoxXZ(startX: Double, startZ: Double, endX: Double, y: Double, endZ: Double,
                     sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean)
   extends Box(startX, y, startZ, endX, y, endZ, sizeX, sizeY, sizeZ, firstSide, endSide) {
@@ -303,9 +302,9 @@ private class BoxXZ(startX: Double, startZ: Double, endX: Double, y: Double, end
 }
 
 object Box {
-  def apply(axisAlignedBB: AABB, sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean): Box =
-    apply(axisAlignedBB.minX, axisAlignedBB.minY, axisAlignedBB.minZ,
-      axisAlignedBB.maxX, axisAlignedBB.maxY, axisAlignedBB.maxZ,
+  def apply(aabb: AABB, sizeX: Double, sizeY: Double, sizeZ: Double, firstSide: Boolean, endSide: Boolean): Box =
+    apply(aabb.minX, aabb.minY, aabb.minZ,
+      aabb.maxX, aabb.maxY, aabb.maxZ,
       sizeX, sizeY, sizeZ, firstSide, endSide)
 
   def apply(startX: Double, startY: Double, startZ: Double,
@@ -334,8 +333,18 @@ object Box {
     final val sky = brightness >> 16 & 0xFFFF
     final val block = brightness >> 0 & 0xFFFF
 
+    /**
+     * Sky light
+     *
+     * @return the amount of light block is getting from sky.
+     */
     def l1: Int = sky
 
+    /**
+     * Block light
+     *
+     * @return the light amount block is getting or emitting.
+     */
     def l2: Int = block
 
     def overrideBlock(light: Int): LightValue = {

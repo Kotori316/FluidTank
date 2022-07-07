@@ -18,14 +18,11 @@
   "entrypoints": {
     "main": [
       {
-        "value": "com.kotori316.fluidtank.ModTank"
+        "value": "com.kotori316.fluidtank.FluidTank"
       }
     ],
     "client": [
       "com.kotori316.fluidtank.ModTankClientInit"
-    ],
-    "fabric-datagen": [
-      "com.kotori316.fluidtank.data.FluidTankGenerator"
     ],
     "ae2": [
       "com.kotori316.fluidtank.integration.ae2.TankAE2Plugin"

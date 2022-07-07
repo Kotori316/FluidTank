@@ -6,16 +6,16 @@ import appeng.api.storage.IStorageMonitorableAccessor;
 import appeng.api.storage.MEStorage;
 import net.fabricmc.loader.api.FabricLoader;
 
-import com.kotori316.fluidtank.ModTank;
-import com.kotori316.fluidtank.TankConstant;
-import com.kotori316.fluidtank.tank.TileTank;
+import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 public final class TankAE2Plugin implements IAEAddonEntrypoint {
     // public static final ResourceLocation LOCATION = new ResourceLocation(ModTank.modID, "attach_ae2");
 
     @Override
     public void onAe2Initialized() {
-        if (FabricLoader.getInstance().isModLoaded("ae2") && TankConstant.config.enableAE2Integration) {
+        if (FabricLoader.getInstance().isModLoaded("ae2") && FluidTank.config.enableAE2Integration) {
             CapHandler.event();
         }
     }
@@ -25,7 +25,7 @@ public final class TankAE2Plugin implements IAEAddonEntrypoint {
             IStorageMonitorableAccessor.SIDED.registerForBlockEntities((blockEntity, context) -> {
                 if (blockEntity instanceof TileTank tank) return new AEConnectionCapabilityProvider(tank);
                 else return null;
-            }, ModTank.Entries.TANK_BLOCK_ENTITY_TYPE, ModTank.Entries.VOID_BLOCK_ENTITY_TYPE, ModTank.Entries.CREATIVE_BLOCK_ENTITY_TYPE);
+            }, ModObjects.TANK_TYPE(), ModObjects.TANK_VOID_TYPE(), ModObjects.TANK_CREATIVE_TYPE());
         }
     }
 

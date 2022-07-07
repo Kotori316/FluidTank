@@ -1,12 +1,14 @@
 package com.kotori316.fluidtank.render
 
-import com.kotori316.fluidtank.ModTank
-import com.kotori316.fluidtank.tank.{TankBlockItem, TileTank}
+import com.kotori316.fluidtank.fluids.Tank
+import com.kotori316.fluidtank.items.ItemBlockTank
+import com.kotori316.fluidtank.tiles.TileTank
+import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
-import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.block.model.ItemTransforms
@@ -18,33 +20,36 @@ import net.minecraft.world.item.{BlockItem, ItemStack}
 @Environment(EnvType.CLIENT)
 class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
 
-  lazy val tileTank = new TileTank(BlockPos.ZERO, ModTank.Entries.WOOD_TANK.defaultBlockState())
-  private val internalModel = new RenderItemTank.Model
+  lazy val tileTank = new TileTank(BlockPos.ZERO, ModObjects.blockTanks.head.defaultBlockState())
+  private val internalModel = new ModelWrapper(null)
 
-  override def render(stack: ItemStack, mode: ItemTransforms.TransformType, matrixStack: PoseStack, renderTypeBuffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
+  override def render(stack: ItemStack, cameraType: ItemTransforms.TransformType, matrixStack: PoseStack,
+                      renderTypeBuffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
-      case tankItem: TankBlockItem =>
+      case tankItem: ItemBlockTank =>
 
         val state = tankItem.blockTank.defaultBlockState()
         val model = Minecraft.getInstance.getBlockRenderer.getBlockModel(state)
         //          ForgeHooksClient.handleCameraTransforms(matrixStack, Minecraft.getInstance.getBlockRendererDispatcher.getModelForState(state),
         //          TransformType.FIXED, false)
-        //val renderType = RenderLayers.getItemLayer(stack, true)
-        //val b = renderTypeBuffer.getBuffer(renderType)
+        //val renderType = RenderTypeLookup.func_239219_a_(stack, true)
+        //val b = ItemRenderer.getBuffer(renderTypeBuffer, renderType, true, stack.hasEffect)
+        RenderSystem.enableCull()
         renderItemModel(Minecraft.getInstance().getItemRenderer, model, stack, light, otherLight, matrixStack, renderTypeBuffer)
 
-        tileTank.tier = tankItem.blockTank.tiers
-        tileTank.tank.setFluid(null)
+        tileTank.tier = tankItem.blockTank.tier
+        tileTank.internalTank.setTank(Tank.EMPTY)
         val compound = BlockItem.getBlockEntityData(stack)
         if (compound != null)
           tileTank.readNBTClient(compound)
+        //        RenderHelper.disableStandardItemLighting()
         Lighting.setupForFlatItems()
         Minecraft.getInstance.getBlockEntityRenderDispatcher.renderItem(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
         Lighting.setupFor3DItems()
 
-      case _ => ModTank.LOGGER.warn("RenderItemTank is called for " + stack.getItem)
+      case _ => FluidTank.LOGGER.info(ModObjects.MARKER_RenderItemTank, "RenderItemTank is called for " + stack.getItem)
     }
   }
 
@@ -54,22 +59,10 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
     //    renderBakedItemModel.invoke(renderer,
     //      model, stack, light, otherLight, matrixStack, builder)
     internalModel.setModel(model)
-    matrixStack.push()
+    matrixStack.pushPose()
     matrixStack.translate(0.5D, 0.5D, 0.5D)
     renderer.render(stack, ItemTransforms.TransformType.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, internalModel)
-    matrixStack.pop()
-  }
-
-}
-
-object RenderItemTank {
-
-  private class Model extends ForwardingBakedModel {
-    def setModel(newModel: BakedModel): Unit = {
-      this.wrapped = newModel
-    }
-
-    override def isCustomRenderer: Boolean = false
+    matrixStack.popPose()
   }
 
 }
