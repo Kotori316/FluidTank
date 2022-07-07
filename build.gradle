@@ -124,9 +124,13 @@ dependencies {
     modImplementation "net.fabricmc:fabric-language-scala:${project.fabric_scala_version}"
     // https://mvnrepository.com/artifact/org.typelevel/cats-core
     implementation group: 'org.typelevel', name: 'cats-core_2.13', version: '2.8.0'
+    // https://mvnrepository.com/artifact/org.typelevel/cats-core
+    include group: 'org.typelevel', name: 'cats-kernel_2.13', version: '2.8.0'
+    // https://mvnrepository.com/artifact/org.typelevel/cats-core
+    include group: 'org.typelevel', name: 'cats-core_2.13', version: '2.8.0'
 
     // library
-    implementation "org.scala-lang:scala-library:2.13.6"
+    implementation "org.scala-lang:scala-library:2.13.8"
     implementation "com.google.code.findbugs:jsr305:3.0.1"
 
     //noinspection SpellCheckingInspection
