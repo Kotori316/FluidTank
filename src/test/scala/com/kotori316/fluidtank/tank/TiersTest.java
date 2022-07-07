@@ -13,7 +13,6 @@ import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.TankConfig;
 import com.kotori316.fluidtank.TankConstant;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TiersTest extends BeforeAllTest {
@@ -34,7 +33,7 @@ class TiersTest extends BeforeAllTest {
         var pre = TankConstant.config.capacity.wood;
         try {
             TankConstant.config.capacity.wood = 12;
-            assertEquals(12000L, Tiers.WOOD.amount());
+            assertEquals(12000L, Tier.WOOD.amount());
         } finally {
             TankConstant.config.capacity.wood = pre;
         }

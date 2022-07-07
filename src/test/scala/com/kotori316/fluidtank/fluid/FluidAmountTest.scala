@@ -1,8 +1,7 @@
 package com.kotori316.fluidtank.fluid
 
-import alexiil.mc.lib.attributes.fluid.amount.{FluidAmount => BCAmount}
-import alexiil.mc.lib.attributes.fluid.volume.FluidKeys
-import com.kotori316.fluidtank.{BeforeAllTest, FluidAmount}
+import com.kotori316.fluidtank.BeforeAllTest
+import com.kotori316.fluidtank.fluids.FluidAmount
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
@@ -12,9 +11,9 @@ import org.junit.jupiter.api.function.Executable
 private[fluid] class FluidAmountTest extends BeforeAllTest {
   @Test
   def equiv(): Unit = {
-    val a = FluidAmount(FluidKeys.get(Fluids.WATER).withAmount(BCAmount.BUCKET))
+    val a = FluidAmount(Fluids.WATER, FluidAmount.AMOUNT_BUCKET, None)
     assertTrue(a == a, "Equal to itself")
-    val b = FluidAmount(FluidKeys.get(Fluids.WATER).withAmount(BCAmount.BUCKET))
+    val b = FluidAmount(Fluids.WATER, FluidAmount.AMOUNT_BUCKET, None)
     assertTrue(a == b, "Eq")
     assertEquals(a, b, "Eq2")
     assertTrue(a fluidEqual b)
@@ -27,23 +26,20 @@ private[fluid] class FluidAmountTest extends BeforeAllTest {
       () => assertTrue(FluidAmount.EMPTY.isEmpty),
       () => assertTrue(FluidAmount.EMPTY.copy().isEmpty),
       // () => assertTrue(FluidAmount(FluidKeys.EMPTY.withAmount(BCAmount.BUCKET.mul(10))).isEmpty), // Amount of empty fluid is 0.
-      () => assertTrue(FluidAmount(FluidKeys.LAVA.withAmount(BCAmount.ZERO)).isEmpty),
       () => assertTrue(FluidAmount.BUCKET_LAVA.setAmount(0).isEmpty),
       () => assertTrue((FluidAmount.BUCKET_WATER - FluidAmount.BUCKET_WATER).isEmpty),
       () => assertTrue(FluidAmount.fromItem(new ItemStack(Items.BUCKET)).isEmpty),
     )
   }
 
-  private[this] def getAmount(fluidAmount: FluidAmount): Long = fluidAmount.fluidVolume.amount().asLong(FluidAmount.AMOUNT_BUCKET)
-
   @Test
   def adder(): Unit = {
     {
       val a = FluidAmount.BUCKET_WATER
-      assertEquals(FluidAmount.AMOUNT_BUCKET, getAmount(a))
-      assertEquals(FluidAmount.AMOUNT_BUCKET * 2, getAmount(a + a))
-      assertEquals(FluidAmount.AMOUNT_BUCKET * 3, getAmount(a + a + a))
-      assertEquals(FluidAmount.AMOUNT_BUCKET, getAmount(a))
+      assertEquals(FluidAmount.AMOUNT_BUCKET, a.amount)
+      assertEquals(FluidAmount.AMOUNT_BUCKET * 2, (a + a).amount)
+      assertEquals(FluidAmount.AMOUNT_BUCKET * 3, (a + a + a).amount)
+      assertEquals(FluidAmount.AMOUNT_BUCKET, a.amount)
     }
     locally {
       val wl = FluidAmount.BUCKET_WATER + FluidAmount.BUCKET_LAVA
@@ -68,7 +64,7 @@ private[fluid] class FluidAmountTest extends BeforeAllTest {
       val a = FluidAmount.BUCKET_LAVA.setAmount(3000L)
       val e = FluidAmount.EMPTY.setAmount(2000L)
 
-      assertEquals(3000L, getAmount(e + a))
+      assertEquals(3000L, (e + a).amount)
       assertEquals(a, a + e)
       assertEquals(a, e + a)
     }
@@ -88,7 +84,7 @@ private[fluid] class FluidAmountTest extends BeforeAllTest {
         d <- List(true, false)
         left = if (d) zero else hasContent
         right = if (d) hasContent else zero
-      } yield () => assertEquals(left.setAmount(hasContent.fluidVolume.amount()), left + right,
+      } yield () => assertEquals(left.setAmount(hasContent.amount), left + right,
         () => s"$left + $right")
 
       assertAll(assertions: _*)

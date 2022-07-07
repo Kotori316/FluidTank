@@ -1,10 +1,27 @@
 {
   "variants": {
-    "facing=down": {"model": "fluidtank:block/chest_as_tank", "x": 90},
-    "facing=up": {"model": "fluidtank:block/chest_as_tank", "x": 270},
-    "facing=north": {"model": "fluidtank:block/chest_as_tank"},
-    "facing=south": {"model": "fluidtank:block/chest_as_tank", "y": 180},
-    "facing=west": {"model": "fluidtank:block/chest_as_tank", "y": 270},
-    "facing=east": {"model": "fluidtank:block/chest_as_tank", "y": 90}
+    "facing=down": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "fluidtank:block/chest_as_tank",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "fluidtank:block/chest_as_tank"
+    },
+    "facing=south": {
+      "model": "fluidtank:block/chest_as_tank",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "fluidtank:block/chest_as_tank",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "fluidtank:block/chest_as_tank",
+      "y": 270
+    }
   }
 }

@@ -8,12 +8,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 
-import com.kotori316.fluidtank.tank.Connection;
-import com.kotori316.fluidtank.tank.TankBlock;
-import com.kotori316.fluidtank.tank.TileTank;
+import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.tiles.Connection;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 final class Utils {
-    static void placeTank(GameTestHelper helper, BlockPos pos, TankBlock block) {
+    static void placeTank(GameTestHelper helper, BlockPos pos, BlockTank block) {
         helper.setBlock(pos, block);
         Optional.ofNullable(helper.getBlockEntity(pos))
             .map(TileTank.class::cast)

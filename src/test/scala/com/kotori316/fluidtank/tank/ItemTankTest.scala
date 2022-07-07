@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.tank
 
-import com.kotori316.fluidtank.FluidAmount
+import com.kotori316.fluidtank.fluids.FluidAmount
+import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.nbt.CompoundTag
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{Disabled, Nested, Test}
@@ -13,14 +14,14 @@ class ItemTankTest {
 
   @Test
   def createInstance(): Unit = {
-    val tank = ItemTank.empty(1000L, Tiers.WOOD)
+    val tank = ItemTank.empty(1000L, Tier.WOOD)
     assertEquals(FluidAmount.EMPTY, tank.getFluid)
     assertEquals(1000L, tank.getCapacity)
   }
 
   @Test
   def createInstance2(): Unit = {
-    val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+    val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
     assertEquals(FluidAmount.BUCKET_WATER, tank.getFluid)
     assertEquals(2000L, tank.getCapacity)
   }
@@ -28,13 +29,13 @@ class ItemTankTest {
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.tank.ItemTankTest#nonEmptyFluids"))
   def testCanFillEmptyTank(fluid: FluidAmount): Unit = {
-    val tank = ItemTank.empty(1000L, Tiers.WOOD)
+    val tank = ItemTank.empty(1000L, Tier.WOOD)
     assertTrue(tank.canFillFluidType(fluid))
   }
 
   @Test
   def testCanFillWaterTank(): Unit = {
-    val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+    val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
     assertTrue(tank.canFillFluidType(FluidAmount.BUCKET_WATER))
     assertFalse(tank.canFillFluidType(FluidAmount.BUCKET_LAVA))
     assertFalse(tank.canFillFluidType(FluidAmount.EMPTY))
@@ -42,7 +43,7 @@ class ItemTankTest {
 
   @Test
   def testCanFillLavaTank(): Unit = {
-    val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tiers.WOOD)
+    val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tier.WOOD)
     assertFalse(tank.canFillFluidType(FluidAmount.BUCKET_WATER))
     assertTrue(tank.canFillFluidType(FluidAmount.BUCKET_LAVA))
     assertFalse(tank.canFillFluidType(FluidAmount.EMPTY))
@@ -52,7 +53,7 @@ class ItemTankTest {
   class FillTest {
     @Test
     def fillToEmptySimulate(): Unit = {
-      val tank = ItemTank.empty(1000L, Tiers.WOOD)
+      val tank = ItemTank.empty(1000L, Tier.WOOD)
       val result = tank.fill(FluidAmount.BUCKET_WATER, doFill = false)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertEquals(FluidAmount.EMPTY, tank.getFluid)
@@ -60,7 +61,7 @@ class ItemTankTest {
 
     @Test
     def fillToEmptyExecute(): Unit = {
-      val tank = ItemTank.empty(1000L, Tiers.WOOD)
+      val tank = ItemTank.empty(1000L, Tier.WOOD)
       val result = tank.fill(FluidAmount.BUCKET_WATER, doFill = true)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertEquals(FluidAmount.BUCKET_WATER, tank.getFluid)
@@ -68,7 +69,7 @@ class ItemTankTest {
 
     @Test
     def fillEmpty(): Unit = {
-      val tank = ItemTank.empty(1000L, Tiers.WOOD)
+      val tank = ItemTank.empty(1000L, Tier.WOOD)
       val result = tank.fill(FluidAmount.EMPTY, doFill = false)
       assertTrue(result.isEmpty)
     }
@@ -77,7 +78,7 @@ class ItemTankTest {
     @ValueSource(longs = Array(1500L, 2000L, 5000L, 16000L))
     def fillOverCapacitySimulate(amount: Long): Unit = {
       val fill = FluidAmount.BUCKET_WATER.setAmount(amount)
-      val tank = ItemTank.empty(1000L, Tiers.WOOD)
+      val tank = ItemTank.empty(1000L, Tier.WOOD)
       val result = tank.fill(fill, doFill = false)
       assertEquals(FluidAmount.BUCKET_WATER.setAmount(1000), result)
       assertEquals(FluidAmount.EMPTY, tank.getFluid)
@@ -87,7 +88,7 @@ class ItemTankTest {
     @ValueSource(longs = Array(1500L, 2000L, 5000L, 16000L))
     def fillOverCapacityExecute(amount: Long): Unit = {
       val fill = FluidAmount.BUCKET_WATER.setAmount(amount)
-      val tank = ItemTank.empty(1000L, Tiers.WOOD)
+      val tank = ItemTank.empty(1000L, Tier.WOOD)
       val result = tank.fill(fill, doFill = true)
       assertEquals(FluidAmount.BUCKET_WATER.setAmount(1000), result)
       assertEquals(FluidAmount.BUCKET_WATER, tank.getFluid)
@@ -95,7 +96,7 @@ class ItemTankTest {
 
     @Test
     def respectMinParameter(): Unit = {
-      val tank = ItemTank.empty(100L, Tiers.WOOD)
+      val tank = ItemTank.empty(100L, Tier.WOOD)
       val result = tank.fill(FluidAmount.BUCKET_WATER, doFill = false, min = 500)
       assertTrue(result.isEmpty)
     }
@@ -103,7 +104,7 @@ class ItemTankTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.tank.ItemTankTest#nonEmptyFluids"))
     def fillToFullTank(fluid: FluidAmount): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 1000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 1000L, Tier.WOOD)
       val result = tank.fill(fluid, doFill = true)
       assertTrue(result.isEmpty)
     }
@@ -113,7 +114,7 @@ class ItemTankTest {
   class DrainTest {
     @Test
     def drainWaterSimulate(): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.BUCKET_WATER, doDrain = false)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertEquals(FluidAmount.BUCKET_WATER, tank.getFluid)
@@ -121,7 +122,7 @@ class ItemTankTest {
 
     @Test
     def drainWaterExecute(): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.BUCKET_WATER, doDrain = true)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertTrue(tank.getFluid.isEmpty)
@@ -130,7 +131,7 @@ class ItemTankTest {
     @Disabled
     @Test
     def drainWaterSimulate2(): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.EMPTY.setAmount(1000), doDrain = false)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertEquals(FluidAmount.BUCKET_WATER, tank.getFluid)
@@ -139,7 +140,7 @@ class ItemTankTest {
     @Disabled
     @Test
     def drainWaterExecute2(): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.EMPTY.setAmount(1000), doDrain = true)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertTrue(tank.getFluid.isEmpty)
@@ -148,7 +149,7 @@ class ItemTankTest {
     @ParameterizedTest
     @ValueSource(booleans = Array(true, false))
     def drainLavaFromWaterTank(doDrain: Boolean): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_WATER, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.BUCKET_LAVA, doDrain = doDrain)
       assertTrue(result.isEmpty)
       assertEquals(FluidAmount.BUCKET_WATER, tank.getFluid)
@@ -157,7 +158,7 @@ class ItemTankTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.tank.ItemTankTest#nonEmptyFluids"))
     def drainFromEmptyTank1(fluid: FluidAmount): Unit = {
-      val tank = ItemTank.empty(2000L, Tiers.WOOD)
+      val tank = ItemTank.empty(2000L, Tier.WOOD)
       val result = tank.drain(fluid, doDrain = true)
       assertTrue(result.isEmpty)
       assertTrue(tank.getFluid.isEmpty)
@@ -166,7 +167,7 @@ class ItemTankTest {
     @ParameterizedTest
     @ValueSource(longs = Array(1500L, 2000L, 5000L, 16000L))
     def drainOverSimulate(amount: Long): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.BUCKET_LAVA.setAmount(amount), doDrain = false)
       assertEquals(FluidAmount.BUCKET_LAVA, result)
       assertEquals(FluidAmount.BUCKET_LAVA, tank.getFluid)
@@ -175,7 +176,7 @@ class ItemTankTest {
     @ParameterizedTest
     @ValueSource(longs = Array(1500L, 2000L, 5000L, 16000L))
     def drainOverExecute(amount: Long): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.BUCKET_LAVA.setAmount(amount), doDrain = true)
       assertEquals(FluidAmount.BUCKET_LAVA, result)
       assertTrue(tank.getFluid.isEmpty)
@@ -184,7 +185,7 @@ class ItemTankTest {
     @ParameterizedTest
     @ValueSource(longs = Array(1500L, 2000L, 5000L, 16000L))
     def respectMin(amount: Long): Unit = {
-      val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tiers.WOOD)
+      val tank = new ItemTank(FluidAmount.BUCKET_LAVA, 2000L, Tier.WOOD)
       val result = tank.drain(FluidAmount.BUCKET_LAVA.setAmount(amount), doDrain = false, min = amount)
       assertTrue(result.isEmpty)
     }
@@ -205,7 +206,7 @@ class ItemTankTest {
 
     @Test
     def cycle2(): Unit = {
-      val tank = ItemTank.empty(4000, Tiers.WOOD)
+      val tank = ItemTank.empty(4000, Tier.WOOD)
       val tag = tank.createTag("")
       assertTrue(tag.isEmpty)
 

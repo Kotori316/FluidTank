@@ -20,7 +20,7 @@ public class BeforeAllTest {
             initLoader();
             changeDist();
             Bootstrap.bootStrap();
-            TankConstant.config = new TankConfig();
+            FluidTank.config = new TankConfig();
         }
     }
 

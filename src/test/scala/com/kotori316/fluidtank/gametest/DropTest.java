@@ -10,30 +10,33 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
-import com.kotori316.fluidtank.FluidAmount;
-import com.kotori316.fluidtank.ModTank;
-import com.kotori316.fluidtank.tank.ItemTank;
-import com.kotori316.fluidtank.tank.Tiers;
+import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.fluids.FluidAction;
+import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.items.TankItemFluidHandler;
+import com.kotori316.fluidtank.tiles.Tier;
 
 import static com.kotori316.fluidtank.gametest.Utils.getConnection;
 import static com.kotori316.fluidtank.gametest.Utils.placeTank;
 
 public final class DropTest implements FabricGameTest {
 
+    BlockTank wood_tank = ModObjects.tierToBlock().apply(Tier.WOOD);
+
     @GameTest(template = EMPTY_STRUCTURE)
     public void dropOfEmptyTank(GameTestHelper helper) {
         var pos = BlockPos.ZERO.east();
-        placeTank(helper, pos, ModTank.Entries.WOOD_TANK);
+        placeTank(helper, pos, wood_tank);
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
         assert drops.size() == 1 : "Drop was " + drops;
         var stack = drops.get(0);
-        assert stack.getItem() == ModTank.Entries.WOOD_TANK.blockItem() : "Dropped item was " + stack;
+        assert stack.getItem() == wood_tank.itemBlock() : "Dropped item was " + stack;
         assert !stack.hasTag() : "Stack must not have tag if dropped from empty tank. " + stack;
 
         helper.succeed();
@@ -51,16 +54,16 @@ public final class DropTest implements FabricGameTest {
 
     void dropOfWaterTank1(GameTestHelper helper, FluidAmount amount) {
         var pos = BlockPos.ZERO.east();
-        placeTank(helper, pos, ModTank.Entries.WOOD_TANK);
+        placeTank(helper, pos, wood_tank);
         var connection = getConnection(helper, pos);
-        connection.handler().fill(amount, true, 0);
+        connection.handler().fill(amount, FluidAction.EXECUTE);
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
         assert drops.size() == 1 : "Drop was " + drops;
         var stack = drops.get(0);
-        assert stack.getItem() == ModTank.Entries.WOOD_TANK.blockItem() : "Dropped item was " + stack;
-        var itemTank = ItemTank.from(BlockItem.getBlockEntityData(stack), Tiers.WOOD);
+        assert stack.getItem() == wood_tank.itemBlock() : "Dropped item was " + stack;
+        var itemTank = new TankItemFluidHandler(Tier.WOOD, stack);
         assert itemTank.getFluid().equals(amount) : "Fluid must be given fluid. " + itemTank.getFluid();
 
         helper.succeed();
