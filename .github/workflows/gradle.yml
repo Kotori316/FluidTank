@@ -28,7 +28,7 @@ jobs:
           echo "::group::IGNORE ME"
           chmod +x ./gradlew && ./gradlew tasks
           echo "::endgroup::"
-      - name: Check Paramater
+      - name: Check Parameter
         run: chmod +x ./gradlew && ./gradlew gCO
       - name: Toolchain
         run: chmod +x ./gradlew && ./gradlew javaToolchains
@@ -38,6 +38,15 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew compileScala
       - name: Data Generation
         run: chmod +x ./gradlew && ./gradlew runData
+      - name: Assemble
+        run: chmod +x ./gradlew && ./gradlew assemble
+      - name: Check artifacts
+        run: ls -alF build/libs
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          path: build/libs/*
+          name: ${{ github.event.repository.name }}-${{ github.run_number }}
       - name: Prepare Test dir
         run: mkdir -p build/test-results/test
       - name: Test with Gradle
@@ -61,10 +70,3 @@ jobs:
         with:
           path: build/test-results/test/*.xml
           name: Test-Report-${{ matrix.java }}-${{ github.run_number }}
-      - name: Check artifacts
-        run: ls -alF build/libs
-      - name: Publish
-        uses: actions/upload-artifact@v2
-        with:
-          path: build/libs/*
-          name: ${{ github.event.repository.name }}-${{ github.run_number }}
