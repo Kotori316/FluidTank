@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "Gold",
+  "sub_item": {
+    "tag": "c:gold_ingots"
+  },
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config"

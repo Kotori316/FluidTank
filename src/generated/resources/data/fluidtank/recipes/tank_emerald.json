@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "Emerald",
+  "sub_item": {
+    "tag": "c:emeralds"
+  },
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config"

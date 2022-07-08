@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "Star",
+  "sub_item": {
+    "tag": "fluidtank:material_star"
+  },
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config"

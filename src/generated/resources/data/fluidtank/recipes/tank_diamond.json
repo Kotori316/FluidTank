@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "Diamond",
+  "sub_item": {
+    "tag": "c:diamonds"
+  },
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config"

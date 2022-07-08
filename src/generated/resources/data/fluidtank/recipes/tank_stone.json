@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "Stone",
+  "sub_item": {
+    "tag": "fluidtank:material_stone"
+  },
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config"

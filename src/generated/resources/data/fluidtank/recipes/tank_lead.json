@@ -1,6 +1,9 @@
 {
   "type": "fluidtank:crafting_grade_up",
   "tier": "Lead",
+  "sub_item": {
+    "tag": "c:lead_ingots"
+  },
   "fabric:load_conditions": [
     {
       "condition": "fluidtank:config"
