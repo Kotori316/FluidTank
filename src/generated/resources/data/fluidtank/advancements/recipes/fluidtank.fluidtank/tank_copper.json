@@ -31,7 +31,7 @@
   ],
   "fabric:load_conditions": [
     {
-      "condition": "fluidtank:config_update_recipe"
+      "condition": "fluidtank:config"
     },
     {
       "condition": "fabric:item_tags_populated",
