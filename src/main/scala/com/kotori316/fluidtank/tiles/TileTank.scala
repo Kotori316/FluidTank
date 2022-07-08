@@ -3,7 +3,7 @@ package com.kotori316.fluidtank.tiles
 import cats.implicits.toShow
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
-import com.kotori316.fluidtank.network.{ClientSyncMessage, PacketHandler}
+import com.kotori316.fluidtank.network.ClientSync
 import com.kotori316.fluidtank.render.Box
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
@@ -20,6 +20,7 @@ import scala.collection.mutable.ArrayBuffer
 class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s: BlockState)
   extends BlockEntity(t, p, s)
     with Nameable
+    with ClientSync
     /*with ICustomPipeConnection
     with IDebuggable*/ {
   self =>
@@ -78,8 +79,15 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     }
   }
 
+  override def fromClientTag(tag: CompoundTag): Unit = load(tag)
+
+  override def toClientTag(tag: CompoundTag): CompoundTag = {
+    saveAdditional(tag)
+    tag
+  }
+
   private def sendPacket(): Unit = {
-    if (Utils.isServer(this)) PacketHandler.sendToClientWorld(new ClientSyncMessage(this), getLevel)
+    sync()
   }
 
   def hasContent: Boolean = internalTank.getFluid.nonEmpty
