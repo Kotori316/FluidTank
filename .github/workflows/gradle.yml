@@ -23,23 +23,38 @@ jobs:
       #  with:
       #    path: ~/.gradle/caches
       #    key: ${{ runner.os }}-gradle-${{ hashFiles('**/forge_version.properties') }}
-      - name: Dummy
-        run: |
-          echo "::group::IGNORE ME"
-          chmod +x ./gradlew && ./gradlew tasks
-          echo "::endgroup::"
+      - name: Permission
+        run: chmod +x ./gradlew
       - name: Check Parameter
-        run: chmod +x ./gradlew && ./gradlew gCO
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: gCO
+          cache-read-only: false
       - name: Toolchain
-        run: chmod +x ./gradlew && ./gradlew javaToolchains
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: javaToolchains
+          cache-read-only: false
       - name: Check Dependencies
-        run: chmod +x ./gradlew && ./gradlew dependencies
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: dependencies
+          cache-read-only: false
       - name: Precompile
-        run: chmod +x ./gradlew && ./gradlew compileScala
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: compileScala
+          cache-read-only: false
       - name: Data Generation
-        run: chmod +x ./gradlew && ./gradlew runData
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: runData
+          cache-read-only: false
       - name: Assemble
-        run: chmod +x ./gradlew && ./gradlew assemble
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assemble
+          cache-read-only: false
       - name: Check artifacts
         run: ls -alF build/libs
       - name: Publish
@@ -51,13 +66,19 @@ jobs:
         run: mkdir -p build/test-results/test
       - name: Test with Gradle
         if: ${{ contains(github.event.head_commit.message, '[skip release]') }} || true
-        run: chmod +x ./gradlew && ./gradlew build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          cache-read-only: false
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_GAME_TEST: true
       - name: Build and Publish with Gradle
         if: ${{ !contains(github.event.head_commit.message, '[skip release]') }} && false
-        run: chmod +x ./gradlew && ./gradlew build curseforge publishAllPublicationsToAzureRepositoryRepository --stacktrace
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build curseforge publishAllPublicationsToAzureRepositoryRepository
+          cache-read-only: false
         env:
           CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_KEY }}
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
