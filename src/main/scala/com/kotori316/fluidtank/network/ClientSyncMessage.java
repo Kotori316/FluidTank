@@ -62,6 +62,8 @@ public final class ClientSyncMessage implements IMessage<ClientSyncMessage> {
                 client.execute(() -> {
                     if (world.getBlockEntity(message.pos) instanceof ClientSync tile) {
                         tile.fromClientTag(message.tag);
+                    } else {
+                        FluidTank.LOGGER.warn("Tried to sync to {} in {}, but the tile isn't ClientSync", message.pos, message.dim);
                     }
                 });
             }
