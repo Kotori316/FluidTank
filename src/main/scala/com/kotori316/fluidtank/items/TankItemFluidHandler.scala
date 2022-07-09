@@ -28,15 +28,14 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) {
     if (fluid.isEmpty) {
       val amount = math.min(resource.amount, getCapacity)
       if (action.execute()) {
-        fluid = resource.copy()
-        fluid.setAmount(amount)
+        fluid = resource.copy().setAmount(amount)
         updateTag()
       }
       resource.setAmount(amount)
     } else if (fluid.fluidEqual(resource)) {
       val move = math.min(resource.amount, getCapacity - fluid.amount)
       if (action.execute()) {
-        fluid.setAmount(fluid.amount + move)
+        fluid = fluid.setAmount(fluid.amount + move)
         updateTag()
       }
       fluid.setAmount(move)
@@ -48,16 +47,16 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) {
   @NotNull
   def drain(resource: FluidAmount, action: FluidAction): FluidAmount = {
     init()
-    if (fluid.isEmpty || resource.isEmpty || stack.getCount > 1) {
+    if (fluid.isEmpty || stack.getCount > 1) {
       return FluidAmount.EMPTY
     }
-    if (fluid.fluidEqual(resource)) {
+    if (fluid.fluidEqual(resource) || resource.isEmpty) {
       val move = math.min(resource.amount, fluid.amount)
       if (action.execute()) {
-        fluid.setAmount(fluid.amount - move)
+        fluid = fluid.setAmount(fluid.amount - move)
         updateTag()
       }
-      resource.setAmount(move)
+      fluid.setAmount(move)
     } else
       FluidAmount.EMPTY
   }
@@ -124,5 +123,5 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) {
     fluid
   }
 
-  def getCapacity: Long = if (tankNbt == null) tier.amount else tankNbt.getLong(TileTank.NBT_Capacity)
+  def getCapacity: Long = if (tankNbt == null || !tankNbt.contains(TileTank.NBT_Capacity)) tier.amount else tankNbt.getLong(TileTank.NBT_Capacity)
 }
