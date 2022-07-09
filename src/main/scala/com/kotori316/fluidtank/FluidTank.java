@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.fluids.FabricFluidTankStorage;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.recipes.CombineRecipe;
 import com.kotori316.fluidtank.recipes.FluidTankConditions;
@@ -38,6 +39,7 @@ public class FluidTank implements ModInitializer {
         config = AutoConfig.getConfigHolder(TankConfig.class).getConfig();
         PacketHandler.Server.initServer();
         Register.register();
+        FabricFluidTankStorage.register();
     }
 
     public static class Register {

@@ -24,7 +24,7 @@ import com.kotori316.fluidtank.blocks.BucketEventHandler;
 @SuppressWarnings("UnstableApiUsage")
 public final class VariantUtil {
     static long convertFabricAmountToForge(long fabricAmount) {
-        return fabricAmount / FluidConstants.BUCKET * 1000L;
+        return fabricAmount * 1000L / FluidConstants.BUCKET;
     }
 
     static long convertForgeAmountToFabric(long forgeAmount) {
