@@ -19,6 +19,7 @@ class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects
     for {
       direction <- Direction.values()
       pos = getBlockPos.offset(direction)
+      if !level.getBlockState(pos).isAir
     } {
       VariantUtil.fillAtPos(fluid, level, pos, direction)
     }

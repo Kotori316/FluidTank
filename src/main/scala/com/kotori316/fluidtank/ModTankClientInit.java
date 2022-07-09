@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
@@ -17,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import scala.jdk.javaapi.CollectionConverters;
 
+import com.kotori316.fluidtank.blocks.FluidSourceBlock;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderTank;
@@ -36,7 +38,11 @@ public class ModTankClientInit implements ClientModInitializer {
         FluidTank.LOGGER.info("Client init is called. {} ", FluidTank.modID);
         PacketHandler.Client.initClient();
         ClientSpriteRegistryCallback.event(InventoryMenu.BLOCK_ATLAS).register(SPRITES);
-        CollectionConverters.asJava(ModObjects.blockTanks()).forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, RenderType.cutoutMipped()));
+        var renderType = RenderType.cutoutMipped();
+        CollectionConverters.asJava(ModObjects.blockTanks()).forEach(b -> BlockRenderLayerMap.INSTANCE.putBlock(b, renderType));
+        BlockRenderLayerMap.INSTANCE.putBlock(ModObjects.blockFluidPipe(), renderType);
+        BlockRenderLayerMap.INSTANCE.putBlock(ModObjects.blockItemPipe(), renderType);
+
         BlockEntityRendererRegistry.register(ModObjects.TANK_TYPE(), RenderTank::new);
         BlockEntityRendererRegistry.register(ModObjects.TANK_CREATIVE_TYPE(), d ->
             (BlockEntityRenderer<TileTankCreative>) ((BlockEntityRenderer<?>) new RenderTank(d)));
@@ -44,6 +50,8 @@ public class ModTankClientInit implements ClientModInitializer {
             ClientSpriteRegistryCallback.event(si.atlasLocation()).register((atlasTexture, registry) -> registry.register(si.texture())));
         // FluidRenderHandlerRegistry.INSTANCE.register(ModTank.Entries.MILK_FLUID, (view, pos, state) -> new TextureAtlasSprite[]{STILL_IDENTIFIER.sprite(), FLOW_IDENTIFIER.sprite()});
         CollectionConverters.asJava(ModObjects.blockTanks()).forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, RENDER_ITEM_TANK));
+        ItemProperties.register(ModObjects.blockSource().itemBlock(),
+            new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity, i) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
         FluidTank.LOGGER.info("Client init is finished. {} ", FluidTank.modID);
     }
 
