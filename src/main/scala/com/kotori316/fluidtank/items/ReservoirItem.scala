@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.items
 
+import com.kotori316.fluidtank.fluids.{FluidAction, FluidKey, VariantUtil}
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
@@ -9,7 +10,9 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.{BlockItem, Item, ItemStack, Rarity, TooltipFlag}
-import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.BucketPickup
+import net.minecraft.world.level.{ClipContext, Level}
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.{InteractionHand, InteractionResult, InteractionResultHolder}
 
 class ReservoirItem(val tier: Tier) extends Item(new Item.Properties().tab(ModObjects.CREATIVE_TABS).stacksTo(1)) {
@@ -18,48 +21,53 @@ class ReservoirItem(val tier: Tier) extends Item(new Item.Properties().tab(ModOb
   // ---------- Fluid Interaction ----------
   override def useOn(context: UseOnContext): InteractionResult = {
     // Move to containers such as tanks.
-    /*val tile = context.getLevel.getBlockEntity(context.getClickedPos)
-    if (tile != null) {
+    val handler = new TankItemFluidHandler(tier, context.getItemInHand)
+    if (handler.getFluid.nonEmpty) {
       if (!context.getLevel.isClientSide) {
-        val moveResult = for {
-          destination <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, context.getClickedFace).asScala
-          source <- context.getItemInHand.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).asScala
-          result = FluidUtil.tryEmptyContainer(context.getItemInHand, destination, source.getTankCapacity(0), context.getPlayer, true)
-          if result.isSuccess
-        } yield result
-        moveResult.value.value.foreach(s => context.getPlayer.setItemInHand(context.getHand, s.getResult))
+        val source = handler.getFluid
+        val inserted = VariantUtil.fillAtPos(source, context.getLevel, context.getClickedPos, context.getClickedFace)
+        handler.drain(inserted, FluidAction.EXECUTE)
+        InteractionResult.CONSUME
+      } else {
+        if (VariantUtil.isFluidContainer(context.getLevel, context.getClickedPos, context.getClickedFace)) {
+          InteractionResult.sidedSuccess(context.getLevel.isClientSide)
+        } else {
+          InteractionResult.PASS
+        }
       }
-      InteractionResult.SUCCESS
-    } else*/
-    {
+    } else {
       super.useOn(context)
     }
   }
 
   override def use(worldIn: Level, playerIn: Player, handIn: InteractionHand): InteractionResultHolder[ItemStack] = {
-    val stack = playerIn.getItemInHand(handIn)
-    /*val rayTraceResult = Item.getPlayerPOVHitResult(worldIn, playerIn, ClipContext.Fluid.SOURCE_ONLY)
+    val stack = playerIn.getItemInHand(handIn).copy()
+    val rayTraceResult = Item.getPlayerPOVHitResult(worldIn, playerIn, ClipContext.Fluid.SOURCE_ONLY)
     if (rayTraceResult.getType == HitResult.Type.BLOCK) {
       val pos = rayTraceResult.getBlockPos
-      val direction = rayTraceResult.getDirection
       if (worldIn.mayInteract(playerIn, pos)) {
+        val state = worldIn.getBlockState(pos)
         val fluidState = worldIn.getFluidState(pos)
-        if (!fluidState.isEmpty) {
-          val result = FluidUtil.tryPickUpFluid(stack, playerIn, worldIn, pos, direction)
-          if (result.isSuccess)
-            InteractionResultHolder.success(result.getResult)
-          else
-            InteractionResultHolder.pass(stack)
-        } else {
-          InteractionResultHolder.pass(stack)
+        val itemHandler = new TankItemFluidHandler(tier, stack)
+        state.getBlock match {
+          case pickup: BucketPickup
+            if itemHandler.getFluid.isEmpty || FluidKey.from(itemHandler.getFluid) == FluidKey(fluidState.getType, None) =>
+            val picked = pickup.pickupBlock(worldIn, pos, state)
+            if (!picked.isEmpty) {
+              val fluid = VariantUtil.getFluidInItem(picked)
+              itemHandler.fill(fluid, FluidAction.EXECUTE)
+              pickup.getPickupSound.ifPresent(s => playerIn.playSound(s, 1f, 1f))
+              InteractionResultHolder.success(stack)
+            } else {
+              InteractionResultHolder.pass(stack)
+            }
+          case _ => InteractionResultHolder.pass(stack)
         }
       } else {
         // Access denied.
         InteractionResultHolder.fail(stack)
       }
-    } else*/
-
-    {
+    } else {
       InteractionResultHolder.pass(stack)
     }
   }

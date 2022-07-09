@@ -52,7 +52,7 @@ public final class VariantUtil {
         return storage != null;
     }
 
-    static FluidAmount getFluidInItem(ItemStack stack) {
+    public static FluidAmount getFluidInItem(ItemStack stack) {
         var storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack));
         if (storage != null) {
             for (StorageView<FluidVariant> view : storage) {
@@ -62,6 +62,11 @@ public final class VariantUtil {
             }
         }
         return FluidAmount.EMPTY();
+    }
+
+    public static boolean isFluidContainer(Level level, BlockPos pos, Direction direction) {
+        var storage = FluidStorage.SIDED.find(level, pos, direction);
+        return storage != null;
     }
 
     /**
