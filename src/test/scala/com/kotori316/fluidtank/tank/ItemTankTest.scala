@@ -6,9 +6,11 @@ import com.kotori316.fluidtank.items.TankItemFluidHandler
 import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.world.item.ItemStack
 import org.junit.jupiter.api.Assertions._
-import org.junit.jupiter.api.{Disabled, Nested, Test}
+import org.junit.jupiter.api.{Disabled, DynamicTest, Nested, Test, TestFactory}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{EnumSource, MethodSource, ValueSource}
+
+import scala.jdk.javaapi.CollectionConverters
 
 class ItemTankTest {
 
@@ -43,6 +45,29 @@ class ItemTankTest {
       val result = tank.fill(FluidAmount.BUCKET_WATER, FluidAction.EXECUTE)
       assertEquals(FluidAmount.BUCKET_WATER, result)
       assertEquals(FluidAmount.BUCKET_WATER, tank.getTank.fluidAmount)
+    }
+
+    @TestFactory
+    def fillToEmpty2() = {
+      val tankFluids = Seq(FluidAmount.EMPTY, FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_LAVA.setAmount(0))
+      val toFill = for {
+        amount <- Seq(1L, 10L, 100L, 1000L, 4000L)
+        fluid <- Seq(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)
+      } yield fluid.setAmount(amount)
+      val modes = FluidAction.values().toSeq
+
+      CollectionConverters.asJava(
+        for {
+          tank <- tankFluids.map(f => TankHandler(Tank(f, 4000L)))
+          fill <- toFill
+          mode <- modes
+        } yield {
+          DynamicTest.dynamicTest(s"$tank, $fill, $mode", () => {
+            val result = tank.fill(fill, mode)
+            assertEquals(fill, result)
+          })
+        }
+      )
     }
 
     @Test
