@@ -25,7 +25,7 @@ import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.TileTankCreative;
 
 @SuppressWarnings("unused")
-public class ModTankClientInit implements ClientModInitializer {
+public class FluidTankClientInit implements ClientModInitializer {
 
     public static final Material STILL_IDENTIFIER = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(FluidTank.modID, "blocks/milk_still"));
     public static final Material FLOW_IDENTIFIER = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(FluidTank.modID, "blocks/milk_flow"));
