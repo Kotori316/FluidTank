@@ -1,5 +1,3 @@
-## v18.5.1
+## v18.5.2
 
-* Enabled non-vanilla tanks because condition of tags works fine now.
-* Respect enableWailaAndTOP config.
-* Changed required version of Forge.
+* Use tanks as fuel.

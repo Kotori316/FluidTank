@@ -1,3 +1,9 @@
+## v18.5.2
+
+* Use tanks as fuel.
+
+Build with 1.18.2-40.1.48, Mapping: Official 1.18.2
+
 ## v18.5.1
 
 * Enabled non-vanilla tanks because condition of tags works fine now.
