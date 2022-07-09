@@ -58,13 +58,14 @@ class ItemTankTest {
 
       CollectionConverters.asJava(
         for {
-          tank <- tankFluids.map(f => TankHandler(Tank(f, 4000L)))
+          tankContent <- tankFluids
           fill <- toFill
           mode <- modes
         } yield {
-          DynamicTest.dynamicTest(s"$tank, $fill, $mode", () => {
+          DynamicTest.dynamicTest(s"$tankContent, $fill, $mode", () => {
+            val tank = TankHandler(Tank(tankContent, 4000L))
             val result = tank.fill(fill, mode)
-            assertEquals(fill, result)
+            assertEquals(fill, result, s"Tank: ${tank.getTank}, Filled: $result, Mode: $mode")
           })
         }
       )
