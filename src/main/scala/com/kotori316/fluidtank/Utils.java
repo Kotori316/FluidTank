@@ -50,7 +50,12 @@ public class Utils {
     public static boolean isInDev() {
         int i = inDev.get();
         if (i == -1) {
-            inDev.set(!FabricLoader.getInstance().isDevelopmentEnvironment() || FluidTank.config.debug ? 1 : 0);
+            if (FabricLoader.getInstance().getAllMods().isEmpty()) {
+                // In JUnit Test.
+                inDev.set(0);
+            } else {
+                inDev.set(!FabricLoader.getInstance().isDevelopmentEnvironment() || FluidTank.config.debug ? 1 : 0);
+            }
             return inDev.get() == 1;
         }
         return i == 1;

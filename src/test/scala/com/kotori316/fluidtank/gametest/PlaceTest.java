@@ -21,7 +21,6 @@ import net.minecraft.world.phys.Vec3;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Connection;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
@@ -46,7 +45,7 @@ public final class PlaceTest implements FabricGameTest {
         var entity = helper.getBlockEntity(BlockPos.ZERO);
         if (entity instanceof TileTank tank) {
             var connection = tank.connection();
-            assert Objects.equals(connection, Connection.invalid()) : "Connection before initialization must be invalid. " + connection;
+            assert connection.isDummy() : "Connection before initialization must be invalid. " + connection;
         } else {
             throw new GameTestAssertException("Expected TileTank but " + entity);
         }
