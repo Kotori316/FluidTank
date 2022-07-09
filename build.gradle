@@ -225,10 +225,11 @@ def joinedLog = String.join("\n", List.of(
         "",
         isInCI() ? "Released via GitHub Action. This version may contain some bugs!" : "",
         "",
+        "Only items which have recipe will work fine. Items without recipe are still in development.",
+        "",
         "Requires:",
         "",
         "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
-        "* [LibBlockAttributes](https://www.curseforge.com/minecraft/mc-mods/libblockattributes)",
         "* [Cloth Config API (Fabric)](https://www.curseforge.com/minecraft/mc-mods/cloth-config)",
         "",
         "See https://github.com/Kotori316/FluidTank/tree/${BRANCH} to get all change log.",
@@ -263,8 +264,6 @@ curseforge {
         addArtifact jar
         relations {
             requiredDependency 'fabric-language-scala'
-            //noinspection SpellCheckingInspection
-            requiredDependency 'libblockattributes'
             requiredDependency 'cloth-config'
         }
     }

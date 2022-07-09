@@ -65,7 +65,7 @@ jobs:
       - name: Prepare Test dir
         run: mkdir -p build/test-results/test
       - name: Test with Gradle
-        if: ${{ contains(github.event.head_commit.message, '[skip release]') || true }}
+        if: ${{ contains(github.event.head_commit.message, '[skip release]')}}
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
@@ -74,7 +74,7 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_GAME_TEST: true
       - name: Build and Publish with Gradle
-        if: ${{ !contains(github.event.head_commit.message, '[skip release]') && false }}
+        if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build curseforge publishAllPublicationsToAzureRepositoryRepository
