@@ -55,6 +55,7 @@
   "item.fluidtank.reservoir_stone": "石の携帯タンク",
   "item.fluidtank.reservoir_wood": "木の携帯タンク",
   "itemGroup.fluidtank": "FluidTanks",
+  "itemGroup.fluidtank.fluidtank": "FluidTanks",
   "tooltip.fluidtank.source": "水のみ",
   "tooltip.fluidtank.source_disabled": "無効",
   "tooltip.fluidtank.source_inf": "無限のソース"

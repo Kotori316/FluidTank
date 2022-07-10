@@ -55,6 +55,7 @@
   "item.fluidtank.reservoir_stone": "Stone Reservoir",
   "item.fluidtank.reservoir_wood": "Wood Reservoir",
   "itemGroup.fluidtank": "Tanque de fluido",
+  "itemGroup.fluidtank.fluidtank": "Tanque de fluido",
   "tooltip.fluidtank.source": "Só água",
   "tooltip.fluidtank.source_disabled": "Desabilitado",
   "tooltip.fluidtank.source_inf": "Infinito"
