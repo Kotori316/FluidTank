@@ -53,7 +53,7 @@ object ModObjects {
   //---------- TileEntities ----------
 
   private[this] final var types: List[NamedEntry[BlockEntityType[_ <: BlockEntity]]] = Nil
-  final val TANK_TYPE = createTileType((p, s) => new TileTank(p, s), blockTanks)
+  final val TANK_TYPE = createTileType((p, s) => new TileTank(p, s), woodTank +: normalTanks.toList)
   final val TANK_CREATIVE_TYPE = createTileType((p, s) => new TileTankCreative(p, s), List(creativeTank))
   final val TANK_VOID_TYPE = createTileType((p, s) => new TileTankVoid(p, s), List(voidTank))
   final val CAT_TYPE = createTileType((p, s) => new CATTile(p, s), List(blockCat))
