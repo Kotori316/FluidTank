@@ -52,6 +52,7 @@ public class FluidTankClientInit implements ClientModInitializer {
             ClientSpriteRegistryCallback.event(si.atlasLocation()).register((atlasTexture, registry) -> registry.register(si.texture())));
         // FluidRenderHandlerRegistry.INSTANCE.register(ModTank.Entries.MILK_FLUID, (view, pos, state) -> new TextureAtlasSprite[]{STILL_IDENTIFIER.sprite(), FLOW_IDENTIFIER.sprite()});
         CollectionConverters.asJava(ModObjects.blockTanks()).forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, RENDER_ITEM_TANK));
+        CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(i -> BuiltinItemRendererRegistry.INSTANCE.register(i, RENDER_RESERVOIR_ITEM));
         ItemProperties.register(ModObjects.blockSource().itemBlock(),
             new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity, i) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
         FluidTank.LOGGER.info("Client init is finished. {} ", FluidTank.modID);

@@ -19,7 +19,6 @@ import com.kotori316.fluidtank.items.TankItemFluidHandler;
 @Environment(EnvType.CLIENT)
 public class RenderReservoirItem implements BuiltinItemRendererRegistry.DynamicItemRenderer {
     private static final float d = 1f / 16f;
-    private final ModelWrapper internalModel = new ModelWrapper(null);
 
     public RenderReservoirItem() {
         super();
@@ -30,22 +29,24 @@ public class RenderReservoirItem implements BuiltinItemRendererRegistry.DynamicI
                        MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (stack.getItem() instanceof ReservoirItem reservoirItem) {
             BakedModel itemModel = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(stack);
-            matrixStack.pushPose();
-            matrixStack.translate(0.5D, 0.5D, 0.5D);
-            internalModel.setModel(itemModel);
-            Minecraft.getInstance().getItemRenderer().render(stack, cameraType,
-                false, matrixStack, buffer, combinedLight, combinedOverlay, internalModel);
-            matrixStack.popPose();
-
-            if (cameraType == ItemTransforms.TransformType.GUI) {
+            if (itemModel instanceof ModelCustomWrapper) {
                 matrixStack.pushPose();
-                var handler = new TankItemFluidHandler(reservoirItem.tier(), stack);
-                var fluid = handler.getFluid();
-                var capacity = handler.getCapacity();
-                if (fluid.nonEmpty()) {
-                    renderFluid(fluid, capacity, matrixStack, buffer, combinedLight, combinedOverlay);
-                }
+                matrixStack.translate(0.5D, 0.5D, 0.5D);
+                BakedModel original = ((ModelCustomWrapper) itemModel).getOriginalModel();
+                Minecraft.getInstance().getItemRenderer().render(stack, ItemTransforms.TransformType.NONE,
+                    false, matrixStack, buffer, combinedLight, combinedOverlay, original);
                 matrixStack.popPose();
+
+                if (cameraType == ItemTransforms.TransformType.GUI) {
+                    matrixStack.pushPose();
+                    var handler = new TankItemFluidHandler(reservoirItem.tier(), stack);
+                    var fluid = handler.getFluid();
+                    var capacity = handler.getCapacity();
+                    if (fluid.nonEmpty()) {
+                        renderFluid(fluid, capacity, matrixStack, buffer, combinedLight, combinedOverlay);
+                    }
+                    matrixStack.popPose();
+                }
             }
         }
     }

@@ -31,6 +31,9 @@
       "com.kotori316.fluidtank.integration.jade.JadeTankWailaPlugin"
     ]
   },
+  "mixins": [
+    "fluidtank.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=0.14.0",
     "fabric": ">=0.55.3+1.19",
