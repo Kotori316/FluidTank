@@ -21,6 +21,7 @@ import scala.jdk.javaapi.CollectionConverters;
 import com.kotori316.fluidtank.blocks.FluidSourceBlock;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.render.RenderItemTank;
+import com.kotori316.fluidtank.render.RenderReservoirItem;
 import com.kotori316.fluidtank.render.RenderTank;
 import com.kotori316.fluidtank.tiles.TileTankCreative;
 
@@ -30,6 +31,7 @@ public class FluidTankClientInit implements ClientModInitializer {
     public static final Material STILL_IDENTIFIER = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(FluidTank.modID, "blocks/milk_still"));
     public static final Material FLOW_IDENTIFIER = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(FluidTank.modID, "blocks/milk_flow"));
     private static final RenderItemTank RENDER_ITEM_TANK = new RenderItemTank();
+    private static final RenderReservoirItem RENDER_RESERVOIR_ITEM = new RenderReservoirItem();
     public static final Sprites SPRITES = new Sprites();
 
     @SuppressWarnings("unchecked")
