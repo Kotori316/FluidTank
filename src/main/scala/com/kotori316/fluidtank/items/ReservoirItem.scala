@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.items
 
-import com.kotori316.fluidtank.fluids.{FluidAction, FluidAmount, VariantUtil}
+import cats.implicits.catsSyntaxEq
+import com.kotori316.fluidtank.fluids.{FabricAmount, FluidAction, FluidAmount, VariantUtil}
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
@@ -51,8 +52,8 @@ class ReservoirItem(val tier: Tier) extends Item(new Item.Properties().tab(ModOb
         val itemHandler = new TankItemFluidHandler(tier, stack)
         state.getBlock match {
           case pickup: BucketPickup =>
-            val simulate = itemHandler.fill(FluidAmount(fluidState.getType, FluidAmount.AMOUNT_BUCKET, None), FluidAction.SIMULATE)
-            if (simulate.nonEmpty && simulate.amount == FluidAmount.AMOUNT_BUCKET) {
+            val simulate = itemHandler.fill(FluidAmount(fluidState.getType, FabricAmount.BUCKET, None), FluidAction.SIMULATE)
+            if (simulate.nonEmpty && simulate.fabricAmount === FabricAmount.BUCKET) {
               val picked = pickup.pickupBlock(worldIn, pos, state)
               if (!picked.isEmpty) {
                 val fluid = VariantUtil.getFluidInItem(picked)

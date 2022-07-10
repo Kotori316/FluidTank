@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.material.{Fluid, Fluids}
 
 case class FluidKey(fluid: Fluid, tag: Option[CompoundTag]) {
-  def toAmount(amount: Long): FluidAmount = FluidAmount(fluid, amount, tag)
+  def toAmount(amount: FabricAmount): FluidAmount = FluidAmount(fluid, amount, tag)
 
   def isEmpty: Boolean = fluid == Fluids.EMPTY
 

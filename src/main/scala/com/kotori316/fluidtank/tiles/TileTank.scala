@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.tiles
 
 import cats.implicits.toShow
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
+import com.kotori316.fluidtank.fluids.{FabricAmount, FluidAmount, Tank, TankHandler}
 import com.kotori316.fluidtank.network.ClientSync
 import com.kotori316.fluidtank.render.Box
 import net.minecraft.core.BlockPos
@@ -33,7 +33,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     this(t, ModObjects.TANK_TYPE, p, s)
   }
 
-  val internalTank: TankHandler with TileTank.RealTank = new InternalTank(tier.amount)
+  val internalTank: TankHandler with TileTank.RealTank = new InternalTank(FabricAmount.fromForge(tier.amount))
   private final var mConnection: Connection = Connection.invalid
   final val connectionAttaches: ArrayBuffer[Connection => Unit] = ArrayBuffer.empty
   var loading = false
@@ -123,7 +123,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
 
   override def getCustomName: Component = getStackName.orNull
 
-  class InternalTank(initialCapacity: Long) extends TankHandler with TileTank.RealTank {
+  class InternalTank(initialCapacity: FabricAmount) extends TankHandler with TileTank.RealTank {
     initCapacity(initialCapacity)
 
     override def tile: TileTank = self
@@ -156,11 +156,11 @@ object TileTank {
     lazy val upperBound: Double = 1d - 0.001d
 
     // Util methods
-    def getFluidAmount: Long = this.getTank.amount
+    def getFluidAmount: Long = this.getTank.amount.toForge
 
     def getFluid: FluidAmount = this.getTank.fluidAmount
 
-    protected def capacity = this.getTank.capacity
+    protected def capacity = this.getTank.capacityInForge
 
     override def onContentsChanged(): Unit = {
       tile.sendPacket()

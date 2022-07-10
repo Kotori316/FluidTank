@@ -30,7 +30,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
         if (tried.nonEmpty()) {
             updateSnapshots(transaction);
             var inserted = connection.handler().fill(toFill, FluidAction.EXECUTE);
-            return VariantUtil.convertForgeAmountToFabric(inserted.amount());
+            return inserted.fabricAmount();
         } else {
             return 0;
         }
@@ -43,7 +43,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
         if (tried.nonEmpty()) {
             updateSnapshots(transaction);
             var extracted = connection.handler().drain(toDrain, FluidAction.EXECUTE);
-            return VariantUtil.convertForgeAmountToFabric(extracted.amount());
+            return extracted.fabricAmount();
         } else {
             return 0;
         }
@@ -82,7 +82,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
     }
 
     static FluidAmount getFluidAmount(FluidVariant variant, long fabricAmount) {
-        return FluidAmount.apply(variant.getFluid(), VariantUtil.convertFabricAmountToForge(fabricAmount), Option.apply(variant.copyNbt()));
+        return FluidAmount.apply(variant.getFluid(), fabricAmount, Option.apply(variant.copyNbt()));
     }
 
     public static void register() {

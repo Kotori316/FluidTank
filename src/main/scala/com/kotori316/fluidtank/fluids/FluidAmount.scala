@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fluids
 
+import cats.implicits.catsSyntaxEq
 import cats.{Hash, Monoid, Show}
 import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
@@ -9,9 +10,16 @@ import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.{Fluid, Fluids}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
-case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option[CompoundTag]) {
+case class FluidAmount(@NotNull fluid: Fluid, fabricAmount: FabricAmount, @NotNull nbt: Option[CompoundTag]) {
+  def amount: Long = fabricAmount.toForge
+
   def setAmount(newAmount: Long): FluidAmount = {
-    if (newAmount == this.amount) this // No need to create new instance.
+    if (newAmount === this.amount) this // No need to create new instance.
+    else FluidAmount(fluid, FabricAmount.fromForge(newAmount), nbt)
+  }
+
+  def setAmountF(newAmount: FabricAmount): FluidAmount = {
+    if (newAmount === this.fabricAmount) this // No need to create new instance.
     else FluidAmount(fluid, newAmount, nbt)
   }
 
@@ -20,7 +28,7 @@ case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option
 
     val fluidNBT = new CompoundTag()
     fluidNBT.putString(NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
-    fluidNBT.putLong(NBT_amount, amount)
+    fluidNBT.putLong(NBT_fabric_amount, fabricAmount.amount)
     this.nbt.foreach(fluidNBT.put(NBT_tag, _))
 
     tag merge fluidNBT
@@ -39,15 +47,15 @@ case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option
   def +(that: FluidAmount): FluidAmount = {
     if (this.isEmpty) that
     else if (that.isEmpty) this
-    else setAmount(this.amount + that.amount)
+    else copy(fabricAmount = this.fabricAmount + that.fabricAmount)
   }
 
   def -(that: FluidAmount): FluidAmount = {
-    val subtracted = this.amount - that.amount
+    val subtracted = this.fabricAmount - that.fabricAmount
     (this.fluid == Fluids.EMPTY, that.fluid == Fluids.EMPTY) match {
-      case (true, _) => that.copy(amount = subtracted)
-      case (false, true) => this.copy(amount = subtracted)
-      case (false, false) if this.fluid == that.fluid => this.copy(amount = subtracted)
+      case (true, _) => that.copy(fabricAmount = subtracted)
+      case (false, true) => this.copy(fabricAmount = subtracted)
+      case (false, false) if this.fluid == that.fluid => this.copy(fabricAmount = subtracted)
       case _ /*(false, false)*/ => FluidAmount.EMPTY
     }
   }
@@ -67,11 +75,12 @@ case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option
 object FluidAmount {
   final val NBT_fluid = "fluid"
   final val NBT_amount = "amount"
+  final val NBT_fabric_amount = "fabric_amount"
   final val NBT_tag = "tag"
   final val AMOUNT_BUCKET = 1000L
-  val EMPTY: FluidAmount = FluidAmount(Fluids.EMPTY, 0, None)
-  val BUCKET_LAVA: FluidAmount = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
-  val BUCKET_WATER: FluidAmount = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
+  val EMPTY: FluidAmount = FluidAmount(Fluids.EMPTY, FabricAmount(0), None)
+  val BUCKET_LAVA: FluidAmount = FluidAmount(Fluids.LAVA, FabricAmount.BUCKET, None)
+  val BUCKET_WATER: FluidAmount = FluidAmount(Fluids.WATER, FabricAmount.BUCKET, None)
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
@@ -84,7 +93,8 @@ object FluidAmount {
   def fromNBT(@Nullable tag: CompoundTag): FluidAmount = {
     if (tag == null || tag.isEmpty) return FluidAmount.EMPTY
     val name = new ResourceLocation(tag.getString(NBT_fluid))
-    val amount = tag.getLong(NBT_amount)
+    val amount = if (tag.contains(NBT_amount)) FabricAmount.fromForge(tag.getLong(NBT_amount))
+    else FabricAmount(tag.getLong(NBT_fabric_amount))
     val nbt = if (tag.contains(NBT_tag)) Option(tag.getCompound(NBT_tag)) else None
     val fluid = registry.get(name)
     FluidAmount(fluid, amount, nbt)

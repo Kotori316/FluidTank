@@ -15,11 +15,11 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
   override def getFluid: FluidAmount = {
     // Drain from bottom tank.
     val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
-    val drained = this.action(opList(drainOps), FluidAmount.EMPTY.setAmount(getSumOfCapacity), FluidAction.SIMULATE)
+    val drained = this.action(opList(drainOps), FluidAmount.EMPTY.setAmountF(getSumOfCapacity), FluidAction.SIMULATE)
     drained
   }
 
-  def getSumOfCapacity: Long = tankHandlers.map(_.getTank.capacity).combineAll
+  def getSumOfCapacity: FabricAmount = tankHandlers.map(_.getTank.capacity).combineAll
 
   protected def action(op: ListTankOperation[Chain], resource: FluidAmount, action: FluidAction): FluidAmount = {
     val (log, left, newTanks) = op.run((), resource)

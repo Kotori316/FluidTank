@@ -81,7 +81,7 @@ public final class PlaceTest implements FabricGameTest {
             .thenIdle(2)
             .thenExecute(() -> {
                 var c = getConnection(helper, pos);
-                assert c.capacity() == 4000L : "Connection is not created.";
+                assert c.capacity() == 4000L : "Connection is not created. " + c;
             })
             .thenSucceed();
     }
@@ -128,8 +128,8 @@ public final class PlaceTest implements FabricGameTest {
 
         var tile = (TileTank) Objects.requireNonNull(helper.getBlockEntity(pos));
         var connection = tile.connection();
-        assert connection.capacity() == tile.internalTank().getTank().capacity() * 3L :
-            "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.internalTank().getTank().capacity(), connection.capacity());
+        assert connection.capacity() == tile.internalTank().getTank().capacityInForge() * 3L :
+            "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.internalTank().getTank().capacityInForge(), connection.capacity());
         assert 3 == connection.seq().length() : "Connection must contain 3 tanks. seq=" + connection.seq();
 
         helper.succeed();

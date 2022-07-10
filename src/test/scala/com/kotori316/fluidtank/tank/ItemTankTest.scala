@@ -26,7 +26,7 @@ class ItemTankTest {
   def createInstance2(): Unit = {
     val tank = TankHandler(Tank(FluidAmount.BUCKET_WATER, 2000L))
     assertEquals(FluidAmount.BUCKET_WATER, tank.getTank.fluidAmount)
-    assertEquals(2000L, tank.getTank.capacity)
+    assertEquals(2000L, tank.getTank.capacityInForge)
   }
 
   @Nested

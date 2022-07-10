@@ -14,7 +14,7 @@ object CreativeTankHandler {
   def creativeFillOp(tank: Tank): TankOperation =
     if (tank.isEmpty) {
       // Fill tank.
-      fillOp(tank).map(t => t.copy(t.fluidAmount.setAmount(t.capacity)))
+      fillOp(tank).map(t => t.copy(t.fluidAmount.setAmountF(t.capacity)))
     } else {
       ReaderWriterStateT.applyS { s =>
         if (tank.fluidAmount fluidEqual s) {

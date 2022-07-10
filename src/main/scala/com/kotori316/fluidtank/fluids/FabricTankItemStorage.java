@@ -65,7 +65,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
 
     @Override
     public long getAmount() {
-        return VariantUtil.convertForgeAmountToFabric(getItemTank().getFluid().amount());
+        return getItemTank().getFluid().fabricAmount();
     }
 
     @Override

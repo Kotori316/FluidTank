@@ -19,7 +19,7 @@ class TankHandler {
     }
   }
 
-  def initCapacity(capacity: Long): Unit = {
+  def initCapacity(capacity: FabricAmount): Unit = {
     val newTank = getTank.copy(capacity = capacity)
     // Not to use setter to avoid NPE of connection.
     this.tank = newTank
@@ -60,12 +60,6 @@ class TankHandler {
 }
 
 object TankHandler {
-  def apply(capacity: Long): TankHandler = {
-    val h = new TankHandler()
-    h.setTank(h.getTank.copy(capacity = capacity))
-    h
-  }
-
   def apply(tank: Tank): TankHandler = {
     val h = new TankHandler()
     h setTank tank

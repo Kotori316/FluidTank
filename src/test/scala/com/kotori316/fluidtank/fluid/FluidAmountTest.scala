@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.fluid
 
 import com.kotori316.fluidtank.BeforeAllTest
-import com.kotori316.fluidtank.fluids.FluidAmount
+import com.kotori316.fluidtank.fluids.{FabricAmount, FluidAmount}
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
 import org.junit.jupiter.api.{DynamicTest, Test, TestFactory}
@@ -11,9 +11,9 @@ import scala.jdk.javaapi.CollectionConverters
 private[fluid] class FluidAmountTest extends BeforeAllTest {
   @Test
   def equiv(): Unit = {
-    val a = FluidAmount(Fluids.WATER, FluidAmount.AMOUNT_BUCKET, None)
+    val a = FluidAmount(Fluids.WATER, FabricAmount.BUCKET, None)
     assertTrue(a == a, "Equal to itself")
-    val b = FluidAmount(Fluids.WATER, FluidAmount.AMOUNT_BUCKET, None)
+    val b = FluidAmount(Fluids.WATER, FabricAmount.BUCKET, None)
     assertTrue(a == b, "Eq")
     assertEquals(a, b, "Eq2")
     assertTrue(a fluidEqual b)

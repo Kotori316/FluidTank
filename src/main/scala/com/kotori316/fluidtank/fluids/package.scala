@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank
 
 import cats.data.{Chain, ReaderWriterStateT}
+import cats.implicits.{catsSyntaxOrder, catsSyntaxPartialOrder}
 import cats.syntax.group._
 import cats.syntax.semigroupk._
 import cats.{Applicative, Foldable, Id, Monad, MonoidK}
@@ -15,8 +16,8 @@ package object fluids {
       // Nothing to fill, skip.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
     } else if (tank.fluidAmount.isEmpty || (tank.fluidAmount fluidEqual s)) {
-      val filledAmount = (tank.capacity |-| tank.amount) min s.amount
-      val filledStack = s.copy(amount = filledAmount)
+      val filledAmount = (tank.capacity |-| tank.amount) min s.fabricAmount
+      val filledStack = s.copy(fabricAmount = filledAmount)
       val newTank = tank.copy(tank.fluidAmount + filledStack)
       (Chain(FluidTransferLog.FillFluid(s, filledStack, tank, newTank)), s - filledStack, newTank)
     } else {
@@ -30,9 +31,9 @@ package object fluids {
       // Nothing to drain.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
     } else if (s.fluid == Fluids.EMPTY || (s fluidEqual tank.fluidAmount)) {
-      val drainAmount = tank.amount min s.amount
-      val drainedStack = tank.fluidAmount.copy(amount = drainAmount)
-      val newTank = tank.copy(tank.fluidAmount.copy(amount = tank.amount |-| drainAmount))
+      val drainAmount = tank.amount min s.fabricAmount
+      val drainedStack = tank.fluidAmount.copy(fabricAmount = drainAmount)
+      val newTank = tank.copy(tank.fluidAmount.copy(fabricAmount = tank.amount |-| drainAmount))
       val subtracted = if (drainedStack.nonEmpty) s - drainedStack else s
       (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank, newTank)), subtracted, newTank)
     } else {
@@ -54,10 +55,10 @@ package object fluids {
     val op: Tank => TankOperation = t =>
       for {
         before <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
-        _ <- ReaderWriterStateT.modify[Id, Unit, Chain[FluidTransferLog], FluidAmount](f => f.setAmount(t.capacity))
+        _ <- ReaderWriterStateT.modify[Id, Unit, Chain[FluidTransferLog], FluidAmount](f => f.setAmountF(t.capacity))
         y <- fillOp(t)
         rest <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
-        r = if (rest.amount < t.capacity) rest.setAmount(0) else before
+        r = if (rest.fabricAmount < t.capacity) rest.setAmount(0) else before
         _ <- ReaderWriterStateT.set[Id, Unit, Chain[FluidTransferLog], FluidAmount](r)
       } yield y
     opList(applicative.map(tanks)(op))

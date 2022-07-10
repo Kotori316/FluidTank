@@ -7,6 +7,7 @@
   "entrypoints": {
     "fabric-gametest": [
       "com.kotori316.fluidtank.gametest.PlaceTest",
+      "com.kotori316.fluidtank.gametest.SerializeTest",
       "com.kotori316.fluidtank.gametest.FillTest",
       "com.kotori316.fluidtank.gametest.RuntimeOnlyTest",
       "com.kotori316.fluidtank.gametest.DropTest"

@@ -28,7 +28,7 @@ sealed class Connection private(s: Seq[TileTank]) {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
   }
 
-  def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity
+  def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity.toForge
 
   def amount: Long = if (hasCreative && fluidType.nonEmpty) Tier.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
 

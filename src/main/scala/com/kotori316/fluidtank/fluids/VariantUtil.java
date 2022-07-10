@@ -57,7 +57,7 @@ public final class VariantUtil {
         if (storage != null) {
             for (StorageView<FluidVariant> view : storage) {
                 var variant = view.getResource();
-                var amount = convertFabricAmountToForge(view.getAmount());
+                var amount = view.getAmount();
                 return FluidAmount.apply(variant.getFluid(), amount, Option.apply(variant.copyNbt()));
             }
         }
@@ -76,12 +76,12 @@ public final class VariantUtil {
         var storage = FluidStorage.SIDED.find(level, pos, direction);
         if (storage != null && storage.supportsInsertion()) {
             var variant = convert(source);
-            var simulate = storage.simulateInsert(variant, convertForgeAmountToFabric(source.amount()), null);
+            var simulate = storage.simulateInsert(variant, source.fabricAmount(), null);
             if (simulate > 0) {
                 try (Transaction transaction = Transaction.openOuter()) {
                     var inserted = storage.insert(variant, simulate, transaction);
                     transaction.commit();
-                    return source.setAmount(convertFabricAmountToForge(inserted));
+                    return source.setAmountF(inserted);
                 }
             } else {
                 // Fill failed.
@@ -108,8 +108,8 @@ public final class VariantUtil {
 
         final FluidAmount drained;
         try (var transaction = Transaction.openOuter()) {
-            var result = fluidStorage.extract(convert(fillSimulation), convertForgeAmountToFabric(fillSimulation.amount()), transaction);
-            drained = fillSimulation.setAmount(convertFabricAmountToForge(result));
+            var result = fluidStorage.extract(convert(fillSimulation), fillSimulation.fabricAmount(), transaction);
+            drained = fillSimulation.setAmountF(result);
             transaction.abort();
         }
         // Nothing is drained from item.
@@ -122,8 +122,8 @@ public final class VariantUtil {
         // DO ACTUAL PROCESS
         final FluidAmount drainExecution;
         try (var transaction = Transaction.openOuter()) {
-            var result = fluidStorage.extract(convert(fillSimulation), convertForgeAmountToFabric(fillSimulation.amount()), transaction);
-            drainExecution = fillSimulation.setAmount(convertFabricAmountToForge(result));
+            var result = fluidStorage.extract(convert(fillSimulation), fillSimulation.fabricAmount(), transaction);
+            drainExecution = fillSimulation.setAmountF(result);
             transaction.commit();
         }
         container.fill(drainExecution, FluidAction.EXECUTE);
@@ -138,8 +138,8 @@ public final class VariantUtil {
         // Not a fluid storage item.
         if (fluidStorage == null || !fluidStorage.supportsInsertion()) return Option.empty();
 
-        var filled = fluidStorage.simulateInsert(convert(tankContent), convertForgeAmountToFabric(tankContent.amount()), null);
-        var toFill = tankContent.setAmount(convertFabricAmountToForge(filled));
+        var filled = fluidStorage.simulateInsert(convert(tankContent), tankContent.fabricAmount(), null);
+        var toFill = tankContent.setAmountF(filled);
         // Nothing is filled into the item.
         if (toFill.isEmpty()) return Option.empty();
         // The fluid can't be drained from the tank.
@@ -148,7 +148,7 @@ public final class VariantUtil {
 
         var drainExecution = tank.drain(drained, FluidAction.EXECUTE);
         try (var transaction = Transaction.openOuter()) {
-            fluidStorage.insert(convert(drainExecution), convertForgeAmountToFabric(drainExecution.amount()), transaction);
+            fluidStorage.insert(convert(drainExecution), drainExecution.fabricAmount(), transaction);
             transaction.commit();
         }
         var filledItem = itemStorage.getItemVariant().toStack(Utils.toInt(itemStorage.getAmount()));
