@@ -18,7 +18,7 @@ import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.{InteractionHand, InteractionResult, InteractionResultHolder}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.IItemRenderProperties
+import net.minecraftforge.client.extensions.common.IClientItemExtensions
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler
@@ -77,9 +77,9 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
     new TankItemFluidHandler(tier, stack)
   }
 
-  override def getContainerItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
+  override def getCraftingRemainingItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
 
-  override def hasContainerItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
+  override def hasCraftingRemainingItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
 
   override def getBurnTime(itemStack: ItemStack, recipeType: RecipeType[_]): Int = ItemUtil.getTankBurnTime(tier, itemStack, recipeType)
 
@@ -101,9 +101,9 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
     if (BlockItem.getBlockEntityData(stack) != null) Rarity.RARE
     else Rarity.COMMON
 
-  override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {
-    consumer.accept(new IItemRenderProperties {
-      override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_RESERVOIR.value
+  override def initializeClient(consumer: Consumer[IClientItemExtensions]): Unit = {
+    consumer.accept(new IClientItemExtensions {
+      override def getCustomRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_RESERVOIR.value
     })
   }
 }

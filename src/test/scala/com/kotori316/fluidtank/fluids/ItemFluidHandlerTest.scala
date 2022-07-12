@@ -148,7 +148,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val handler = RecipeInventoryUtil.getFluidHandler(stack)
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(amount).toStack, IFluidHandler.FluidAction.EXECUTE)
 
-    val container = stack.getContainerItem
+    val container = stack.getCraftingRemainingItem
     assertEquals(woodTank.itemBlock, container.getItem)
     val containerContent = RecipeInventoryUtil.getFluidHandler(container).getFluid
     assertTrue(containerContent.isEmpty)
@@ -163,7 +163,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val handler = RecipeInventoryUtil.getFluidHandler(stack)
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(amount).toStack, IFluidHandler.FluidAction.EXECUTE)
 
-    val container = stack.getContainerItem
+    val container = stack.getCraftingRemainingItem
     assertEquals(woodTank.itemBlock, container.getItem)
     val containerContent = RecipeInventoryUtil.getFluidHandler(container).getFluid
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount - 1000), containerContent)

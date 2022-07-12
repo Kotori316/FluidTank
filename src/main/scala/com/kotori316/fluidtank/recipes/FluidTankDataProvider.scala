@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent
+import net.minecraftforge.data.event.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 

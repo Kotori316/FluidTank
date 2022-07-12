@@ -21,7 +21,7 @@ import net.minecraft.world.item.{BlockItem, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.IItemRenderProperties
+import net.minecraftforge.client.extensions.common.IClientItemExtensions
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import org.jetbrains.annotations.Nullable
 
@@ -90,15 +90,15 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, Fluid
     }
   }
 
-  override def getContainerItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
+  override def getCraftingRemainingItem(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
 
-  override def hasContainerItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
+  override def hasCraftingRemainingItem(stack: ItemStack): Boolean = BlockItem.getBlockEntityData(stack) != null
 
   override def getBurnTime(itemStack: ItemStack, recipeType: RecipeType[_]): Int = ItemUtil.getTankBurnTime(blockTank.tier, itemStack, recipeType)
 
-  override def initializeClient(consumer: Consumer[IItemRenderProperties]): Unit = {
-    consumer.accept(new IItemRenderProperties {
-      override def getItemStackRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_TANK.value
+  override def initializeClient(consumer: Consumer[IClientItemExtensions]): Unit = {
+    consumer.accept(new IClientItemExtensions {
+      override def getCustomRenderer: BlockEntityWithoutLevelRenderer = ClientProxy.RENDER_ITEM_TANK.value
     })
   }
 

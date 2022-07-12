@@ -196,8 +196,8 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
 
         for (int i = 0; i < stacks.size(); ++i) {
             ItemStack item = inv.getItem(i);
-            if (item.hasContainerItem() && !(item.getItem() instanceof ItemBlockTank)) {
-                stacks.set(i, item.getContainerItem());
+            if (item.hasCraftingRemainingItem() && !(item.getItem() instanceof ItemBlockTank)) {
+                stacks.set(i, item.getCraftingRemainingItem());
             }
         }
 

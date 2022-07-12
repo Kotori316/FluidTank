@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.level.Level
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
-import net.minecraftforge.client.RenderProperties
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions
 import net.minecraftforge.fluids.FluidType
 
 @OnlyIn(Dist.CLIENT)
@@ -40,22 +40,22 @@ object RenderTank {
   private def textureName(tile: TileTank) = {
     val world = getTankWorld(tile)
     val pos = getTankPos(tile)
-    val attributes = RenderProperties.get(tile.internalTank.getFluid.fluid)
+    val attributes = IClientFluidTypeExtensions.of(tile.internalTank.getFluid.fluid)
     attributes.getStillTexture(tile.internalTank.getFluid.fluid.defaultFluidState, world, pos)
   }
 
   private def color(tile: TileTank) = {
     val fluidAmount = tile.internalTank.getFluid
-    val attributes = RenderProperties.get(fluidAmount.fluid)
-    val normal = attributes.getColorTint
+    val attributes = IClientFluidTypeExtensions.of(fluidAmount.fluid)
+    val normal = attributes.getTintColor
     if (attributes.getClass == classOf[FluidType]) {
       normal
     } else {
-      val stackColor = attributes.getColorTint(fluidAmount.toStack)
+      val stackColor = attributes.getTintColor(fluidAmount.toStack)
       if (normal == stackColor) {
         val world = getTankWorld(tile)
         val pos = getTankPos(tile)
-        val worldColor = attributes.getColorTint(fluidAmount.fluid.defaultFluidState, world, pos)
+        val worldColor = attributes.getTintColor(fluidAmount.fluid.defaultFluidState, world, pos)
         worldColor
       } else {
         stackColor

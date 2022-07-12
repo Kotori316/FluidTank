@@ -53,7 +53,7 @@ class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.M
           InteractionResult.SUCCESS
         case _ =>
           if (!level.isClientSide)
-            NetworkHooks.openGui(player.asInstanceOf[ServerPlayer], level.getBlockEntity(pos).asInstanceOf[CATTile], pos)
+            NetworkHooks.openScreen(player.asInstanceOf[ServerPlayer], level.getBlockEntity(pos).asInstanceOf[CATTile], pos)
           InteractionResult.SUCCESS
       }
     } else {

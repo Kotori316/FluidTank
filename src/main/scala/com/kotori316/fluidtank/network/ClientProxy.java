@@ -19,8 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -90,16 +89,16 @@ public class ClientProxy extends SideProxy {
     }
 
     @SubscribeEvent
-    public void registerModels(ModelRegistryEvent event) {
+    public void registerModels(ModelEvent.RegisterAdditional event) {
     }
 
     @SubscribeEvent
-    public void onBake(ModelBakeEvent event) {
+    public void onBake(ModelEvent.BakingCompleted event) {
         CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
             .map(ForgeRegistries.ITEMS::getKey)
             .filter(Objects::nonNull)
             .map(n -> new ModelResourceLocation(n, "inventory"))
-            .forEach(n -> event.getModelRegistry().put(n, new ModelWrapper(event.getModelManager().getModel(n))));
+            .forEach(n -> event.getModels().put(n, new ModelWrapper(event.getModelManager().getModel(n))));
     }
 
     @SubscribeEvent
