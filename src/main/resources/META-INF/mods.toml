@@ -15,8 +15,8 @@ Add large fluid tanks.'''
 [[dependencies.fluidtank]]
     modId = "forge"
     mandatory = true
-    versionRange = "[41,)"
-    ordering = "NONE"
+versionRange = "[41.0.94,)"
+ordering = "NONE"
     side = "BOTH"
 [[dependencies.fluidtank]]
     modId = "minecraft"
