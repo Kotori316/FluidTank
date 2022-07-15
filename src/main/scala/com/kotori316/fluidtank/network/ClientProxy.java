@@ -72,8 +72,6 @@ public class ClientProxy extends SideProxy {
         MenuScreens.register(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
 
         RenderType rendertype = RenderType.cutoutMipped();
-        CollectionConverters.asJava(ModObjects.blockTanks())
-            .forEach(tank -> ItemBlockRenderTypes.setRenderLayer(tank, rendertype));
         ItemBlockRenderTypes.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
         ItemBlockRenderTypes.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
 

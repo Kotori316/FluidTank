@@ -35,6 +35,7 @@ object FluidTankDataProvider {
     event.getGenerator.addProvider(event.includeServer, new AdvancementProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeServer, new RecipeProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeClient, new ModelProvider(event.getGenerator))
+    event.getGenerator.addProvider(event.includeClient, new StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))
     event.getGenerator.addProvider(event.includeServer, new LootTableProvider(event.getGenerator))
   }
 
@@ -220,9 +221,6 @@ object FluidTankDataProvider {
     override def run(cache: CachedOutput): Unit = {
       val path = generatorIn.getOutputFolder
       val models: mutable.Buffer[ModelSerializerHelper] = mutable.Buffer.empty
-      models ++= ModObjects.blockTanks.map(ModelSerializerHelper.getTankModel)
-      models += ModelSerializerHelper.getFluidSourceModel(ModObjects.blockSource)
-      models += ModelSerializerHelper.getCatModel(ModObjects.blockCat)
       models += ModelSerializerHelper.getPipeModel(ModObjects.blockFluidPipe)
       models += ModelSerializerHelper.getPipeModel(ModObjects.blockItemPipe)
 
