@@ -1,6 +1,6 @@
 {
   "parent": "fluidtank:block/tanks",
-  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "fluidtank:blocks/lead1",
     "side": "fluidtank:blocks/lead1",

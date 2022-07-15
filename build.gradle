@@ -110,7 +110,7 @@ minecraft {
             with commonRunSetting
             workingDirectory file('run-server')
             setForceExit(false)
-            args('--mod', "fluidtank", '--all', '--output', file('src/generated/resources/'))
+            args('--mod', "fluidtank", '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'))
         }
 
         gameTestServer {

@@ -34,7 +34,7 @@ object FluidTankDataProvider {
   def gatherData(event: GatherDataEvent): Unit = {
     event.getGenerator.addProvider(event.includeServer, new AdvancementProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeServer, new RecipeProvider(event.getGenerator))
-    event.getGenerator.addProvider(event.includeClient, new ModelProvider(event.getGenerator))
+    event.getGenerator.addProvider(event.includeClient, new StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))
     event.getGenerator.addProvider(event.includeServer, new LootTableProvider(event.getGenerator))
   }
 
@@ -213,31 +213,6 @@ object FluidTankDataProvider {
 
     override def getName = "Recipe of FluidTank"
 
-  }
-
-  class ModelProvider(generatorIn: DataGenerator) extends DataProvider {
-    //noinspection SpellCheckingInspection
-    override def run(cache: CachedOutput): Unit = {
-      val path = generatorIn.getOutputFolder
-      val models: mutable.Buffer[ModelSerializerHelper] = mutable.Buffer.empty
-      models ++= ModObjects.blockTanks.map(ModelSerializerHelper.getTankModel)
-      models += ModelSerializerHelper.getFluidSourceModel(ModObjects.blockSource)
-      models += ModelSerializerHelper.getCatModel(ModObjects.blockCat)
-      models += ModelSerializerHelper.getPipeModel(ModObjects.blockFluidPipe)
-      models += ModelSerializerHelper.getPipeModel(ModObjects.blockItemPipe)
-
-      for (model <- models) {
-        val out = path.resolve(s"assets/${model.location.getNamespace}/blockstates/${model.location.getPath}.json")
-        try {
-          saveData(cache, model.build, out)
-        } catch {
-          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}.", e)
-          case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${model.location}. Check the serializer registered.", e)
-        }
-      }
-    }
-
-    override def getName: String = "Models of FluidTank"
   }
 
   class LootTableProvider(generatorIn: DataGenerator) extends DataProvider {

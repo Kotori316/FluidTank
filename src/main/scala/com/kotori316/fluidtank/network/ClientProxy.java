@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import cats.Eval;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -70,12 +68,6 @@ public class ClientProxy extends SideProxy {
         BlockEntityRenderers.register(ModObjects.FLUID_PIPE_TYPE(), ClientProxy::createPipeRenderer);
         BlockEntityRenderers.register(ModObjects.ITEM_PIPE_TYPE(), ClientProxy::createPipeRenderer);
         MenuScreens.register(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
-
-        RenderType rendertype = RenderType.cutoutMipped();
-        CollectionConverters.asJava(ModObjects.blockTanks())
-            .forEach(tank -> ItemBlockRenderTypes.setRenderLayer(tank, rendertype));
-        ItemBlockRenderTypes.setRenderLayer(ModObjects.blockFluidPipe(), rendertype);
-        ItemBlockRenderTypes.setRenderLayer(ModObjects.blockItemPipe(), rendertype);
 
         // Item Properties Override
         ItemProperties.register(ModObjects.blockSource().itemBlock(),

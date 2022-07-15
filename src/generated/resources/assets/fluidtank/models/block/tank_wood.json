@@ -1,5 +1,6 @@
 {
   "parent": "fluidtank:block/tanks",
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "fluidtank:blocks/wood1",
     "side": "fluidtank:blocks/wood1",
