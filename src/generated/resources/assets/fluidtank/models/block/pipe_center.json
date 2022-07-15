@@ -33,9 +33,5 @@
       ]
     }
   ],
-  "render_type": "minecraft:cutout_mipped",
-  "textures": {
-    "particle": "fluidtank:blocks/frame",
-    "texture": "fluidtank:blocks/frame"
-  }
+  "render_type": "minecraft:cutout_mipped"
 }

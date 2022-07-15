@@ -2,12 +2,12 @@
   "multipart": [
     {
       "apply": {
-        "model": "fluidtank:block/pipe_center"
+        "model": "fluidtank:block/fluid_pipe_center"
       }
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_side",
+        "model": "fluidtank:block/fluid_pipe_side",
         "uvlock": true
       },
       "when": {
@@ -16,7 +16,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_side",
+        "model": "fluidtank:block/fluid_pipe_side",
         "uvlock": true,
         "y": 90
       },
@@ -26,7 +26,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_side",
+        "model": "fluidtank:block/fluid_pipe_side",
         "uvlock": true,
         "y": 180
       },
@@ -36,7 +36,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_side",
+        "model": "fluidtank:block/fluid_pipe_side",
         "uvlock": true,
         "y": 270
       },
@@ -46,7 +46,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_side",
+        "model": "fluidtank:block/fluid_pipe_side",
         "uvlock": true,
         "x": 270
       },
@@ -56,7 +56,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_side",
+        "model": "fluidtank:block/fluid_pipe_side",
         "uvlock": true,
         "x": 90
       },
@@ -66,7 +66,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_output",
+        "model": "fluidtank:block/fluid_pipe_output",
         "uvlock": true
       },
       "when": {
@@ -75,7 +75,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_output",
+        "model": "fluidtank:block/fluid_pipe_output",
         "uvlock": true,
         "y": 90
       },
@@ -85,7 +85,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_output",
+        "model": "fluidtank:block/fluid_pipe_output",
         "uvlock": true,
         "y": 180
       },
@@ -95,7 +95,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_output",
+        "model": "fluidtank:block/fluid_pipe_output",
         "uvlock": true,
         "y": 270
       },
@@ -105,7 +105,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_output",
+        "model": "fluidtank:block/fluid_pipe_output",
         "uvlock": true,
         "x": 270
       },
@@ -115,7 +115,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_output",
+        "model": "fluidtank:block/fluid_pipe_output",
         "uvlock": true,
         "x": 90
       },
@@ -125,7 +125,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_input",
+        "model": "fluidtank:block/fluid_pipe_input",
         "uvlock": true
       },
       "when": {
@@ -134,7 +134,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_input",
+        "model": "fluidtank:block/fluid_pipe_input",
         "uvlock": true,
         "y": 90
       },
@@ -144,7 +144,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_input",
+        "model": "fluidtank:block/fluid_pipe_input",
         "uvlock": true,
         "y": 180
       },
@@ -154,7 +154,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_input",
+        "model": "fluidtank:block/fluid_pipe_input",
         "uvlock": true,
         "y": 270
       },
@@ -164,7 +164,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_input",
+        "model": "fluidtank:block/fluid_pipe_input",
         "uvlock": true,
         "x": 270
       },
@@ -174,7 +174,7 @@
     },
     {
       "apply": {
-        "model": "fluidtank:block/pipe_input",
+        "model": "fluidtank:block/fluid_pipe_input",
         "uvlock": true,
         "x": 90
       },

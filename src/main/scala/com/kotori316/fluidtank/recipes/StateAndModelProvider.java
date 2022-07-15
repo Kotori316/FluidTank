@@ -30,10 +30,9 @@ final class StateAndModelProvider extends BlockStateProvider {
         sourceBlock();
         tankBase();
         StreamConverters.asJavaSeqStream(ModObjects.blockTanks()).forEach(this::tank);
-        pipeBase(ModObjects.blockFluidPipe());
-        pipeBase(ModObjects.blockItemPipe());
-        pipe(ModObjects.blockFluidPipe());
-        pipe(ModObjects.blockItemPipe());
+        pipeBase();
+        pipe(ModObjects.blockFluidPipe(), "fluid_pipe");
+        pipe(ModObjects.blockItemPipe(), "item_pipe");
     }
 
     void catBlock() {
@@ -77,19 +76,14 @@ final class StateAndModelProvider extends BlockStateProvider {
     }
 
     @SuppressWarnings("SpellCheckingInspection")
-    void pipeBase(PipeBlock pipeBlock) {
-        String prefix = pipeBlock.registryName.getPath().replace("pipe", "");
+    void pipeBase() {
         // Center Model
-        models().getBuilder("block/" + pipeBlock.registryName.getPath() + "_center")
-            .texture("particle", blockTexture(prefix + "frame"))
-            .texture("texture", blockTexture(prefix + "frame"))
+        models().getBuilder("block/" + "pipe_center")
             .renderType("cutout_mipped")
             .element().from(4.0f, 4.0f, 4.0f).to(12.0f, 12.0f, 12.0f)
             .allFaces((direction, faceBuilder) -> faceBuilder.uvs(4.0f, 4.0f, 12.0f, 12.0f).texture("#texture"));
         // Side Model
-        models().getBuilder("block/" + pipeBlock.registryName.getPath() + "_side")
-            .texture("particle", blockTexture(prefix + "frame"))
-            .texture("texture", blockTexture(prefix + "frame"))
+        models().getBuilder("block/" + "pipe_side")
             .renderType("cutout_mipped")
             .element().from(4.0f, 4.0f, 0.0f).to(12.0f, 12.0f, 4.0f)
             .face(Direction.SOUTH).uvs(4.0f, 4.0f, 12.0f, 12.0f).texture("#texture").cullface(Direction.SOUTH).end()
@@ -119,27 +113,31 @@ final class StateAndModelProvider extends BlockStateProvider {
         ;
     }
 
-    void pipe(PipeBlock pipeBlock) {
+    void pipe(PipeBlock pipeBlock, String modelBaseName) {
         String prefix = pipeBlock.registryName.getPath().replace("pipe", "");
-        var centerModel = new ResourceLocation(FluidTank.modID, "block/" + pipeBlock.registryName.getPath() + "_center");
-        var sideModel = new ResourceLocation(FluidTank.modID, "block/" + pipeBlock.registryName.getPath() + "_side");
-        var outModel = models().withExistingParent("block/" + pipeBlock.registryName.getPath() + "_output", new ResourceLocation(FluidTank.modID, "block/pipe_in_out"))
+        var centerModel = models().withExistingParent("block/" + modelBaseName + "_center", new ResourceLocation(FluidTank.modID, "block/pipe_center"))
+            .texture("particle", blockTexture(prefix + "frame"))
+            .texture("texture", blockTexture(prefix + "frame"));
+        var sideModel = models().withExistingParent("block/" + modelBaseName + "_side", new ResourceLocation(FluidTank.modID, "block/pipe_side"))
+            .texture("particle", blockTexture(prefix + "frame"))
+            .texture("texture", blockTexture(prefix + "frame"));
+        var outModel = models().withExistingParent("block/" + modelBaseName + "_output", new ResourceLocation(FluidTank.modID, "block/pipe_in_out"))
             .texture("particle", blockTexture(prefix + "frame"))
             .texture("texture", blockTexture(prefix + "frame"))
             .texture("side", blockTexture(prefix + "frame_output"));
-        var inModel = models().withExistingParent("block/" + pipeBlock.registryName.getPath() + "_input", new ResourceLocation(FluidTank.modID, "block/pipe_in_out"))
+        var inModel = models().withExistingParent("block/" + modelBaseName + "_input", new ResourceLocation(FluidTank.modID, "block/pipe_in_out"))
             .texture("particle", blockTexture(prefix + "frame"))
             .texture("texture", blockTexture(prefix + "frame"))
             .texture("side", blockTexture(prefix + "frame_input"));
         getMultipartBuilder(pipeBlock).part()
-            .modelFile(models().getExistingFile(centerModel)).addModel().end().part()
+            .modelFile(centerModel).addModel().end().part()
             // Connected
-            .modelFile(models().getExistingFile(sideModel)).uvLock(true).addModel().condition(PipeBlock.NORTH, PipeBlock.Connection.CONNECTED).end().part()
-            .modelFile(models().getExistingFile(sideModel)).uvLock(true).rotationY(90).addModel().condition(PipeBlock.EAST, PipeBlock.Connection.CONNECTED).end().part()
-            .modelFile(models().getExistingFile(sideModel)).uvLock(true).rotationY(180).addModel().condition(PipeBlock.SOUTH, PipeBlock.Connection.CONNECTED).end().part()
-            .modelFile(models().getExistingFile(sideModel)).uvLock(true).rotationY(270).addModel().condition(PipeBlock.WEST, PipeBlock.Connection.CONNECTED).end().part()
-            .modelFile(models().getExistingFile(sideModel)).uvLock(true).rotationX(270).addModel().condition(PipeBlock.UP, PipeBlock.Connection.CONNECTED).end().part()
-            .modelFile(models().getExistingFile(sideModel)).uvLock(true).rotationX(90).addModel().condition(PipeBlock.DOWN, PipeBlock.Connection.CONNECTED).end().part()
+            .modelFile(sideModel).uvLock(true).addModel().condition(PipeBlock.NORTH, PipeBlock.Connection.CONNECTED).end().part()
+            .modelFile(sideModel).uvLock(true).rotationY(90).addModel().condition(PipeBlock.EAST, PipeBlock.Connection.CONNECTED).end().part()
+            .modelFile(sideModel).uvLock(true).rotationY(180).addModel().condition(PipeBlock.SOUTH, PipeBlock.Connection.CONNECTED).end().part()
+            .modelFile(sideModel).uvLock(true).rotationY(270).addModel().condition(PipeBlock.WEST, PipeBlock.Connection.CONNECTED).end().part()
+            .modelFile(sideModel).uvLock(true).rotationX(270).addModel().condition(PipeBlock.UP, PipeBlock.Connection.CONNECTED).end().part()
+            .modelFile(sideModel).uvLock(true).rotationX(90).addModel().condition(PipeBlock.DOWN, PipeBlock.Connection.CONNECTED).end().part()
             // OUTPUT
             .modelFile(outModel).uvLock(true).addModel().condition(PipeBlock.NORTH, PipeBlock.Connection.OUTPUT).end().part()
             .modelFile(outModel).uvLock(true).rotationY(90).addModel().condition(PipeBlock.EAST, PipeBlock.Connection.OUTPUT).end().part()
