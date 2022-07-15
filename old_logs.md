@@ -1,3 +1,9 @@
+## v19.3
+
+* Update for new forge.
+
+Build with 1.19-41.0.98, Mapping: Official 1.19
+
 ## v19.2
 
 * You can now use tanks and reservoirs as fuel.
