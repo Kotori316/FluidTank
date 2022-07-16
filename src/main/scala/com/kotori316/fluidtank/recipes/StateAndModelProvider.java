@@ -1,10 +1,13 @@
 package com.kotori316.fluidtank.recipes;
 
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import scala.jdk.javaapi.StreamConverters;
 
@@ -13,6 +16,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockCAT;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.FluidSourceBlock;
+import com.kotori316.fluidtank.items.ReservoirItem;
 import com.kotori316.fluidtank.transport.PipeBlock;
 
 final class StateAndModelProvider extends BlockStateProvider {
@@ -33,11 +37,13 @@ final class StateAndModelProvider extends BlockStateProvider {
         pipeBase();
         pipe(ModObjects.blockFluidPipe(), "fluid_pipe");
         pipe(ModObjects.blockItemPipe(), "item_pipe");
+        StreamConverters.asJavaSeqStream(ModObjects.itemReservoirs()).forEach(this::reservoir);
     }
 
     void catBlock() {
         this.directionalBlock(ModObjects.blockCat(), models().cubeTop(BlockCAT.NAME(),
             blockTexture("cat_side"), blockTexture("cat_front")));
+        this.itemModels().withExistingParent("item/" + BlockCAT.NAME(), new ResourceLocation(FluidTank.modID, "block/" + BlockCAT.NAME()));
     }
 
     void sourceBlock() {
@@ -46,6 +52,16 @@ final class StateAndModelProvider extends BlockStateProvider {
             new ConfiguredModel(models().cubeColumn(FluidSourceBlock.NAME(), blockTexture("fluid_source"), blockTexture("white"))));
         builder.setModels(builder.partialState().with(FluidSourceBlock.CHEAT_MODE(), true),
             new ConfiguredModel(models().cubeColumn(FluidSourceBlock.NAME() + "_inf", blockTexture("fluid_source_inf"), blockTexture("pink"))));
+        ResourceLocation cheat = new ResourceLocation(FluidTank.modID, "source_cheat");
+        itemModels().getBuilder(ModObjects.blockSource().registryName().getPath())
+            .override()
+            .predicate(cheat, 0)
+            .model(models().getExistingFile(new ResourceLocation(FluidTank.modID, "block/" + FluidSourceBlock.NAME())))
+            .end()
+            .override()
+            .predicate(cheat, 1)
+            .model(models().getExistingFile(new ResourceLocation(FluidTank.modID, "block/" + FluidSourceBlock.NAME() + "_inf")))
+            .end();
     }
 
     void tankBase() {
@@ -53,6 +69,30 @@ final class StateAndModelProvider extends BlockStateProvider {
             .element()
             .from(2.0f, 0.0f, 2.0f)
             .to(14.0f, 16.0f, 14.0f)
+            .allFaces((direction, faceBuilder) -> {
+                if (direction.getAxis() == Direction.Axis.Y) {
+                    faceBuilder.texture("#top").uvs(0.0f, 0.0f, 12.0f, 12.0f);
+                } else {
+                    faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
+                }
+            });
+        itemModels().getBuilder("item/item_tank")
+            .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
+            .guiLight(BlockModel.GuiLight.SIDE)
+            .transforms()
+            .transform(ItemTransforms.TransformType.GUI).scale(0.625f).translation(0, 0, 0).rotation(30, 225, 0).end()
+            .transform(ItemTransforms.TransformType.GROUND).scale(0.25f).translation(0, 3, 0).rotation(0, 0, 0).end()
+            .transform(ItemTransforms.TransformType.FIXED).scale(0.5f).translation(0, 0, 0).rotation(0, 0, 0).end()
+            .transform(ItemTransforms.TransformType.THIRD_PERSON_RIGHT_HAND).scale(0.375f).translation(0, 2.5f, 0).rotation(75, 45, 0).end()
+            .transform(ItemTransforms.TransformType.FIRST_PERSON_RIGHT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 45, 0).end()
+            .transform(ItemTransforms.TransformType.FIRST_PERSON_LEFT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 225, 0).end()
+            .end()
+            .ao(false)
+            .texture("particle", "#1")
+            .texture("side", "#1")
+            .texture("top", "#2")
+            .element()
+            .from(2.0f, 0.0f, 2.0f).to(14.0f, 16.0f, 14.0f)
             .allFaces((direction, faceBuilder) -> {
                 if (direction.getAxis() == Direction.Axis.Y) {
                     faceBuilder.texture("#top").uvs(0.0f, 0.0f, 12.0f, 12.0f);
@@ -73,6 +113,9 @@ final class StateAndModelProvider extends BlockStateProvider {
                     .renderType("cutout")
                 )
             });
+        itemModels().withExistingParent(blockTank.registryName().getPath(), new ResourceLocation(FluidTank.modID, "item/item_tank"))
+            .texture("1", blockTexture(tier.lowerName() + "1"))
+            .texture("2", blockTexture(tier.lowerName() + "2"));
     }
 
     @SuppressWarnings("SpellCheckingInspection")
@@ -111,23 +154,37 @@ final class StateAndModelProvider extends BlockStateProvider {
             .face(Direction.WEST).uvs(0, 2, 2, 14).texture("#side").end()
             .face(Direction.EAST).uvs(14, 2, 16, 14).texture("#side").end()
         ;
+
+        // Item
+        itemModels().withExistingParent("item/" + "pipe_base", "block/block")
+            .transforms()
+            .transform(ItemTransforms.TransformType.GUI).rotation(30, 225, 0).scale(0.8f).end()
+            .transform(ItemTransforms.TransformType.FIXED).scale(0.8f).end()
+            .end()
+            .ao(false)
+            .element()
+            .from(4, 4, 4).to(12, 12, 12)
+            .allFaces((direction, faceBuilder) ->
+                faceBuilder.uvs(4, 4, 12, 12).texture("#texture")
+            );
     }
 
     void pipe(PipeBlock pipeBlock, String modelBaseName) {
         String prefix = pipeBlock.registryName.getPath().replace("pipe", "");
+        ResourceLocation frameTexture = blockTexture(prefix + "frame");
         var centerModel = models().withExistingParent("block/" + modelBaseName + "_center", new ResourceLocation(FluidTank.modID, "block/pipe_center"))
-            .texture("particle", blockTexture(prefix + "frame"))
-            .texture("texture", blockTexture(prefix + "frame"));
+            .texture("particle", frameTexture)
+            .texture("texture", frameTexture);
         var sideModel = models().withExistingParent("block/" + modelBaseName + "_side", new ResourceLocation(FluidTank.modID, "block/pipe_side"))
-            .texture("particle", blockTexture(prefix + "frame"))
-            .texture("texture", blockTexture(prefix + "frame"));
+            .texture("particle", frameTexture)
+            .texture("texture", frameTexture);
         var outModel = models().withExistingParent("block/" + modelBaseName + "_output", new ResourceLocation(FluidTank.modID, "block/pipe_in_out"))
-            .texture("particle", blockTexture(prefix + "frame"))
-            .texture("texture", blockTexture(prefix + "frame"))
+            .texture("particle", frameTexture)
+            .texture("texture", frameTexture)
             .texture("side", blockTexture(prefix + "frame_output"));
         var inModel = models().withExistingParent("block/" + modelBaseName + "_input", new ResourceLocation(FluidTank.modID, "block/pipe_in_out"))
-            .texture("particle", blockTexture(prefix + "frame"))
-            .texture("texture", blockTexture(prefix + "frame"))
+            .texture("particle", frameTexture)
+            .texture("texture", frameTexture)
             .texture("side", blockTexture(prefix + "frame_input"));
         getMultipartBuilder(pipeBlock).part()
             .modelFile(centerModel).addModel().end().part()
@@ -153,5 +210,15 @@ final class StateAndModelProvider extends BlockStateProvider {
             .modelFile(inModel).uvLock(true).rotationX(270).addModel().condition(PipeBlock.UP, PipeBlock.Connection.INPUT).end().part()
             .modelFile(inModel).uvLock(true).rotationX(90).addModel().condition(PipeBlock.DOWN, PipeBlock.Connection.INPUT).end()
         ;
+
+        itemModels().withExistingParent("item/" + pipeBlock.registryName.getPath(), new ResourceLocation(FluidTank.modID, "item/pipe_base"))
+            .texture("texture", frameTexture);
+    }
+
+    void reservoir(ReservoirItem reservoirItem) {
+        ResourceLocation item = reservoirItem.registryName();
+        itemModels().getBuilder(item.toString())
+            .parent(new ModelFile.UncheckedModelFile("item/generated"))
+            .texture("layer0", new ResourceLocation(item.getNamespace(), "items/" + item.getPath()));
     }
 }
