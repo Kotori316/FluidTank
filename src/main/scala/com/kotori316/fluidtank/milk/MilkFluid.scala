@@ -27,7 +27,7 @@ class MilkFluid extends Fluid {
 
   override def createLegacyBlock(fluidState: FluidState): BlockState = Blocks.AIR.defaultBlockState()
 
-  override def isSource(fluidState: FluidState): Boolean = false
+  override def isSource(fluidState: FluidState): Boolean = true
 
   override def getAmount(fluidState: FluidState): Int = 0
 
