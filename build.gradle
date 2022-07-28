@@ -133,21 +133,30 @@ dependencies {
     implementation "org.scala-lang:scala-library:2.13.8"
     implementation "com.google.code.findbugs:jsr305:3.0.1"
 
-    //noinspection SpellCheckingInspection
-    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
-    modImplementation("RebornCore:RebornCore-1.19:${project.RebornCore_version}") {
-        //noinspection SpellCheckingInspection
-        exclude(group: "net.fabricmc.fabric-api")
-    }
-    modRuntimeOnly("TechReborn:TechReborn-1.19:${project.TechReborn_version}") {
-        //noinspection SpellCheckingInspection
-        exclude(group: "net.fabricmc.fabric-api")
-    }
     modCompileOnly("mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}")
-    modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
-    modRuntimeOnly(group: "lol.bai", name: "badpackets", version: "fabric-${project.badpackets_version}")
-    modImplementation(group: "curse.maven", name: "jade-324717", version: project.jade_id)
 
+    if (isInCI()) {
+        // modCompileOnly
+        modCompileOnly("RebornCore:RebornCore-1.19:${project.RebornCore_version}") {
+            //noinspection SpellCheckingInspection
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+        modCompileOnly(group: "curse.maven", name: "jade-324717", version: project.jade_id)
+    } else {
+        //noinspection SpellCheckingInspection
+        modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
+        modImplementation("RebornCore:RebornCore-1.19:${project.RebornCore_version}") {
+            //noinspection SpellCheckingInspection
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+        modRuntimeOnly("TechReborn:TechReborn-1.19:${project.TechReborn_version}") {
+            //noinspection SpellCheckingInspection
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+        modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
+        modRuntimeOnly(group: "lol.bai", name: "badpackets", version: "fabric-${project.badpackets_version}")
+        modImplementation(group: "curse.maven", name: "jade-324717", version: project.jade_id)
+    }
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
         //noinspection SpellCheckingInspection
         exclude(group: "net.fabricmc.fabric-api")
