@@ -224,7 +224,7 @@ dependencies {
     if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null) {
         // All dependencies must be either `implementation` or `runtimeOnly`.
         // `compileOnly` means the mod is not released for this MC version.
-        implementation(fg.deobf(group: "mezz.jei", name: "jei-1.19-forge", version: project.jeiVersion) {
+        implementation(fg.deobf(group: "mezz.jei", name: "jei-1.19.1-forge", version: project.jeiVersion) {
             transitive(false)
         })
         implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
@@ -234,7 +234,7 @@ dependencies {
         runtimeOnly(fg.deobf("lol.bai:badpackets:forge-${project.badpackets_version}"))
     } else {
         // All dependencies must be `compileOnly`
-        compileOnly(fg.deobf(group: "mezz.jei", name: "jei-1.19-forge", version: project.jeiVersion) {
+        compileOnly(fg.deobf(group: "mezz.jei", name: "jei-1.19.1-forge", version: project.jeiVersion) {
             transitive(false)
         })
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
