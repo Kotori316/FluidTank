@@ -1,3 +1,9 @@
+## v19.4
+
+* Update to 1.19.1
+
+Build with 1.19.1-42.0.1, Mapping: Official 1.19.1
+
 ## v19.3
 
 * Update for new forge.
