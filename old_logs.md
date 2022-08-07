@@ -1,3 +1,9 @@
+## v19.5
+
+* Update to 1.19.2
+
+Build with 1.19.2-43.0.0, Mapping: Official 1.19.2
+
 ## v19.4
 
 * Update to 1.19.1
