@@ -26,7 +26,7 @@ jobs:
       - name: Make Java dir
         run: mkdir -p src/main/java
       - name: Assemble
-        run: chmod +x ./gradlew && ./gradlew assemble --stacktrace --no-daemon
+        run: chmod +x ./gradlew && ./gradlew assemble --no-daemon
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
@@ -60,10 +60,10 @@ jobs:
         run: echo "SAME_DEFAULT=false" >> $GITHUB_ENV
       - name: Java Toolchains
         if: ${{ env.SAME_DEFAULT == 'false' }}
-        run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon --stacktrace
+        run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon
       - name: Test with JUnit
         if: ${{ env.SAME_DEFAULT == 'false' }}
-        run: chmod +x ./gradlew && ./gradlew --no-daemon test --stacktrace
+        run: chmod +x ./gradlew && ./gradlew --no-daemon test
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload failed test report
