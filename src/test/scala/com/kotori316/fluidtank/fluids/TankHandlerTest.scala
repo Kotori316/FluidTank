@@ -6,30 +6,16 @@ import net.minecraft.world.level.material.Fluids
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions.{assertEquals, assertTrue}
-import org.junit.jupiter.api.{DisplayName, Test}
+import org.junit.jupiter.api.{DisplayName, Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 import scala.util.chaining.scalaUtilChainingOps
 
-//noinspection DuplicatedCode It's a test!
-object TankHandlerTest extends BeforeAllTest {
-  def nonEmptyFluidKeys: Array[FluidKey] = FluidAmountTest.fluidKeys().filter(!_.isEmpty)
-
-  def keyFillFluidMode: Array[Array[AnyRef]] = for {
-    key <- FluidAmountTest.fluidKeys()
-    fluid <- Seq(new FluidStack(Fluids.WATER, 4000), new FluidStack(Fluids.LAVA, 4000))
-    mode <- IFluidHandler.FluidAction.values()
-  } yield Array(key, fluid, mode)
-
-  def stackType(): Array[Array[AnyRef]] = {
-    for {
-      fluid: FluidAmount <- FluidAmountTest.stackFluids()
-      fluidAction: IFluidHandler.FluidAction <- IFluidHandler.FluidAction.values()
-    } yield Array[AnyRef](fluid, fluidAction)
-  }
-
-  object NormalFill extends BeforeAllTest {
+//noinspection DuplicatedCode,AssertBetweenInconvertibleTypes It's a test!
+class TankHandlerTest extends BeforeAllTest {
+  @Nested
+  class NormalFill extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#nonEmptyFluidKeys"))
     def fillToEmpty1(key: FluidKey): Unit = {
@@ -144,7 +130,8 @@ object TankHandlerTest extends BeforeAllTest {
     }
   }
 
-  object NormalDrain extends BeforeAllTest {
+  @Nested
+  class NormalDrain extends BeforeAllTest {
     @Test
     def drainEmpty(): Unit = {
       val tank = TankHandler(4000L)
@@ -216,7 +203,8 @@ object TankHandlerTest extends BeforeAllTest {
 
   }
 
-  object SpecialHandlers extends BeforeAllTest {
+  @Nested
+  class SpecialHandlers extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.TankHandlerTest#stackType"))
@@ -266,5 +254,22 @@ object TankHandlerTest extends BeforeAllTest {
       assertTrue(drained.isEmpty)
     }
 
+  }
+}
+
+object TankHandlerTest {
+  def nonEmptyFluidKeys: Array[FluidKey] = FluidAmountTest.fluidKeys().filter(!_.isEmpty)
+
+  def keyFillFluidMode: Array[Array[AnyRef]] = for {
+    key <- FluidAmountTest.fluidKeys()
+    fluid <- Seq(new FluidStack(Fluids.WATER, 4000), new FluidStack(Fluids.LAVA, 4000))
+    mode <- IFluidHandler.FluidAction.values()
+  } yield Array(key, fluid, mode)
+
+  def stackType(): Array[Array[AnyRef]] = {
+    for {
+      fluid: FluidAmount <- FluidAmountTest.stackFluids()
+      fluidAction: IFluidHandler.FluidAction <- IFluidHandler.FluidAction.values()
+    } yield Array[AnyRef](fluid, fluidAction)
   }
 }

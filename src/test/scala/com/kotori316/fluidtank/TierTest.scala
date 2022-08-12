@@ -19,7 +19,8 @@ class TierTest extends BeforeAllTest {
 
   final def check(tier: Tier, name: String): Unit = {
     val deserialized = Tier.byName(name)
-    assertEquals(Optional.of(tier), deserialized, f"Tier $tier, Actual $deserialized, name=$name")
+    val expected = Optional.of(tier)
+    assertEquals(expected, deserialized, f"Tier $tier, Actual $deserialized, name=$name")
   }
 
   @ParameterizedTest

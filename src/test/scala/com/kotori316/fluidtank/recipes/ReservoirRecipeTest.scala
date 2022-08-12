@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource
 
 import scala.jdk.CollectionConverters._
 
-object ReservoirRecipeTest extends BeforeAllTest {
+class ReservoirRecipeTest extends BeforeAllTest {
   private final val wood = ModObjects.tierToBlock(Tier.WOOD)
   private final val stone = ModObjects.tierToBlock(Tier.STONE)
 
@@ -104,6 +104,10 @@ object ReservoirRecipeTest extends BeforeAllTest {
     assertEquals(fluid, handler.getFluid)
     assertEquals(Tier.STONE.amount, handler.getCapacity)
   }
+
+}
+
+object ReservoirRecipeTest {
 
   def stoneFluids(): Array[FluidAmount] = {
     val fluids = for {

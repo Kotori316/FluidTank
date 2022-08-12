@@ -3,21 +3,20 @@ package com.kotori316.fluidtank.fluids
 import com.kotori316.fluidtank.BeforeAllTest
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertFalse, assertTrue}
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.{Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.{MethodSource, ValueSource}
 
 import scala.jdk.CollectionConverters._
 
-//noinspection DuplicatedCode It's test!
-object TransferOperationTest extends BeforeAllTest {
+//noinspection DuplicatedCode,AssertBetweenInconvertibleTypes It's test!
+class TransferOperationTest extends BeforeAllTest {
   private[this] final val waterTank = Tank(FluidAmount.BUCKET_WATER.setAmount(0), 16000)
   private[this] final val lavaTank = Tank(FluidAmount.BUCKET_LAVA.setAmount(4000), 16000)
 
-  def normalFluids(): Array[FluidAmount] = Array(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)
-
-  object Fill extends BeforeAllTest {
+  @Nested
+  class Fill extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids"))
     def fillToEmpty1(fa: FluidAmount): Unit = {
@@ -126,7 +125,8 @@ object TransferOperationTest extends BeforeAllTest {
 
   }
 
-  object FillAll extends BeforeAllTest {
+  @Nested
+  class FillAll extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids"))
@@ -191,7 +191,8 @@ object TransferOperationTest extends BeforeAllTest {
     }
   }
 
-  object Drain extends BeforeAllTest {
+  @Nested
+  class Drain extends BeforeAllTest {
 
     @Test
     def drain1(): Unit = {
@@ -294,7 +295,8 @@ object TransferOperationTest extends BeforeAllTest {
 
   }
 
-  object Util extends BeforeAllTest {
+  @Nested
+  class Util extends BeforeAllTest {
     @Test
     def tankIsEmpty(): Unit = {
       assertAll(
@@ -306,4 +308,8 @@ object TransferOperationTest extends BeforeAllTest {
     }
   }
 
+}
+
+object TransferOperationTest {
+  def normalFluids(): Array[FluidAmount] = Array(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)
 }

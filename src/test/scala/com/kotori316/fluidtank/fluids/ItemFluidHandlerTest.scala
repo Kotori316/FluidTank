@@ -14,7 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 //noinspection DuplicatedCode It's a test.
-object ItemFluidHandlerTest extends BeforeAllTest {
+class ItemFluidHandlerTest extends BeforeAllTest {
   private final val woodTank = ModObjects.tierToBlock(Tier.WOOD)
 
   @Test
@@ -41,7 +41,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     assertEquals(FluidAmount.BUCKET_WATER, handler.getFluid)
 
     handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L), handler.getFluid)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L): FluidAmount, handler.getFluid)
   }
 
   @Test
@@ -52,7 +52,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
     assertTrue(stack.hasTag)
     val drained = handler.drain(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(FluidAmount.BUCKET_WATER, FluidAmount.fromStack(drained))
+    assertEquals(FluidAmount.BUCKET_WATER, FluidAmount.fromStack(drained): FluidAmount)
     assertFalse(stack.hasTag)
   }
 
@@ -62,14 +62,14 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val handler = RecipeInventoryUtil.getFluidHandler(stack)
 
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(2000L).toStack, IFluidHandler.FluidAction.EXECUTE)
-    assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L), handler.getFluid)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L): FluidAmount, handler.getFluid)
 
     val tag = stack.getTag
     assertNotNull(tag)
     val childTag = tag.getCompound("BlockEntityTag")
     assertFalse(childTag.isEmpty)
     val fluidInTank = FluidAmount.fromNBT(childTag.getCompound(TileTank.NBT_Tank))
-    assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L), fluidInTank)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000L): FluidAmount, fluidInTank)
   }
 
   @Test
@@ -79,7 +79,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
 
     assertEquals(0, handler.fill(FluidAmount.BUCKET_WATER.toStack, IFluidHandler.FluidAction.EXECUTE))
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
-    assertEquals(FluidStack.EMPTY, handler.drain(1000, IFluidHandler.FluidAction.EXECUTE))
+    assertEquals(FluidStack.EMPTY, handler.drain(1000, IFluidHandler.FluidAction.EXECUTE): FluidStack)
     assertEquals(FluidAmount.EMPTY, handler.getFluid)
   }
 
@@ -90,7 +90,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     handler.fill(FluidAmount.BUCKET_WATER.setAmount(4000L).toStack, IFluidHandler.FluidAction.EXECUTE)
 
     val stackTag = handler.createTag
-    assertEquals(Tier.WOOD.toString.toLowerCase, stackTag.getString("tier"))
+    assertEquals(Tier.WOOD.toString.toLowerCase, stackTag.getString("tier"): String)
     assertEquals(FluidAmount.BUCKET_WATER.setAmount(4000L), FluidAmount.fromNBT(stackTag.getCompound("tank")))
   }
 
@@ -101,7 +101,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val tag = handler.createTag
 
     val tierTag = tag.get(TileTank.NBT_Tier)
-    assertEquals(handler.tier, Tier.fromNBT(tierTag))
+    assertEquals(handler.tier, Tier.fromNBT(tierTag): Tier)
     val tankTag = tag.get(TileTank.NBT_Tank)
     assertEquals(CompoundTag.TYPE, tankTag.getType)
 
@@ -117,7 +117,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val tag = handler.createTag
 
     val tierTag = tag.get(TileTank.NBT_Tier)
-    assertEquals(handler.tier, Tier.fromNBT(tierTag))
+    assertEquals(handler.tier, Tier.fromNBT(tierTag): Tier)
     val tankTag = tag.get(TileTank.NBT_Tank)
     assertEquals(CompoundTag.TYPE, tankTag.getType)
 
@@ -153,7 +153,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val containerContent = RecipeInventoryUtil.getFluidHandler(container).getFluid
     assertTrue(containerContent.isEmpty)
     assertEquals(0L, containerContent.amount)
-    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount), handler.getFluid)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount): FluidAmount, handler.getFluid)
   }
 
   @ParameterizedTest
@@ -166,7 +166,7 @@ object ItemFluidHandlerTest extends BeforeAllTest {
     val container = stack.getCraftingRemainingItem
     assertEquals(woodTank.itemBlock, container.getItem)
     val containerContent = RecipeInventoryUtil.getFluidHandler(container).getFluid
-    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount - 1000), containerContent)
-    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount), handler.getFluid)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount - 1000): FluidAmount, containerContent)
+    assertEquals(FluidAmount.BUCKET_WATER.setAmount(amount): FluidAmount, handler.getFluid)
   }
 }

@@ -6,61 +6,17 @@ import net.minecraft.nbt.{CompoundTag, LongTag, StringTag}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.Fluids
 import org.junit.jupiter.api.Assertions._
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.{Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 import scala.util.chaining._
 
-object FluidAmountTest extends BeforeAllTest {
+class FluidAmountTest extends BeforeAllTest {
 
-  def empties(): Array[FluidAmount] = fluidKeys().map(k => k.toAmount(0L))
-
-  def fluidKeys(): Array[FluidKey] = {
-    val nbt = Option(new CompoundTag().tap(_.putInt("b", 6)))
-    Array(
-      FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None), FluidKey(Fluids.EMPTY, None),
-      FluidKey(Fluids.WATER, nbt), FluidKey(Fluids.LAVA, nbt), FluidKey(Fluids.EMPTY, nbt),
-    )
-  }
-
-  def fluidKeysNonEmpty(): Array[FluidKey] = {
-    val nbt1 = Option(new CompoundTag().tap(_.putInt("b", 6)))
-    val nbt2 = Option(new CompoundTag().tap(_.putString("v", "a")))
-    val nbt3 = for {a <- nbt1; aa = a.copy(); b <- nbt2} yield aa merge b
-    Array(
-      FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None),
-      FluidKey(Fluids.WATER, nbt1), FluidKey(Fluids.LAVA, nbt1),
-      FluidKey(Fluids.WATER, nbt2), FluidKey(Fluids.LAVA, nbt2),
-      FluidKey(Fluids.WATER, nbt3), FluidKey(Fluids.LAVA, nbt3),
-    )
-  }
-
-  def fluidKeys2(): Array[Array[FluidKey]] = fluidKeys()
-    .combinations(2)
-    .map(_.toArray)
-    .toArray
-
-  def fluidKeyAmount(): Array[Object] = for {
-    amount <- Array(0, 1000, 5000, Int.MaxValue, Int.MaxValue + 8L, Long.MaxValue)
-    fluid <- fluidKeys()
-  } yield Array(amount, fluid)
-
-  def fluidKey2Amount(): Array[Object] = for {
-    amount <- Array(0, 1000, 5000, Int.MaxValue, Int.MaxValue + 8L, Long.MaxValue)
-    keys <- fluidKeys2()
-  } yield Array(amount, keys(0), keys(1))
-
-  def stackFluids(): Array[FluidAmount] = {
-    val l = for {
-      f <- List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)
-      amount <- Iterator.iterate(1L)(_ * 10).take(10).filter(l => l < Int.MaxValue)
-    } yield f.setAmount(amount)
-    l.toArray
-  }
-
-  object Equals extends BeforeAllTest {
+  @Nested
+  class Equals extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeys"))
     def equiv(key: FluidKey): Unit = {
@@ -139,13 +95,15 @@ object FluidAmountTest extends BeforeAllTest {
     }
   }
 
-  object Converts extends BeforeAllTest {
+  @Nested
+  class Converts extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeys"))
     def convertStackWithNBT(key: FluidKey): Unit = {
       if (key.isEmpty) {
-        assertEquals(FluidAmount.EMPTY, FluidAmount.fromStack(key.toAmount(1000).toStack))
+        val amount = FluidAmount.fromStack(key.toAmount(1000).toStack)
+        assertEquals(FluidAmount.EMPTY, amount)
         return
       }
       val nbt1 = new CompoundTag()
@@ -164,7 +122,8 @@ object FluidAmountTest extends BeforeAllTest {
 
   }
 
-  object Empties extends BeforeAllTest {
+  @Nested
+  class Empties extends BeforeAllTest {
     @Test
     def empty(): Unit = {
       val tag = Some {
@@ -192,7 +151,8 @@ object FluidAmountTest extends BeforeAllTest {
     }
   }
 
-  object Monoid extends BeforeAllTest {
+  @Nested
+  class Monoid extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
     def times1(key: FluidKey): Unit = {
@@ -213,13 +173,19 @@ object FluidAmountTest extends BeforeAllTest {
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
     def times2(key: FluidKey): Unit = {
       val a = key.toAmount(FluidAmount.AMOUNT_BUCKET)
+      val a2 = a * 2
+      val a3 = a * 3
+      val a5 = a * 5
+      val combine2 = cats.Semigroup[FluidAmount].combine(a, a)
+      val combine3 = cats.Semigroup[FluidAmount].combineN(a, 3)
+      val combine5 = cats.Semigroup[FluidAmount].combineN(a, 5)
       assertAll(
         () => assertEquals(a.setAmount(2000), cats.Semigroup[FluidAmount].combine(a, a)),
-        () => assertEquals(a * 2, cats.Semigroup[FluidAmount].combine(a, a)),
+        () => assertEquals(a2, combine2),
         () => assertEquals(a.setAmount(3000), cats.Semigroup[FluidAmount].combineN(a, 3)),
-        () => assertEquals(a * 3, cats.Semigroup[FluidAmount].combineN(a, 3)),
+        () => assertEquals(a3, combine3),
         () => assertEquals(a.setAmount(5000), cats.Semigroup[FluidAmount].combineN(a, 5)),
-        () => assertEquals(a * 5, cats.Semigroup[FluidAmount].combineN(a, 5)),
+        () => assertEquals(a5, combine5),
       )
     }
 
@@ -240,7 +206,8 @@ object FluidAmountTest extends BeforeAllTest {
     @Test
     def adder2(): Unit = {
       val wl = FluidAmount.BUCKET_WATER |+| FluidAmount.BUCKET_LAVA
-      assertEquals(FluidAmount.BUCKET_WATER.setAmount(2000), wl)
+      val expected = FluidAmount.BUCKET_WATER.setAmount(2000)
+      assertEquals(expected, wl)
     }
 
     @ParameterizedTest
@@ -264,11 +231,11 @@ object FluidAmountTest extends BeforeAllTest {
 
     @Test
     def adder0Fluid(): Unit = {
-      val zeros = fluidKeys().toSeq.map(_.toAmount(0)) :+ cats.Monoid[FluidAmount].empty
+      val zeros = FluidAmountTest.fluidKeys().toSeq.map(_.toAmount(0)) :+ cats.Monoid[FluidAmount].empty
 
       assertTrue(zeros.forall(_.isEmpty))
 
-      val nonZero = fluidKeysNonEmpty().toSeq.map(_.toAmount(1000))
+      val nonZero = FluidAmountTest.fluidKeysNonEmpty().toSeq.map(_.toAmount(1000))
 
       val assertions: Seq[Executable] = for {
         zero <- zeros
@@ -280,7 +247,8 @@ object FluidAmountTest extends BeforeAllTest {
     }
   }
 
-  object SerializeTag extends BeforeAllTest {
+  @Nested
+  class SerializeTag extends BeforeAllTest {
     @Test
     def serializeEmpty(): Unit = {
       val tag = FluidAmount.EMPTY.write(new CompoundTag())
@@ -314,4 +282,53 @@ object FluidAmountTest extends BeforeAllTest {
       )
     }
   }
+}
+
+object FluidAmountTest {
+
+  def empties(): Array[FluidAmount] = fluidKeys().map(k => k.toAmount(0L))
+
+  def fluidKeys(): Array[FluidKey] = {
+    val nbt = Option(new CompoundTag().tap(_.putInt("b", 6)))
+    Array(
+      FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None), FluidKey(Fluids.EMPTY, None),
+      FluidKey(Fluids.WATER, nbt), FluidKey(Fluids.LAVA, nbt), FluidKey(Fluids.EMPTY, nbt),
+    )
+  }
+
+  def fluidKeysNonEmpty(): Array[FluidKey] = {
+    val nbt1 = Option(new CompoundTag().tap(_.putInt("b", 6)))
+    val nbt2 = Option(new CompoundTag().tap(_.putString("v", "a")))
+    val nbt3 = for {a <- nbt1; aa = a.copy(); b <- nbt2} yield aa merge b
+    Array(
+      FluidKey(Fluids.WATER, None), FluidKey(Fluids.LAVA, None),
+      FluidKey(Fluids.WATER, nbt1), FluidKey(Fluids.LAVA, nbt1),
+      FluidKey(Fluids.WATER, nbt2), FluidKey(Fluids.LAVA, nbt2),
+      FluidKey(Fluids.WATER, nbt3), FluidKey(Fluids.LAVA, nbt3),
+    )
+  }
+
+  def fluidKeys2(): Array[Array[FluidKey]] = fluidKeys()
+    .combinations(2)
+    .map(_.toArray)
+    .toArray
+
+  def fluidKeyAmount(): Array[Object] = for {
+    amount <- Array(0, 1000, 5000, Int.MaxValue, Int.MaxValue + 8L, Long.MaxValue)
+    fluid <- fluidKeys()
+  } yield Array(amount, fluid)
+
+  def fluidKey2Amount(): Array[Object] = for {
+    amount <- Array(0, 1000, 5000, Int.MaxValue, Int.MaxValue + 8L, Long.MaxValue)
+    keys <- fluidKeys2()
+  } yield Array(amount, keys(0), keys(1))
+
+  def stackFluids(): Array[FluidAmount] = {
+    val l = for {
+      f <- List(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA)
+      amount <- Iterator.iterate(1L)(_ * 10).take(10).filter(l => l < Int.MaxValue)
+    } yield f.setAmount(amount)
+    l.toArray
+  }
+
 }

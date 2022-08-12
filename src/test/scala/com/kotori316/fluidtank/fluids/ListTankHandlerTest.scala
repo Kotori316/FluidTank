@@ -9,19 +9,18 @@ import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidStack, FluidType}
 import net.minecraftforge.fml.unsafe.UnsafeHacks
 import org.junit.jupiter.api.Assertions.{assertAll, assertEquals, assertTrue}
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.Executable
+import org.junit.jupiter.api.{Nested, Test}
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 //noinspection DuplicatedCode
-object ListTankHandlerTest extends BeforeAllTest {
-  private final val WOOD = Tank(FluidAmount.EMPTY, 4000L)
-  private final val STONE = Tank(FluidAmount.EMPTY, 16000L)
+class ListTankHandlerTest extends BeforeAllTest {
 
-  private def createWoodStone: Chain[TankHandler] = Chain(TankHandler(WOOD), TankHandler(STONE))
+  import ListTankHandlerTest._
 
-  object Fill extends BeforeAllTest {
+  @Nested
+  class Fill extends BeforeAllTest {
     @Test
     def fillWater1(): Unit = {
       val h = new ListTankHandler(createWoodStone)
@@ -73,7 +72,8 @@ object ListTankHandlerTest extends BeforeAllTest {
 
       val filled = h.fill(new FluidStack(Fluids.WATER, 10000), IFluidHandler.FluidAction.SIMULATE)
       assertEquals(10000, filled)
-      assertEquals(createWoodStone.map(_.getTank), h.getTankList)
+      val expected = createWoodStone.map(_.getTank)
+      assertEquals(expected, h.getTankList)
     }
 
     @Test
@@ -126,7 +126,8 @@ object ListTankHandlerTest extends BeforeAllTest {
     }
   }
 
-  object Drain extends BeforeAllTest {
+  @Nested
+  class Drain extends BeforeAllTest {
     @Test
     def drainWater1(): Unit = {
       val before = Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(6000), STONE.capacity))
@@ -181,12 +182,14 @@ object ListTankHandlerTest extends BeforeAllTest {
       val h = new ListTankHandler(before.map(TankHandler.apply))
       locally {
         val drained = h.drain(FluidAmount.EMPTY.setAmount(5000), IFluidHandler.FluidAction.SIMULATE)
-        assertEquals(FluidAmount.BUCKET_WATER.setAmount(5000), drained)
+        val expected = FluidAmount.BUCKET_WATER.setAmount(5000)
+        assertEquals(expected, drained)
         assertEquals(before, h.getTankList)
       }
       locally {
         val drained = h.drain(FluidAmount.EMPTY.setAmount(5000), IFluidHandler.FluidAction.EXECUTE)
-        assertEquals(FluidAmount.BUCKET_WATER.setAmount(5000), drained)
+        val expected = FluidAmount.BUCKET_WATER.setAmount(5000)
+        assertEquals(expected, drained)
         assertEquals(Chain(Tank(FluidAmount.BUCKET_WATER.setAmount(4000), WOOD.capacity), Tank(FluidAmount.BUCKET_WATER.setAmount(1000), STONE.capacity)), h.getTankList)
       }
     }
@@ -208,7 +211,8 @@ object ListTankHandlerTest extends BeforeAllTest {
     }
   }
 
-  object SpecialHandlers extends BeforeAllTest {
+  @Nested
+  class SpecialHandlers extends BeforeAllTest {
     @Test
     def fillVoidTank(): Unit = {
       val value = Chain(TankHandler(Tank(FluidAmount.EMPTY, 4000)), new VoidTankHandler(), TankHandler(Tank(FluidAmount.EMPTY, 4000)))
@@ -224,20 +228,8 @@ object ListTankHandlerTest extends BeforeAllTest {
     }
   }
 
-  def amountAndTanks(): Array[Array[Any]] = Array(
-    Array(20000L, createWoodStone),
-    Array(5000, Chain(Tank.EMPTY, Tank(FluidAmount.EMPTY, 3000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply)),
-    Array(0, Chain(Tank.EMPTY).map(TankHandler.apply)),
-    Array(2000, Chain(Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply)),
-    Array(5000, Chain(Tank(FluidAmount.BUCKET_LAVA, 3000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply)),
-  )
-
-  def fluidKeyAndAmount(): Array[Array[Any]] = for {
-    key <- com.kotori316.fluidtank.fluids.FluidAmountTest.fluidKeys()
-    amount <- Seq(1000, 2000)
-  } yield Array(key, amount)
-
-  object TankContents extends BeforeAllTest {
+  @Nested
+  class TankContents extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource(Array("com.kotori316.fluidtank.fluids.ListTankHandlerTest#amountAndTanks"))
@@ -313,8 +305,9 @@ object ListTankHandlerTest extends BeforeAllTest {
 
       {
         val h = new ListTankHandler(Chain(Tank(FluidAmount.EMPTY, 2000), Tank(FluidAmount.EMPTY, 2000)).map(TankHandler.apply))
+        val filled = h.fill(fa, IFluidHandler.FluidAction.SIMULATE)
         tests ++= Seq(
-          () => assertEquals(fa, h.fill(fa, IFluidHandler.FluidAction.SIMULATE)),
+          () => assertEquals(fa, filled),
           () => assertEquals(fa.setAmount(4000), h.fill(fa.setAmount(4000), IFluidHandler.FluidAction.SIMULATE)),
           () => assertEquals(fa.setAmount(4000), h.fill(fa.setAmount(6000), IFluidHandler.FluidAction.SIMULATE)),
         )
@@ -351,4 +344,26 @@ object ListTankHandlerTest extends BeforeAllTest {
       assertAll(tests: _*)
     }
   }
+}
+
+object ListTankHandlerTest {
+  private final val WOOD = Tank(FluidAmount.EMPTY, 4000L)
+  private final val STONE = Tank(FluidAmount.EMPTY, 16000L)
+
+  private def createWoodStone: Chain[TankHandler] = Chain(TankHandler(WOOD), TankHandler(STONE))
+
+
+  def amountAndTanks(): Array[Array[Any]] = Array(
+    Array(20000L, createWoodStone),
+    Array(5000, Chain(Tank.EMPTY, Tank(FluidAmount.EMPTY, 3000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply)),
+    Array(0, Chain(Tank.EMPTY).map(TankHandler.apply)),
+    Array(2000, Chain(Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply)),
+    Array(5000, Chain(Tank(FluidAmount.BUCKET_LAVA, 3000), Tank(FluidAmount.BUCKET_WATER, 2000)).map(TankHandler.apply)),
+  )
+
+  def fluidKeyAndAmount(): Array[Array[Any]] = for {
+    key <- FluidAmountTest.fluidKeys()
+    amount <- Seq(1000, 2000)
+  } yield Array(key, amount)
+
 }

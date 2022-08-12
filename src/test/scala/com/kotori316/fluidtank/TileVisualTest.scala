@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-object TileVisualTest extends BeforeAllTest {
+class TileVisualTest extends BeforeAllTest {
   @ParameterizedTest
   @ValueSource(longs = Array(0, 500, 1000, 2000, 4000))
   def height1(amount: Long): Unit = {

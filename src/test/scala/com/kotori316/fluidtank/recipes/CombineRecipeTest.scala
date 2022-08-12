@@ -18,7 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource
 
 import scala.jdk.CollectionConverters._
 
-object CombineRecipeTest extends BeforeAllTest {
+class CombineRecipeTest extends BeforeAllTest {
   private final val woodTank = ModObjects.tierToBlock(Tier.WOOD)
   private final val stoneTank = ModObjects.tierToBlock(Tier.STONE)
   private final val emeraldTank = ModObjects.tierToBlock(Tier.EMERALD)

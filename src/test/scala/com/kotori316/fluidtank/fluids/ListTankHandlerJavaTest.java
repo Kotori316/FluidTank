@@ -12,6 +12,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -54,7 +55,8 @@ final class ListTankHandlerJavaTest extends BeforeAllTest {
         );
     }
 
-    static class FillTest extends BeforeAllTest {
+    @Nested
+    class FillTest extends BeforeAllTest {
 
         static Object[] fluidWithAmount8() {
             return Stream.of(fluids())
@@ -130,7 +132,8 @@ final class ListTankHandlerJavaTest extends BeforeAllTest {
         }
     }
 
-    static class DrainTest extends BeforeAllTest {
+    @Nested
+    class DrainTest extends BeforeAllTest {
         static Object[] fluidWithAmount24() {
             return ListTankHandlerJavaTest.fluidWithAmount24();
         }
