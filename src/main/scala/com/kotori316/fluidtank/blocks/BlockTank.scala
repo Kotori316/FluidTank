@@ -42,7 +42,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     new TileTank(tier, pos, state)
   }
 
-  //noinspection ScalaDeprecation
+   //noinspection ScalaDeprecation,deprecation
   override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     level.getBlockEntity(pos) match {
       case tileTank: TileTank =>
@@ -77,7 +77,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
 
   //  override final def getRenderType(state: BlockState): RenderShape = RenderShape.MODEL
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override final def skipRendering(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
 
   override def setPlacedBy(level: Level, pos: BlockPos, state: BlockState, @Nullable entity: LivingEntity, stack: ItemStack): Unit = {
@@ -88,10 +88,10 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     }
   }
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override final def hasAnalogOutputSignal(state: BlockState): Boolean = true
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override final def getAnalogOutputSignal(blockState: BlockState, level: Level, pos: BlockPos): Int = {
     level.getBlockEntity(pos) match {
       case tileTank: TileTank => tileTank.getComparatorLevel
@@ -99,7 +99,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     }
   }
 
-  @nowarn //noinspection ScalaDeprecation
+  @nowarn //noinspection ScalaDeprecation,deprecation
   override final def onRemove(state: BlockState, level: Level, pos: BlockPos, newState: BlockState, moved: Boolean): Unit = {
     if (!state.is(newState.getBlock)) {
       level.getBlockEntity(pos) match {
@@ -123,7 +123,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     stack
   }
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override def getShape(state: BlockState, worldIn: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ModObjects.TANK_SHAPE
 
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = {

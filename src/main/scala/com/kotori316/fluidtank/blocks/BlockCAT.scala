@@ -28,14 +28,14 @@ class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.M
 
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = builder.add(FACING)
 
-  //noinspection ScalaDeprecation,ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override final def getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
 
   override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = new CATTile(pos, state)
 
   override def getStateForPlacement(context: BlockPlaceContext): BlockState = this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection)
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     val stack = player.getItemInHand(hand)
     if (!player.isCrouching) {

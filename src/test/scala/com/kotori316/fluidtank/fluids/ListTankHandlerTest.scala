@@ -304,7 +304,7 @@ object ListTankHandlerTest extends BeforeAllTest {
       val fluid = new WaterFluid.Source()
       val attribute = FluidType.Properties.create().density(999)
       UnsafeHacks.setField(classOf[Fluid].getDeclaredField("forgeFluidType"), fluid, new FluidType(attribute))
-      //noinspection ScalaDeprecation
+      //noinspection ScalaDeprecation,deprecation
       fluid.builtInRegistryHolder().bindTags(java.util.List.of(Tags.Fluids.GASEOUS))
 
       val fa = FluidAmount(fluid, 1000L, None)

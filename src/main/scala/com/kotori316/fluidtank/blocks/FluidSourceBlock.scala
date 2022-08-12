@@ -25,7 +25,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
   val itemBlock = new FluidSourceItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
   registerDefaultState(this.getStateDefinition.any.setValue(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override final def getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
 
   override def newBlockEntity(pos: BlockPos, state: BlockState): BlockEntity = ModObjects.SOURCE_TYPE.create(pos, state)
@@ -60,7 +60,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
     items.add(stack)
   }
 
-  //noinspection ScalaDeprecation
+  //noinspection ScalaDeprecation,deprecation
   override def use(state: BlockState, level: Level, pos: BlockPos, player: Player,
                    hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     if (Config.content.enableFluidSupplier.get()) {
