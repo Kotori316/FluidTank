@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -64,8 +63,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())
                 .resolve()
                 .flatMap(i -> i instanceof IItemHandlerModifiable ? Optional.of((IItemHandlerModifiable) i) : Optional.empty())
-                .map(i -> ((NonNullSupplier<FluidHandlerWrapper>) () -> new FluidHandlerWrapper(i)))
-                .map(LazyOptional::of)
+                .map(i -> LazyOptional.of(() -> new FluidHandlerWrapper(i)))
                 .orElse(LazyOptional.empty());
         }
     }
