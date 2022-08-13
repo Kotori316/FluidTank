@@ -42,9 +42,7 @@ object FluidTankDataProvider {
 
   private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registry.ITEM_REGISTRY, name)
 
-  private def saveData(pCache: CachedOutput, pJsonElement: JsonElement, pPath: Path): Unit = {
-    val path = pPath.normalize
-    FluidTank.LOGGER.info("Save {}", path)
+  private def saveData(pCache: CachedOutput, pJsonElement: JsonElement, path: Path): Unit = {
     DataProvider.saveStable(pCache, pJsonElement, path)
   }
 
