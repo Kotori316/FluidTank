@@ -17,7 +17,7 @@ import com.kotori316.fluidtank.network.PacketHandler;
 
 public class CATContainer extends AbstractContainerMenu {
     public static final String GUI_ID = FluidTank.modID + ":gui_chest_as_tank";
-    public final CATTile catTile;
+    final CATTile catTile;
 
     /**
      * Only for internal use. Use instance in {@link com.kotori316.fluidtank.ModObjects}.

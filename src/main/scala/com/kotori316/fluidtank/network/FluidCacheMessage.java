@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
 
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.CATTile;
 
@@ -46,9 +47,7 @@ public class FluidCacheMessage {
     public void onReceive(Supplier<NetworkEvent.Context> ctx) {
         FluidTank.proxy.getLevel(ctx.get())
             .filter(w -> w.dimension().equals(dimensionId))
-            .map(w -> w.getBlockEntity(pos))
-            .filter(CATTile.class::isInstance)
-            .map(CATTile.class::cast)
+            .flatMap(w -> w.getBlockEntity(pos, ModObjects.CAT_TYPE()))
             .ifPresent(tile -> ctx.get().enqueueWork(() -> tile.fluidCache = this.amounts));
         ctx.get().setPacketHandled(true);
     }
