@@ -23,6 +23,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
+import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -249,6 +250,27 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
                 assertTrue(h1.getFluid().isEmpty());
                 assertEquals(amount.setAmount(300), h2.getFluid());
             }
+
+            @Test
+            void drainFromMixed1() {
+                ItemStackHandler items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY,
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_LAVA().setAmount(800)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_WATER().setAmount(1000)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_LAVA().setAmount(1000))
+                ));
+                var handler = new CATTile.FluidHandlerWrapper(items);
+
+                assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1500), FluidAmount.fromStack(
+                    handler.drain(1500, IFluidHandler.FluidAction.SIMULATE)));
+                assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1500), FluidAmount.fromStack(
+                    handler.drain(1500, IFluidHandler.FluidAction.EXECUTE)));
+
+                assertAll(
+                    () -> assertTrue(RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(0)).getFluid().isEmpty()),
+                    () -> assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(1)).getFluid()),
+                    () -> assertEquals(FluidAmount.BUCKET_LAVA().setAmount(300), RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(2)).getFluid())
+                );
+            }
         }
 
         @Nested
@@ -303,6 +325,65 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
                 assertEquals(FluidAmount.BUCKET_LAVA(), FluidAmount.fromStack(drained));
                 assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
                 assertEquals(Items.BUCKET, items.getStackInSlot(1).getItem());
+            }
+
+            @ParameterizedTest
+            @MethodSource("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids")
+            void drain1500FromTank(FluidAmount amount) {
+                ItemStackHandler items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY,
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount.setAmount(800)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount.setAmount(1000))
+                ));
+                var handler = new CATTile.FluidHandlerWrapper(items);
+                var toDrain = amount.setAmount(1500);
+                var drained = handler.drain(toDrain.toStack(), IFluidHandler.FluidAction.EXECUTE);
+                assertEquals(toDrain, FluidAmount.fromStack(drained));
+                var h1 = new TankItemFluidHandler(woodTank.tier(), items.getStackInSlot(0));
+                var h2 = new TankItemFluidHandler(woodTank.tier(), items.getStackInSlot(1));
+                assertTrue(h1.getFluid().isEmpty());
+                assertEquals(amount.setAmount(300), h2.getFluid());
+            }
+
+            @Test
+            void drainFromMixed1() {
+                ItemStackHandler items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY,
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_LAVA().setAmount(800)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_WATER().setAmount(1000)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_LAVA().setAmount(1000))
+                ));
+                var handler = new CATTile.FluidHandlerWrapper(items);
+
+                assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1500), FluidAmount.fromStack(
+                    handler.drain(FluidAmount.BUCKET_LAVA().setAmount(1500).toStack(), IFluidHandler.FluidAction.SIMULATE)));
+                assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1500), FluidAmount.fromStack(
+                    handler.drain(FluidAmount.BUCKET_LAVA().setAmount(1500).toStack(), IFluidHandler.FluidAction.EXECUTE)));
+
+                assertAll(
+                    () -> assertTrue(RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(0)).getFluid().isEmpty()),
+                    () -> assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(1)).getFluid()),
+                    () -> assertEquals(FluidAmount.BUCKET_LAVA().setAmount(300), RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(2)).getFluid())
+                );
+            }
+
+            @Test
+            void drainFromMixed2() {
+                ItemStackHandler items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY,
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_LAVA().setAmount(800)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_WATER().setAmount(1000)),
+                    RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, FluidAmount.BUCKET_LAVA().setAmount(1000))
+                ));
+                var handler = new CATTile.FluidHandlerWrapper(items);
+
+                assertEquals(FluidAmount.BUCKET_WATER().setAmount(1000), FluidAmount.fromStack(
+                    handler.drain(FluidAmount.BUCKET_WATER().setAmount(1500).toStack(), IFluidHandler.FluidAction.SIMULATE)));
+                assertEquals(FluidAmount.BUCKET_WATER().setAmount(1000), FluidAmount.fromStack(
+                    handler.drain(FluidAmount.BUCKET_WATER().setAmount(1500).toStack(), IFluidHandler.FluidAction.EXECUTE)));
+
+                assertAll(
+                    () -> assertTrue(RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(1)).getFluid().isEmpty()),
+                    () -> assertEquals(FluidAmount.BUCKET_LAVA().setAmount(800), RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(0)).getFluid()),
+                    () -> assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1000), RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(2)).getFluid())
+                );
             }
         }
     }

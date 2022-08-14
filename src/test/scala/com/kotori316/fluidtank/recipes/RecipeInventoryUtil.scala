@@ -1,10 +1,14 @@
 package com.kotori316.fluidtank.recipes
 
+import com.kotori316.fluidtank.ModObjects
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.{ItemBlockTank, ReservoirItem, TankItemFluidHandler}
+import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.{AbstractContainerMenu, CraftingContainer, Slot}
 import net.minecraft.world.item.ItemStack
+import net.minecraftforge.fluids.capability.IFluidHandler
 
 object RecipeInventoryUtil {
 
@@ -29,6 +33,13 @@ object RecipeInventoryUtil {
     case tank: ItemBlockTank => new TankItemFluidHandler(tank.blockTank.tier, stack)
     case reservoir: ReservoirItem => new TankItemFluidHandler(reservoir.tier, stack)
     case _ => throw new IllegalArgumentException(s"Stack $stack has no valid handler")
+  }
+
+  def getFilledTankStack(tier: Tier, fluid: FluidAmount): ItemStack = {
+    val stack = new ItemStack(ModObjects.tierToBlock(tier))
+    val handler = getFluidHandler(stack)
+    handler.fill(fluid.toStack, IFluidHandler.FluidAction.EXECUTE)
+    stack
   }
 
   final class DummyContainer extends AbstractContainerMenu(null, 35) {
