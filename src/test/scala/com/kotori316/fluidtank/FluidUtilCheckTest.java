@@ -126,9 +126,9 @@ final class FluidUtilCheckTest extends BeforeAllTest {
         assertTrue(tank.getTank().isEmpty(), "Content: %s".formatted(tank.getTank())); // Make sure the tank is empty before filling.
         var result = FluidUtil.tryEmptyContainerAndStow(tankStack, tank, inv, 1000, null, false);
         assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid());
-        assertTrue(RecipeInventoryUtil.getFluidHandler(result.getResult()).getFluid().isEmpty());
+        assertTrue(RecipeInventoryUtil.getFluidHandler(result.getResult()).getFluid().nonEmpty());
         assertTrue(result.isSuccess());
-        //assertTrue(tank.getTank().isEmpty(), "Content: %s".formatted(tank.getTank())); // The tank must be empty after simulating, but not.
+        assertTrue(tank.getTank().isEmpty(), "Content: %s".formatted(tank.getTank())); // The tank must be empty after simulating, but not.
     }
 
     @Test
