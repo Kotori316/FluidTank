@@ -8,9 +8,10 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraftforge.common.SoundActions
+import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.{FluidActionResult, FluidStack, FluidUtil}
-import net.minecraftforge.items.{CapabilityItemHandler, ItemHandlerHelper}
+import net.minecraftforge.items.ItemHandlerHelper
 
 import scala.jdk.OptionConverters._
 
@@ -71,7 +72,7 @@ object BucketEventHandler {
       if (originalStack.getCount == 1) {
         player.setItemInHand(hand, result.result.getResult)
       } else {
-        val rest = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        val rest = player.getCapability(ForgeCapabilities.ITEM_HANDLER)
           .map[ItemStack](i => ItemHandlerHelper.insertItemStacked(i, result.result.getResult, false))
         rest.ifPresent(i => ItemHandlerHelper.giveItemToPlayer(player, i))
         originalStack.shrink(1)

@@ -9,10 +9,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.junit.jupiter.api.Disabled;
@@ -137,7 +137,7 @@ final class AccessTest extends BeforeAllTest {
         @Test
         void mockCapability() {
             var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
-            assertDoesNotThrow(() -> stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY));
+            assertDoesNotThrow(() -> stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM));
         }
 
         @Test

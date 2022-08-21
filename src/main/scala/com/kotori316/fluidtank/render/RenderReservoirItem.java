@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.kotori316.fluidtank.items.ReservoirItem;
@@ -43,7 +43,7 @@ public class RenderReservoirItem extends BlockEntityWithoutLevelRenderer {
 
                 if (cameraType == ItemTransforms.TransformType.GUI) {
                     matrixStack.pushPose();
-                    stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+                    stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
                         .map(h -> Pair.of(h.getFluidInTank(0), h.getTankCapacity(0)))
                         .filter(p -> !p.getLeft().isEmpty() && p.getLeft().getAmount() > 0)
                         .ifPresent(p -> renderFluid(p.getLeft(), p.getRight(), matrixStack, buffer, combinedLight, combinedOverlay));

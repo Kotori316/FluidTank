@@ -6,10 +6,10 @@ import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.{BlockItem, ItemStack}
-import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
+import net.minecraftforge.common.capabilities.{Capability, ForgeCapabilities, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler, IFluidHandlerItem}
+import net.minecraftforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
 class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
@@ -79,7 +79,7 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandl
   }
 
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.orEmpty(capability, LazyOptional.of(() => this))
+    ForgeCapabilities.FLUID_HANDLER_ITEM.orEmpty(capability, LazyOptional.of(() => this))
   }
 
   private def init(): Unit = {

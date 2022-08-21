@@ -10,10 +10,10 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.HopperBlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.capabilities.{Capability, ForgeCapabilities}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.items.wrapper.InvWrapper
-import net.minecraftforge.items.{CapabilityItemHandler, IItemHandler, ItemHandlerHelper}
+import net.minecraftforge.items.{IItemHandler, ItemHandlerHelper}
 
 final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE, p, s) {
   private[this] val handler = new PipeItemHandler(this)
@@ -63,7 +63,7 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+    if (cap == ForgeCapabilities.ITEM_HANDLER) {
       if (side != null &&
         (!hasLevel || getBlockState.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
         LazyOptional.of(() => handler.asInstanceOf[T])
@@ -78,7 +78,7 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
   def findItemHandler(level: Level, pos: BlockPos, direction: Direction): OptionT[Eval, (IItemHandler, BlockPos)] = {
     def tileCap: OptionT[Eval, (IItemHandler, BlockPos)] = for {
       t <- Cap.make(level.getBlockEntity(pos))
-      cap <- getCapFromCache(t, pos, direction.getOpposite, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+      cap <- getCapFromCache(t, pos, direction.getOpposite, ForgeCapabilities.ITEM_HANDLER)
     } yield cap -> pos
 
     def entityCap: OptionT[Eval, (IItemHandler, BlockPos)] = for {

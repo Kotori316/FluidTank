@@ -6,7 +6,8 @@ import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
+import net.minecraftforge.common.capabilities.ForgeCapabilities
+import net.minecraftforge.fluids.capability.IFluidHandler
 
 class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects.SOURCE_TYPE, p, s) {
 
@@ -20,7 +21,7 @@ class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects
     for (direction <- directions) {
       for {
         tile <- Option(getLevel.getBlockEntity(getBlockPos.offset(direction)))
-        cap <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite).asScala.value.value
+        cap <- tile.getCapability(ForgeCapabilities.FLUID_HANDLER, direction.getOpposite).asScala.value.value
       } yield {
         val accepted = cap.fill(fluid.toStack, IFluidHandler.FluidAction.SIMULATE)
         if (accepted > 0) {

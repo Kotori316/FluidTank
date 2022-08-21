@@ -20,12 +20,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +46,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
         if (side != direction) {
-            if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            if (cap == ForgeCapabilities.FLUID_HANDLER) {
                 return getFluidHandler(direction).cast();
             }
         }
@@ -60,7 +59,7 @@ public class CATTile extends BlockEntity implements MenuProvider {
         if (entity == null) {
             return LazyOptional.empty();
         } else {
-            return entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())
+            return entity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite())
                 .resolve()
                 .flatMap(i -> i instanceof IItemHandlerModifiable ? Optional.of((IItemHandlerModifiable) i) : Optional.empty())
                 .map(i -> LazyOptional.of(() -> new FluidHandlerWrapper(i)))

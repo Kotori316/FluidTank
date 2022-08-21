@@ -14,12 +14,12 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.unsafe.UnsafeHacks;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
@@ -54,21 +54,28 @@ public abstract class BeforeAllTest {
         try {
             var method = CapabilityManager.class.getDeclaredMethod("get", String.class, boolean.class);
             method.setAccessible(true);
+            var cap_IEnergyStorage = (Capability<IEnergyStorage>) method.invoke(CapabilityManager.INSTANCE, "IEnergyStorage", false);
             var cap_IFluidHandler = (Capability<IFluidHandler>) method.invoke(CapabilityManager.INSTANCE, "IFluidHandler", false);
             var cap_IFluidHandlerItem = (Capability<IFluidHandlerItem>) method.invoke(CapabilityManager.INSTANCE, "IFluidHandlerItem", false);
             var cap_IItemHandler = (Capability<IItemHandler>) method.invoke(CapabilityManager.INSTANCE, "IItemHandler", false);
             try (var mocked = mockStatic(CapabilityManager.class)) {
-                mocked.when(() -> CapabilityManager.get(any())).thenReturn(cap_IFluidHandler).thenReturn(cap_IFluidHandlerItem).thenReturn(cap_IItemHandler);
-                assertEquals(cap_IFluidHandler, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-                assertEquals(cap_IFluidHandlerItem, CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
-                assertEquals(cap_IItemHandler, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+                mocked.when(() -> CapabilityManager.get(any()))
+                    .thenReturn(cap_IEnergyStorage)
+                    .thenReturn(cap_IFluidHandler)
+                    .thenReturn(cap_IFluidHandlerItem)
+                    .thenReturn(cap_IItemHandler);
+                assertEquals(cap_IEnergyStorage, ForgeCapabilities.ENERGY);
+                assertEquals(cap_IFluidHandler, ForgeCapabilities.FLUID_HANDLER);
+                assertEquals(cap_IFluidHandlerItem, ForgeCapabilities.FLUID_HANDLER_ITEM);
+                assertEquals(cap_IItemHandler, ForgeCapabilities.ITEM_HANDLER);
             }
         } catch (ReflectiveOperationException e) {
             throw new AssertionError(e);
         }
-        assertNotNull(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-        assertNotNull(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
-        assertNotNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        assertNotNull(ForgeCapabilities.ENERGY);
+        assertNotNull(ForgeCapabilities.FLUID_HANDLER);
+        assertNotNull(ForgeCapabilities.FLUID_HANDLER_ITEM);
+        assertNotNull(ForgeCapabilities.ITEM_HANDLER);
     }
 
     private static void mockRegistries() {

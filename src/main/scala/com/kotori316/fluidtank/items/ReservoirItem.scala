@@ -19,9 +19,8 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.{InteractionHand, InteractionResult, InteractionResultHolder}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 import net.minecraftforge.client.extensions.common.IClientItemExtensions
-import net.minecraftforge.common.capabilities.ICapabilityProvider
+import net.minecraftforge.common.capabilities.{ForgeCapabilities, ICapabilityProvider}
 import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirProperties.stacksTo(1)) {
   final val registryName = new ResourceLocation(FluidTank.modID, "reservoir_" + tier.lowerName)
@@ -33,8 +32,8 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
     if (tile != null) {
       if (!context.getLevel.isClientSide) {
         val moveResult = for {
-          destination <- tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, context.getClickedFace).asScala
-          source <- context.getItemInHand.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).asScala
+          destination <- tile.getCapability(ForgeCapabilities.FLUID_HANDLER, context.getClickedFace).asScala
+          source <- context.getItemInHand.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).asScala
           result = FluidUtil.tryEmptyContainer(context.getItemInHand, destination, source.getTankCapacity(0), context.getPlayer, true)
           if result.isSuccess
         } yield result
@@ -88,7 +87,7 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
   override def appendHoverText(stack: ItemStack, worldIn: Level, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = {
     val nbt = BlockItem.getBlockEntityData(stack)
     if (nbt != null) {
-      val fluid = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).asScala
+      val fluid = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).asScala
         .collect { case h: TankItemFluidHandler => h.getFluid -> h.getCapacity }
         .filter(_._1.nonEmpty)
       fluid.value.value.foreach { case (f, capacity) =>

@@ -10,11 +10,11 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.level.BlockGetter
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
+import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ForgeCapabilities, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -103,7 +103,7 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
   //noinspection ComparingUnrelatedTypes
   override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
     //noinspection ComparingUnrelatedTypes
-    if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+    if (capability == ForgeCapabilities.FLUID_HANDLER) {
       lazyOptional.cast()
     } else {
       capabilities.map(_.getCapability(capability, facing))

@@ -12,10 +12,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +37,7 @@ public class FluidPipeBlock extends PipeBlock {
     @Override
     @NotNull
     protected Connection getConnection(Direction direction, @NotNull BlockEntity entity) {
-        LazyOptional<IFluidHandler> capability = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
+        LazyOptional<IFluidHandler> capability = entity.getCapability(ForgeCapabilities.FLUID_HANDLER, direction.getOpposite());
         if (capability.isPresent())
             if (capability.map(f -> f.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)).orElse(0) >= 4000)
                 return Connection.OUTPUT;

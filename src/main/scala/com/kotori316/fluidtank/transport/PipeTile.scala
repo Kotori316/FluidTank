@@ -5,10 +5,9 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.capabilities.{Capability, ForgeCapabilities}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.FluidUtil
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler
 
 final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects.FLUID_PIPE_TYPE, p, s) {
   private[this] val handler = new PipeFluidHandler(this)
@@ -22,7 +21,7 @@ final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects
         val sourcePos = getBlockPos.offset(direction)
         val c = for {
           t <- Cap.make(getLevel.getBlockEntity(sourcePos))
-          cap <- getCapFromCache(t, sourcePos, direction.getOpposite, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+          cap <- getCapFromCache(t, sourcePos, direction.getOpposite, ForgeCapabilities.FLUID_HANDLER)
         } yield cap -> sourcePos
         c.toList
       } else {
@@ -36,7 +35,7 @@ final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects
         if pos != sourcePos
         if getLevel.getBlockState(p).getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(direction)).isOutput
         t <- Option(getLevel.getBlockEntity(pos)).toList
-        dest <- getCapFromCache(t, pos, direction.getOpposite, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).toList
+        dest <- getCapFromCache(t, pos, direction.getOpposite, ForgeCapabilities.FLUID_HANDLER).toList
         if f != dest
       } {
         val transferSimulate = FluidUtil.tryFluidTransfer(dest, f, PipeTile.amountPerTick, false)
@@ -48,7 +47,7 @@ final class PipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+    if (cap == ForgeCapabilities.FLUID_HANDLER) {
       if (side != null &&
         (!hasLevel || getBlockState.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
         LazyOptional.of(() => handler.asInstanceOf[T])

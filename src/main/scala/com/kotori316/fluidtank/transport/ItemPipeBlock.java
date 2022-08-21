@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +35,7 @@ public class ItemPipeBlock extends PipeBlock {
         BlockPos maybeTilePos = pos.relative(d);
         BlockEntity maybeTile = level.getBlockEntity(maybeTilePos);
         if (maybeTile != null) {
-            LazyOptional<IItemHandler> cap = maybeTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
+            LazyOptional<IItemHandler> cap = maybeTile.getCapability(ForgeCapabilities.ITEM_HANDLER, d.getOpposite());
             if (cap.isPresent()) return true;
         }
         // Technique to get world instance.
@@ -56,7 +56,7 @@ public class ItemPipeBlock extends PipeBlock {
     @Override
     protected Connection getConnection(Direction direction, @NotNull BlockEntity entity) {
         if (entity instanceof Container ||
-            entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent())
+            entity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite()).isPresent())
             return Connection.CONNECTED;
         else
             return Connection.NO_CONNECTION;

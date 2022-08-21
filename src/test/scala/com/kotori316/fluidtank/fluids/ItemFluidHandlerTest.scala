@@ -6,8 +6,9 @@ import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
 import net.minecraft.nbt.{CompoundTag, LongTag}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
+import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
+import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{DisplayName, Test}
 import org.junit.jupiter.params.ParameterizedTest
@@ -129,7 +130,7 @@ class ItemFluidHandlerTest extends BeforeAllTest {
   @DisplayName("Get capability via getter")
   def testGetCapability1(): Unit = {
     val stack = new ItemStack(woodTank)
-    val handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+    val handler = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
     assertTrue(handler.isPresent)
   }
 
@@ -137,7 +138,7 @@ class ItemFluidHandlerTest extends BeforeAllTest {
   @DisplayName("Get capability even if stack size is over 2")
   def testGetCapability2(): Unit = {
     val stack = new ItemStack(woodTank, 2)
-    val handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+    val handler = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
     assertTrue(handler.isPresent)
   }
 
