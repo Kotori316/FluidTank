@@ -66,10 +66,15 @@ public class Utils {
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 8000L, fluid: "silents_mechanisms:ethane", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 8000L, fluid: "minecraft:water", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 10L, fluid: "minecraft:lava", capacity: 16000L}}}
-        /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "stone", id: "fluidtank:tiletank", tank: {amount: 8000L, fluid: "minecraft:water", capacity: 16000L}}}
+        /give @p fluidtank:tank_wood{BlockEntityTag:{tank:{amount:3000L,capacity:4000L,fluid:"minecraft:lava"},tier:"wood"}}
+        /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "stone", tank: {amount: 8000L, fluid: "minecraft:water", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 10000L, fluid: "fluidtank:vanilla_milk", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "Stone", id: "fluidtank:tiletank", tank: {amount: 10000L, fluid: "fluidtank:vanilla_milk", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier:"stone",tank:{amount:10000L,fluid:"fluidtank:vanilla_milk",capacity:16000L}}}
+        */
+        /*
+        /setblock ~ ~-1 ~ fluidtank:tank_stone{tier: "stone", id: "fluidtank:tiletank", tank: {amount: 3000L, fluid: "minecraft:lava", capacity: 4000L}}
+        /data merge block ~ ~-1 ~ {tank: {fluid: "minecraft:lava"}}
         */
     }
 

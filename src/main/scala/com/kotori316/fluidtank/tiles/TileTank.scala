@@ -85,20 +85,21 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
 
   override def onLoad(): Unit = {
     super.onLoad()
-    if (loading) {
-      loading = false
-      if (SideProxy.isServer(this)) {
-        val executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
-        executor.tell(new TickTask(0, () => {
-          getLevel.getProfiler.push("Connection Loading")
-          if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
-            "Connection load in delayed task. At={}, connection={}", this.getBlockPos.show, this.connection)
-          if (this.connection.isDummy) {
-            Connection.load(getLevel, getBlockPos)
-          }
-          getLevel.getProfiler.pop()
-        }))
-      }
+    if (SideProxy.isServer(this)) {
+      val executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
+      executor.tell(new TickTask(0, () => {
+        getLevel.getProfiler.push("Connection Loading")
+        if (Utils.isInDev) {
+          FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
+            "Connection {} loaded in delayed task. At={}, connection={}",
+            if (this.connection.isDummy) "will be" else "won't",
+            this.getBlockPos.show, this.connection)
+        }
+        if (this.connection.isDummy) {
+          Connection.load(getLevel, getBlockPos)
+        }
+        getLevel.getProfiler.pop()
+      }))
     }
   }
 
@@ -116,6 +117,14 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
   def getComparatorLevel: Int = connection.getComparatorLevel
 
   def onBlockPlacedBy(): Unit = {
+    if (Utils.isInDev) {
+      FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
+        "Connection {} loaded in onBlockPlacedBy. At={}, connection={}",
+        if (this.connection.isDummy) "will be" else "won't",
+        this.getBlockPos.show, this.connection)
+    }
+    // Do nothing if the connection is already created.
+    if (!this.connection.isDummy) return
     val downTank = Option(getLevel.getBlockEntity(getBlockPos.below())).collect { case t: TileTank => t }
     val upTank = Option(getLevel.getBlockEntity(getBlockPos.above())).collect { case t: TileTank => t }
     val newSeq = (downTank, upTank) match {
