@@ -38,10 +38,6 @@ object Config {
 
     builder.pop()
 
-    val showInvisibleTank: ForgeConfigSpec.BooleanValue = builder.worldRestart()
-      .comment("NOT USED. (True to show invisible tank in creative tabs. Recipe and block aren't removed.)")
-      .define("showInvisibleTankInTab", false)
-
     val showTOP: ForgeConfigSpec.BooleanValue = builder.comment("Show tank info on TOP tooltip.")
       .define("showTOP", true)
 
