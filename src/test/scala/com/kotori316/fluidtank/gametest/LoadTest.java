@@ -21,7 +21,6 @@ import com.kotori316.testutil.GameTestUtil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @GameTestHolder(value = FluidTank.modID)
@@ -60,7 +59,7 @@ public final class LoadTest {
         var pos = GameTestUtil.getBasePos(helper).offset(1, 0, 0);
         var bottomTank = helper.getBlockEntity(pos);
         if (bottomTank instanceof TileTank tank) {
-            assertTrue(tank.connection().isDummy());
+            assertFalse(tank.connection().isDummy(), "Connection should be valid.");
         } else {
             fail("Tank entity is not presented at %s.".formatted(helper.absolutePos(pos)));
         }
@@ -72,9 +71,9 @@ public final class LoadTest {
         var pos = GameTestUtil.getBasePos(helper).offset(1, 0, 0);
         var bottomTank = helper.getBlockEntity(pos);
         if (bottomTank instanceof TileTank tank) {
-            tank.onBlockPlacedBy();
+            // tank.onBlockPlacedBy(); not needed.
             assertFalse(tank.connection().isDummy());
-            assertEquals(2, tank.connection().seq().size());
+            assertEquals(2, tank.connection().seq().size(), String.valueOf(tank.connection().seq()));
             assertEquals(24000L, tank.connection().amount());
             assertEquals(Fluids.WATER, tank.connection().fluidType().fluid());
         } else {
@@ -88,7 +87,7 @@ public final class LoadTest {
         var pos = GameTestUtil.getBasePos(helper).offset(1, 1, 2);
         var bottomTank = helper.getBlockEntity(pos);
         if (bottomTank instanceof TileTank tank) {
-            tank.onBlockPlacedBy();
+            // tank.onBlockPlacedBy(); // not needed.
             var connection = tank.connection();
             assertFalse(tank.connection().isDummy(), "Connection shouldn't be null. T: %s %s".formatted(tank, tank.internalTank()));
             assertEquals(Tier.WOOD.amount() * 2L, connection.amount(), "Connection: %s".formatted(connection));
