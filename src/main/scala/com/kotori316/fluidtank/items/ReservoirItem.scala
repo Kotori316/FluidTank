@@ -83,8 +83,6 @@ class ReservoirItem(val tier: Tier) extends Item(FluidTank.proxy.getReservoirPro
 
   override def getBurnTime(itemStack: ItemStack, recipeType: RecipeType[_]): Int = ItemUtil.getTankBurnTime(tier, itemStack, recipeType)
 
-  override def getBurnTime(itemStack: ItemStack, recipeType: RecipeType[_]): Int = ItemUtil.getTankBurnTime(tier, itemStack, recipeType)
-
   // ---------- Information ----------
   @OnlyIn(Dist.CLIENT)
   override def appendHoverText(stack: ItemStack, worldIn: Level, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = {

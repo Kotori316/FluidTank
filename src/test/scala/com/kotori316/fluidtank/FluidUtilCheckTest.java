@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
@@ -117,6 +118,7 @@ final class FluidUtilCheckTest extends BeforeAllTest {
     }
 
     @Test
+    @Disabled("Disable until forge patch is installed.")
     void insert1StackSimulate() {
         var tankStack = new ItemStack(BLOCK_TANK);
         var tank = TankHandler.apply(5000L);
