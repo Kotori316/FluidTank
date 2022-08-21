@@ -1,3 +1,3 @@
-## v19.5
+## v19.6
 
-* Update to 1.19.2
+* Internal change

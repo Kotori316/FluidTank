@@ -1,3 +1,9 @@
+## v19.6
+
+* Internal change
+
+Build with 1.19.2-43.0.2, Mapping: Official 1.19.2
+
 ## v19.5
 
 * Update to 1.19.2
