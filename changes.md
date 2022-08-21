@@ -1,3 +1,5 @@
-## v18.5.2
+## v18.6.0
 
-* Use tanks as fuel.
+* Internal change.
+  * Improved loading connection of tanks.
+  * Works for setBlock command.

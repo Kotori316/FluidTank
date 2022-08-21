@@ -1,3 +1,11 @@
+## v18.6.0
+
+* Internal change.
+  * Improved loading connection of tanks.
+  * Works for setBlock command.
+
+Build with 1.18.2-40.1.73, Mapping: Official 1.18.2
+
 ## v18.5.2
 
 * Use tanks as fuel.
