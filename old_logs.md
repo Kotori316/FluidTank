@@ -1,3 +1,9 @@
+## v19.3.1
+
+* Backport internal changes from 1.19.2
+
+Build with 1.19-41.1.0, Mapping: Official 1.19
+
 ## v19.3
 
 * Update for new forge.

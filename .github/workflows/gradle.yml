@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
     branches:
-      - "1.19"
+      - "1.19.0"
     paths:
       - "src/main/scala/**"
       - "src/test/**"
@@ -11,7 +11,7 @@ on:
       - ".github/workflows/gradle.yml"
   pull_request:
     branches:
-      - "1.19"
+      - "1.19.0"
 
 jobs:
   assemble:
@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        forge: [ 1.19, default ]
+        forge: [ default ]
     steps:
       - uses: actions/checkout@v2
       - name: Get latest version
