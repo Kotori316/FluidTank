@@ -258,7 +258,11 @@ dependencies {
     testImplementation(fg.deobf(group: "com.kotori316", name: "test_utility", version: project.testUtilVersion))
     testImplementation(group: "com.kotori316", name: "test_utility_dependency", version: "1.0-SNAPSHOT")
 
-    game_test(group: "com.kotori316", name: "test_utility_dependency", version: "1.0-SNAPSHOT")
+    String JUPITER_VERSION = '5.8.2'
+    game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
+    game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
+    game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
+    game_test(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.8.2')
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
