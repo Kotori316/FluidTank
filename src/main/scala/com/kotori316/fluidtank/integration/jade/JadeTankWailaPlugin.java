@@ -22,6 +22,7 @@ public class JadeTankWailaPlugin implements IWailaPlugin {
 
     static final ResourceLocation KEY_TANK_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_TANK_INFO);
     static final ResourceLocation KEY_SHORT_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_SHORT_INFO);
+    static final ResourceLocation KEY_COMPACT_NUMBER = new ResourceLocation(FluidTank.modID, Localize.WAILA_COMPACT_NUMBER);
 
     @Override
     public void register(IWailaCommonRegistration registration) {
@@ -30,6 +31,7 @@ public class JadeTankWailaPlugin implements IWailaPlugin {
             registration.registerBlockDataProvider(tankDataProvider, TileTank.class);
             registration.addConfig(KEY_TANK_INFO, true);
             registration.addConfig(KEY_SHORT_INFO, true);
+            registration.addConfig(KEY_COMPACT_NUMBER, false);
         }
     }
 
