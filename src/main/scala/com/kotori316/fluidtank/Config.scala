@@ -40,6 +40,10 @@ object Config {
 
     val showTOP: ForgeConfigSpec.BooleanValue = builder.comment("Show tank info on TOP tooltip.")
       .define("showTOP", true)
+    val topShort: ForgeConfigSpec.BooleanValue = builder.comment("Use short format for TOP tooltip")
+      .define("topShort", false)
+    val topCompact: ForgeConfigSpec.BooleanValue = builder.comment("Use compact number format for TOP tooltip")
+      .define("topCompact", false)
 
     val enableWailaAndTOP: ForgeConfigSpec.BooleanValue = builder.comment("True to enable waila and top to show tank info.")
       .define("showToolTipOnMods", true)

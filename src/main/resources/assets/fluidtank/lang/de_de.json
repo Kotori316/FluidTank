@@ -41,6 +41,7 @@
   "config.jade.plugin_fluidtank.fluidtank.waila.tank_info": "Showtank Info",
   "config.jade.plugin_fluidtank.jade_plugin": "FluidTank Plugin",
   "config.waila.plugin_fluidtank": "Fluidtank",
+  "config.waila.plugin_fluidtank.fluidtank.waila.compact_number": "Compact Number",
   "config.waila.plugin_fluidtank.fluidtank.waila.short_info": "Short",
   "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "Showtank Info",
   "fluidtank.recipe.tooltip": "Recipe of tanks",
