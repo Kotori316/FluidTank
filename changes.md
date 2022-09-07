@@ -1,5 +1,5 @@
-## v18.6.0
+## v18.6.1
 
-* Internal change.
-  * Improved loading connection of tanks.
-  * Works for setBlock command.
+* Improved text in tooltip mods.
+  * Added a mode to use compact numbers(such as 1.0K, 2.3M)
+  * Added option to change format in TOP tooltip in FluidTank config.
