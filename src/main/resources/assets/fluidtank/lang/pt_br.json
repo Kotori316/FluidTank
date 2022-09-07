@@ -44,6 +44,7 @@
   "config.waila.plugin_fluidtank": "Tanque de fluido",
   "config.waila.plugin_fluidtank.fluidtank.waila.compact_number": "Compact Number",
   "config.waila.plugin_fluidtank.fluidtank.waila.short_info": "curta",
+  "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "Show Tank Info",
   "fluidtank.recipe.tooltip": "receita do tanque",
   "fluidtank.waila.amount": "Quantidade: %s mB",
   "fluidtank.waila.capacity": "Capacidade: %s mB",

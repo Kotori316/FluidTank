@@ -7,9 +7,8 @@ import com.kotori316.fluidtank.integration.Localize._
 import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTank, TileTankVoid}
 import com.kotori316.fluidtank.{Config, FluidTank}
 import mcjty.theoneprobe.api.{IProbeHitData, IProbeInfo, IProbeInfoProvider, ProbeMode}
-import net.minecraft.network.chat.Component
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
@@ -59,23 +58,23 @@ class TankDataProvider extends IProbeInfoProvider {
   def shortInfo(tank: TileTank, numberFormatter: Number => String, fluidNameFormatter: String => String): Seq[Component] = {
     val fluid = fluidNameFormatter(tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL))
     if (tank.connection.hasCreative) {
-      Seq(new TextComponent(fluid))
+      Seq(Component.literal(fluid))
     } else {
       val amount = numberFormatter(Long.box(tank.connection.amount))
       val capacity = numberFormatter(Long.box(tank.connection.capacity))
-      Seq(new TranslatableComponent(WAILA_SHORT, fluid, amount, capacity))
+      Seq(Component.translatable(WAILA_SHORT, fluid, amount, capacity))
     }
   }
 
   def longInfo(tank: TileTank, numberFormatter: Number => String, fluidNameFormatter: String => String): Seq[Component] = {
-    val tier = new TranslatableComponent(TIER, tank.tier)
-    val fluid = new TranslatableComponent(CONTENT, fluidNameFormatter(tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL)))
+    val tier = Component.translatable(TIER, tank.tier)
+    val fluid = Component.translatable(CONTENT, fluidNameFormatter(tank.connection.getFluidStack.map(_.getLocalizedName).getOrElse(FLUID_NULL)))
     if (tank.connection.hasCreative) {
       Seq(tier, fluid)
     } else {
-      val amount = new TranslatableComponent(AMOUNT, numberFormatter(Long.box(tank.connection.amount)))
-      val capacity = new TranslatableComponent(CAPACITY, numberFormatter(Long.box(tank.connection.capacity)))
-      val comparator = new TranslatableComponent(COMPARATOR, Int.box(tank.getComparatorLevel))
+      val amount = Component.translatable(AMOUNT, numberFormatter(Long.box(tank.connection.amount)))
+      val capacity = Component.translatable(CAPACITY, numberFormatter(Long.box(tank.connection.capacity)))
+      val comparator = Component.translatable(COMPARATOR, Int.box(tank.getComparatorLevel))
       Seq(tier, fluid, amount, capacity, comparator)
     }
   }

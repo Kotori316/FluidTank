@@ -1,7 +1,5 @@
 package com.kotori316.fluidtank.integration;
 
-import com.kotori316.fluidtank.tiles.TileTank;
-
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -14,8 +12,6 @@ import java.util.function.UnaryOperator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
@@ -69,14 +65,14 @@ public class Localize {
             } else {
                 if (!tankData.contains(NBT_Creative)) {
                     return Collections.singletonList(
-                        new TranslatableComponent(WAILA_SHORT,
+                        Component.translatable(WAILA_SHORT,
                             fluidNameFormatter.apply(tank.internalTank().getTank().fluidAmount().getLocalizedName()),
                             numberFormat.apply(tank.internalTank().getTank().amount()),
                             numberFormat.apply(tank.internalTank().getTank().capacity()))
                     );
                 } else if (!tankData.getBoolean(NBT_Creative)) {
                     return Collections.singletonList(
-                        new TranslatableComponent(WAILA_SHORT,
+                        Component.translatable(WAILA_SHORT,
                             fluidNameFormatter.apply(tankData.getString(NBT_ConnectionFluidName)),
                             numberFormat.apply(tankData.getLong(NBT_ConnectionAmount)),
                             numberFormat.apply(tankData.getLong(NBT_ConnectionCapacity)))
@@ -85,7 +81,7 @@ public class Localize {
                     return java.util.Optional.of(tankData.getString(NBT_ConnectionFluidName))
                         .map(fluidNameFormatter)
                         .filter(s -> !FLUID_NULL.equals(s))
-                        .map(TextComponent::new)
+                        .map(Component::literal)
                         .map(Collections::singletonList)
                         .orElse(Collections.emptyList());
                 }
@@ -93,20 +89,20 @@ public class Localize {
         } else {
             Tier tier = tank.tier();
             if (tank instanceof TileTankVoid) {
-                return Collections.singletonList(new TranslatableComponent(TIER, tier.toString()));
+                return Collections.singletonList(Component.translatable(TIER, tier.toString()));
             } else {
                 if (!tankData.getBoolean(NBT_Creative)) {
                     return Arrays.asList(
-                        new TranslatableComponent(TIER, tier.toString()),
-                        new TranslatableComponent(CONTENT, fluidNameFormatter.apply(tankData.getString(NBT_ConnectionFluidName))),
-                        new TranslatableComponent(AMOUNT, numberFormat.apply(tankData.getLong(NBT_ConnectionAmount))),
-                        new TranslatableComponent(CAPACITY, numberFormat.apply(tankData.getLong(NBT_ConnectionCapacity))),
-                        new TranslatableComponent(COMPARATOR, tankData.getInt(NBT_ConnectionComparator))
+                        Component.translatable(TIER, tier.toString()),
+                        Component.translatable(CONTENT, fluidNameFormatter.apply(tankData.getString(NBT_ConnectionFluidName))),
+                        Component.translatable(AMOUNT, numberFormat.apply(tankData.getLong(NBT_ConnectionAmount))),
+                        Component.translatable(CAPACITY, numberFormat.apply(tankData.getLong(NBT_ConnectionCapacity))),
+                        Component.translatable(COMPARATOR, tankData.getInt(NBT_ConnectionComparator))
                     );
                 } else {
                     return Arrays.asList(
-                        new TranslatableComponent(TIER, tier.toString()),
-                        new TranslatableComponent(CONTENT, fluidNameFormatter.apply(tankData.getString(NBT_ConnectionFluidName)))
+                        Component.translatable(TIER, tier.toString()),
+                        Component.translatable(CONTENT, fluidNameFormatter.apply(tankData.getString(NBT_ConnectionFluidName)))
                     );
                 }
             }

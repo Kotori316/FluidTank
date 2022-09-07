@@ -44,6 +44,7 @@
   "config.waila.plugin_fluidtank": "Fluidtank",
   "config.waila.plugin_fluidtank.fluidtank.waila.compact_number": "Compact Number",
   "config.waila.plugin_fluidtank.fluidtank.waila.short_info": "Кратко",
+  "config.waila.plugin_fluidtank.fluidtank.waila.tank_info": "Show Tank Info",
   "fluidtank.recipe.tooltip": "Рецепт резервуаров",
   "fluidtank.waila.amount": "Количество: %s mB",
   "fluidtank.waila.capacity": "Вместимость: %s mB",
