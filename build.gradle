@@ -220,7 +220,7 @@ dependencies {
         implementation(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
     } else {
-        compileOnly(fg.deobf("mezz.jei:jei-1.18.2:" + project.jeiVersion))
+        compileOnly(fg.deobf("mezz.jei:jei-1.18.2-forge:" + project.jeiVersion))
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
