@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -23,6 +24,7 @@ import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.render.RenderItemTank;
 import com.kotori316.fluidtank.render.RenderReservoirItem;
 import com.kotori316.fluidtank.render.RenderTank;
+import com.kotori316.fluidtank.tiles.CATScreen;
 import com.kotori316.fluidtank.tiles.TileTankCreative;
 
 @SuppressWarnings("unused")
@@ -55,6 +57,7 @@ public class FluidTankClientInit implements ClientModInitializer {
         CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(i -> BuiltinItemRendererRegistry.INSTANCE.register(i, RENDER_RESERVOIR_ITEM));
         ItemProperties.register(ModObjects.blockSource().itemBlock(),
             new ResourceLocation(FluidTank.modID, "source_cheat"), (stack, world, entity, i) -> FluidSourceBlock.isCheatStack(stack) ? 1f : 0f);
+        MenuScreens.register(ModObjects.CAT_CONTAINER_TYPE(), CATScreen::new);
         FluidTank.LOGGER.info("Client init is finished. {} ", FluidTank.modID);
     }
 
