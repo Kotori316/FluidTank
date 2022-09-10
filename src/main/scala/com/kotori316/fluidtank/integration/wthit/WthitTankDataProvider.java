@@ -54,8 +54,8 @@ final class WthitTankDataProvider implements IServerDataProvider<BlockEntity>, I
                         list = Collections.singletonList(
                             Component.translatable(WAILA_SHORT,
                                 tank.internalTank().getTank().fluidAmount().getLocalizedName(),
-                                tank.internalTank().getTank().amount(),
-                                tank.internalTank().getTank().capacity())
+                                tank.internalTank().getTank().amountInForge(),
+                                tank.internalTank().getTank().capacityInForge())
                         );
                     } else if (!nbtData.getBoolean(NBT_Creative)) {
                         list = Collections.singletonList(

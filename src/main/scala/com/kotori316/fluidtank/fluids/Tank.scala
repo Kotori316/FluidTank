@@ -11,6 +11,8 @@ case class Tank private(fluidAmount: FluidAmount, capacity: FabricAmount, dummy:
   def isEmpty: Boolean = fluidAmount.isEmpty
 
   def capacityInForge: Long = capacity.toForge
+
+  def amountInForge: Long = fluidAmount.amount
 }
 
 object Tank {
