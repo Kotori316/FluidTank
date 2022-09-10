@@ -6,7 +6,7 @@ plugins {
     id "scala"
     id("maven-publish")
     // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
-    id 'fabric-loom' version "0.12-SNAPSHOT"
+    id 'fabric-loom' version "0.13-SNAPSHOT"
     // id 'maven-publish'
     //noinspection SpellCheckingInspection
     id "com.github.breadmoirai.github-release" version "2.2.12"
@@ -145,6 +145,7 @@ dependencies {
     } else {
         //noinspection SpellCheckingInspection
         modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
+        modRuntimeOnly(group: "dev.architectury", name: "architectury-fabric", version: project.architectury_version)
         modImplementation("RebornCore:RebornCore-1.19:${project.RebornCore_version}") {
             //noinspection SpellCheckingInspection
             exclude(group: "net.fabricmc.fabric-api")
