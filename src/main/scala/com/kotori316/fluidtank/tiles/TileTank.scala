@@ -194,13 +194,13 @@ object TileTank {
   }
 
   def tick(world: Level, pos: BlockPos, state: BlockState, tile: TileTank): Unit = {
-    world.getProfiler.push("Connection Loading")
-    if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
-      "Connection load in delayed task. At={}, connection={}", pos.show, tile.connection)
     if (tile.connection.isDummy) {
+      world.getProfiler.push("Connection Loading")
+      if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
+        "Connection load in delayed task. At={}, connection={}", pos.show, tile.connection)
       Connection.load(world, pos)
+      world.getProfiler.pop()
     }
-    world.getProfiler.pop()
   }
 
   /**
