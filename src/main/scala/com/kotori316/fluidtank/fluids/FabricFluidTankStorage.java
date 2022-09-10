@@ -81,7 +81,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
         connection.handler().fill(snapshot, FluidAction.EXECUTE);
     }
 
-    static FluidAmount getFluidAmount(FluidVariant variant, long fabricAmount) {
+   public static FluidAmount getFluidAmount(FluidVariant variant, long fabricAmount) {
         return FluidAmount.apply(variant.getFluid(), fabricAmount, Option.apply(variant.copyNbt()));
     }
 

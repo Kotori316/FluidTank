@@ -1,28 +1,60 @@
 package com.kotori316.fluidtank.tiles;
 
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.NotNull;
+import scala.Option;
+import scala.jdk.javaapi.OptionConverters;
 
 import com.kotori316.fluidtank.ModObjects;
+import com.kotori316.fluidtank.Utils;
+import com.kotori316.fluidtank.fluids.FabricFluidTankStorage;
+import com.kotori316.fluidtank.fluids.FluidAction;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.FluidContainer;
+import com.kotori316.fluidtank.fluids.FluidKey;
+import com.kotori316.fluidtank.fluids.VariantUtil;
 
-public class CATTile extends BlockEntity implements MenuProvider {
+public class CATTile extends BlockEntity implements MenuProvider, ExtendedScreenHandlerFactory {
     // The direction of FACING is facing to you, people expect to use itemBlock targeting an inventory so the chest exists on the opposite side of FACING.
     public List<FluidAmount> fluidCache = Collections.emptyList();
 
     public CATTile(BlockPos pos, BlockState state) {
         super(ModObjects.CAT_TYPE(), pos, state);
     }
-/*
+
     @SuppressWarnings("UnstableApiUsage")
     public Option<FluidHandlerWrapper> getFluidHandler(Direction direction) {
         assert level != null;
@@ -31,17 +63,13 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return Option.empty();
         } else {
             var storage = ItemStorage.SIDED.find(level, getBlockPos().relative(direction), direction.getOpposite());
-            if (storage == null || !storage.supportsInsertion()) return Option.empty();
-
-
-            return entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())
-                .resolve()
-                .flatMap(i -> i instanceof IItemHandlerModifiable ? Optional.of((IItemHandlerModifiable) i) : Optional.empty())
-                .map(i -> ((NonNullSupplier<FluidHandlerWrapper>) () -> new FluidHandlerWrapper(i)))
-                .map(LazyOptional::of)
-                .orElse(LazyOptional.empty());
+            if (storage instanceof InventoryStorage inventoryStorage && inventoryStorage.supportsInsertion()) {
+                return Option.apply(new FluidHandlerWrapper(inventoryStorage));
+            } else {
+                return Option.empty();
+            }
         }
-    }*/
+    }
 
     @Override
     public Component getDisplayName() {
@@ -52,114 +80,108 @@ public class CATTile extends BlockEntity implements MenuProvider {
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new CATContainer(id, player, getBlockPos());
     }
-/*
-    public static class FluidHandlerWrapper implements IFluidHandler {
-        private final IItemHandlerModifiable inventory;
 
-        public FluidHandlerWrapper(IItemHandlerModifiable inventory) {
+    @Override
+    public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf) {
+        buf.writeBlockPos(getBlockPos());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static class FluidHandlerWrapper implements Storage<FluidVariant>, FluidContainer {
+        private final InventoryStorage inventory;
+
+        public FluidHandlerWrapper(InventoryStorage inventory) {
             this.inventory = inventory;
         }
 
-        public LazyOptional<IFluidHandlerItem> getFluidHandler(int tank) {
-            ItemStack stackInSlot = inventory.getStackInSlot(tank);
-            if (stackInSlot.isEmpty())
-                return LazyOptional.empty();
-            else
-                return net.minecraftforge.fluids.FluidUtil.getFluidHandler(stackInSlot);
+        public Optional<Storage<FluidVariant>> getFluidHandler(int slot) {
+            var item = this.inventory.getSlot(slot);
+            return Optional.ofNullable(FluidStorage.ITEM.find(item.getResource().toStack(Utils.toInt(item.getAmount())), ContainerItemContext.ofSingleSlot(item)));
         }
 
         @Override
-        public int getTanks() {
-            return inventory.getSlots();
-        }
-
-        @NotNull
-        @Override
-        public FluidStack getFluidInTank(int tank) {
-            return getFluidHandler(tank).map(h -> h.drain(Integer.MAX_VALUE, FluidAction.SIMULATE)).orElse(FluidStack.EMPTY);
-        }
-
-        @Override
-        public int getTankCapacity(int tank) {
-            return getFluidHandler(tank).map(h -> h.getTankCapacity(0)).orElse(0);
-        }
-
-        @Override
-        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-            return getFluidHandler(tank).map(h -> h.isFluidValid(0, stack)).orElse(false);
-        }
-
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            if (resource == null || resource.isEmpty()) return 0;
-            FluidStack toFill = resource.copy();
-            for (int i = 0; i < getTanks(); i++) {
-                int slot = i;
-                getFluidHandler(slot).ifPresent(handler -> {
-                    int filled = handler.fill(toFill, action);
-                    toFill.setAmount(toFill.getAmount() - filled);
-                    if (action.execute()) {
-                        inventory.setStackInSlot(slot, handler.getContainer());
-                    }
-                });
-                if (toFill.isEmpty())
-                    return resource.getAmount();
+        public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
+            if (resource.isBlank() || maxAmount <= 0) return 0;
+            AtomicLong rest = new AtomicLong(maxAmount);
+            for (int i = 0; i < this.inventory.getSlots().size(); i++) {
+                var handler = getFluidHandler(i);
+                handler.map(s -> s.insert(resource, rest.get(), transaction))
+                    .ifPresent(l -> rest.addAndGet(-l));
+                if (rest.get() <= 0) return maxAmount;
             }
-            return resource.getAmount() - toFill.getAmount();
+            return maxAmount - rest.get();
         }
 
-        @NotNull
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (resource == null || resource.isEmpty()) return FluidStack.EMPTY;
-            FluidStack toDrain = resource.copy();
-            for (int i = 0; i < getTanks(); i++) {
-                int slot = i;
-                getFluidHandler(slot)
-                    .map(h -> {
-                        FluidStack drain = h.drain(toDrain, action);
-                        if (action.execute()) {
-                            inventory.setStackInSlot(slot, h.getContainer());
-                        }
-                        return drain;
-                    })
-                    .ifPresent(drained -> toDrain.setAmount(toDrain.getAmount() - drained.getAmount()));
-                if (toDrain.isEmpty())
-                    break;
+        public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
+            if (resource.isBlank() || maxAmount <= 0) return 0;
+            AtomicLong rest = new AtomicLong(maxAmount);
+            for (int i = 0; i < this.inventory.getSlots().size(); i++) {
+                var handler = getFluidHandler(i);
+                handler.map(s -> s.extract(resource, rest.get(), transaction))
+                    .ifPresent(l -> rest.addAndGet(-l));
+                if (rest.get() <= 0) return maxAmount;
             }
-            return new FluidStack(resource, resource.getAmount() - toDrain.getAmount());
+            return maxAmount - rest.get();
         }
 
-        @NotNull
         @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
-            if (maxDrain <= 0) return FluidStack.EMPTY;
-            Optional<FluidStack> first = getFluidAmountStream()
-                .map(FluidAmount::toStack)
-                .findFirst();
-            return first.map(s -> this.drain(new FluidStack(s, Math.min(maxDrain, s.getAmount())), action)).orElse(FluidStack.EMPTY);
+        public Iterator<StorageView<FluidVariant>> iterator() {
+            return inventory.getSlots().stream()
+                .map(s -> FluidStorage.ITEM.find(s.getResource().toStack(Utils.toInt(s.getAmount())), ContainerItemContext.ofSingleSlot(s)))
+                .filter(Objects::nonNull)
+                .flatMap(f -> StreamSupport.stream(f.spliterator(), false))
+                .iterator();
         }
 
         public List<FluidAmount> fluidList() {
-            return getFluidAmountStream().collect(Collectors.toList());
+            return getFluidAmountStream().toList();
         }
 
         @NotNull
         public Stream<FluidAmount> getFluidAmountStream() {
-            return IntStream.range(0, this.getTanks())
-                .mapToObj(this::getFluidInTank)
-                .collect(Collectors.groupingBy(FluidKey::from, LinkedHashMap::new, Collectors.summingLong(FluidStack::getAmount)))
+            return IntStream.range(0, this.inventory.getSlots().size())
+                .mapToObj(this::getFluidHandler)
+                .flatMap(Optional::stream)
+                .flatMap(s -> StreamSupport.stream(s.spliterator(), false))
+                .map(s -> FabricFluidTankStorage.getFluidAmount(s.getResource(), s.getAmount()))
+                .collect(Collectors.groupingBy(FluidKey::from, LinkedHashMap::new, Collectors.summingLong(FluidAmount::fabricAmount)))
                 .entrySet().stream()
                 .map(e -> e.getKey().toAmount(e.getValue()))
                 .filter(FluidAmount::nonEmpty);
         }
-    }*/
+
+        @Override
+        public FluidAmount fill(FluidAmount resource, FluidAction action) {
+            var variant = VariantUtil.convert(resource);
+            var amount = resource.fabricAmount();
+            try (Transaction transaction = Transaction.openOuter()) {
+                var inserted = this.insert(variant, amount, transaction);
+                if (action.execute()) {
+                    transaction.commit();
+                }
+                return resource.setAmountF(inserted);
+            }
+        }
+
+        @Override
+        public FluidAmount drain(FluidAmount resource, FluidAction action) {
+            var variant = VariantUtil.convert(resource);
+            var amount = resource.fabricAmount();
+            try (Transaction transaction = Transaction.openOuter()) {
+                var extracted = this.extract(variant, amount, transaction);
+                if (action.execute()) {
+                    transaction.commit();
+                }
+                return resource.setAmountF(extracted);
+            }
+        }
+    }
 
     public List<FluidAmount> fluidAmountList() {
-        return List.of();
-        /*Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
+        Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
         var opt = OptionConverters.toJava(getFluidHandler(direction));
-        return opt.map(FluidHandlerWrapper::fluidList).orElse(Collections.emptyList());*/
+        return opt.map(FluidHandlerWrapper::fluidList).orElse(Collections.emptyList());
     }
 
 }
