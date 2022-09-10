@@ -18,7 +18,7 @@ public enum Tier {
     DIAMOND(5, 1 << 14, "Diamond", "forge:gems/diamond", true),
     EMERALD(6, 1 << 16, "Emerald", "forge:gems/emerald", true),
     STAR(7, 1 << 20, "Star", "forge:nether_stars", true),
-    CREATIVE(8, Long.MAX_VALUE, "Creative"),
+    CREATIVE(8, 113868790578454022L, "Creative"),
     VOID(0, 0, "Void"),
     COPPER(2, 40, "Copper", "forge:ingots/copper", true),
     TIN(2, 48, "Tin", "forge:ingots/tin", false),
