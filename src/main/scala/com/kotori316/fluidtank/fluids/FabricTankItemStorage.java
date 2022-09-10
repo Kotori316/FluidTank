@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
         var tank = getItemTank();
         var inserted = tank.fill(fluid, FluidAction.EXECUTE);
         if (inserted.nonEmpty() &&
-            context.exchange(createNewVariant(tank.createTag()), 1, transaction) == 1) {
+            context.exchange(createNewVariant(tank), 1, transaction) == 1) {
             return VariantUtil.convertForgeAmountToFabric(inserted.amount());
         }
         return 0;
@@ -46,7 +45,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
         var tank = getItemTank();
         var drained = tank.drain(fluid, FluidAction.EXECUTE);
         if (drained.nonEmpty() &&
-            context.exchange(createNewVariant(tank.createTag()), 1, transaction) == 1) {
+            context.exchange(createNewVariant(tank), 1, transaction) == 1) {
             return VariantUtil.convertForgeAmountToFabric(drained.amount());
         }
         return 0;
@@ -86,9 +85,8 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
         }
     }
 
-    private ItemVariant createNewVariant(CompoundTag newTag) {
-        var item = context.getItemVariant();
-        return ItemVariant.of(item.getItem(), newTag);
+    private ItemVariant createNewVariant(TankItemFluidHandler handler) {
+        return ItemVariant.of(handler.getContainer());
     }
 
     static String tankId() {
