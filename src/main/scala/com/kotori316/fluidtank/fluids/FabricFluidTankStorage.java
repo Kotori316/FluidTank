@@ -12,6 +12,7 @@ import scala.jdk.javaapi.StreamConverters;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.items.ItemBlockTank;
+import com.kotori316.fluidtank.items.ReservoirItem;
 import com.kotori316.fluidtank.tiles.Connection;
 import com.kotori316.fluidtank.tiles.TileTank;
 
@@ -81,7 +82,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
         connection.handler().fill(snapshot, FluidAction.EXECUTE);
     }
 
-   public static FluidAmount getFluidAmount(FluidVariant variant, long fabricAmount) {
+    public static FluidAmount getFluidAmount(FluidVariant variant, long fabricAmount) {
         return FluidAmount.apply(variant.getFluid(), fabricAmount, Option.apply(variant.copyNbt()));
     }
 
@@ -94,7 +95,7 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
             }
         }, ModObjects.TANK_TYPE(), ModObjects.TANK_CREATIVE_TYPE(), ModObjects.TANK_VOID_TYPE());
 
-        var items = StreamConverters.asJavaSeqStream(ModObjects.blockTanks())
+        var tankItems = StreamConverters.asJavaSeqStream(ModObjects.blockTanks())
             .map(BlockTank::itemBlock)
             .toArray(ItemBlockTank[]::new);
         FluidStorage.ITEM.registerForItems((itemStack, context) -> {
@@ -103,6 +104,9 @@ public class FabricFluidTankStorage extends SnapshotParticipant<FluidAmount> imp
                 return new FabricTankItemStorage(context);
             else
                 return null;
-        }, items);
+        }, tankItems);
+        var reservoirItems = StreamConverters.asJavaSeqStream(ModObjects.itemReservoirs())
+            .toArray(ReservoirItem[]::new);
+        FluidStorage.ITEM.registerForItems((itemStack, context) -> new FabricTankItemStorage(context), reservoirItems);
     }
 }
