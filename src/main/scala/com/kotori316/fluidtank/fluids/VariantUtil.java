@@ -136,7 +136,7 @@ public final class VariantUtil {
         var itemStorage = ContainerItemContext.withInitial(stack);
         var fluidStorage = FluidStorage.ITEM.find(stack, itemStorage);
         // Not a fluid storage item.
-        if (fluidStorage == null || !fluidStorage.supportsInsertion()) return Option.empty();
+        if (fluidStorage == null || !fluidStorage.supportsInsertion() || tankContent.isEmpty()) return Option.empty();
 
         var filled = fluidStorage.simulateInsert(convert(tankContent), tankContent.fabricAmount(), null);
         var toFill = tankContent.setAmountF(filled);
