@@ -81,6 +81,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
         } else if (item.getItem() instanceof ReservoirItem reservoirItem) {
             return new TankItemFluidHandler(reservoirItem.tier(), stack);
         } else {
+            LOGGER.error("Invalid item for TankItemFluidHandler. context={}, item={}", context, stack);
             throw new IllegalArgumentException("How do I get tier from %s?".formatted(item));
         }
     }
