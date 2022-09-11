@@ -20,9 +20,20 @@ Minecraft CurseForge - https://www.curseforge.com/minecraft/mc-mods/largefluidta
 ### APIs
 
 * **REQUIRED** [Fabric](https://github.com/FabricMC/fabric)
-  * For Minecraft 1.18
+  * For Minecraft 1.19
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.6
   * Licensed under the [Apache License 2.0](https://github.com/scala/scala/blob/2.13.x/LICENSE)
-  * FOR USERS install https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala
+  * FOR USERS, install https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala
+
+* **REQUIRED** [Cats](https://github.com/typelevel/cats)
+  * Version 2.8.0
+  * Licensed under the MIT License
+  * FOR USERS, this library is included in the mod jar.
+
+* [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
+  * Licensed under [LGPLv3](https://github.com/AppliedEnergistics/Applied-Energistics-2#license)
+
+* [Jade](https://github.com/Snownee/Jade)
+  * Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
