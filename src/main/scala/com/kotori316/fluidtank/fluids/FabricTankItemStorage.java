@@ -34,7 +34,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
         var inserted = tank.fill(fluid, FluidAction.EXECUTE);
         if (inserted.nonEmpty() &&
             context.exchange(createNewVariant(tank), 1, transaction) == 1) {
-            return VariantUtil.convertForgeAmountToFabric(inserted.amount());
+            return inserted.fabricAmount();
         }
         return 0;
     }
@@ -46,7 +46,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
         var drained = tank.drain(fluid, FluidAction.EXECUTE);
         if (drained.nonEmpty() &&
             context.exchange(createNewVariant(tank), 1, transaction) == 1) {
-            return VariantUtil.convertForgeAmountToFabric(drained.amount());
+            return drained.fabricAmount();
         }
         return 0;
     }

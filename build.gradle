@@ -142,6 +142,9 @@ dependencies {
             exclude(group: "net.fabricmc.fabric-api")
         }
         modCompileOnly(group: "curse.maven", name: "jade-324717", version: project.jade_id)
+        modCompileOnly("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
+            transitive(false)
+        }
     } else {
         //noinspection SpellCheckingInspection
         modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
@@ -157,15 +160,15 @@ dependencies {
         modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
         modRuntimeOnly(group: "lol.bai", name: "badpackets", version: "fabric-${project.badpackets_version}")
         modImplementation(group: "curse.maven", name: "jade-324717", version: project.jade_id)
+        modImplementation("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
+            transitive(false)
+        }
     }
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
         //noinspection SpellCheckingInspection
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modCompileOnly("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
-        transitive(false)
-    }
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
