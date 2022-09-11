@@ -3,7 +3,6 @@ package com.kotori316.fluidtank.integration.wthit;
 import mcp.mobius.waila.api.IRegistrar;
 import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
-import mcp.mobius.waila.api.WailaPlugin;
 import net.minecraft.resources.ResourceLocation;
 
 import com.kotori316.fluidtank.Config;
@@ -15,7 +14,6 @@ import com.kotori316.fluidtank.tiles.TileTank;
 /*
     Use java to avoid strange java.lang.VerifyError.
  */
-@WailaPlugin(id = FluidTank.modID + ":wthit_plugin")
 public class WthitTankWailaPlugin implements IWailaPlugin {
     static final ResourceLocation KEY_TANK_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_TANK_INFO);
     static final ResourceLocation KEY_SHORT_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_SHORT_INFO);

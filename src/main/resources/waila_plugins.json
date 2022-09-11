@@ -1,0 +1,5 @@
+{
+  "fluidtank:wthit_plugin": {
+    "initializer": "com.kotori316.fluidtank.integration.wthit.WthitTankWailaPlugin"
+  }
+}
