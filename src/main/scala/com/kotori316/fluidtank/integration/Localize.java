@@ -24,9 +24,9 @@ public class Localize {
     public static final String AMOUNT = "fluidtank.waila.amount";
     public static final String CAPACITY = "fluidtank.waila.capacity";
     public static final String COMPARATOR = "fluidtank.waila.comparator";
-    public static final String WAILA_TANK_INFO = "fluidtank.waila.tank_info";
-    public static final String WAILA_SHORT_INFO = "fluidtank.waila.short_info";
-    public static final String WAILA_COMPACT_NUMBER = "fluidtank.waila.compact_number";
+    public static final String WAILA_TANK_INFO = "fluidtank.tank_info";
+    public static final String WAILA_SHORT_INFO = "fluidtank.short_info";
+    public static final String WAILA_COMPACT_NUMBER = "fluidtank.compact_number";
     public static final String WAILA_SHORT = "fluidtank.waila.short";
     public static final String WAILA_SUPPLIER = "fluidtank.waila.supplier";
     public static final String FLUID_NULL = "None";
