@@ -2,27 +2,25 @@ package com.kotori316.fluidtank.tiles
 
 import cats.implicits.toShow
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
-import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
+import com.kotori316.fluidtank.fluids.{FabricAmount, FluidAmount, Tank, TankHandler}
+import com.kotori316.fluidtank.network.ClientSync
 import com.kotori316.fluidtank.render.Box
-import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
-import net.minecraft.server.TickTask
 import net.minecraft.util.Mth
 import net.minecraft.world.Nameable
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.util.{LazyOptional, LogicalSidedProvider}
-import net.minecraftforge.fml.LogicalSide
 
 import scala.collection.mutable.ArrayBuffer
 
 class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s: BlockState)
   extends BlockEntity(t, p, s)
     with Nameable
+    with ClientSync
     /*with ICustomPipeConnection
     with IDebuggable*/ {
   self =>
@@ -35,7 +33,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     this(t, ModObjects.TANK_TYPE, p, s)
   }
 
-  val internalTank: TankHandler with TileTank.RealTank = new InternalTank(tier.amount)
+  val internalTank: TankHandler with TileTank.RealTank = new InternalTank(FabricAmount.fromForge(tier.amount))
   private final var mConnection: Connection = Connection.invalid
   final val connectionAttaches: ArrayBuffer[Connection => Unit] = ArrayBuffer.empty
   var loading = false
@@ -81,35 +79,15 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     }
   }
 
-  override def onDataPacket(n: net.minecraft.network.Connection, pkt: ClientboundBlockEntityDataPacket): Unit = handleUpdateTag(pkt.getTag)
+  override def fromClientTag(tag: CompoundTag): Unit = load(tag)
 
-  override def onLoad(): Unit = {
-    super.onLoad()
-    if (SideProxy.isServer(this)) {
-      val executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
-      executor.tell(new TickTask(0, () => {
-        getLevel.getProfiler.push("Connection Loading")
-        if (Utils.isInDev) {
-          FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
-            "Connection {} loaded in delayed task. At={}, connection={}",
-            if (this.connection.isDummy) "will be" else "won't",
-            this.getBlockPos.show, this.connection)
-        }
-        if (this.connection.isDummy) {
-          Connection.load(getLevel, getBlockPos)
-        }
-        getLevel.getProfiler.pop()
-      }))
-    }
-  }
-
-  override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    val c = connection.getCapability(capability, facing)
-    if (c.isPresent) c else super.getCapability(capability, facing)
+  override def toClientTag(tag: CompoundTag): CompoundTag = {
+    saveAdditional(tag)
+    tag
   }
 
   private def sendPacket(): Unit = {
-    if (SideProxy.isServer(this)) PacketHandler.sendToClient(TileMessage(this), getLevel)
+    sync()
   }
 
   def hasContent: Boolean = internalTank.getFluid.nonEmpty
@@ -117,14 +95,6 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
   def getComparatorLevel: Int = connection.getComparatorLevel
 
   def onBlockPlacedBy(): Unit = {
-    if (Utils.isInDev) {
-      FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
-        "Connection {} loaded in onBlockPlacedBy. At={}, connection={}",
-        if (this.connection.isDummy) "will be" else "won't",
-        this.getBlockPos.show, this.connection)
-    }
-    // Do nothing if the connection is already created.
-    if (!this.connection.isDummy) return
     val downTank = Option(getLevel.getBlockEntity(getBlockPos.below())).collect { case t: TileTank => t }
     val upTank = Option(getLevel.getBlockEntity(getBlockPos.above())).collect { case t: TileTank => t }
     val newSeq = (downTank, upTank) match {
@@ -153,7 +123,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
 
   override def getCustomName: Component = getStackName.orNull
 
-  class InternalTank(initialCapacity: Long) extends TankHandler with TileTank.RealTank {
+  class InternalTank(initialCapacity: FabricAmount) extends TankHandler with TileTank.RealTank {
     initCapacity(initialCapacity)
 
     override def tile: TileTank = self
@@ -182,21 +152,21 @@ object TileTank {
 
     def tile: TileTank
 
-    lazy val lowerBound: Double = Config.content.renderLowerBound.get().doubleValue()
-    lazy val upperBound: Double = Config.content.renderUpperBound.get().doubleValue()
+    lazy val lowerBound: Double = 0.001d
+    lazy val upperBound: Double = 1d - 0.001d
 
     // Util methods
-    def getFluidAmount: Long = this.getTank.amount
+    def getFluidAmount: Long = this.getTank.amount.toForge
 
     def getFluid: FluidAmount = this.getTank.fluidAmount
 
-    protected def capacity = this.getTank.capacity
+    protected def capacity = this.getTank.capacityInForge
 
     override def onContentsChanged(): Unit = {
       tile.sendPacket()
       if (!tile.loading)
         tile.connection.updateNeighbors()
-      if (!SideProxy.isServer(tile) && capacity != 0) {
+      if (!Utils.isServer(tile) && capacity != 0) {
         if (getFluidAmount > 0) {
           val d = 1d / 16d
           val (minY, maxY) = getFluidHeight(capacity.toDouble, getFluidAmount.toDouble, lowerBound, upperBound, 0.003, getFluid.isGaseous)
@@ -221,6 +191,16 @@ object TileTank {
       nbt
     }
 
+  }
+
+  def tick(world: Level, pos: BlockPos, state: BlockState, tile: TileTank): Unit = {
+    if (tile.connection.isDummy) {
+      world.getProfiler.push("Connection Loading")
+      if (Utils.isInDev) FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
+        "Connection load in delayed task. At={}, connection={}", pos.show, tile.connection)
+      Connection.load(world, pos)
+      world.getProfiler.pop()
+    }
   }
 
   /**

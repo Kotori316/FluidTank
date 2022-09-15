@@ -41,7 +41,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
@@ -173,10 +172,11 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         BlockState blockState = level.getBlockState(pos);
         BlockEntity entity = level.getBlockEntity(pos);
         if (blockState.getBlock() == this) {
-            if (!Config.content().enablePipeRainbowRenderer().get() && entity instanceof PipeTileBase p) {
-                return p.getColor() == Config.content().pipeColor().get() ? Connection.CONNECTED : Connection.NO_CONNECTION;
+            if (entity instanceof PipeTileBase p) {
+                return p.getColor() == FluidTank.config.pipeColor ? Connection.CONNECTED : Connection.NO_CONNECTION;
+            } else {
+                return Connection.CONNECTED;
             }
-            return Connection.CONNECTED;
         } else {
             if (entity != null) {
                 return getConnection(direction, entity);
@@ -196,7 +196,7 @@ public abstract class PipeBlock extends Block implements EntityBlock {
             return InteractionResult.PASS;
         // Dying pipe.
         OptionalInt maybeColor = Utils.getItemColor(player.getItemInHand(handIn));
-        if (maybeColor.isPresent() && !Config.content().enablePipeRainbowRenderer().get()) {
+        if (maybeColor.isPresent()) {
             if (!worldIn.isClientSide) {
                 Optional.ofNullable(worldIn.getBlockEntity(pos)).map(PipeTileBase.class::cast).ifPresent(p -> p.changeColor(maybeColor.getAsInt()));
                 Object colorName = Stream.of(DyeColor.values()).filter(d -> d.getMaterialColor().col == maybeColor.getAsInt()).findFirst()
@@ -256,8 +256,8 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         }
         // Update handlers
         if (!worldIn.isClientSide) {
-            Optional.ofNullable((PipeTileBase) worldIn.getBlockEntity(pos))
-                .ifPresent(t -> t.removeCapCache(fromPos));
+//            Optional.ofNullable((PipeTileBase) worldIn.getBlockEntity(pos))
+//                .ifPresent(t -> t.removeCapCache(fromPos));
         }
     }
 

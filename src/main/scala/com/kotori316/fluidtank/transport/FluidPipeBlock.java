@@ -2,6 +2,8 @@ package com.kotori316.fluidtank.transport;
 
 import java.util.Objects;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -12,11 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,10 +33,11 @@ public class FluidPipeBlock extends PipeBlock {
 
     @Override
     @NotNull
+    @SuppressWarnings("UnstableApiUsage")
     protected Connection getConnection(Direction direction, @NotNull BlockEntity entity) {
-        LazyOptional<IFluidHandler> capability = entity.getCapability(ForgeCapabilities.FLUID_HANDLER, direction.getOpposite());
-        if (capability.isPresent())
-            if (capability.map(f -> f.fill(new FluidStack(Fluids.WATER, 4000), IFluidHandler.FluidAction.SIMULATE)).orElse(0) >= 4000)
+        var storage = FluidStorage.SIDED.find(entity.getLevel(), entity.getBlockPos(), entity.getBlockState(), entity, direction.getOpposite());
+        if (storage != null)
+            if (storage.simulateInsert(FluidVariant.of(Fluids.WATER), 4000, null) >= 4000)
                 return Connection.OUTPUT;
             else
                 return Connection.CONNECTED;
@@ -57,10 +55,11 @@ public class FluidPipeBlock extends PipeBlock {
         return isFluidHandler(w, pipePos.relative(d), d);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public static boolean isFluidHandler(BlockGetter world, BlockPos pos, Direction direction) {
         BlockEntity t = world.getBlockEntity(pos);
         if (t != null && t.getLevel() != null)
-            return FluidUtil.getFluidHandler(t.getLevel(), pos, direction.getOpposite()).isPresent();
+            return FluidStorage.SIDED.find(t.getLevel(), pos, null, t, direction.getOpposite()) != null;
         else return false;
     }
 

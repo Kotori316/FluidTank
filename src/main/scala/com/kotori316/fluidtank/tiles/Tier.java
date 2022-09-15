@@ -6,9 +6,8 @@ import java.util.Optional;
 
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 
-import com.kotori316.fluidtank.recipes.TagCondition;
+import com.kotori316.fluidtank.FluidTank;
 
 public enum Tier {
     Invalid(0, 0, "Invalid"),
@@ -19,7 +18,7 @@ public enum Tier {
     DIAMOND(5, 1 << 14, "Diamond", "forge:gems/diamond", true),
     EMERALD(6, 1 << 16, "Emerald", "forge:gems/emerald", true),
     STAR(7, 1 << 20, "Star", "forge:nether_stars", true),
-    CREATIVE(8, Long.MAX_VALUE, "Creative"),
+    CREATIVE(8, 113868790578454022L, "Creative"),
     VOID(0, 0, "Void"),
     COPPER(2, 40, "Copper", "forge:ingots/copper", true),
     TIN(2, 48, "Tin", "forge:ingots/tin", false),
@@ -29,7 +28,7 @@ public enum Tier {
     ;
     private static final String UNKNOWN_TAG = "Unknown";
     private final int rank;
-    private final long amount;
+    private final long defaultAmount;
     private final String string;
     private final String lowerName;
     private final String tagName;
@@ -41,7 +40,7 @@ public enum Tier {
 
     Tier(int rank, int buckets, String name, String tagName, boolean availableInVanilla) {
         this.rank = rank;
-        this.amount = buckets * 1000L;
+        this.defaultAmount = buckets * 1000L;
         this.string = name;
         this.lowerName = name.toLowerCase(Locale.ROOT);
         this.tagName = tagName;
@@ -50,7 +49,7 @@ public enum Tier {
 
     Tier(int rank, long amount, String name) {
         this.rank = rank;
-        this.amount = amount;
+        this.defaultAmount = amount;
         this.string = name;
         this.lowerName = name.toLowerCase(Locale.ROOT);
         this.tagName = UNKNOWN_TAG;
@@ -62,7 +61,11 @@ public enum Tier {
     }
 
     public long amount() {
-        return amount;
+        return FluidTank.config.capacity.get(name()).orElse(defaultAmount);
+    }
+
+    public long getDefaultAmount() {
+        return defaultAmount;
     }
 
     public boolean hasTagRecipe() {
@@ -81,8 +84,8 @@ public enum Tier {
         return StringTag.valueOf(lowerName);
     }
 
-    public boolean hasWayToCreate(ICondition.IContext context) {
-        return isAvailableInVanilla() || new TagCondition(tagName).test(context);
+    public boolean hasWayToCreate() {
+        return isAvailableInVanilla();
     }
 
     public boolean isNormalTier() {

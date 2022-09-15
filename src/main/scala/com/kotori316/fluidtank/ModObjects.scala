@@ -5,9 +5,10 @@ import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
 import net.minecraft.core.{BlockPos, Registry}
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.{CreativeModeTab, ItemStack}
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
@@ -22,9 +23,9 @@ import scala.reflect.ClassTag
 object ModObjects {
   //---------- Objects used in block and items ----------
 
-  final val CREATIVE_TABS = new CreativeModeTab(FluidTank.modID) {
-    override def makeIcon() = new ItemStack(woodTank)
-  }
+  final val CREATIVE_TABS = FabricItemGroupBuilder.build(
+    new ResourceLocation(FluidTank.modID, FluidTank.modID), () => new ItemStack(ModObjects.tierToBlock(Tier.WOOD))
+  );
   final val MATERIAL = new Material(MaterialColor.NONE, false, true, true, false,
     false, false, PushReaction.BLOCK)
   final val MATERIAL_PIPE = new Material(MaterialColor.NONE, false, false, true, false,
@@ -52,7 +53,7 @@ object ModObjects {
   //---------- TileEntities ----------
 
   private[this] final var types: List[NamedEntry[BlockEntityType[_ <: BlockEntity]]] = Nil
-  final val TANK_TYPE = createTileType((p, s) => new TileTank(p, s), blockTanks)
+  final val TANK_TYPE = createTileType((p, s) => new TileTank(p, s), woodTank +: normalTanks.toList)
   final val TANK_CREATIVE_TYPE = createTileType((p, s) => new TileTankCreative(p, s), List(creativeTank))
   final val TANK_VOID_TYPE = createTileType((p, s) => new TileTankVoid(p, s), List(voidTank))
   final val CAT_TYPE = createTileType((p, s) => new CATTile(p, s), List(blockCat))

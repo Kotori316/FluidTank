@@ -12,11 +12,12 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
@@ -25,16 +26,12 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.IShapedRecipe;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
 import scala.jdk.javaapi.OptionConverters;
 
-import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
@@ -45,7 +42,7 @@ import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContainer> {
+public class TierRecipe implements CraftingRecipe {
     private static final Logger LOGGER = Utils.getLogger(TierRecipe.class);
     public static final Serializer SERIALIZER = new Serializer();
     private static final int[] TANK_SLOTS = {0, 2, 6, 8};
@@ -58,8 +55,8 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
     private static final int recipeWidth = 3;
     private static final int recipeHeight = 3;
 
-    public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems, ICondition.IContext context) {
-        this(idIn, tier, subItems, getTankSet(tier, context));
+    public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems) {
+        this(idIn, tier, subItems, getTankSet(tier));
     }
 
     public TierRecipe(ResourceLocation idIn, Tier tier, Ingredient subItems, Set<BlockTank> normalTankSet) {
@@ -72,10 +69,9 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         LOGGER.debug("{} instance({}) created for Tier {}({}).", getClass().getSimpleName(), idIn, tier, result);
     }
 
-    static Set<BlockTank> getTankSet(Tier tier, ICondition.IContext context) {
+    static Set<BlockTank> getTankSet(Tier tier) {
         Set<Tier> tierSet = Arrays.stream(Tier.values()).filter(t -> t.rank() == tier.rank() - 1).collect(Collectors.toSet());
         return CollectionConverters.asJava(ModObjects.blockTanks()).stream().filter(b -> tierSet.contains(b.tier()))
-            .filter(blockTank -> Config.content().usableUnavailableTankInRecipe().get() || blockTank.tier().hasWayToCreate(context))
             .collect(Collectors.toSet());
     }
 
@@ -196,8 +192,8 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
 
         for (int i = 0; i < stacks.size(); ++i) {
             ItemStack item = inv.getItem(i);
-            if (item.hasCraftingRemainingItem() && !(item.getItem() instanceof ItemBlockTank)) {
-                stacks.set(i, item.getCraftingRemainingItem());
+            if (item.getItem().hasCraftingRemainingItem() && !(item.getItem() instanceof ItemBlockTank)) {
+                stacks.set(i, new ItemStack(item.getItem().getCraftingRemainingItem()));
             }
         }
 
@@ -229,16 +225,6 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
     }
 
-    @Override
-    public int getRecipeWidth() {
-        return 3;
-    }
-
-    @Override
-    public int getRecipeHeight() {
-        return 3;
-    }
-
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
@@ -246,20 +232,13 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "crafting_grade_up");
 
         @Override
-        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json, ICondition.IContext context) {
+        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             Tier tier = Tier.byName(GsonHelper.getAsString(json, KEY_TIER)).orElse(Tier.Invalid);
             Ingredient subItem = Ingredient.fromJson(json.get(KEY_SUB_ITEM));
             if (subItem == Ingredient.EMPTY)
                 LOGGER.warn("Empty ingredient was loaded for {}, data: {}", recipeId, json);
             LOGGER.debug("Serializer loaded {} from json for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(subItem));
-            return new TierRecipe(recipeId, tier, subItem, context);
-        }
-
-        @Override
-        @Deprecated
-        public TierRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-            LOGGER.warn("Trying to load recipe({}) without ICondition.IContext, which should not happen.", recipeId);
-            return fromJson(recipeId, json, ICondition.IContext.EMPTY);
+            return new TierRecipe(recipeId, tier, subItem);
         }
 
         @Override
@@ -272,7 +251,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(subItem));
             var ingredientTanks = buffer.readCollection(ArrayList::new, FriendlyByteBuf::readResourceLocation)
                 .stream()
-                .map(ForgeRegistries.BLOCKS::getValue)
+                .map(Registry.BLOCK::get)
                 .mapMulti(Utils.cast(BlockTank.class))
                 .collect(Collectors.toSet());
             return new TierRecipe(recipeId, tier, subItem, ingredientTanks);
@@ -297,7 +276,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier) {
             this.recipeId = recipeId;
             this.tier = tier;
-            this.ingredient = Ingredient.of(ItemTags.create(new ResourceLocation(this.tier.tagName())));
+            this.ingredient = Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(this.tier.tagName())));
         }
 
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier, Ingredient ingredient) {

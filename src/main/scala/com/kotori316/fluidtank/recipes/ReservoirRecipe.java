@@ -22,7 +22,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.CollectionConverters;
@@ -99,7 +98,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
             List<Ingredient> ingredientList;
             if (json.has("sub"))
                 ingredientList = StreamSupport.stream(GsonHelper.getAsJsonArray(json, "sub").spliterator(), false)
-                    .map(CraftingHelper::getIngredient)
+                    .map(Ingredient::fromJson)
                     .collect(Collectors.toList());
             else
                 ingredientList = Collections.singletonList(Ingredient.of(Items.BUCKET));

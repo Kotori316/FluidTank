@@ -28,7 +28,7 @@ public class CATScreen extends AbstractContainerScreen<CATContainer> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, resourceLocation);
-        this.blit(matrices, getGuiLeft(), getGuiTop(), 0, 0, imageWidth, imageHeight);
+        this.blit(matrices, leftPos, topPos, 0, 0, imageWidth, imageHeight);
     }
 
     @Override

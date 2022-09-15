@@ -4,21 +4,15 @@ import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.blocks.TankPos
-import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
-import net.minecraft.core.{BlockPos, Direction}
+import com.kotori316.fluidtank.fluids.{FluidAction, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
+import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.level.BlockGetter
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ForgeCapabilities, ICapabilityProvider}
-import net.minecraftforge.common.util.LazyOptional
-import net.minecraftforge.event.AttachCapabilitiesEvent
-import net.minecraftforge.fluids.capability.IFluidHandler
-import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 
 import scala.collection.mutable.ArrayBuffer
 
-sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
+sealed class Connection private(s: Seq[TileTank]) {
   val seq: Seq[TileTank] = s.sortBy(_.getBlockPos.getY)
   val hasCreative: Boolean = seq.exists(_.isInstanceOf[TileTankCreative])
   val hasVoid: Boolean = seq.exists(_.isInstanceOf[TileTankVoid])
@@ -30,23 +24,11 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
   val isDummy: Boolean = false
   private[tiles] final var mIsValid = true
 
-  val capabilities: Cap[CapabilityDispatcher] = if (seq.nonEmpty) {
-    val event = new AttachCapabilitiesEvent[Connection](classOf[Connection], this)
-    MinecraftForge.EVENT_BUS.post(event)
-    if (event.getCapabilities.isEmpty) {
-      Cap.empty
-    } else {
-      new CapabilityDispatcher(event.getCapabilities, event.getListeners).pure[Cap]
-    }
-  } else {
-    Cap.empty
-  }
-
   protected def fluidType: FluidAmount = {
     seq.headOption.flatMap(Connection.stackFromTile).orElse(seq.lastOption.flatMap(Connection.stackFromTile)).getOrElse(FluidAmount.EMPTY)
   }
 
-  def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity
+  def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity.toForge
 
   def amount: Long = if (hasCreative && fluidType.nonEmpty) Tier.CREATIVE.amount else seq.map(_.internalTank.getFluidAmount).sum
 
@@ -86,30 +68,11 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
     updateActions.foreach(_.apply())
   }
 
-  // ----- START DEPRECATED REMOVE IN 1.17 -----
-  private[this] final val lazyOptional = LazyOptional.of(() => if (seq.nonEmpty) handler
-  else if (Utils.isInDev) DebugFluidHandler.INSTANCE else EmptyFluidHandler.INSTANCE)
-
   private[tiles] def isValid = mIsValid
 
   //noinspection AccessorLikeMethodIsUnit
   private[tiles] def isValid_=(newValue: Boolean): Unit = {
     mIsValid = newValue
-    if (!newValue) lazyOptional.invalidate()
-  }
-
-  // ----- END DEPRECATED REMOVE IN 1.17 -----
-
-  //noinspection ComparingUnrelatedTypes
-  override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    //noinspection ComparingUnrelatedTypes
-    if (capability == ForgeCapabilities.FLUID_HANDLER) {
-      lazyOptional.cast()
-    } else {
-      capabilities.map(_.getCapability(capability, facing))
-        .getOrElse(LazyOptional.empty())
-        .value
-    }
   }
 
   override def toString: String = {
@@ -123,11 +86,11 @@ sealed class Connection private(s: Seq[TileTank]) extends ICapabilityProvider {
   def getTextComponent: Component = {
     if (hasCreative)
       Component.translatable("chat.fluidtank.connection_creative",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
+        getFluidStack.map(_.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
         Int.box(getComparatorLevel))
     else
       Component.translatable("chat.fluidtank.connection",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
+        getFluidStack.map(_.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
         Long.box(amount),
         Long.box(capacity),
         Int.box(getComparatorLevel))
@@ -167,9 +130,9 @@ object Connection {
       val (s1, s2) = s.span(t => t.internalTank.getFluid.fluidEqual(fluid) || t.internalTank.getFluid.isEmpty)
       // Assert tanks in s1 have the same fluid.
       require(s1.map(_.internalTank.getFluid).forall(f => f.isEmpty || f.fluidEqual(fluid)))
-      val content: FluidAmount = s1.foldMap(t => t.internalTank.drain(t.internalTank.getFluid, IFluidHandler.FluidAction.EXECUTE))
+      val content: FluidAmount = s1.foldMap(t => t.internalTank.drain(t.internalTank.getFluid, FluidAction.EXECUTE))
       val connection = Connection.create(s1)
-      connection.handler.fill(content, IFluidHandler.FluidAction.EXECUTE)
+      connection.handler.fill(content, FluidAction.EXECUTE)
       s1.foreach { t =>
         t.connection.isValid = false
         t.connection = connection
@@ -202,7 +165,7 @@ object Connection {
 
   private class ConnectionTankHandler(tankHandlers: Chain[TankHandler], hasCreative: Boolean) extends ListTankHandler(tankHandlers, true) {
 
-    override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
+    override protected def outputLog(logs: Chain[FluidTransferLog], action: FluidAction): Unit = {
       import org.apache.logging.log4j.util.Supplier
       if (action.execute() && Utils.isInDev) {
         FluidTank.LOGGER.debug(ModObjects.MARKER_Connection, (() => logs.mkString_(action.toString + " ", ", ", "")): Supplier[String])
@@ -211,11 +174,11 @@ object Connection {
       }
     }
 
-    override def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount =
+    override def fill(resource: FluidAmount, action: FluidAction): FluidAmount =
       if (hasCreative) super.action(fillAll(getTankList), resource, action) else super.fill(resource, action)
 
-    override def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount =
-      if (hasCreative) super.drain(toDrain, IFluidHandler.FluidAction.SIMULATE) else super.drain(toDrain, action)
+    override def drain(toDrain: FluidAmount, action: FluidAction): FluidAmount =
+      if (hasCreative) super.drain(toDrain, FluidAction.SIMULATE) else super.drain(toDrain, action)
   }
 
   def load(level: BlockGetter, pos: BlockPos): Unit = {

@@ -18,18 +18,15 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import scala.jdk.javaapi.StreamConverters;
 
-import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.fluids.FluidAction;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
 import com.kotori316.fluidtank.items.ItemBlockTank;
@@ -97,11 +94,11 @@ public class CombineRecipe extends CustomRecipe {
             .filter(FluidAmount::nonEmpty)
             .reduce(FluidAmount::$plus);
         Optional<ItemStack> tank = getMaxCapacityTank(inv)
-            .flatMap(p -> getHandler(ItemHandlerHelper.copyStackWithSize(p.getLeft(), 1))
+            .flatMap(p -> getHandler(copyStackWithSize(p.getLeft(), 1))
                 .flatMap(h ->
                     fluid.map(f -> {
-                        h.drain(h.getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE);
-                        h.fill(f.toStack(), IFluidHandler.FluidAction.EXECUTE);
+                        h.drain(h.getFluidInTank(0), FluidAction.EXECUTE);
+                        h.fill(f, FluidAction.EXECUTE);
                         return h.getContainer();
                     })));
         return tank.orElse(ItemStack.EMPTY);
@@ -117,9 +114,9 @@ public class CombineRecipe extends CustomRecipe {
             if (stack.filter(s -> s.sameItem(item)).isPresent()) {
                 stack = Optional.empty();
             } else {
-                ItemStack leave = getHandler(ItemHandlerHelper.copyStackWithSize(item, 1))
+                ItemStack leave = getHandler(copyStackWithSize(item, 1))
                     .map(h -> {
-                        h.drain(h.getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE);
+                        h.drain(h.getFluidInTank(0), FluidAction.EXECUTE);
                         return h.getContainer();
                     }).orElse(item);
                 nn.set(i, leave);
@@ -146,11 +143,17 @@ public class CombineRecipe extends CustomRecipe {
         }
     }
 
+    private static ItemStack copyStackWithSize(ItemStack stack, int size) {
+        var copied = stack.copy();
+        copied.setCount(size);
+        return copied;
+    }
+
     private static final class Serializer implements RecipeSerializer<CombineRecipe> {
         @Override
         public CombineRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
-            LOGGER.warn("Trying to load recipe({}) without ICondition.IContext, which should not happen.", pRecipeId);
-            return fromJson(pRecipeId, pSerializedRecipe, ICondition.IContext.EMPTY);
+            var tanks = tankList();
+            return new CombineRecipe(pRecipeId, tanks);
         }
 
         @Override
@@ -164,18 +167,9 @@ public class CombineRecipe extends CustomRecipe {
             recipe.tanks.toNetwork(pBuffer);
         }
 
-        @Override
-        public CombineRecipe fromJson(ResourceLocation recipeLoc, JsonObject recipeJson, ICondition.IContext context) {
-            var tanks = tankList(context);
-            return new CombineRecipe(recipeLoc, tanks);
-        }
-
-        private static Ingredient tankList(ICondition.IContext context) {
+        private static Ingredient tankList() {
             Stream<BlockTank> tankStream = StreamConverters.asJavaSeqStream(ModObjects.blockTanks());
             Predicate<BlockTank> filter = t -> t.tier().isNormalTier();
-            if (!Config.content().usableUnavailableTankInRecipe().get()) {
-                filter = filter.and(t -> t.tier().hasWayToCreate(context));
-            }
             return Ingredient.of(tankStream.filter(filter).map(ItemStack::new));
         }
     }

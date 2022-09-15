@@ -1,288 +1,69 @@
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-
-buildscript {
-    repositories {
-        maven { url = 'https://repo.spongepowered.org/maven' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        mavenCentral()
-    }
-    dependencies {
-        // classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        classpath 'org.parchmentmc:librarian:1.+'
-    }
-}
+import java.util.stream.Collectors
 
 plugins {
+    id "scala"
     id("maven-publish")
-    id("scala")
-    id 'net.minecraftforge.gradle' version '5.+'
-    id "com.github.breadmoirai.github-release" version "2.2.12"
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
-}
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-// apply plugin: 'org.spongepowered.mixin'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
-version = project.getProperty("modVersion")
-if (isInCI()) {
-    // In remote CI/CD environment
-    version = (project.getProperty("modVersion") + "_" + (System.getenv("GITHUB_SHA") ?: "NOT_GIT").substring(0, 7))
-}
-
-private static boolean isInCI() {
-    return Boolean.valueOf(System.getenv("GITHUB_ACTIONS")) || Boolean.valueOf(System.getenv("CI"))
-}
-
-group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "LargeFluidTank"
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-compileScala {
-    scalaCompileOptions.additionalParameters = ["-Wconf:cat=deprecation:w,any:e"]
+    // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
+    id 'fabric-loom' version "0.13-SNAPSHOT"
+    // id 'maven-publish'
     //noinspection SpellCheckingInspection
-    options.forkOptions.jvmArgs += ["-Duser.language=en", "-Duser.country=US"]
+    id "com.github.breadmoirai.github-release" version "2.2.12"
+    //noinspection SpellCheckingInspection
+    id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
-String forgeVersion() {
-    String versionNumber
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
 
-    if (isInCI() && System.getenv("CI_FORGE") != null && "default" != System.getenv("CI_FORGE")) {
-        versionNumber = System.getenv("CI_FORGE")
-    } else {
-        versionNumber = project.forgeVersion
-    }
-    return "net.minecraftforge:forge:" + versionNumber
+if (isInCI()) {
+    String postFix = System.getenv("GITHUB_RUN_NUMBER") ?: "SNAPSHOT"
+    // In remote CI/CD environment
+    version = (version + "." + postFix + "-fabric")
+
+    System.out.println("Set version to $version because I'm in CI." as String)
+    System.out.println("CURSEFORGE_KEY: ${System.getenv().containsKey('CURSEFORGE_KEY')}" as String)
+    System.out.println("AZURE_TOKEN: ${System.getenv().containsKey('AZURE_TOKEN')}" as String)
+} else {
+    version = (version + ".0" + "-fabric")
 }
 
-String mappingVersion() {
-    return (project.parchmentMapping + "-" + project.minecraftVersion) as String
-}
-
-println("Java: ${System.getProperty('java.version')} " +
-        "JVM: ${System.getProperty('java.vm.version')}(${System.getProperty('java.vendor')}) " +
-        "Arch: ${System.getProperty('os.arch')}")
-
-def commonRunSetting = {
-    // Recommended logging data for a userdev environment
-    property('forge.logging.markers', 'REGISTRIES')
-    property('mixin.env.remapRefMap', 'true')
-    property('mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg")
-    property("mixin.debug.export", "true")
-    property('forge.logging.console.level', 'debug')
-
-    mods {
-        fluidtank {
-            source sourceSets.main
-        }
-    }
-}
-
-minecraft {
-    mappings channel: 'parchment', version: mappingVersion()
-    // mappings channel: 'official', version: (project.minecraftVersion as String)
-    // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
+loom {
     runs {
         client {
-            with commonRunSetting
-            workingDirectory file('Minecraft')
-
-            // From https://github.com/SlimeKnights/TinkersConstruct/blob/1.18/build.gradle
-            if (project.hasProperty('mc_uuid')) {
-                // Your uuid without any dashes in the middle
-                args '--uuid', project.getProperty('mc_uuid')
-            }
-            if (project.hasProperty('mc_username')) {
-                // Your username/display name, this is the name that shows up in chat
-                // Note: This is not your email, even if you have a Mojang account
-                args '--username', project.getProperty('mc_username')
-            }
-            // Your access token, you can find it in your '.minecraft/launcher_profiles.json' file
-            // If not set, use "0" to prevent authentication exception.
-            args '--accessToken', project.findProperty('mc_token') ?: "0"
+            name "Client"
+            runDir = Boolean.parseBoolean(System.getenv("FABRIC_SERVER")) ? "run-server" : "Minecraft"
         }
-
         server {
-            with commonRunSetting
-            workingDirectory file('run-server')
+            name "Server"
+            runDir = "run-server"
         }
-
         data {
-            with commonRunSetting
-            workingDirectory file('run-server')
-            setForceExit(false)
-            args('--mod', "fluidtank", '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/'))
+            client()
+            name "Data Generation"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.datagen"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.datagen.strict-validation"
+
+            ideConfigGenerated = true
+            runDir = "run-server"
         }
-
-        gameTestServer {
-            with commonRunSetting
-            workingDirectory file("${project.buildDir}/game_test")
-            setForceExit(false)
-            property 'forge.enabledGameTestNamespaces', 'fluidtank'
-            jvmArgs("-EnableAssertions".toLowerCase())
-
-            mods {
-                fluidtank {
-                    source sourceSets.test
-                }
-            }
-            lazyToken("minecraft_classpath") {
-                configurations.game_test.collect { it.absolutePath }.join(File.pathSeparator)
-            }
+        gameTest {
+            name "GameTest"
+            server()
+            vmArg "-ea"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.gametest"
+            //noinspection SpellCheckingInspection
+            vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/test-results/test/game_test.xml"
+            runDir = "build/game_test"
+            source sourceSets.test
         }
-    }
-}
-
-task deleteGateTestWorld(type: Delete) {
-    delete("${project.buildDir}/game_test")
-    onlyIf { file("${project.buildDir}/game_test").exists() }
-}
-
-task copyGameTestTemplate(type: Copy, dependsOn: deleteGateTestWorld) {
-    //noinspection SpellCheckingInspection
-    from("src/test/resources/data/fluidtank/gameteststructures/")
-    into("${project.buildDir}/game_test/gameteststructures/")
-}
-
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-        content {
-            it.includeGroup("mezz.jei")
-            it.includeModule("knightminer", "Inspirations")
-            it.includeModule("slimeknights.mantle", "Mantle")
-        }
-    }
-    maven {
-        // location of a maven mirror for many mods, as a fallback
-        name = "ModMaven.k-4u.nl"
-        url = "https://modmaven.dev/"
-        content {
-            it.includeModule("appeng", "appliedenergistics2")
-        }
-    }
-    maven {
-        name = "Azure-SLP"
-        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
-        content {
-            it.includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
-            it.includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
-            it.includeVersion("org.typelevel", "cats-core_2.13", project.cats_version as String)
-            it.includeVersion("org.typelevel", "cats-kernel_2.13", project.cats_version as String)
-            // Required these libraries to execute the tests.
-            it.includeVersion("com.kotori316", "test_utility", project.testUtilVersion as String)
-            it.includeVersion("com.kotori316", "test_utility_dependency", "1.0-SNAPSHOT")
-        }
-    }
-    maven {
-        url = "https://www.cursemaven.com"
-        content {
-            it.includeGroup("curse.maven")
-        }
-    }
-    maven {
-        name = "What The Hell Is That"
-        url = "https://maven.bai.lol"
-        content {
-            it.includeModule("mcp.mobius.waila", "wthit-api")
-            it.includeModule("mcp.mobius.waila", "wthit")
-            it.includeModule("lol.bai", "badpackets")
-        }
-    }
-    maven {
-        name = "Mixin"
-        url = 'https://repo.spongepowered.org/maven'
-        content {
-            it.includeGroup("org.spongepowered")
-        }
-    }
-}
-
-private boolean hasGitHubToken() {
-    return project.hasProperty("githubToken") || System.getenv("REPO_TOKEN") != null
-}
-
-configurations {
-    game_test
-}
-
-dependencies {
-    def versionNumber = forgeVersion()
-    minecraft(versionNumber)
-    System.out.println("Detected $versionNumber with Minecraft ${project.minecraftVersion}, mapping ${mappingVersion()}" as String)
-    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.8')
-    implementation(group: 'org.typelevel', name: "cats-core_2.13", version: project.cats_version)
-
-    /*if (!isInCI()) {
-        runtimeOnly(fg.deobf("curse.maven:create-328085:3167531"))
-        runtimeOnly(fg.deobf("knightminer:Inspirations:1.16.5-1.2.2.27"))
-        runtimeOnly(fg.deobf("slimeknights.mantle:Mantle:1.16.5-1.6.79"))
-    }*/
-    if (System.getenv("IGNORE_OTHER_MODS_IN_RUNTIME") == null) {
-        // All dependencies must be either `implementation` or `runtimeOnly`.
-        // `compileOnly` means the mod is not released for this MC version.
-        implementation(fg.deobf(group: "mezz.jei", name: "jei-1.19.2-forge", version: project.jeiVersion) {
-            transitive(false)
-        })
-        implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
-        implementation(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
-        compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
-        runtimeOnly(fg.deobf("mcp.mobius.waila:wthit:forge-${project.wthit_version}"))
-        runtimeOnly(fg.deobf("lol.bai:badpackets:forge-${project.badpackets_version}"))
-    } else {
-        // All dependencies must be `compileOnly`
-        compileOnly(fg.deobf(group: "mezz.jei", name: "jei-1.19.2-forge", version: project.jeiVersion) {
-            transitive(false)
-        })
-        compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
-        compileOnly(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
-        compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
-    }
-    compileOnly(fg.deobf("mcp.mobius.waila:wthit-api:forge-${project.wthit_version}"))
-
-    // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
-
-    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.8-build-8', classifier: 'with-library') {
-        transitive(false)
-    }
-    // Mixin
-    // annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
-    // Test Dependencies.
-    // Required these libraries to execute the tests.
-    // The library will avoid errors of ForgeRegistry and Capability.
-    testImplementation(fg.deobf(group: "com.kotori316", name: "test_utility", version: project.testUtilVersion))
-    testImplementation(group: "com.kotori316", name: "test_utility_dependency", version: "1.0-SNAPSHOT")
-
-    String JUPITER_VERSION = '5.8.2'
-    game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
-    game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: JUPITER_VERSION)
-    game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: JUPITER_VERSION)
-    game_test(group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.8.2')
-}
-
-// Example for how to get properties into the manifest for reading by the runtime..
-def jarAttributeMap = [
-        "Specification-Title"     : String.valueOf(project.name),
-        "Specification-Vendor"    : "Kotori316",
-        "Specification-Version"   : "1", // We are version 1 of ourselves
-        "Implementation-Title"    : String.valueOf(project.name),
-        "Implementation-Version"  : String.valueOf(project.version),
-        "Implementation-Vendor"   : "Kotori316",
-        "Implementation-Timestamp": ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT),
-        'Automatic-Module-Name'   : 'fluidtank',
-]
-jar {
-    manifest {
-        attributes(jarAttributeMap)
     }
 }
 
@@ -295,211 +76,251 @@ sourceSets {
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    setType('jar')
-    builtBy 'reobfJar'
+@SuppressWarnings("SpellCheckingInspection")
+private static boolean isInCI() {
+    return Boolean.parseBoolean(System.getenv("GITHUB_ACTIONS")) || Boolean.parseBoolean(System.getenv("CI")) ||
+            (!System.getProperty("os.name").toLowerCase().startsWith("windows") && Files.exists(Paths.get("/", ".dockerenv")))
 }
 
-task srcJar(type: Jar) {
-    from sourceSets.main.allSource
-    archiveClassifier.set('sources')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
+repositories {
+    maven {
+        // location of a maven mirror for many mods, as a fallback
+        name = "ModMaven.k-4u.nl"
+        url = "https://modmaven.dev/"
+        content {
 
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    archiveClassifier.set('deobf')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    manifest {
-        attributes(jarAttributeMap)
+        }
+    }
+    maven {
+        name = "Azure-SLP"
+        url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
+        content {
+            it.includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
+            it.includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
+            it.includeModule("org.typelevel", "cats-core_2.13")
+            it.includeModule("org.typelevel", "cats-kernel_2.13")
+            it.includeVersion("com.kotori316", "test_utility_dependency", "1.0-SNAPSHOT")
+        }
+    }
+    maven {
+        name = "REI"
+        url = "https://maven.shedaniel.me/"
+    }
+    maven {
+        name = "Curse Maven"
+        url = "https://www.cursemaven.com"
+        content {
+            it.includeGroup("curse.maven")
+        }
+    }
+    maven {
+        name = "What The Hell Is That"
+        url = "https://maven.bai.lol"
+        content {
+            it.includeVersion("mcp.mobius.waila", "wthit-api", "fabric-${project.wthit_version}")
+            it.includeVersion("mcp.mobius.waila", "wthit", "fabric-${project.wthit_version}")
+            it.includeVersion("lol.bai", "badpackets", "fabric-${project.badpackets_version}")
+        }
     }
 }
 
-// Tell the artifact system about our extra jars
-artifacts {
-    archives srcJar, deobfJar
+dependencies {
+    //to change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    //noinspection SpellCheckingInspection
+    modImplementation "net.fabricmc:fabric-language-scala:${project.fabric_scala_version}"
+    // https://mvnrepository.com/artifact/org.typelevel/cats-core
+    implementation group: 'org.typelevel', name: 'cats-core_2.13', version: '2.8.0'
+    // https://mvnrepository.com/artifact/org.typelevel/cats-core
+    include group: 'org.typelevel', name: 'cats-kernel_2.13', version: '2.8.0'
+    // https://mvnrepository.com/artifact/org.typelevel/cats-core
+    include group: 'org.typelevel', name: 'cats-core_2.13', version: '2.8.0'
+
+    // library
+    implementation "org.scala-lang:scala-library:2.13.8"
+    implementation "com.google.code.findbugs:jsr305:3.0.1"
+
+    modCompileOnly("mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}")
+
+    if (isInCI()) {
+        // modCompileOnly
+        modCompileOnly("RebornCore:RebornCore-1.19:${project.RebornCore_version}") {
+            //noinspection SpellCheckingInspection
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+        modCompileOnly(group: "curse.maven", name: "jade-324717", version: project.jade_id)
+        modCompileOnly("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
+            transitive(false)
+        }
+    } else {
+        //noinspection SpellCheckingInspection
+        modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
+        modRuntimeOnly(group: "dev.architectury", name: "architectury-fabric", version: project.architectury_version)
+        modImplementation("RebornCore:RebornCore-1.19:${project.RebornCore_version}") {
+            //noinspection SpellCheckingInspection
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+        modRuntimeOnly("TechReborn:TechReborn-1.19:${project.TechReborn_version}") {
+            //noinspection SpellCheckingInspection
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+        modRuntimeOnly("mcp.mobius.waila:wthit:fabric-${project.wthit_version}")
+        modRuntimeOnly(group: "lol.bai", name: "badpackets", version: "fabric-${project.badpackets_version}")
+        modImplementation(group: "curse.maven", name: "jade-324717", version: project.jade_id)
+        modImplementation("appeng:appliedenergistics2-fabric:${project.ae2_version}") {
+            transitive(false)
+        }
+    }
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
+        //noinspection SpellCheckingInspection
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+
+    // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
+    // You may need to force-disable transitiveness on them.
+
+    // Test Dependencies.
+    testImplementation(group: "com.kotori316", name: "test_utility_dependency", version: "1.0-SNAPSHOT")
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+    toolchain {
+        it.languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from "LICENSE"
+}
+
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 test {
     useJUnitPlatform()
 }
 
-curseforge {
-    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : ""
-    project {
-        id = '291006'
-        changelogType = 'markdown'
-        changelog = getAllChangeLog()
-        releaseType = 'release'
-        addGameVersion(project.minecraftVersion as String)
-        addGameVersion 'Forge'
-        mainArtifact jar
-        addArtifact deobfJar
-        addArtifact srcJar
-        relations {
-            requiredDependency 'scalable-cats-force'
-        }
+task removeTestWorld(type: Delete) {
+    delete("${project.buildDir}/game_test/world")
+    onlyIf {
+        file("${project.buildDir}/game_test/world").exists() || !file("${project.buildDir}/test-results/test").exists()
     }
-    options {
-        curseGradleOptions.debug = false // defaults to false
-        javaVersionAutoDetect = false
+    doLast {
+        mkdir("${project.buildDir}/test-results/test")
     }
 }
+runGameTest.dependsOn(removeTestWorld)
+test.dependsOn runGameTest
+
+def BRANCH = "1.19-fabric"
+
+// PUBLISH
+def joinedLog = String.join("\n", List.of(
+        "Fluid Tank for ${project.minecraft_version} and Fabric.",
+        "",
+        isInCI() ? "Released via GitHub Action. This version may contain some bugs!" : "",
+        "",
+        "Only items which have recipe will work fine. Items without recipe are still in development.",
+        "",
+        "Requires:",
+        "",
+        "* [Fabric Language Scala](https://www.curseforge.com/minecraft/mc-mods/fabric-language-scala)",
+        "* [Cloth Config API (Fabric)](https://www.curseforge.com/minecraft/mc-mods/cloth-config)",
+        "",
+        "See https://github.com/Kotori316/FluidTank/tree/${BRANCH} to get all change log.",
+        "",
+        "Built with:",
+        "",
+        "* Minecraft ${project.minecraft_version}",
+        "* Mapping Official ${project.minecraft_version}",
+        "* Fabric API ${project.fabric_version}",
+        "* Fabric Loader ${project.loader_version}",
+).stream().map { it.toString() }.toList())
 
 githubRelease {
     repo.set('FluidTank')
     token = project.hasProperty("githubToken") ? getProperty("githubToken") : ""
-    targetCommitish.set(project.getProperty("branch"))
-    body.set(getLatestChangeLog())
-    releaseAssets = files(
-            jar,
-            deobfJar,
-            srcJar,
-    )
+    targetCommitish.set(BRANCH)
+
+    body.set(joinedLog)
+    releaseAssets = fileTree("build/libs")
 }
 
-task signJar2() {
-    doLast {
-        ant.signjar(
-                jar: jar.getArchiveFile().get(),
-                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
-                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
-                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
-                sigalg: "SHA1withRSA",
-                digestalg: "SHA-256",
-                tsaurl: "http://timestamp.digicert.com"
-        )
-        ant.signjar(
-                jar: deobfJar.getArchiveFile().get(),
-                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
-                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
-                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
-                sigalg: "SHA1withRSA",
-                digestalg: "SHA-256",
-                tsaurl: "http://timestamp.digicert.com"
-        )
-    }
-    onlyIf {
-        project.hasProperty('keyStoreAlias') &&
-                project.hasProperty('keyStore') &&
-                project.hasProperty('keyStorePass')
-    }
-}
-
-if (!isInCI()) {
-    // Runs this task automatically when build is ran.
-    assemble.finalizedBy(signJar2)
-} else {
-    // In CI
-    tasks.withType(JavaExec) {
-        // Avoid error of GL
-        systemProperty("fml.earlyprogresswindow", false)
-    }
-}
-
-void moveOldLog() {
-    def new_log_file = file("changes.md")
-    def old_log_file = file("old_logs.md")
-
-    if (new_log_file.exists()) {
-        if (!old_log_file.exists())
-            old_log_file.createNewFile()
-        def combined = new_log_file.text +
-                System.lineSeparator() +
-                "Build with ${project.forgeVersion}, Mapping: Parchment ${mappingVersion()}" +
-                System.lineSeparator() * 2 +
-                old_log_file.text
-        old_log_file.setText(combined)
-    }
-}
-
-String getAllChangeLog() {
-    final old_log = file("old_logs.md")
-    final header_file = file("header.md")
-
-    def all_log = old_log.exists() ? old_log.text : "No change log provided."
-    def header = header_file.exists() ? header_file.text : "#Change Log"
-    return header + System.lineSeparator() + all_log
-}
-
-String getLatestChangeLog() {
-    final def log_file = file("changes.md")
-    final def header_file = file("header.md")
-    def log = log_file.exists() ? log_file.text : "No change log provided."
-    def header = header_file.exists() ? header_file.text : "#Change Log"
-    return header + System.lineSeparator() + log
-}
-
-task makeChangeLog() {
-    doLast {
-        moveOldLog()
-    }
-}
-
-def minecraftVersion = forgeVersion().substring(forgeVersion().lastIndexOf(":") + 1).split("-")[0]
-task checkMethod() {
-    doLast {
-        System.out.println("Forge: ${forgeVersion()}" as String)
-        System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}" as String)
-        System.out.println("Minecraft ${minecraftVersion}" as String)
-        System.out.println("Mapping ${mappingVersion()}" as String)
-        System.out.println("Is In CI ${isInCI()}" as String)
-        System.out.println("FilePath ${jar.getArchiveFile().get()}" as String)
-        System.out.println("FilePath ${srcJar.getArchiveFile().get()}" as String)
-        System.out.println("FilePath ${deobfJar.getArchiveFile().get()}" as String)
-        System.out.println("Name $project.name" as String)
-        System.out.println("BaseName $archivesBaseName" as String)
-        System.out.println("ModVersion-fromProperty ${project.getProperty("modVersion")}" as String)
-        System.out.println("ModVersion-fromProject ${project.version}" as String)
-        System.out.println("Branch ${project.getProperty("branch")}" as String)
-        System.out.println("*" * 20 as String)
-        System.out.println("changes.md")
-        System.out.println(getLatestChangeLog())
-        System.out.println("*" * 20 as String)
-        System.out.println("hasGitHubToken ${hasGitHubToken()}" as String)
-        System.out.println("hasSignToken ${project.hasProperty("keyStore")}" as String)
-        System.out.println("hasCurseForgeToken ${project.hasProperty("curseforge_additional-enchanted-miner_key")}" as String)
-        System.out.println("*" * 20 as String)
-        System.out.println("All Changes")
-//        System.out.println(getAllChangeLog())
-        System.out.println("*" * 20 as String)
-        System.out.println("FindProperty of githubToken: project.findProperty(\"githubToken\") != null ${project.findProperty("githubToken") != null}" as String)
-        System.out.println("FindProperty of gpr.user ${project.findProperty("gpr.user")}" as String)
-        System.out.println("Username ${project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: "NULL"}" as String)
-//        println("Property of gpr.user ${project.property("gpr.user")}" as String) // FAILED
-        System.out.println("*" * 20 as String)
-        System.out.println("Repository")
-        getProject().getRepositories().stream().forEach { n ->
-            System.out.println("${n.name} $n ${n instanceof MavenArtifactRepository ? n.getUrl() : "Not maven"}" as String)
+curseforge {
+    apiKey = project.hasProperty("curseforge_additional-enchanted-miner_key") ? getProperty("curseforge_additional-enchanted-miner_key") : (System.getenv("CURSEFORGE_KEY") ?: "")
+    project {
+        id = '411564'
+        changelogType = 'markdown'
+        addGameVersion 'Fabric'
+        addGameVersion project.minecraft_version
+        changelog = joinedLog
+        releaseType = isInCI() ? 'alpha' : 'release'
+        mainArtifact remapJar
+        addArtifact jar
+        relations {
+            requiredDependency 'fabric-language-scala'
+            requiredDependency 'cloth-config'
         }
-        System.out.println("Dependency" + System.lineSeparator() + "*" * 20 as String)
-        getProject().getConfigurations().each { config ->
-            System.out.println(config.getName())
-            config.getAllDependencies().each { System.out.println(it) }
-        }
-        printProperties()
+    }
+    options {
+        curseGradleOptions.debug = false
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
+    }
+}
+
+task getCompileOptions() {
+    doLast {
+        List<String> strings = new ArrayList<>()
+        strings.add("archivesBaseName: $archivesBaseName")
+        strings.add("group: $group")
+        strings.add("project.maven_group: ${project.maven_group}")
+        strings.add("project.group: ${project.group}")
+        strings.add("version: $version")
+        strings.add("version in config: ${project.version}")
+        strings.add("runs: ${loom.getRunConfigs().asMap.toMapString()}")
+        strings.add("Absolute Client RunDir: ${project.projectDir.toPath().resolve(loom.getRunConfigs().getByName("client").runDir).toAbsolutePath()}")
+        strings.add("Absolute Server RunDir: ${project.projectDir.toPath().resolve(loom.getRunConfigs().getByName("server").runDir).toAbsolutePath()}")
+        strings.add("-" * 20)
+        strings.add("Jar: ${jar.getArchiveFile().get()}")
+        strings.add("Remap Jar ${remapJar.getArchiveFile().get()}")
+        strings.add("Source Jar ${sourcesJar.getArchiveFile().get()}")
+        // strings.add("RemapSource Jar ${remapSourcesJar.getOutput()}")
+        strings.add(String.valueOf(fileTree("build/libs").getFiles()))
+
+        println(strings.stream().collect(Collectors.joining(System.lineSeparator())))
     }
 }
 
 publishing {
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Kotori316/FluidTank")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = project.findProperty("githubToken") ?: System.getenv("REPO_TOKEN")
-            }
-        }
-        maven {
-            name = "BuildDir"
-            url = file("$buildDir/repo")
-        }
         maven {
             name = "AzureRepository"
             url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
@@ -511,57 +332,37 @@ publishing {
     }
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "fluidtank"
-            artifact srcJar {
-                archiveClassifier.set('sources')
-                archiveExtension.set('jar')
+            artifactId = "FluidTank".toLowerCase()
+            if (isInCI()) {
+                version = "${project.snapshot_version}.0-fabric-SNAPSHOT"
+            } else {
+                version = "${project.mod_version}.0-fabric"
+
             }
-            artifact deobfJar {
-                archiveClassifier.set('deobf')
-                archiveExtension.set('jar')
-            }
-            artifact reobfArtifact
+            from components.java
             pom {
-                def v = forgeVersion()
                 name = archivesBaseName
-                description = "FluidTank for Minecraft ${project.minecraftVersion}, build with forge $v"
-                url = 'https://github.com/Kotori316/FluidTank'
+                description = "FluidTank for Minecraft ${project.minecraft_version}, build with Fabric ${project.fabric_version}"
+                url = 'https://github.com/Kotori316/FluidTank/commits/' + BRANCH
                 packaging = "jar"
+                withXml {
+                    //noinspection SpellCheckingInspection
+                    List<String> requiredArtifacts = ["cloth", "fabric-language-scala", "libblockattributes"]
+                    def pomNode = asNode() as Node
+                    Set<String> added = []
+                    pomNode.dependencies.'*'.findAll() { Node node ->
+                        def valueList = node.value() as NodeList
+                        String artifactId = ((valueList.get(1) as Node).value() as NodeList).get(0)
+                        if (!added.contains(artifactId)) {
+                            if (requiredArtifacts.stream().noneMatch { artifactId.contains(it) }) {
+                                node.parent().remove(node)
+                            } else {
+                                added.add(artifactId)
+                            }
+                        }
+                    }
+                }
             }
-        }
-    }
-}
-
-task copyToDrive(type: Copy, dependsOn: "build") {
-    def PATH_NAME = "drive_path"
-    from(jar.getArchiveFile(), deobfJar.getArchiveFile(), srcJar.getArchiveFile())
-    into(file(java.util.Optional.ofNullable(System.getenv(PATH_NAME)).orElse(".")))
-    onlyIf {
-        System.getenv(PATH_NAME) != null &&
-                Files.exists(Paths.get(System.getenv(PATH_NAME)))
-    }
-}
-
-static void printProperties() {
-    System.out.println("PRINT_PROPERTIES_START")
-    System.getProperties().entrySet().stream()
-            .map { e -> Map.entry(String.valueOf(e.getKey()), e.getValue()) }
-            .sorted(Map.Entry.comparingByKey())
-            .forEach { e -> System.out.println((e.getKey() + ": " + e.getValue()) as String) }
-    System.out.println("PRINT_PROPERTIES_END")
-}
-
-////////////////
-// IntelliJ Project Import
-// The Mixin annotation process does not have an obfuscation source when running through the IntelliJ compiler,
-// thus we have to prevent it from being activated as part of importing this Gradle project into IntelliJ.
-if (System.getProperty("idea.sync.active") == "true") {
-    afterEvaluate {
-        tasks.withType(JavaCompile).all {
-            it.options.annotationProcessorPath = files()
-        }
-        tasks.withType(ScalaCompile).all {
-            it.options.annotationProcessorPath = files()
         }
     }
 }

@@ -11,20 +11,22 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonElement;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +50,12 @@ public class Utils {
     public static boolean isInDev() {
         int i = inDev.get();
         if (i == -1) {
-            inDev.set(!FMLLoader.isProduction() || Config.content().debug().get() ? 1 : 0);
+            if (FabricLoader.getInstance().getAllMods().isEmpty()) {
+                // In JUnit Test.
+                inDev.set(0);
+            } else {
+                inDev.set(!FabricLoader.getInstance().isDevelopmentEnvironment() || FluidTank.config.debug ? 1 : 0);
+            }
             return inDev.get() == 1;
         }
         return i == 1;
@@ -66,17 +73,10 @@ public class Utils {
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 16000L, fluid: "silents_mechanisms:diesel", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 8000L, fluid: "silents_mechanisms:ethane", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 8000L, fluid: "minecraft:water", capacity: 16000L}}}
-        /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 10L, fluid: "minecraft:lava", capacity: 16000L}}}
-        /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 10L, fluid: "minecraft:lava", capacity: 16000L}}}
-        /give @p fluidtank:tank_wood{BlockEntityTag:{tank:{amount:3000L,capacity:4000L,fluid:"minecraft:lava"},tier:"wood"}}
-        /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "stone", tank: {amount: 8000L, fluid: "minecraft:water", capacity: 16000L}}}
+        /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "stone", id: "fluidtank:tiletank", tank: {amount: 8000L, fluid: "minecraft:water", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: {string: "Stone"}, id: "fluidtank:tiletank", tank: {amount: 10000L, fluid: "fluidtank:vanilla_milk", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier: "Stone", id: "fluidtank:tiletank", tank: {amount: 10000L, fluid: "fluidtank:vanilla_milk", capacity: 16000L}}}
         /give @p fluidtank:tank_stone{BlockEntityTag:{tier:"stone",tank:{amount:10000L,fluid:"fluidtank:vanilla_milk",capacity:16000L}}}
-        */
-        /*
-        /setblock ~ ~-1 ~ fluidtank:tank_stone{tier: "stone", id: "fluidtank:tiletank", tank: {amount: 3000L, fluid: "minecraft:lava", capacity: 4000L}}
-        /data merge block ~ ~-1 ~ {tank: {fluid: "minecraft:lava"}}
         */
     }
 
@@ -111,7 +111,14 @@ public class Utils {
     }
 
     public static OptionalInt getItemColor(ItemStack stack) {
-        DyeColor color = DyeColor.getColor(stack);
+        final DyeColor color;
+        if (stack.getItem() instanceof DyeItem dyeItem) {
+            color = dyeItem.getDyeColor();
+        } else if (stack.getItem() instanceof ShieldItem) {
+            color = ShieldItem.getColor(stack);
+        } else {
+            color = null;
+        }
         if (color != null)
             return OptionalInt.of(color.getMaterialColor().col);
         if (stack.getItem() instanceof DyeableLeatherItem item) {
@@ -125,14 +132,7 @@ public class Utils {
     }
 
     public static Logger getLogger(String name) {
-        try {
-            var field = Class.forName("net.minecraftforge.fml.ModLoader").getDeclaredField("LOGGER");
-            field.setAccessible(true);
-            var loaderLogger = (org.apache.logging.log4j.core.Logger) field.get(null);
-            return loaderLogger.getContext().getLogger(name);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Can't access to LOGGER in loader.", e);
-        }
+        return LogManager.getLogger(name);
     }
 
     public static <FROM, TO extends FROM> BiConsumer<FROM, Consumer<TO>> cast(Class<TO> toClass) {
@@ -158,11 +158,6 @@ public class Utils {
             .collect(Collectors.toSet());
     }
 
-    @SuppressWarnings("deprecation")
-    public static boolean isInTag(Fluid fluid, TagKey<Fluid> tagKey) {
-        return fluid.is(tagKey);
-    }
-
     public static String convertIngredientToString(Collection<Ingredient> ingredients) {
         return ingredients.stream()
             .map(Ingredient::toJson)
@@ -172,5 +167,9 @@ public class Utils {
 
     public static String convertIngredientToString(Ingredient ingredient) {
         return "[%s]".formatted(ingredient.toJson());
+    }
+
+    public static boolean isServer(BlockEntity entity) {
+        return entity.getLevel() != null && !entity.getLevel().isClientSide;
     }
 }

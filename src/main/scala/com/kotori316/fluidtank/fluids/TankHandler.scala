@@ -3,14 +3,12 @@ package com.kotori316.fluidtank.fluids
 import cats.data.Chain
 import cats.implicits.{catsSyntaxEq, catsSyntaxFoldOps}
 import com.kotori316.fluidtank._
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.IFluidHandler
 
 /**
  * Mutable, because forge requires to be.
  * The handler will be cached, so mutable is the easiest way to tell the change of content to the holder.
  */
-class TankHandler extends IFluidHandler {
+class TankHandler {
 
   private[this] final var tank: Tank = Tank.EMPTY
 
@@ -21,7 +19,7 @@ class TankHandler extends IFluidHandler {
     }
   }
 
-  def initCapacity(capacity: Long): Unit = {
+  def initCapacity(capacity: FabricAmount): Unit = {
     val newTank = getTank.copy(capacity = capacity)
     // Not to use setter to avoid NPE of connection.
     this.tank = newTank
@@ -31,25 +29,11 @@ class TankHandler extends IFluidHandler {
 
   def onContentsChanged(): Unit = ()
 
-  override def getTanks: Int = 1
-
-  override def getFluidInTank(tank: Int): FluidStack =
-    getDrainOperation(this.tank).runS((), FluidAmount.EMPTY.setAmount(this.tank.capacity)).toStack
-
-  override def getTankCapacity(tank: Int): Int = Utils.toInt(this.tank.capacity)
-
-  // Discards current state.
-  override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
-
   def getFillOperation(tank: Tank): TankOperation = fillOp(tank)
 
   def getDrainOperation(tank: Tank): TankOperation = drainOp(tank)
 
-  override final def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
-    Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
-  }
-
-  private final def action(op: TankOperation, resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  private final def action(op: TankOperation, resource: FluidAmount, action: FluidAction): FluidAmount = {
     val (log, left, newTank) = op.run((), resource)
     val moved: FluidAmount = resource - left
     if (action.execute())
@@ -58,19 +42,15 @@ class TankHandler extends IFluidHandler {
     moved
   }
 
-  final def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  final def fill(resource: FluidAmount, action: FluidAction): FluidAmount = {
     this.action(getFillOperation(this.tank), resource, action)
   }
 
-  final def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  final def drain(toDrain: FluidAmount, action: FluidAction): FluidAmount = {
     this.action(getDrainOperation(this.tank), toDrain, action)
   }
 
-  override final def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.fromStack(resource), action).toStack
-
-  override final def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.EMPTY.setAmount(maxDrain), action).toStack
-
-  protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
+  protected def outputLog(logs: Chain[FluidTransferLog], action: FluidAction): Unit = {
     if (Utils.isInDev) {
       FluidTank.LOGGER.debug(ModObjects.MARKER_TankHandler, logs.mkString_(action.toString + " ", ", ", ""))
     }
@@ -80,12 +60,6 @@ class TankHandler extends IFluidHandler {
 }
 
 object TankHandler {
-  def apply(capacity: Long): TankHandler = {
-    val h = new TankHandler()
-    h.setTank(h.getTank.copy(capacity = capacity))
-    h
-  }
-
   def apply(tank: Tank): TankHandler = {
     val h = new TankHandler()
     h setTank tank

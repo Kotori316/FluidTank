@@ -2,15 +2,16 @@ package com.kotori316.fluidtank.render
 
 import java.awt.Color
 
-import com.kotori316.fluidtank.network.ClientProxy
+import com.kotori316.fluidtank.FluidTankClientInit
 import com.kotori316.fluidtank.transport.{PipeBlock, PipeTileBase}
 import com.mojang.blaze3d.vertex.PoseStack
+import net.fabricmc.api.{EnvType, Environment}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
-import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class RenderPipe extends BlockEntityRenderer[PipeTileBase] {
   var useColor: Boolean = false
 
@@ -21,7 +22,7 @@ class RenderPipe extends BlockEntityRenderer[PipeTileBase] {
     Minecraft.getInstance.getProfiler.push("RenderPipe")
     matrixStack.pushPose()
 
-    val texture = ClientProxy.whiteTexture
+    val texture: TextureAtlasSprite = FluidTankClientInit.SPRITES.getWhite
     val minU = texture.getU0
     val minV = texture.getV0
     val maxU = texture.getU1

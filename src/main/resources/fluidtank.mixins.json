@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "com.kotori316.fluidtank.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [ ],
+  "client": [ "MixinModelManager" ],
+  "server": [ ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

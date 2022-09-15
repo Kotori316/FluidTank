@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "id": "fluidtank",
+  "version": "${version}",
+  "name": "Fluid Tank",
+  "description": "FluidTank",
+  "authors": [
+    "Kotori316"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Kotori316",
+    "sources": "https://github.com/Kotori316/FluidTank",
+    "issues": "https://github.com/Kotori316/FluidTank/issues"
+  },
+  "license": "All rights reserved",
+  "icon": "assets/fluidtank/textures/tank_big.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "value": "com.kotori316.fluidtank.FluidTank"
+      }
+    ],
+    "client": [
+      "com.kotori316.fluidtank.FluidTankClientInit"
+    ],
+    "ae2": [
+      "com.kotori316.fluidtank.integration.ae2.TankAE2Plugin"
+    ],
+    "jade": [
+      "com.kotori316.fluidtank.integration.jade.JadeTankWailaPlugin"
+    ]
+  },
+  "mixins": [
+    "fluidtank.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "fabric": ">=0.55.3+1.19",
+    "minecraft": "1.19.x",
+    "fabric-language-scala": ">=0.3.0"
+  },
+  "custom": {
+    "waila:plugins": [
+      {
+        "id": "fluidtank:wthit_plugin",
+        "initializer": "com.kotori316.fluidtank.integration.wthit.WthitTankWailaPlugin"
+      }
+    ]
+  }
+}

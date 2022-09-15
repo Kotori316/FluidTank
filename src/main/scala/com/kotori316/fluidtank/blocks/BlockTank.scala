@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.ItemBlockTank
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import net.minecraft.core.{BlockPos, Direction}
@@ -8,14 +9,13 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.{Item, ItemStack}
-import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.{Block, EntityBlock}
 import net.minecraft.world.level.{BlockGetter, Level}
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
-import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import net.minecraft.world.{InteractionHand, InteractionResult}
-import net.minecraftforge.fluids.FluidStack
 import org.jetbrains.annotations.Nullable
 
 import scala.annotation.nowarn
@@ -42,7 +42,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     new TileTank(tier, pos, state)
   }
 
-   //noinspection ScalaDeprecation,deprecation
+  //noinspection ScalaDeprecation,deprecation
   override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     level.getBlockEntity(pos) match {
       case tileTank: TileTank =>
@@ -55,7 +55,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           val result = for {
             r <- if (!level.isClientSide) BucketEventHandler.transferFluid(tileTank.connection.handler,
-              tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY),
+              tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).getOrElse(FluidAmount.EMPTY),
               stack)
             else BucketEventHandler.checkStack(stack)
             if r.result.isSuccess
@@ -117,8 +117,8 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
       .foreach(stack.setHoverName)
   }
 
-  override final def getCloneItemStack(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
-    val stack = super.getCloneItemStack(state, target, level, pos, player)
+  override final def getCloneItemStack(level: BlockGetter, pos: BlockPos, state: BlockState): ItemStack = {
+    val stack = super.getCloneItemStack(level, pos, state)
     saveTankNBT(level.getBlockEntity(pos), stack)
     stack
   }
@@ -129,5 +129,19 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = {
     super.createBlockStateDefinition(builder)
     builder.add(TankPos.TANK_POS_PROPERTY)
+  }
+
+  override def getTicker[T <: BlockEntity](level: Level, blockState: BlockState, blockEntityType: BlockEntityType[T]): BlockEntityTicker[T] = {
+    if (!level.isClientSide) {
+      if (blockEntityType == ModObjects.TANK_TYPE ||
+        blockEntityType == ModObjects.TANK_CREATIVE_TYPE ||
+        blockEntityType == ModObjects.TANK_VOID_TYPE) {
+        (l, p, s, t) => TileTank.tick(l, p, s, t.asInstanceOf[TileTank])
+      } else {
+        null
+      }
+    } else {
+      null
+    }
   }
 }

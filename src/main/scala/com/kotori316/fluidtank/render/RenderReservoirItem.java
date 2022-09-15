@@ -1,68 +1,66 @@
 package com.kotori316.fluidtank.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import org.apache.commons.lang3.tuple.Pair;
 
+import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.items.ReservoirItem;
+import com.kotori316.fluidtank.items.TankItemFluidHandler;
 
-@OnlyIn(Dist.CLIENT)
-public class RenderReservoirItem extends BlockEntityWithoutLevelRenderer {
+@Environment(EnvType.CLIENT)
+public class RenderReservoirItem implements BuiltinItemRendererRegistry.DynamicItemRenderer {
     private static final float d = 1f / 16f;
 
     public RenderReservoirItem() {
-        super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+        super();
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemTransforms.TransformType cameraType, PoseStack matrixStack,
-                             MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
-        if (stack.getItem() instanceof ReservoirItem) {
+    public void render(ItemStack stack, ItemTransforms.TransformType cameraType, PoseStack matrixStack,
+                       MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+        if (stack.getItem() instanceof ReservoirItem reservoirItem) {
             BakedModel itemModel = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(stack);
-            if (itemModel instanceof ModelWrapper) {
+            if (itemModel instanceof ModelCustomWrapper) {
                 matrixStack.pushPose();
                 matrixStack.translate(0.5D, 0.5D, 0.5D);
-                BakedModel original = ((ModelWrapper) itemModel).getOriginalModel();
-                Minecraft.getInstance().getItemRenderer().render(stack, cameraType,
+                BakedModel original = ((ModelCustomWrapper) itemModel).getOriginalModel();
+                Minecraft.getInstance().getItemRenderer().render(stack, ItemTransforms.TransformType.NONE,
                     false, matrixStack, buffer, combinedLight, combinedOverlay, original);
                 matrixStack.popPose();
 
                 if (cameraType == ItemTransforms.TransformType.GUI) {
                     matrixStack.pushPose();
-                    stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
-                        .map(h -> Pair.of(h.getFluidInTank(0), h.getTankCapacity(0)))
-                        .filter(p -> !p.getLeft().isEmpty() && p.getLeft().getAmount() > 0)
-                        .ifPresent(p -> renderFluid(p.getLeft(), p.getRight(), matrixStack, buffer, combinedLight, combinedOverlay));
+                    var handler = new TankItemFluidHandler(reservoirItem.tier(), stack);
+                    var fluid = handler.getFluid();
+                    var capacity = handler.getCapacity();
+                    if (fluid.nonEmpty()) {
+                        renderFluid(fluid, capacity, matrixStack, buffer, combinedLight, combinedOverlay);
+                    }
                     matrixStack.popPose();
                 }
             }
         }
     }
 
-    private static void renderFluid(FluidStack stack, int capacity, PoseStack matrixStack, MultiBufferSource buffer, int light, int overlay) {
-        IClientFluidTypeExtensions properties = IClientFluidTypeExtensions.of(stack.getFluid());
-        ResourceLocation textureName = properties.getStillTexture(stack);
-        TextureAtlasSprite texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(textureName);
-        int color = properties.getTintColor(stack);
+    private static void renderFluid(FluidAmount stack, long capacity, PoseStack matrixStack, MultiBufferSource buffer, int light, int overlay) {
+        TextureAtlasSprite texture = RenderResourceHelper.getSprite(stack);
+        if (texture == null)
+            return;
+        int color = RenderResourceHelper.getColor(stack);
         Wrapper wrapper = new Wrapper(buffer.getBuffer(RenderType.translucent()));
         int alpha = (color >> 24 & 0xFF) > 0 ? color >> 24 & 0xFF : 0xFF;
         int red = color >> 16 & 0xFF, green = color >> 8 & 0xFF, blue = color & 0xFF;
 
-        float height = Math.max(0.01f, (float) stack.getAmount() / capacity);
+        float height = Math.max(0.01f, (float) stack.amount() / capacity);
         float maxV = texture.getV1(); //texture.getV(height / d);
         float minV = texture.getV0();
         float maxU = texture.getU1();

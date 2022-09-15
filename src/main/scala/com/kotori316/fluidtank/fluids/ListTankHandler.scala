@@ -4,36 +4,24 @@ import cats.Align
 import cats.data.Chain
 import cats.implicits._
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.IFluidHandler
 
-class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) extends IFluidHandler {
+class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) extends FluidContainer {
   def this(t: Chain[TankHandler]) = {
     this(t, false)
   }
 
   def getTankList: Chain[Tank] = tankHandlers.map(_.getTank)
 
-  override def getTanks: Int = 1
-
-  override def getFluidInTank(tank: Int): FluidStack = {
+  override def getFluid: FluidAmount = {
     // Drain from bottom tank.
     val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
-    val drained = this.action(opList(drainOps), FluidAmount.EMPTY.setAmount(getSumOfCapacity), IFluidHandler.FluidAction.SIMULATE)
-    drained.toStack
+    val drained = this.action(opList(drainOps), FluidAmount.EMPTY.setAmountF(getSumOfCapacity), FluidAction.SIMULATE)
+    drained
   }
 
-  def getSumOfCapacity: Long = tankHandlers.map(_.getTank.capacity).combineAll
+  def getSumOfCapacity: FabricAmount = tankHandlers.map(_.getTank.capacity).combineAll
 
-  override def getTankCapacity(tank: Int): Int = Utils.toInt(getSumOfCapacity)
-
-  override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
-
-  override final def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
-    Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
-  }
-
-  protected def action(op: ListTankOperation[Chain], resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  protected def action(op: ListTankOperation[Chain], resource: FluidAmount, action: FluidAction): FluidAmount = {
     val (log, left, newTanks) = op.run((), resource)
     val moved = resource - left
     if (action.execute())
@@ -42,7 +30,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     moved
   }
 
-  def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  def fill(resource: FluidAmount, action: FluidAction): FluidAmount = {
     if (limitOneFluid) {
       val fluidInTank = tankHandlers.headOption.map(_.getTank.fluidAmount).filter(_.nonEmpty)
       if (!fluidInTank.forall(_ fluidEqual resource)) {
@@ -60,8 +48,8 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     }
   }
 
-  def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
-    if ((toDrain.nonEmpty && toDrain.isGaseous) || getTankList.lastOption.exists(_.fluidAmount.isGaseous)) {
+  def drain(toDrain: FluidAmount, action: FluidAction): FluidAmount = {
+    if (toDrain.isGaseous || getTankList.lastOption.exists(_.fluidAmount.isGaseous)) {
       // Drain from bottom tank.
       val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
       this.action(opList(drainOps), toDrain, action)
@@ -72,11 +60,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     }
   }
 
-  override final def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.fromStack(resource), action).toStack
-
-  override final def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = drain(FluidAmount.EMPTY.setAmount(maxDrain), action).toStack
-
-  protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
+  protected def outputLog(logs: Chain[FluidTransferLog], action: FluidAction): Unit = {
     if (Utils.isInDev) {
       FluidTank.LOGGER.debug(ModObjects.MARKER_ListTankHandler, logs.mkString_(action.toString + " ", ", ", ""))
     }

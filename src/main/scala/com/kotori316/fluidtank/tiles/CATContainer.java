@@ -2,13 +2,13 @@ package com.kotori316.fluidtank.tiles;
 
 import java.util.Objects;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.extensions.IForgeMenuType;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
@@ -17,13 +17,13 @@ import com.kotori316.fluidtank.network.PacketHandler;
 
 public class CATContainer extends AbstractContainerMenu {
     public static final String GUI_ID = FluidTank.modID + ":gui_chest_as_tank";
-    final CATTile catTile;
+    public final CATTile catTile;
 
     /**
      * Only for internal use. Use instance in {@link com.kotori316.fluidtank.ModObjects}.
      */
     public static MenuType<CATContainer> makeType() {
-        return IForgeMenuType.create((windowId1, inv, data) -> new CATContainer(windowId1, inv.player, data.readBlockPos()));
+        return new ExtendedScreenHandlerType<>((syncId, inv, data) -> new CATContainer(syncId, inv.player, data.readBlockPos()));
     }
 
     public CATContainer(int id, Player player, BlockPos pos) {
@@ -50,7 +50,7 @@ public class CATContainer extends AbstractContainerMenu {
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
-        PacketHandler.sendToClient(new FluidCacheMessage(catTile), catTile.getLevel());
+        PacketHandler.sendToClientWorld(new FluidCacheMessage(catTile), catTile.getLevel());
     }
 
     @Override

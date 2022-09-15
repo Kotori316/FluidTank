@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateD
 import net.minecraft.world.level.block.{BaseEntityBlock, Block, RenderShape}
 import net.minecraft.world.level.material.Material
 import net.minecraft.world.level.{BlockGetter, Level}
-import net.minecraft.world.phys.{BlockHitResult, HitResult}
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.{InteractionHand, InteractionResult}
 import org.jetbrains.annotations.Nullable
 
@@ -45,8 +45,8 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
     }
   }
 
-  override def getCloneItemStack(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
-    val stack = super.getCloneItemStack(state, target, level, pos, player)
+  override def getCloneItemStack(level: BlockGetter, pos: BlockPos, state: BlockState): ItemStack = {
+    val stack = super.getCloneItemStack(level, pos, state)
     if (Option(level.getBlockEntity(pos)).collect { case s: FluidSourceTile => !s.locked }.getOrElse(false)) {
       stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
     }
@@ -63,7 +63,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
   //noinspection ScalaDeprecation,deprecation
   override def use(state: BlockState, level: Level, pos: BlockPos, player: Player,
                    hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
-    if (Config.content.enableFluidSupplier.get()) {
+    if (FluidTank.config.enableFluidSupplier) {
       val stack = player.getItemInHand(hand)
       val fluid = FluidAmount.fromItem(stack)
       if (fluid.isEmpty) {
@@ -123,7 +123,7 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
   }
 
   override def appendHoverText(stack: ItemStack, worldIn: BlockGetter, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = {
-    if (Config.content.enableFluidSupplier.get()) {
+    if (FluidTank.config.enableFluidSupplier) {
       tooltip.add(
         if (FluidSourceBlock.isCheatStack(stack)) {
           Component.translatable(FluidSourceBlock.TOOLTIP_INF)

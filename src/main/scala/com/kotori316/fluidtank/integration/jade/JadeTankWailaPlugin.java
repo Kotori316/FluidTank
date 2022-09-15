@@ -6,7 +6,6 @@ import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 
-import com.kotori316.fluidtank.Config;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.integration.Localize;
@@ -20,24 +19,18 @@ public class JadeTankWailaPlugin implements IWailaPlugin {
 
     static final ResourceLocation KEY_TANK_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_TANK_INFO);
     static final ResourceLocation KEY_SHORT_INFO = new ResourceLocation(FluidTank.modID, Localize.WAILA_SHORT_INFO);
-    static final ResourceLocation KEY_COMPACT_NUMBER = new ResourceLocation(FluidTank.modID, Localize.WAILA_COMPACT_NUMBER);
 
     @Override
     public void register(IWailaCommonRegistration registration) {
-        if (Config.content().enableWailaAndTOP().get()) {
-            JadeTankDataProvider tankDataProvider = new JadeTankDataProvider();
-            registration.registerBlockDataProvider(tankDataProvider, TileTank.class);
-        }
+        JadeTankDataProvider tankDataProvider = new JadeTankDataProvider();
+        registration.registerBlockDataProvider(tankDataProvider, TileTank.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        if (Config.content().enableWailaAndTOP().get()) {
-            JadeTankDataProvider tankDataProvider = new JadeTankDataProvider();
-            registration.registerBlockComponent(tankDataProvider, BlockTank.class);
-            registration.addConfig(KEY_TANK_INFO, true);
-            registration.addConfig(KEY_SHORT_INFO, true);
-            registration.addConfig(KEY_COMPACT_NUMBER, false);
-        }
+        JadeTankDataProvider tankDataProvider = new JadeTankDataProvider();
+        registration.registerBlockComponent(tankDataProvider, BlockTank.class);
+        registration.addConfig(KEY_TANK_INFO, true);
+        registration.addConfig(KEY_SHORT_INFO, true);
     }
 }

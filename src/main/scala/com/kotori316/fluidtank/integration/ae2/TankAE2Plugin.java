@@ -1,64 +1,46 @@
 package com.kotori316.fluidtank.integration.ae2;
 
+import appeng.api.IAEAddonEntrypoint;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.IStorageMonitorableAccessor;
 import appeng.api.storage.MEStorage;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.fabricmc.loader.api.FabricLoader;
 
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.tiles.TileTank;
 
-public class TankAE2Plugin {
-    public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "attach_ae2");
+public final class TankAE2Plugin implements IAEAddonEntrypoint {
+    // public static final ResourceLocation LOCATION = new ResourceLocation(ModTank.modID, "attach_ae2");
 
-    public static void onAPIAvailable() {
-        if (ModList.get().isLoaded("ae2"))
-            MinecraftForge.EVENT_BUS.register(new CapHandler());
+    @Override
+    public void onAe2Initialized() {
+        if (FabricLoader.getInstance().isModLoaded("ae2") && FluidTank.config.enableAE2Integration) {
+            CapHandler.event();
+        }
     }
 
     static class CapHandler {
-        @SubscribeEvent
-        public void event(AttachCapabilitiesEvent<BlockEntity> event) {
-            if (event.getObject() instanceof TileTank tank) {
-                AEConnectionCapabilityProvider provider = new AEConnectionCapabilityProvider(tank);
-                event.addCapability(LOCATION, provider);
-            }
+        public static void event() {
+            IStorageMonitorableAccessor.SIDED.registerForBlockEntities((blockEntity, context) -> {
+                if (blockEntity instanceof TileTank tank) return new AEConnectionCapabilityProvider(tank);
+                else return null;
+            }, ModObjects.TANK_TYPE(), ModObjects.TANK_VOID_TYPE(), ModObjects.TANK_CREATIVE_TYPE());
         }
     }
-}
 
-class AEConnectionCapabilityProvider implements ICapabilityProvider, IStorageMonitorableAccessor {
-    static Capability<IStorageMonitorableAccessor> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
-    });
-    private final TileTank tank;
-    private AEFluidInv aeFluidInv;
+    static class AEConnectionCapabilityProvider implements IStorageMonitorableAccessor {
+        private final TileTank tank;
+        private AEFluidInv aeFluidInv;
 
-    public AEConnectionCapabilityProvider(TileTank tank) {
-        this.tank = tank;
-    }
+        public AEConnectionCapabilityProvider(TileTank tank) {
+            this.tank = tank;
+        }
 
-    @NotNull
-    @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        return CAPABILITY.orEmpty(cap, LazyOptional.of(() -> this).cast());
-    }
-
-    @Override
-    public MEStorage getInventory(IActionSource iActionSource) {
-        if (aeFluidInv == null) aeFluidInv = new AEFluidInv(tank);
-        return aeFluidInv;
+        @Override
+        public MEStorage getInventory(IActionSource iActionSource) {
+            if (aeFluidInv == null) aeFluidInv = new AEFluidInv(tank);
+            return aeFluidInv;
+        }
     }
 }

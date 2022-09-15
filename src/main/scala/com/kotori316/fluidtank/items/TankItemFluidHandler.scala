@@ -1,18 +1,13 @@
 package com.kotori316.fluidtank.items
 
 import com.kotori316.fluidtank.Utils
-import com.kotori316.fluidtank.fluids.FluidAmount
+import com.kotori316.fluidtank.fluids.{FluidAction, FluidAmount}
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
-import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.{BlockItem, ItemStack}
-import net.minecraftforge.common.capabilities.{Capability, ForgeCapabilities, ICapabilityProvider}
-import net.minecraftforge.common.util.LazyOptional
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.{IFluidHandler, IFluidHandlerItem}
 import org.jetbrains.annotations.{NotNull, Nullable}
 
-class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandlerItem with ICapabilityProvider {
+class TankItemFluidHandler(val tier: Tier, stack: ItemStack) {
 
   def nbt: CompoundTag = BlockItem.getBlockEntityData(stack)
 
@@ -21,71 +16,66 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandl
 
   private[this] var initialized = false
   @NotNull
-  private[this] var fluid: FluidStack = FluidStack.EMPTY
+  private[this] var fluid: FluidAmount = FluidAmount.EMPTY
 
-  override def getContainer: ItemStack = stack
+  def getContainer: ItemStack = stack
 
-  override def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
+  def fill(resource: FluidAmount, action: FluidAction): FluidAmount = {
     if (resource.isEmpty || stack.getCount > 1) {
-      return 0
+      return FluidAmount.EMPTY
     }
     init()
     if (fluid.isEmpty) {
-      val amount = math.min(resource.getAmount, Utils.toInt(getCapacity))
+      val amount = math.min(resource.amount, getCapacity)
       if (action.execute()) {
-        fluid = resource.copy()
-        fluid.setAmount(amount)
+        fluid = resource.copy().setAmount(amount)
         updateTag()
       }
-      amount
-    } else if (fluid.isFluidEqual(resource)) {
-      val move = math.min(resource.getAmount, Utils.toInt(getCapacity) - fluid.getAmount)
+      resource.setAmount(amount)
+    } else if (fluid.fluidEqual(resource)) {
+      val move = math.min(resource.amount, getCapacity - fluid.amount)
       if (action.execute()) {
-        fluid.setAmount(fluid.getAmount + move)
+        fluid = fluid.setAmount(fluid.amount + move)
         updateTag()
       }
-      move
+      fluid.setAmount(move)
     } else {
-      0
+      FluidAmount.EMPTY
     }
   }
 
   @NotNull
-  override def drain(resource: FluidStack, action: IFluidHandler.FluidAction): FluidStack = {
+  def drain(resource: FluidAmount, action: FluidAction): FluidAmount = {
     init()
-    if (fluid.isEmpty || resource.isEmpty || stack.getCount > 1) {
-      return FluidStack.EMPTY
+    if (fluid.isEmpty || stack.getCount > 1) {
+      return FluidAmount.EMPTY
     }
-    if (fluid.isFluidEqual(resource)) {
-      val move = math.min(resource.getAmount, fluid.getAmount)
+    if (fluid.fluidEqual(resource) || resource.isEmpty) {
+      val move = math.min(resource.amount, fluid.amount)
       if (action.execute()) {
-        fluid.setAmount(fluid.getAmount - move)
+        fluid = fluid.setAmount(fluid.amount - move)
         updateTag()
       }
-      new FluidStack(resource, move)
+      fluid.setAmount(move)
     } else
-      FluidStack.EMPTY
+      FluidAmount.EMPTY
   }
 
   @NotNull
-  override def drain(maxDrain: Int, action: IFluidHandler.FluidAction): FluidStack = {
+  def drain(maxDrain: Int, action: FluidAction): FluidAmount = {
     init()
     if (fluid.isEmpty || maxDrain <= 0 || stack.getCount > 1) {
-      return FluidStack.EMPTY
+      return FluidAmount.EMPTY
     }
     val copy = fluid.copy()
     copy.setAmount(maxDrain)
     drain(copy, action)
   }
 
-  override def getCapability[T](capability: Capability[T], facing: Direction): LazyOptional[T] = {
-    ForgeCapabilities.FLUID_HANDLER_ITEM.orEmpty(capability, LazyOptional.of(() => this))
-  }
-
   private def init(): Unit = {
     if (!initialized) {
       initialized = true
-      fluid = FluidAmount.fromNBT(tankNbt).toStack
+      fluid = FluidAmount.fromNBT(tankNbt)
     }
   }
 
@@ -106,7 +96,7 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandl
     tag
   }
 
-  override def getTanks = 1
+  def getTanks = 1
 
   /**
    * Get the content of tank. If the stack has 2 or more items, returns empty.
@@ -114,14 +104,14 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandl
    * @return The content if stack size = 1, else empty fluid.
    */
   @NotNull
-  override def getFluidInTank(tank: Int): FluidStack = {
+  def getFluidInTank(tank: Int): FluidAmount = {
     init()
-    if (stack.getCount == 1) fluid else FluidStack.EMPTY
+    if (stack.getCount == 1) fluid else FluidAmount.EMPTY
   }
 
-  override def getTankCapacity(tank: Int): Int = if (stack.getCount == 1) Utils.toInt(getCapacity) else 0
+  def getTankCapacity(tank: Int): Int = if (stack.getCount == 1) Utils.toInt(getCapacity) else 0
 
-  override def isFluidValid(tank: Int, stack: FluidStack) = true
+  def isFluidValid(tank: Int, stack: FluidAmount) = true
 
   /**
    * Get the fluid, ignoring the stack size.
@@ -130,8 +120,8 @@ class TankItemFluidHandler(val tier: Tier, stack: ItemStack) extends IFluidHandl
    */
   def getFluid: FluidAmount = {
     init()
-    FluidAmount.fromStack(fluid)
+    fluid
   }
 
-  def getCapacity: Long = if (tankNbt == null) tier.amount else tankNbt.getLong(TileTank.NBT_Capacity)
+  def getCapacity: Long = if (tankNbt == null || !tankNbt.contains(TileTank.NBT_Capacity)) tier.amount else tankNbt.getLong(TileTank.NBT_Capacity)
 }

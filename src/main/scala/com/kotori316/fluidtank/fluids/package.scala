@@ -1,25 +1,23 @@
 package com.kotori316.fluidtank
 
 import cats.data.{Chain, ReaderWriterStateT}
-import cats.syntax.eq._
+import cats.implicits.{catsSyntaxOrder, catsSyntaxPartialOrder}
 import cats.syntax.group._
 import cats.syntax.semigroupk._
 import cats.{Applicative, Foldable, Id, Monad, MonoidK}
 import net.minecraft.world.level.material.Fluids
-import net.minecraftforge.fluids.FluidStack
-import net.minecraftforge.fluids.capability.IFluidHandler
 
 package object fluids {
   type TankOperation = ReaderWriterStateT[Id, Unit, Chain[FluidTransferLog], FluidAmount, Tank]
   type ListTankOperation[F[_]] = ReaderWriterStateT[Id, Unit, Chain[FluidTransferLog], FluidAmount, F[Tank]]
 
   def fillOp(tank: Tank): TankOperation = ReaderWriterStateT { case (_, s) =>
-    if (s.fluid === Fluids.EMPTY || s.amount === 0L) {
+    if (s.fluid == Fluids.EMPTY || s.amount == 0L) {
       // Nothing to fill, skip.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
     } else if (tank.fluidAmount.isEmpty || (tank.fluidAmount fluidEqual s)) {
-      val filledAmount = (tank.capacity |-| tank.amount) min s.amount
-      val filledStack = s.copy(amount = filledAmount)
+      val filledAmount = (tank.capacity |-| tank.amount) min s.fabricAmount
+      val filledStack = s.copy(fabricAmount = filledAmount)
       val newTank = tank.copy(tank.fluidAmount + filledStack)
       (Chain(FluidTransferLog.FillFluid(s, filledStack, tank, newTank)), s - filledStack, newTank)
     } else {
@@ -29,13 +27,13 @@ package object fluids {
 
   def drainOp(tank: Tank): TankOperation = if (tank.isEmpty) ReaderWriterStateT.applyS(s => Monad[Id].pure((Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)))
   else ReaderWriterStateT { case (_, s) =>
-    if (s.amount === 0L) {
+    if (s.amount == 0L) {
       // Nothing to drain.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
-    } else if (s.fluid === Fluids.EMPTY || (s fluidEqual tank.fluidAmount)) {
-      val drainAmount = tank.amount min s.amount
-      val drainedStack = tank.fluidAmount.copy(amount = drainAmount)
-      val newTank = tank.copy(tank.fluidAmount.copy(amount = tank.amount |-| drainAmount))
+    } else if (s.fluid == Fluids.EMPTY || (s fluidEqual tank.fluidAmount)) {
+      val drainAmount = tank.amount min s.fabricAmount
+      val drainedStack = tank.fluidAmount.copy(fabricAmount = drainAmount)
+      val newTank = tank.copy(tank.fluidAmount.copy(fabricAmount = tank.amount |-| drainAmount))
       val subtracted = if (drainedStack.nonEmpty) s - drainedStack else s
       (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank, newTank)), subtracted, newTank)
     } else {
@@ -57,10 +55,10 @@ package object fluids {
     val op: Tank => TankOperation = t =>
       for {
         before <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
-        _ <- ReaderWriterStateT.modify[Id, Unit, Chain[FluidTransferLog], FluidAmount](f => f.setAmount(t.capacity))
+        _ <- ReaderWriterStateT.modify[Id, Unit, Chain[FluidTransferLog], FluidAmount](f => f.setAmountF(t.capacity))
         y <- fillOp(t)
         rest <- ReaderWriterStateT.get[Id, Unit, Chain[FluidTransferLog], FluidAmount]
-        r = if (rest.amount < t.capacity) rest.setAmount(0) else before
+        r = if (rest.fabricAmount < t.capacity) rest.setAmount(0) else before
         _ <- ReaderWriterStateT.set[Id, Unit, Chain[FluidTransferLog], FluidAmount](r)
       } yield y
     opList(applicative.map(tanks)(op))
@@ -72,9 +70,7 @@ package object fluids {
   final object EmptyTankHandler extends TankHandler {
     override def setTank(newTank: Tank): Unit = ()
 
-    override def getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
-
-    override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = ()
+    override protected def outputLog(logs: Chain[FluidTransferLog], action: FluidAction): Unit = ()
 
     override def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.FillFailed(s, tank)), s, tank)
@@ -89,8 +85,6 @@ package object fluids {
 
   class VoidTankHandler extends TankHandler {
     override def setTank(newTank: Tank): Unit = ()
-
-    override def getFluidInTank(tank: Int): FluidStack = FluidStack.EMPTY
 
     override def getFillOperation(tank: Tank): TankOperation = ReaderWriterStateT.applyS { s =>
       Monad[Id].pure(Chain(FluidTransferLog.FillAll(s, tank)), FluidAmount.EMPTY, tank)

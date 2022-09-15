@@ -1,78 +1,65 @@
 package com.kotori316.fluidtank.recipes;
 
-import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
+import java.util.function.Predicate;
 
-import com.kotori316.fluidtank.Config;
+import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.minecraft.resources.ResourceLocation;
+
 import com.kotori316.fluidtank.FluidTank;
 
-public abstract class FluidTankConditions<T extends FluidTankConditions<T>> implements ICondition {
+public abstract class FluidTankConditions<T extends FluidTankConditions<T>> implements Predicate<JsonObject> {
     public FluidTankConditions(ResourceLocation location) {
         this.location = location;
     }
 
     private final ResourceLocation location;
-    public final IConditionSerializer<FluidTankConditions<T>> serializer = new Serializer();
+    public final ConditionJsonProvider serializer = new Serializer();
 
-    @Override
     public ResourceLocation getID() {
         return this.location;
     }
 
     @Override
-    public abstract boolean test(IContext context);
+    public abstract boolean test(JsonObject context);
 
-    private class Serializer implements IConditionSerializer<FluidTankConditions<T>> {
+    private class Serializer implements ConditionJsonProvider {
         @Override
-        public void write(JsonObject json, FluidTankConditions<T> value) {
+        public void writeParameters(JsonObject object) {
         }
 
         @Override
-        public FluidTankConditions<T> read(JsonObject json) {
-            return FluidTankConditions.this;
-        }
-
-        @Override
-        public ResourceLocation getID() {
+        public ResourceLocation getConditionId() {
             return FluidTankConditions.this.getID();
         }
+
     }
 
-    public static final class TankConfigCondition extends FluidTankConditions<TankConfigCondition> {
+    public static final class ConfigCondition extends FluidTankConditions<ConfigCondition> {
 
-        public TankConfigCondition() {
-            super(new ResourceLocation(FluidTank.modID, "config"));
+        public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "config");
+
+        public ConfigCondition() {
+            super(LOCATION);
         }
 
         @Override
-        public boolean test(IContext context) {
-            return !Config.content().removeTankRecipes().get();
-        }
-    }
-
-    public static final class PipeConfigCondition extends FluidTankConditions<PipeConfigCondition> {
-
-        public PipeConfigCondition() {
-            super(new ResourceLocation(FluidTank.modID, "config_pipe"));
-        }
-
-        @Override
-        public boolean test(IContext context) {
-            return !Config.content().removePipeRecipes().get();
+        public boolean test(JsonObject context) {
+            return FluidTank.config.enableUpdateRecipe;
         }
     }
 
     public static final class EasyCondition extends FluidTankConditions<EasyCondition> {
 
+        public static final ResourceLocation LOCATION = new ResourceLocation(FluidTank.modID, "easy");
+
         public EasyCondition() {
-            super(new ResourceLocation(FluidTank.modID, "easy"));
+            super(LOCATION);
         }
 
         @Override
-        public boolean test(IContext context) {
-            return Config.content().easyRecipe().get();
+        public boolean test(JsonObject context) {
+            return FluidTank.config.easyRecipe;
         }
     }
 

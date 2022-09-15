@@ -5,7 +5,6 @@ import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.CATTile
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.{BlockItem, Item}
@@ -16,9 +15,8 @@ import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateD
 import net.minecraft.world.level.block.{BaseEntityBlock, Block, RenderShape}
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.{InteractionHand, InteractionResult}
-import net.minecraftforge.network.NetworkHooks
 
-import scala.jdk.OptionConverters.RichOptional
+import scala.jdk.OptionConverters._
 
 class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(0.7f)) {
   // Chest as Tank
@@ -42,8 +40,8 @@ class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.M
       val result = for {
         cat <- level.getBlockEntity(pos, ModObjects.CAT_TYPE).toScala
         if !stack.isEmpty
-        catHandler <- cat.getFluidHandler(state.getValue(FACING)).resolve().toScala
-        r <- if (!level.isClientSide) BucketEventHandler.transferFluid(catHandler, catHandler.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY).toStack, stack)
+        catHandler <- cat.getFluidHandler(state.getValue(FACING))
+        r <- if (!level.isClientSide) BucketEventHandler.transferFluid(catHandler, catHandler.getFluidAmountStream.findFirst().orElse(FluidAmount.EMPTY), stack)
         else BucketEventHandler.checkStack(stack)
         if r.result.isSuccess
       } yield r
@@ -53,7 +51,7 @@ class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.M
           InteractionResult.SUCCESS
         case _ =>
           if (!level.isClientSide)
-            NetworkHooks.openScreen(player.asInstanceOf[ServerPlayer], level.getBlockEntity(pos).asInstanceOf[CATTile], pos)
+            player.openMenu(level.getBlockEntity(pos).asInstanceOf[CATTile])
           InteractionResult.SUCCESS
       }
     } else {

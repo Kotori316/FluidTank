@@ -2,23 +2,28 @@ package com.kotori316.fluidtank.network;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
 
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.CATTile;
 
-public class FluidCacheMessage {
+/**
+ * To Client Only.
+ */
+public class FluidCacheMessage implements IMessage<FluidCacheMessage> {
+    public static final ResourceLocation NAME = new ResourceLocation(FluidTank.modID, "fluid_cache_message");
     private final ResourceKey<Level> dimensionId;
     private final BlockPos pos;
     private final List<FluidAmount> amounts;
@@ -38,17 +43,30 @@ public class FluidCacheMessage {
             .toList();
     }
 
-    public void write(FriendlyByteBuf buffer) {
+    @Override
+    public void writeToBuffer(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(pos).writeResourceLocation(dimensionId.location());
         buffer.writeInt(amounts.size());
         amounts.forEach(a -> buffer.writeNbt(a.write(new CompoundTag())));
     }
 
-    public void onReceive(Supplier<NetworkEvent.Context> ctx) {
-        FluidTank.proxy.getLevel(ctx.get())
-            .filter(w -> w.dimension().equals(dimensionId))
-            .flatMap(w -> w.getBlockEntity(pos, ModObjects.CAT_TYPE()))
-            .ifPresent(tile -> ctx.get().enqueueWork(() -> tile.fluidCache = this.amounts));
-        ctx.get().setPacketHandled(true);
+    @Override
+    public ResourceLocation getIdentifier() {
+        return NAME;
+    }
+
+    @Environment(EnvType.CLIENT)
+    static class HandlerHolder {
+        static final ClientPlayNetworking.PlayChannelHandler HANDLER = (client, handler, buf, responseSender) -> {
+            var message = new FluidCacheMessage(buf);
+            var world = client.level;
+            if (world != null && world.dimension().equals(message.dimensionId)) {
+                client.execute(() -> {
+                    if (world.getBlockEntity(message.pos) instanceof CATTile tile) {
+                        tile.fluidCache = message.amounts;
+                    }
+                });
+            }
+        };
     }
 }

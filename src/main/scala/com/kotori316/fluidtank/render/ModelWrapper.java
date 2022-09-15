@@ -1,26 +1,19 @@
 package com.kotori316.fluidtank.render;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraftforge.client.model.BakedModelWrapper;
 
-public class ModelWrapper extends BakedModelWrapper<BakedModel> {
+public class ModelWrapper extends ForwardingBakedModel {
     public ModelWrapper(BakedModel originalModel) {
-        super(originalModel);
+        this.wrapped = originalModel;
     }
 
-    public BakedModel getOriginalModel() {
-        return this.originalModel;
-    }
-
-    @Override
-    public BakedModel applyTransform(ItemTransforms.TransformType cameraTransformType, PoseStack mat, boolean applyLeftHandTransform) {
-        return this;
+    public void setModel(BakedModel newModel) {
+        this.wrapped = newModel;
     }
 
     @Override
     public boolean isCustomRenderer() {
-        return true;
+        return false;
     }
 }

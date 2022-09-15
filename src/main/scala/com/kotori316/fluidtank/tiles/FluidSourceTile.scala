@@ -1,35 +1,27 @@
 package com.kotori316.fluidtank.tiles
 
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.fluids.FluidAmount
-import net.minecraft.core.BlockPos
+import com.kotori316.fluidtank.fluids.{FluidAmount, VariantUtil}
+import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraftforge.common.capabilities.ForgeCapabilities
-import net.minecraftforge.fluids.capability.IFluidHandler
 
 class FluidSourceTile(p: BlockPos, s: BlockState) extends BlockEntity(ModObjects.SOURCE_TYPE, p, s) {
 
   private[this] var mFluid = FluidAmount.EMPTY
   var interval = 1
   var locked = true
-  lazy val enabled: Boolean = Config.content.enableFluidSupplier.get().booleanValue()
+  lazy val enabled: Boolean = FluidTank.config.enableFluidSupplier
 
   def tick(): Unit = if (!level.isClientSide && level.getGameTime % interval == 0 && enabled) {
     // In server world only.
-    for (direction <- directions) {
-      for {
-        tile <- Option(getLevel.getBlockEntity(getBlockPos.offset(direction)))
-        cap <- tile.getCapability(ForgeCapabilities.FLUID_HANDLER, direction.getOpposite).asScala.value.value
-      } yield {
-        val accepted = cap.fill(fluid.toStack, IFluidHandler.FluidAction.SIMULATE)
-        if (accepted > 0) {
-          cap.fill(fluid.setAmount(accepted).toStack, IFluidHandler.FluidAction.EXECUTE)
-        } else {
-          0
-        }
-      }
+    for {
+      direction <- Direction.values()
+      pos = getBlockPos.offset(direction)
+      if !level.getBlockState(pos).isAir
+    } {
+      VariantUtil.fillAtPos(fluid, level, pos, direction)
     }
   }
 

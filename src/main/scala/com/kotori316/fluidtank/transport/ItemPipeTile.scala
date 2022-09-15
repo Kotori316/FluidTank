@@ -6,17 +6,12 @@ import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.HopperBlockEntity
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraftforge.common.capabilities.{Capability, ForgeCapabilities}
-import net.minecraftforge.common.util.LazyOptional
-import net.minecraftforge.items.wrapper.InvWrapper
-import net.minecraftforge.items.{IItemHandler, ItemHandlerHelper}
 
 final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObjects.ITEM_PIPE_TYPE, p, s) {
-  private[this] val handler = new PipeItemHandler(this)
+  // private[this] val handler = new PipeItemHandler(this)
   private[this] var coolTime = ItemPipeTile.defaultCoolTime
   private[this] var repeated = 0
 
@@ -36,7 +31,7 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
         }
       }
       if (handlers.nonEmpty) {
-        val outputPoses = connection.outputs(getBlockPos)
+        /*val outputPoses = connection.outputs(getBlockPos)
         handlers.foreachEntry { (f, sourcePos) =>
           val func = (i: Int) => Option(f.extractItem(i, ItemPipeTile.transferItemCount, true)).filterNot(_.isEmpty).map(item => i -> item)
           for {
@@ -54,7 +49,7 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
               f.extractItem(index, item.getCount - result.getCount, false)
             }
           }
-        }
+        }*/
       }
       repeated = if (handlers.isEmpty) Math.max(repeated - 4, 0) else repeated + 1
       coolTime = ItemPipeTile.getCoolTime(repeated)
@@ -62,28 +57,12 @@ final class ItemPipeTile(p: BlockPos, s: BlockState) extends PipeTileBase(ModObj
 
   }
 
-  override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    if (cap == ForgeCapabilities.ITEM_HANDLER) {
-      if (side != null &&
-        (!hasLevel || getBlockState.getValue(PipeBlock.FACING_TO_PROPERTY_MAP.get(side)).is(PipeBlock.Connection.CONNECTED, PipeBlock.Connection.INPUT))) {
-        LazyOptional.of(() => handler.asInstanceOf[T])
-      } else {
-        LazyOptional.empty()
-      }
-    } else {
-      super.getCapability(cap, side)
-    }
-  }
+  def findItemHandler(level: Level, pos: BlockPos, direction: Direction): OptionT[Eval, (BlockEntity, BlockPos)] = {
+    def tileCap: OptionT[Eval, (BlockEntity, BlockPos)] = for {
+      t <- OptionT(Eval.now(Option(level.getBlockEntity(pos))))
+    } yield t -> pos
 
-  def findItemHandler(level: Level, pos: BlockPos, direction: Direction): OptionT[Eval, (IItemHandler, BlockPos)] = {
-    def tileCap: OptionT[Eval, (IItemHandler, BlockPos)] = for {
-      t <- Cap.make(level.getBlockEntity(pos))
-      cap <- getCapFromCache(t, pos, direction.getOpposite, ForgeCapabilities.ITEM_HANDLER)
-    } yield cap -> pos
-
-    def entityCap: OptionT[Eval, (IItemHandler, BlockPos)] = for {
-      inv <- Cap.make(HopperBlockEntity.getContainerAt(level, pos))
-    } yield new InvWrapper(inv) -> pos
+    def entityCap: OptionT[Eval, (BlockEntity, BlockPos)] = OptionT.none
 
     tileCap orElse entityCap
   }
