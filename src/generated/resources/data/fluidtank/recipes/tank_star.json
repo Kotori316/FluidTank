@@ -1,16 +1,18 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "conditions": [
+  "tier": "Star",
+  "sub_item": {
+    "tag": "fluidtank:material_star"
+  },
+  "fabric:load_conditions": [
     {
-      "type": "fluidtank:config"
+      "condition": "fluidtank:config"
     },
     {
-      "type": "fluidtank:tag",
-      "tag": "forge:nether_stars"
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "fluidtank:material_star"
+      ]
     }
-  ],
-  "sub_item": {
-    "tag": "forge:nether_stars"
-  },
-  "tier": "star"
+  ]
 }

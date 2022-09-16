@@ -1,27 +1,26 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [
-    {
-      "type": "fluidtank:tag",
-      "tag": "forge:stone"
-    }
-  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_stone"
+    ]
+  },
   "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "fluidtank:tank_stone"
+      }
+    },
     "has_stone": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "forge:stone"
+            "tag": "fluidtank:material_stone"
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "fluidtank:tank_stone"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
@@ -30,9 +29,15 @@
       "has_stone"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "fluidtank:tank_stone"
-    ]
-  }
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "fluidtank:material_stone"
+      ]
+    }
+  ]
 }

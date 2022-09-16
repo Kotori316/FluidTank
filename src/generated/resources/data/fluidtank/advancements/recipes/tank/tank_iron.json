@@ -1,38 +1,43 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [
-    {
-      "type": "fluidtank:tag",
-      "tag": "forge:ingots/iron"
-    }
-  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_iron"
+    ]
+  },
   "criteria": {
-    "has_ingots/iron": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "fluidtank:tank_iron"
+      }
+    },
+    "has_iron": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/iron"
+            "tag": "c:iron_ingots"
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "fluidtank:tank_iron"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/iron"
+      "has_iron"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "fluidtank:tank_iron"
-    ]
-  }
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:iron_ingots"
+      ]
+    }
+  ]
 }

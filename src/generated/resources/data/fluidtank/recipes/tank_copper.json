@@ -1,16 +1,18 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "conditions": [
+  "tier": "Copper",
+  "sub_item": {
+    "tag": "c:copper_ingots"
+  },
+  "fabric:load_conditions": [
     {
-      "type": "fluidtank:config"
+      "condition": "fluidtank:config"
     },
     {
-      "type": "fluidtank:tag",
-      "tag": "forge:ingots/copper"
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:copper_ingots"
+      ]
     }
-  ],
-  "sub_item": {
-    "tag": "forge:ingots/copper"
-  },
-  "tier": "copper"
+  ]
 }

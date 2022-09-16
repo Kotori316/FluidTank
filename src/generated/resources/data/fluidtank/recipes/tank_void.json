@@ -1,23 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
-  "conditions": [
-    {
-      "type": "fluidtank:config"
-    }
-  ],
-  "key": {
-    "o": {
-      "tag": "forge:obsidian"
-    },
-    "t": {
-      "item": "fluidtank:tank_wood"
-    }
-  },
   "pattern": [
     "ooo",
     "oto",
     "ooo"
   ],
+  "key": {
+    "o": {
+      "item": "minecraft:obsidian"
+    },
+    "t": {
+      "item": "fluidtank:tank_wood"
+    }
+  },
   "result": {
     "item": "fluidtank:tank_void"
   }

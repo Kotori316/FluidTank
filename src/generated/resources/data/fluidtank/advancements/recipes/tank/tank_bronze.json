@@ -1,38 +1,43 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [
-    {
-      "type": "fluidtank:tag",
-      "tag": "forge:ingots/bronze"
-    }
-  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_bronze"
+    ]
+  },
   "criteria": {
-    "has_ingots/bronze": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "fluidtank:tank_bronze"
+      }
+    },
+    "has_bronze": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/bronze"
+            "tag": "c:bronze_ingots"
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "fluidtank:tank_bronze"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/bronze"
+      "has_bronze"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "fluidtank:tank_bronze"
-    ]
-  }
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:bronze_ingots"
+      ]
+    }
+  ]
 }

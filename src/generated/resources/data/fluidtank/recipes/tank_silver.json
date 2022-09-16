@@ -1,16 +1,18 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "conditions": [
+  "tier": "Silver",
+  "sub_item": {
+    "tag": "c:silver_ingots"
+  },
+  "fabric:load_conditions": [
     {
-      "type": "fluidtank:config"
+      "condition": "fluidtank:config"
     },
     {
-      "type": "fluidtank:tag",
-      "tag": "forge:ingots/silver"
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:silver_ingots"
+      ]
     }
-  ],
-  "sub_item": {
-    "tag": "forge:ingots/silver"
-  },
-  "tier": "silver"
+  ]
 }

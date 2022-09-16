@@ -1,14 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "fluidtank:config_pipe"
+      "condition": "fluidtank:config"
     },
     {
-      "type": "forge:not",
-      "value": {
-        "type": "fluidtank:easy"
-      }
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "fluidtank:never_exist"
+      ]
     }
   ],
   "key": {

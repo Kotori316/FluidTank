@@ -1,11 +1,14 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "forge:not",
-      "value": {
-        "type": "fluidtank:easy"
-      }
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "fluidtank:never_exist"
+      ]
     }
   ],
   "criteria": {

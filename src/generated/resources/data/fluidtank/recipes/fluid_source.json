@@ -2,16 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "I": {
-      "tag": "forge:storage_blocks/iron"
+      "item": "minecraft:iron_block"
     },
     "d": {
       "item": "minecraft:dirt"
     },
     "g": {
-      "tag": "forge:ingots/gold"
+      "tag": "c:gold_ingots"
     },
     "i": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:iron_ingots"
     },
     "w": {
       "item": "minecraft:water_bucket"

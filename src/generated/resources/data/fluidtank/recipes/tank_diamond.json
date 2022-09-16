@@ -1,16 +1,18 @@
 {
   "type": "fluidtank:crafting_grade_up",
-  "conditions": [
+  "tier": "Diamond",
+  "sub_item": {
+    "tag": "c:diamonds"
+  },
+  "fabric:load_conditions": [
     {
-      "type": "fluidtank:config"
+      "condition": "fluidtank:config"
     },
     {
-      "type": "fluidtank:tag",
-      "tag": "forge:gems/diamond"
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:diamonds"
+      ]
     }
-  ],
-  "sub_item": {
-    "tag": "forge:gems/diamond"
-  },
-  "tier": "diamond"
+  ]
 }

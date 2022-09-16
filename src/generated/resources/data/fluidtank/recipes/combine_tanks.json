@@ -1,8 +1,14 @@
 {
   "type": "fluidtank:combine_tanks",
-  "conditions": [
+  "fabric:load_conditions": [
     {
-      "type": "fluidtank:config"
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "fluidtank:never_exist"
+      ]
     }
   ]
 }

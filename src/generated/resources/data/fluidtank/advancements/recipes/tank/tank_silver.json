@@ -1,38 +1,43 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [
-    {
-      "type": "fluidtank:tag",
-      "tag": "forge:ingots/silver"
-    }
-  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_silver"
+    ]
+  },
   "criteria": {
-    "has_ingots/silver": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "fluidtank:tank_silver"
+      }
+    },
+    "has_silver": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/silver"
+            "tag": "c:silver_ingots"
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "fluidtank:tank_silver"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/silver"
+      "has_silver"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "fluidtank:tank_silver"
-    ]
-  }
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:silver_ingots"
+      ]
+    }
+  ]
 }

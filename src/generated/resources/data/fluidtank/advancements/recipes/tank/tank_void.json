@@ -1,8 +1,25 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [ ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_void"
+    ]
+  },
   "criteria": {
-    "has_tank_wood": {
+    "has_obsidian": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:obsidian"
+            ]
+          }
+        ]
+      }
+    },
+    "has_tank": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
@@ -11,25 +28,20 @@
             ]
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
+      }
     },
     "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
       "conditions": {
         "recipe": "fluidtank:tank_void"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_tank_wood"
+      "has_obsidian",
+      "has_tank",
+      "has_the_recipe"
     ]
-  ],
-  "rewards": {
-    "recipes": [
-      "fluidtank:tank_void"
-    ]
-  }
+  ]
 }

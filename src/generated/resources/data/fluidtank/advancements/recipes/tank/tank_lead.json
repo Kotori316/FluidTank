@@ -1,38 +1,43 @@
 {
   "parent": "minecraft:recipes/root",
-  "conditions": [
-    {
-      "type": "fluidtank:tag",
-      "tag": "forge:ingots/lead"
-    }
-  ],
+  "rewards": {
+    "recipes": [
+      "fluidtank:tank_lead"
+    ]
+  },
   "criteria": {
-    "has_ingots/lead": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "fluidtank:tank_lead"
+      }
+    },
+    "has_lead": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/lead"
+            "tag": "c:lead_ingots"
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
-    },
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "fluidtank:tank_lead"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_ingots/lead"
+      "has_lead"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "fluidtank:tank_lead"
-    ]
-  }
+  "fabric:load_conditions": [
+    {
+      "condition": "fluidtank:config"
+    },
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:lead_ingots"
+      ]
+    }
+  ]
 }
