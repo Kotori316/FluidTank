@@ -215,7 +215,7 @@ dependencies {
     def versionNumber = forgeVersion()
     minecraft(versionNumber)
     System.out.println("Detected $versionNumber with Minecraft ${project.minecraftVersion}" as String)
-    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.8')
+    implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.9')
     implementation(group: 'org.typelevel', name: "cats-core_2.13", version: project.cats_version)
 
     /*if (!isInCI()) {
@@ -247,7 +247,7 @@ dependencies {
 
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
 
-    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: '2.13.8-build-8', classifier: 'with-library') {
+    runtimeOnly(group: 'com.kotori316', name: 'ScalableCatsForce'.toLowerCase(Locale.ROOT), version: project.slpVersion, classifier: 'with-library') {
         transitive(false)
     }
     // Mixin
