@@ -41,13 +41,16 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
   * Licensed under the MIT License
   * Not used since 1.14.4
 
-* ~[Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)~
+* [Applied Energistics 2](https://github.com/AppliedEnergistics/Applied-Energistics-2)
   * Licensed under [LGPLv3](https://github.com/AppliedEnergistics/Applied-Energistics-2#license)
 
 * ~[Hwyla](https://github.com/TehNut/HWYLA/tree/1.16_forge)~
   * Licensed under CC BY-NC-SA 4.0
 
 * [Jade](https://github.com/Snownee/Jade)
+  * Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+* [WTHIT](https://github.com/badasintended/wthit)
   * Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 * [The One Prove](https://github.com/McJtyMods/TheOneProbe/tree/1.18)

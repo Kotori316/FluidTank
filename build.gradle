@@ -58,6 +58,10 @@ String forgeVersion() {
     return "net.minecraftforge:forge:" + versionNumber
 }
 
+String mappingVersion() {
+    return (project.parchmentMapping + "-" + project.minecraftVersion) as String
+}
+
 println("Java: ${System.getProperty('java.version')} " +
         "JVM: ${System.getProperty('java.vm.version')}(${System.getProperty('java.vendor')}) " +
         "Arch: ${System.getProperty('os.arch')}")
@@ -78,7 +82,7 @@ def commonRunSetting = {
 }
 
 minecraft {
-    mappings channel: 'parchment', version: ((project.parchmentMapping + "-" + project.minecraftVersion) as String)
+    mappings channel: 'parchment', version: mappingVersion()
     // mappings channel: 'official', version: (project.minecraftVersion as String)
     // accessTransformer = file('build/resources/main/META-INF/accesstransformer.cfg')
     runs {
@@ -214,7 +218,7 @@ configurations {
 dependencies {
     def versionNumber = forgeVersion()
     minecraft(versionNumber)
-    System.out.println("Detected $versionNumber with Minecraft ${project.minecraftVersion}" as String)
+    System.out.println("Detected $versionNumber with Minecraft ${project.minecraftVersion}, mapping ${mappingVersion()}" as String)
     implementation(group: 'org.scala-lang', name: 'scala-library', version: '2.13.9')
     implementation(group: 'org.typelevel', name: "cats-core_2.13", version: project.cats_version)
 
@@ -407,7 +411,7 @@ void moveOldLog() {
             old_log_file.createNewFile()
         def combined = new_log_file.text +
                 System.lineSeparator() +
-                "Build with ${project.forgeVersion}, Mapping: Official ${project.minecraftVersion}" +
+                "Build with ${project.forgeVersion}, Mapping: Parchment ${mappingVersion()}" +
                 System.lineSeparator() * 2 +
                 old_log_file.text
         old_log_file.setText(combined)
@@ -443,7 +447,7 @@ task checkMethod() {
         System.out.println("Forge: ${forgeVersion()}" as String)
         System.out.println("CI_FORGE: ${System.getenv("CI_FORGE")}, latest: ${"latest" == System.getenv("CI_FORGE")}" as String)
         System.out.println("Minecraft ${minecraftVersion}" as String)
-        System.out.println("Mapping ${project.minecraftVersion}" as String)
+        System.out.println("Mapping ${mappingVersion()}" as String)
         System.out.println("Is In CI ${isInCI()}" as String)
         System.out.println("FilePath ${jar.getArchiveFile().get()}" as String)
         System.out.println("FilePath ${srcJar.getArchiveFile().get()}" as String)
