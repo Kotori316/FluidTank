@@ -259,8 +259,8 @@ dependencies {
     // Test Dependencies.
     // Required these libraries to execute the tests.
     // The library will avoid errors of ForgeRegistry and Capability.
-    testImplementation(fg.deobf(group: "com.kotori316", name: "test_utility", version: project.testUtilVersion))
-    testImplementation(group: "com.kotori316", name: "test_utility_dependency", version: "1.0-SNAPSHOT")
+    implementation(fg.deobf(group: "com.kotori316", name: "test_utility", version: project.testUtilVersion))
+    implementation(group: "com.kotori316", name: "test_utility_dependency", version: "1.0-SNAPSHOT")
 
     String JUPITER_VERSION = '5.8.2'
     game_test(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: JUPITER_VERSION)
