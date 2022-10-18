@@ -22,7 +22,7 @@ jobs:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Make Java dir
         run: mkdir -p src/main/java
       - name: Assemble
@@ -30,7 +30,7 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: github.event_name != 'pull_request'
         with:
           path: build/libs/*
@@ -48,7 +48,7 @@ jobs:
       matrix:
         forge: [ 1.19, default ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get latest version
         if: ${{ matrix.forge != 'default' }}
         run: |
@@ -68,7 +68,7 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload failed test report
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: build/reports/tests/*
           name: Test-Report-${{ github.run_number }}-${{ matrix.forge }}
@@ -83,7 +83,7 @@ jobs:
     steps:
       - name: Set version
         run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: RunData
         run: chmod +x ./gradlew && ./gradlew runData
         env:
@@ -99,7 +99,7 @@ jobs:
     steps:
       - name: Set version
         run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: GameTest
         run: chmod +x ./gradlew && ./gradlew copyGameTestTemplate runGameTestServer
         env:
