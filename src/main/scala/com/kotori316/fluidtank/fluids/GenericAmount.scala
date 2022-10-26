@@ -71,7 +71,7 @@ object GenericAmount extends FluidAmountImplicits with GeneralImplicits {
 
 }
 
-private trait FluidAmountImplicits {
+private[fluids] trait FluidAmountImplicits {
   implicit val showFA: Show[FluidAmount] = Show.fromToString
   implicit val hashFA: Hash[FluidAmount] = new Hash[FluidAmount] {
     override def hash(x: FluidAmount): Int = x.hashCode()
@@ -87,7 +87,7 @@ private trait FluidAmountImplicits {
 
 }
 
-private trait GeneralImplicits {
+private[fluids] trait GeneralImplicits {
   implicit def showGA[A]: Show[GenericAmount[A]] = Show.fromToString
 
   implicit def hashGA[A]: Hash[GenericAmount[A]] = new Hash[GenericAmount[A]] {

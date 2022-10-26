@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.fluids
 
+import cats.Monoid
 import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.nbt.CompoundTag
@@ -81,4 +82,6 @@ object FluidAmount {
   def toStack(amount: FluidAmount): FluidStack = if (amount === FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(amount.c, Utils.toInt(amount.amount), amount.nbt.orNull)
 
   def registry: IForgeRegistry[Fluid] = ForgeRegistries.FLUIDS
+
+  def monoidFA: Monoid[FluidAmount] = GenericAmount.monoidFA
 }
