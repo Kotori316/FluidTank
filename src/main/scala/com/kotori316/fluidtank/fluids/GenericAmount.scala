@@ -57,11 +57,12 @@ class GenericAmount[Content]
 
   override def hashCode(): Int = Objects.hash(this.c, this.amount, this.nbt)
 
-  /**
-   * This method doesn't use [[cats.Eq]] instance to check content.
-   */
   override def equals(obj: Any): Boolean = obj match {
-    case that: GenericAmount[_] => this.c == that.c && this.amount === that.amount && this.nbt === that.nbt
+    case that: GenericAmount[_] =>
+      that.c match {
+        case this.GA.classTag(content) => this.c === content && this.amount === that.amount && this.nbt === that.nbt
+        case _ => false
+      }
     case _ => false
   }
 }

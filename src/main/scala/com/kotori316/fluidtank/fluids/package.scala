@@ -105,7 +105,7 @@ package object fluids {
     override def toString: String = "VoidTankHandler"
   }
 
-  implicit class FluidAmountExtension(val amount: FluidAmount) extends AnyVal {
+  implicit class FluidAmountExtension(private val amount: FluidAmount) extends AnyVal {
     def fluidEqual(that: FluidAmount): Boolean = amount.contentEqual(that)
 
     def toStack: FluidStack = FluidAmount.toStack(amount)

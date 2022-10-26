@@ -7,6 +7,8 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.material.{Fluid, Fluids}
 import net.minecraftforge.registries.ForgeRegistries
 
+import scala.reflect.ClassTag
+
 trait GenericAccess[A] {
 
   def isEmpty(a: A): Boolean
@@ -18,6 +20,8 @@ trait GenericAccess[A] {
   def empty: A
 
   def write(amount: GenericAmount[A], tag: CompoundTag): CompoundTag
+
+  def classTag: ClassTag[A]
 }
 
 object GenericAccess {
@@ -42,6 +46,7 @@ object GenericAccess {
       tag merge fluidNBT
     }
 
+    override def classTag: ClassTag[Fluid] = implicitly[ClassTag[Fluid]]
   }
 
   implicit val fluidAccess: GenericAccess[Fluid] = FluidAccess
