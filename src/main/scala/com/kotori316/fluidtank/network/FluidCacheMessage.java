@@ -11,16 +11,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.network.NetworkEvent;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.tiles.CATTile;
 
 public class FluidCacheMessage {
     private final ResourceKey<Level> dimensionId;
     private final BlockPos pos;
-    private final List<FluidAmount> amounts;
+    private final List<GenericAmount<Fluid>> amounts;
 
     public FluidCacheMessage(CATTile tile) {
         pos = tile.getBlockPos();

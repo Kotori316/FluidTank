@@ -6,9 +6,8 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 final class SerializeFA extends BeforeAllTest {
-    static List<FluidAmount> examples() {
+    static List<GenericAmount<Fluid>> examples() {
         return Arrays.asList(
             // Milk is not vanilla fluid, so deserialization fails.
             FluidAmount.EMPTY(),
@@ -42,14 +41,14 @@ final class SerializeFA extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource("com.kotori316.fluidtank.fluids.SerializeFA#examples")
-    void serialize(FluidAmount amount) {
+    void serialize(GenericAmount<Fluid> amount) {
         assertNotNull(amount.write(new CompoundTag()));
     }
 
     @ParameterizedTest
     @MethodSource("com.kotori316.fluidtank.fluids.SerializeFA#examples")
-    void deserialize(FluidAmount amount) {
-        FluidAmount deserialized = FluidAmount.fromNBT(amount.write(new CompoundTag()));
+    void deserialize(GenericAmount<Fluid> amount) {
+        var deserialized = FluidAmount.fromNBT(amount.write(new CompoundTag()));
         assertEquals(amount, deserialized);
     }
 

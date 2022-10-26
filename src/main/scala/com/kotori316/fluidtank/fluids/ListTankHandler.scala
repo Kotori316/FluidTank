@@ -4,6 +4,7 @@ import cats.Align
 import cats.data.Chain
 import cats.implicits._
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
+import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
@@ -12,13 +13,13 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     this(t, false)
   }
 
-  def getTankList: Chain[Tank] = tankHandlers.map(_.getTank)
+  def getTankList: Chain[Tank[Fluid]] = tankHandlers.map(_.getTank)
 
   override def getTanks: Int = 1
 
   override def getFluidInTank(tank: Int): FluidStack = {
     // Drain from bottom tank.
-    val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
+    val drainOps: Chain[TankOperation[Fluid]] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
     val drained = this.action(opList(drainOps), FluidAmount.EMPTY.setAmount(getSumOfCapacity), IFluidHandler.FluidAction.SIMULATE)
     drained.toStack
   }
@@ -33,7 +34,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
   }
 
-  protected def action(op: ListTankOperation[Chain], resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  protected def action(op: ListTankOperation[Chain, Fluid], resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
     val (log, left, newTanks) = op.run((), resource)
     val moved = resource - left
     if (action.execute())
@@ -51,11 +52,11 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     }
     if (resource.isGaseous) {
       // Fill from upper
-      val fillOps: Chain[TankOperation] = tankHandlers.map(t => t.getFillOperation(t.getTank)).reverse
+      val fillOps: Chain[TankOperation[Fluid]] = tankHandlers.map(t => t.getFillOperation(t.getTank)).reverse
       this.action(opList(fillOps).map(_.reverse), resource, action)
     } else {
       // Fill from bottom tank
-      val fillOps: Chain[TankOperation] = tankHandlers.map(t => t.getFillOperation(t.getTank))
+      val fillOps: Chain[TankOperation[Fluid]] = tankHandlers.map(t => t.getFillOperation(t.getTank))
       this.action(opList(fillOps), resource, action)
     }
   }
@@ -63,11 +64,11 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
   def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
     if (toDrain.isGaseous || getTankList.lastOption.exists(_.fluidAmount.isGaseous)) {
       // Drain from bottom tank.
-      val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
+      val drainOps: Chain[TankOperation[Fluid]] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
       this.action(opList(drainOps), toDrain, action)
     } else {
       // Drain from upper tank.
-      val drainOps: Chain[TankOperation] = tankHandlers.map(t => t.getDrainOperation(t.getTank)).reverse
+      val drainOps: Chain[TankOperation[Fluid]] = tankHandlers.map(t => t.getDrainOperation(t.getTank)).reverse
       this.action(opList(drainOps).map(_.reverse), toDrain, action)
     }
   }
@@ -82,7 +83,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
     }
   }
 
-  protected def updateTanks(newTanks: Chain[Tank]): Unit = {
+  protected def updateTanks(newTanks: Chain[Tank[Fluid]]): Unit = {
     Align[Chain].zipAll(tankHandlers, newTanks, EmptyTankHandler, Tank.EMPTY)
       .iterator.foreach { case (handler, tank) => handler.setTank(tank) }
   }
