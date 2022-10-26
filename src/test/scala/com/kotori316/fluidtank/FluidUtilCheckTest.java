@@ -143,7 +143,7 @@ final class FluidUtilCheckTest extends BeforeAllTest {
             () -> assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid()), // Input will not be changed.
             () -> assertTrue(RecipeInventoryUtil.getFluidHandler(result.getResult()).getFluid().isEmpty()),
             () -> assertTrue(result.isSuccess()),
-            () -> assertEquals(FluidAmount.BUCKET_WATER(), tank.getTank().fluidAmount())
+            () -> assertEquals(FluidAmount.BUCKET_WATER(), tank.getTank().genericAmount())
         );
     }
 }

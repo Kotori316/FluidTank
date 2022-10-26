@@ -15,10 +15,10 @@ object CreativeTankHandler {
   def creativeFillOp(tank: Tank[Fluid]): TankOperation[Fluid] =
     if (tank.isEmpty) {
       // Fill tank.
-      fillOp(tank).map(t => t.copy(t.fluidAmount.setAmount(t.capacity)))
+      fillOp(tank).map(t => t.copy(t.genericAmount.setAmount(t.capacity)))
     } else {
       ReaderWriterStateT.applyS { s =>
-        if (tank.fluidAmount fluidEqual s) {
+        if (tank.genericAmount fluidEqual s) {
           (Chain(FluidTransferLog.FillAll(s, tank)), FluidAmount.EMPTY, tank)
         } else {
           (Chain(FluidTransferLog.FillFailed(s, tank)), s, tank)
@@ -31,8 +31,8 @@ object CreativeTankHandler {
       drainOp(tank) // Nothing to change.
     } else {
       ReaderWriterStateT.applyS { s =>
-        if ((tank.fluidAmount fluidEqual s) || (FluidAmount.EMPTY fluidEqual s)) {
-          (Chain(FluidTransferLog.DrainFluid(s, s, tank, tank)), tank.fluidAmount.setAmount(0L), tank)
+        if ((tank.genericAmount fluidEqual s) || (FluidAmount.EMPTY fluidEqual s)) {
+          (Chain(FluidTransferLog.DrainFluid(s, s, tank, tank)), tank.genericAmount.setAmount(0L), tank)
         } else {
           (Chain(FluidTransferLog.DrainFailed(s, tank)), s, tank)
         }

@@ -23,7 +23,7 @@ class CreativeTankHandlerTest extends BeforeAllTest {
       } else {
         assertEquals(key.toAmount(amount), filled, "If fluid is not empty, all fluid must be filled.")
       }
-      assertTrue(h.getTank.fluidAmount.isEmpty, s"Simulation shouldn't change the content. ${h.getTank}")
+      assertTrue(h.getTank.genericAmount.isEmpty, s"Simulation shouldn't change the content. ${h.getTank}")
     }
 
     @ParameterizedTest
@@ -36,8 +36,8 @@ class CreativeTankHandlerTest extends BeforeAllTest {
         assertEquals(key.toAmount(0), filled, "If fluid is empty, filled amount must be 0.")
       } else {
         assertEquals(fluidAmount, filled, "If fluid is not empty, all fluid must be filled.")
-        assertEquals(key, FluidKey.from(h.getTank.fluidAmount), s"Execution must change the content. ${h.getTank}")
-        assertEquals(Long.MaxValue, h.getTank.fluidAmount.amount, s"Inserting to creative tank must fill all tanks to max. ${h.getTank}")
+        assertEquals(key, FluidKey.from(h.getTank.genericAmount), s"Execution must change the content. ${h.getTank}")
+        assertEquals(Long.MaxValue, h.getTank.genericAmount.amount, s"Inserting to creative tank must fill all tanks to max. ${h.getTank}")
       }
     }
 
@@ -82,7 +82,7 @@ class CreativeTankHandlerTest extends BeforeAllTest {
       assertAll(
         () => assertEquals(0, h.fill(FluidStack.EMPTY, IFluidHandler.FluidAction.SIMULATE), "Filling EMPTY"),
         () => assertEquals(0, h.fill(FluidStack.EMPTY, IFluidHandler.FluidAction.EXECUTE), "Filling EMPTY"),
-        () => assertTrue(h.getTank.fluidAmount.isEmpty, "Fill with 0 cause no changes."),
+        () => assertTrue(h.getTank.genericAmount.isEmpty, "Fill with 0 cause no changes."),
         () => assertEquals(FluidAmount.EMPTY, FluidAmount.fromStack(h.drain(FluidStack.EMPTY, IFluidHandler.FluidAction.SIMULATE)), "Drain empty fluid to get EMPTY."),
         () => assertEquals(FluidAmount.EMPTY, FluidAmount.fromStack(h.drain(0, IFluidHandler.FluidAction.SIMULATE)), "Drain 0 fluid to get EMPTY."),
       )
@@ -105,8 +105,8 @@ class CreativeTankHandlerTest extends BeforeAllTest {
       assertTrue(handler.getTank.isEmpty)
       val filled = handler.fill(key.toAmount(1000L), IFluidHandler.FluidAction.EXECUTE)
       assertEquals(key.toAmount(1000L), filled)
-      assertEquals(handler.getTank.capacity, handler.getTank.fluidAmount.amount, "Must be filled to full.")
-      assertEquals(key, FluidKey.from(handler.getTank.fluidAmount), "Must be equal to filled fluid.")
+      assertEquals(handler.getTank.capacity, handler.getTank.genericAmount.amount, "Must be filled to full.")
+      assertEquals(key, FluidKey.from(handler.getTank.genericAmount), "Must be equal to filled fluid.")
     }
 
     @ParameterizedTest

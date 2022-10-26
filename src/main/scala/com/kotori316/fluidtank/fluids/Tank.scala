@@ -9,10 +9,6 @@ case class Tank[A](genericAmount: GenericAmount[A], capacity: Long) {
   def amount: Long = genericAmount.amount
 
   def isEmpty: Boolean = genericAmount.isEmpty
-
-  @deprecated(message = "Temporary compile")
-  @Deprecated(forRemoval = true)
-  def fluidAmount: GenericAmount[A] = this.genericAmount
 }
 
 object Tank {

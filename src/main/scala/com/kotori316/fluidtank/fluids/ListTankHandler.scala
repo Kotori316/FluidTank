@@ -45,7 +45,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
 
   def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
     if (limitOneFluid) {
-      val fluidInTank = tankHandlers.headOption.map(_.getTank.fluidAmount).filter(_.nonEmpty)
+      val fluidInTank = tankHandlers.headOption.map(_.getTank.genericAmount).filter(_.nonEmpty)
       if (!fluidInTank.forall(_ fluidEqual resource)) {
         return FluidAmount.EMPTY
       }
@@ -62,7 +62,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
   }
 
   def drain(toDrain: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
-    if (toDrain.isGaseous || getTankList.lastOption.exists(_.fluidAmount.isGaseous)) {
+    if (toDrain.isGaseous || getTankList.lastOption.exists(_.genericAmount.isGaseous)) {
       // Drain from bottom tank.
       val drainOps: Chain[TankOperation[Fluid]] = tankHandlers.map(t => t.getDrainOperation(t.getTank))
       this.action(opList(drainOps), toDrain, action)

@@ -25,7 +25,7 @@ object TransferOperationTest extends BeforeAllTest {
       val x1: Seq[Executable] = {
         val (log, left, tank) = fillAction.run((), fa.setAmount(10000))
         Seq(
-          () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.FillFluid[Fluid]])),
+          () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.FillFluid[_]])),
           () => assertTrue(left.isEmpty),
           () => assertEquals(Tank(fa.setAmount(10000), 16000), tank),
         )
@@ -44,8 +44,8 @@ object TransferOperationTest extends BeforeAllTest {
 
       val (_, left, (a, b)) = fillAction.run((), fa.setAmount(20000))
       assertTrue(left.isEmpty)
-      assertEquals(fa.setAmount(16000), a.fluidAmount)
-      assertEquals(fa.setAmount(4000), b.fluidAmount)
+      assertEquals(fa.setAmount(16000), a.genericAmount)
+      assertEquals(fa.setAmount(4000), b.genericAmount)
     }
 
     @ParameterizedTest
@@ -198,7 +198,7 @@ object TransferOperationTest extends BeforeAllTest {
       val drainAction = drainOp(lavaTank)
       val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_WATER.setAmount(10000))
       val x1: Seq[Executable] = Seq(
-        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[Fluid]])),
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[_]])),
         () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(10000), left),
         () => assertEquals(lavaTank, tank),
       )
@@ -212,7 +212,7 @@ object TransferOperationTest extends BeforeAllTest {
       val (log, left, tank) = drainAction.run((), toDrain)
       val drained = toDrain - left
       val x2: Seq[Executable] = Seq(
-        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFluid[Fluid]])),
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFluid[_]])),
         () => assertEquals(FluidAmount.BUCKET_LAVA.setAmount(6000), left),
         () => assertEquals(Tank(FluidAmount.BUCKET_LAVA.setAmount(0), 16000), tank),
         () => assertEquals(FluidAmount.BUCKET_LAVA * 4, drained)
@@ -226,7 +226,7 @@ object TransferOperationTest extends BeforeAllTest {
       val drainAction = drainOp(Tank.EMPTY)
       val (log, left, tank) = drainAction.run((), fa.setAmount(10000))
       val e1: Seq[Executable] = Seq(
-        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[Fluid]]), s"Log=$log"),
+        () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[_]]), s"Log=$log"),
         () => assertEquals(fa.setAmount(10000), left),
         () => assertEquals(Tank.EMPTY, tank),
       )
@@ -239,7 +239,7 @@ object TransferOperationTest extends BeforeAllTest {
       val e1: Seq[Executable] = {
         val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_WATER.setAmount(10000))
         Seq(
-          () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[Fluid]]), s"Log=$log"),
+          () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[_]]), s"Log=$log"),
           () => assertEquals(FluidAmount.BUCKET_WATER.setAmount(10000), left),
           () => assertEquals(waterTank, tank),
         )
@@ -247,7 +247,7 @@ object TransferOperationTest extends BeforeAllTest {
       val e2: Seq[Executable] = {
         val (log, left, tank) = drainAction.run((), FluidAmount.BUCKET_LAVA.setAmount(10000))
         Seq(
-          () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[Fluid]]), s"Log=$log"),
+          () => assertTrue(log.forall(_.isInstanceOf[FluidTransferLog.DrainFailed[_]]), s"Log=$log"),
           () => assertEquals(FluidAmount.BUCKET_LAVA.setAmount(10000), left),
           () => assertEquals(waterTank, tank),
         )

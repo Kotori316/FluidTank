@@ -36,7 +36,7 @@ object TankHandlerTest extends BeforeAllTest {
       val tank = TankHandler(4000L)
       val filled = tank.fill(key.createStack(4000), IFluidHandler.FluidAction.EXECUTE)
       assertEquals(4000, filled)
-      assertEquals(key.toAmount(4000), tank.getTank.fluidAmount)
+      assertEquals(key.toAmount(4000), tank.getTank.genericAmount)
     }
 
     @ParameterizedTest
@@ -45,7 +45,7 @@ object TankHandlerTest extends BeforeAllTest {
       val tank = TankHandler(Tank(FluidKey(Fluids.EMPTY, tag = Option(new CompoundTag().tap(_.putBoolean("h", true)))).toAmount(0), 4000))
       val filled = tank.fill(key.createStack(4000), IFluidHandler.FluidAction.EXECUTE)
       assertEquals(4000, filled)
-      assertEquals(key.toAmount(4000), tank.getTank.fluidAmount)
+      assertEquals(key.toAmount(4000), tank.getTank.genericAmount)
     }
 
 
@@ -59,7 +59,7 @@ object TankHandlerTest extends BeforeAllTest {
       if (mode.simulate()) {
         assertTrue(tank.getTank.isEmpty)
       } else {
-        assertEquals(FluidAmount.fromStack(stack), tank.getTank.fluidAmount)
+        assertEquals(FluidAmount.fromStack(stack), tank.getTank.genericAmount)
       }
     }
 
@@ -68,7 +68,7 @@ object TankHandlerTest extends BeforeAllTest {
       val tank = TankHandler(4000L)
       val filled = tank.fill(new FluidStack(Fluids.EMPTY, 4000), IFluidHandler.FluidAction.EXECUTE)
       assertEquals(0, filled)
-      assertEquals(FluidAmount.EMPTY, tank.getTank.fluidAmount)
+      assertEquals(FluidAmount.EMPTY, tank.getTank.genericAmount)
     }
 
     @ParameterizedTest
@@ -79,7 +79,7 @@ object TankHandlerTest extends BeforeAllTest {
 
       val filled = tank.fill(key.createStack(4000), IFluidHandler.FluidAction.SIMULATE)
       assertEquals(4000, filled)
-      assertEquals(FluidAmount.EMPTY, tank.getTank.fluidAmount, "Simulation must not change the content.")
+      assertEquals(FluidAmount.EMPTY, tank.getTank.genericAmount, "Simulation must not change the content.")
       assertEquals(before, tank.getTank)
     }
 
@@ -150,7 +150,7 @@ object TankHandlerTest extends BeforeAllTest {
       val tank = TankHandler(4000L)
       val drained = tank.drain(1000, IFluidHandler.FluidAction.EXECUTE)
       assertTrue(drained.isEmpty)
-      assertTrue(tank.getTank.fluidAmount.isEmpty)
+      assertTrue(tank.getTank.genericAmount.isEmpty)
     }
 
     @Test
@@ -161,7 +161,7 @@ object TankHandlerTest extends BeforeAllTest {
 
       val drained = tank.drain(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE)
       assertEquals(FluidAmount.fromStack(new FluidStack(Fluids.WATER, 1000)), FluidAmount.fromStack(drained))
-      assertTrue(tank.getTank.fluidAmount.isEmpty)
+      assertTrue(tank.getTank.genericAmount.isEmpty)
     }
 
     @Test
@@ -173,7 +173,7 @@ object TankHandlerTest extends BeforeAllTest {
       val drained = tank.drain(1000, IFluidHandler.FluidAction.EXECUTE)
       assertEquals(FluidAmount.BUCKET_WATER, FluidAmount.fromStack(drained))
       assertEquals(FluidAmount.fromStack(new FluidStack(Fluids.WATER, 1000)), FluidAmount.fromStack(drained))
-      assertTrue(tank.getTank.fluidAmount.isEmpty)
+      assertTrue(tank.getTank.genericAmount.isEmpty)
     }
 
     @Test

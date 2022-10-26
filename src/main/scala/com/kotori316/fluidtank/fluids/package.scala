@@ -19,10 +19,10 @@ package object fluids {
     if (s.isEmpty) {
       // Nothing to fill, skip.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
-    } else if (tank.fluidAmount.isEmpty || (tank.fluidAmount contentEqual s)) {
+    } else if (tank.genericAmount.isEmpty || (tank.genericAmount contentEqual s)) {
       val filledAmount = (tank.capacity |-| tank.amount) min s.amount
       val filledStack = s.setAmount(filledAmount)
-      val newTank = tank.copy(tank.fluidAmount + filledStack)
+      val newTank = tank.copy(tank.genericAmount + filledStack)
       (Chain(FluidTransferLog.FillFluid(s, filledStack, tank, newTank)), s - filledStack, newTank)
     } else {
       (Chain(FluidTransferLog.FillFailed(s, tank)), s, tank)
@@ -34,10 +34,10 @@ package object fluids {
     if (s.amount === 0L) {
       // Nothing to drain.
       (Chain(FluidTransferLog.Empty(s, tank)), s, tank)
-    } else if (s.contentIsEmpty || (s contentEqual tank.fluidAmount)) {
+    } else if (s.contentIsEmpty || (s contentEqual tank.genericAmount)) {
       val drainAmount = tank.amount min s.amount
-      val drainedStack = tank.fluidAmount.setAmount(drainAmount)
-      val newTank = tank.copy(tank.fluidAmount.setAmount(tank.amount |-| drainAmount))
+      val drainedStack = tank.genericAmount.setAmount(drainAmount)
+      val newTank = tank.copy(tank.genericAmount.setAmount(tank.amount |-| drainAmount))
       val subtracted = if (drainedStack.nonEmpty) s - drainedStack else s
       (Chain(FluidTransferLog.DrainFluid(s, drainedStack, tank, newTank)), subtracted, newTank)
     } else {
