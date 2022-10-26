@@ -1,6 +1,5 @@
 package com.kotori316.fluidtank.fluids
 
-import cats._
 import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.nbt.CompoundTag
@@ -82,17 +81,4 @@ object FluidAmount {
   def toStack(amount: FluidAmount): FluidStack = if (amount === FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(amount.c, Utils.toInt(amount.amount), amount.nbt.orNull)
 
   def registry: IForgeRegistry[Fluid] = ForgeRegistries.FLUIDS
-
-  implicit val showFA: Show[FluidAmount] = Show.fromToString
-  implicit val hashFA: Hash[FluidAmount] = new Hash[FluidAmount] {
-    override def hash(x: FluidAmount): Int = x.hashCode()
-
-    override def eqv(x: FluidAmount, y: FluidAmount): Boolean = x.fluidEqual(y) && (x.amount === y.amount)
-  }
-  implicit val monoidFA: Monoid[FluidAmount] = new Monoid[FluidAmount] {
-    override def empty: FluidAmount = FluidAmount.EMPTY
-
-    override def combine(x: FluidAmount, y: FluidAmount): FluidAmount = x + y
-  }
-
 }
