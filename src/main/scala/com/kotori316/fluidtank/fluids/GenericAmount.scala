@@ -59,8 +59,9 @@ class GenericAmount[Content]
 
   override def equals(obj: Any): Boolean = obj match {
     case that: GenericAmount[_] =>
+      val tag = this.GA.classTag
       that.c match {
-        case this.GA.classTag(content) => this.c === content && this.amount === that.amount && this.nbt === that.nbt
+        case tag(content) => this.c === content && this.amount === that.amount && this.nbt === that.nbt
         case _ => false
       }
     case _ => false
