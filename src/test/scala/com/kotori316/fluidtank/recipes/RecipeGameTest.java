@@ -9,6 +9,7 @@ import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
@@ -62,7 +63,7 @@ public final class RecipeGameTest {
     public void tanksForIronUnavailableNG(GameTestHelper helper) {
         try {
             Config.content().usableUnavailableTankInRecipe().set(false);
-            var tanks = TierRecipe.getTankSet(Tier.IRON, GameTestUtil.getContext(helper));
+            var tanks = TierRecipe.getTankSet(Tier.IRON, ICondition.IContext.EMPTY);
             assertEquals(Set.of(
                 ModObjects.tierToBlock().apply(Tier.STONE),
                 ModObjects.tierToBlock().apply(Tier.COPPER)
