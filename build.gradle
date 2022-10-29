@@ -227,6 +227,8 @@ dependencies {
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
         compileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion, classifier: "api"))
+        testImplementation(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
+        // Used in game test
     }
 
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))
