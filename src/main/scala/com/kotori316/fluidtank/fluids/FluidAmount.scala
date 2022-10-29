@@ -13,33 +13,6 @@ import org.jetbrains.annotations.Nullable
 
 import scala.util.chaining._
 
-//
-//class FluidAmount(@NotNull val fluid: Fluid, override val amount: Long, @NotNull override val nbt: Option[CompoundTag]) extends GenericAmount[Fluid, FluidAmount](fluid, amount, nbt) {
-//  override type StackType = FluidStack
-//
-//  override def setAmount(newAmount: Long): FluidAmount = {
-//    if (newAmount === this.amount) this // No need to create new instance.
-//    else FluidAmount(fluid, newAmount, nbt)
-//  }
-//
-//  override def empty: FluidAmount = FluidAmount.EMPTY
-//
-//  override def write(tag: CompoundTag): CompoundTag = {
-//    import com.kotori316.fluidtank.fluids.FluidAmount._
-//
-//    val fluidNBT = new CompoundTag()
-//    fluidNBT.putString(NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
-//    fluidNBT.putLong(NBT_amount, amount)
-//    this.nbt.foreach(fluidNBT.put(NBT_tag, _))
-//
-//    tag merge fluidNBT
-//  }
-//
-//  def fluidEqual(that: FluidAmount): Boolean = this.contentEqual(that)
-//
-//  def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount), nbt.orNull)
-//}
-
 object FluidAmount {
   final val NBT_fluid = "fluid"
   final val NBT_amount = "amount"
