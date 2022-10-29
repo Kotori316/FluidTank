@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Assertions._
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
 class MekanismGasTest {
+  type TankAPI = mekanism.api.chemical.IChemicalTank[Gas, GasStack]
+
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
   def instance(helper: GameTestHelper): Unit = {
     val handler = new GasTankHandler
@@ -76,7 +78,7 @@ class MekanismGasTest {
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
   def insertToEmpty3GasAPI(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(6000)
-    val tank: mekanism.api.chemical.IChemicalTank[Gas, GasStack] = handler
+    val tank: TankAPI = handler
 
     val left = tank.insert(MekanismGases.OXYGEN.getStack(1000), MekanismAction.SIMULATE, AutomationType.EXTERNAL)
     assertTrue(left.isEmpty, "The API requests that empty stack is returned if whole stack is accepted.")
@@ -87,7 +89,7 @@ class MekanismGasTest {
   def drainGasAPI1(helper: GameTestHelper): Unit = {
     val stack = MekanismGases.OXYGEN.getStack(2000)
     val handler = GasTankHandler(Tank(GasAmount.fromStack(stack), 6000))
-    val tank: mekanism.api.chemical.IChemicalTank[Gas, GasStack] = handler
+    val tank: TankAPI = handler
     val drained = tank.extract(3000, MekanismAction.SIMULATE, AutomationType.EXTERNAL)
 
     assertEquals(stack, drained)
@@ -99,7 +101,7 @@ class MekanismGasTest {
   def drainGasAPI2(helper: GameTestHelper): Unit = {
     val stack = MekanismGases.OXYGEN.getStack(2000)
     val handler = GasTankHandler(Tank(GasAmount.fromStack(stack), 6000))
-    val tank: mekanism.api.chemical.IChemicalTank[Gas, GasStack] = handler
+    val tank: TankAPI = handler
     val drained = tank.extract(1500, MekanismAction.SIMULATE, AutomationType.EXTERNAL)
 
     assertEquals(new GasStack(stack, 1500), drained)
