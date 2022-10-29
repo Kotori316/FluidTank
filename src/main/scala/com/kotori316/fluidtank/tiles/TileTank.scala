@@ -188,7 +188,7 @@ object TileTank {
     // Util methods
     def getFluidAmount: Long = this.getTank.amount
 
-    def getFluid: FluidAmount = this.getTank.fluidAmount
+    def getFluid: FluidAmount = this.getTank.genericAmount
 
     protected def capacity = this.getTank.capacity
 
@@ -210,7 +210,7 @@ object TileTank {
     }
 
     def readFromNBT(nbt: CompoundTag): TankHandler with TileTank.RealTank = {
-      val newTank: Tank = Tank(FluidAmount.fromNBT(nbt), nbt.getLong(TileTank.NBT_Capacity))
+      val newTank = Tank(FluidAmount.fromNBT(nbt), nbt.getLong(TileTank.NBT_Capacity))
       setTank(newTank)
       self
     }

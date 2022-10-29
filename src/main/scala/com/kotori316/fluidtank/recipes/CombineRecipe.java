@@ -18,6 +18,7 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -33,6 +34,7 @@ import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
 
@@ -59,18 +61,18 @@ public class CombineRecipe extends CustomRecipe {
             .filter(s -> !s.isEmpty()).filter(tanks).count();
         if (tankCount < 2) return false;
         // Check all tanks have the same fluid.
-        List<FluidAmount> fluids = IntStream.range(0, inv.getContainerSize())
+        List<GenericAmount<Fluid>> fluids = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
             .map(s -> getHandler(s)
                 .map(TankItemFluidHandler::getFluid)
                 .orElse(FluidAmount.EMPTY()))
             .toList();
         boolean allSameFluid = fluids.stream()
-            .map(FluidKey::from)
-            .filter(FluidKey::isDefined)
-            .distinct().count() == 1;
+                                   .map(FluidKey::from)
+                                   .filter(FluidKey::isDefined)
+                                   .distinct().count() == 1;
         if (!allSameFluid) return false;
-        long totalAmount = fluids.stream().mapToLong(FluidAmount::amount).sum();
+        long totalAmount = fluids.stream().mapToLong(GenericAmount::amount).sum();
         return getMaxCapacityTank(inv).map(p -> p.getRight() >= totalAmount).orElse(false);
     }
 
@@ -90,19 +92,19 @@ public class CombineRecipe extends CustomRecipe {
 
     @Override
     public ItemStack assemble(CraftingContainer inv) {
-        Optional<FluidAmount> fluid = IntStream.range(0, inv.getContainerSize())
+        Optional<GenericAmount<Fluid>> fluid = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
             .map(s -> getHandler(s)
                 .map(TankItemFluidHandler::getFluid)
                 .orElse(FluidAmount.EMPTY()))
-            .filter(FluidAmount::nonEmpty)
-            .reduce(FluidAmount::$plus);
+            .filter(GenericAmount::nonEmpty)
+            .reduce(FluidAmount.monoidFA()::combine);
         Optional<ItemStack> tank = getMaxCapacityTank(inv)
             .flatMap(p -> getHandler(ItemHandlerHelper.copyStackWithSize(p.getLeft(), 1))
                 .flatMap(h ->
                     fluid.map(f -> {
                         h.drain(h.getFluidInTank(0), IFluidHandler.FluidAction.EXECUTE);
-                        h.fill(f.toStack(), IFluidHandler.FluidAction.EXECUTE);
+                        h.fill(FluidAmount.toStack(f), IFluidHandler.FluidAction.EXECUTE);
                         return h.getContainer();
                     })));
         return tank.orElse(ItemStack.EMPTY);

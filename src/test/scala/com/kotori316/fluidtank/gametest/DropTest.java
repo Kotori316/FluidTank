@@ -19,6 +19,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -26,6 +27,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.testutil.GameTestUtil;
@@ -77,7 +79,7 @@ public final class DropTest {
             .toList();
     }
 
-    void dropOfWaterTank1(GameTestHelper helper, FluidAmount amount) {
+    void dropOfWaterTank1(GameTestHelper helper, GenericAmount<Fluid> amount) {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);

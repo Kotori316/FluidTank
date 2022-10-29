@@ -3,15 +3,15 @@ package com.kotori316.fluidtank.fluids
 import cats.Eq
 import net.minecraft.world.level.material.Fluid
 
-case class Tank(fluidAmount: FluidAmount, capacity: Long) {
-  def fluid: Fluid = fluidAmount.fluid
+case class Tank[A](genericAmount: GenericAmount[A], capacity: Long) {
+  def content: A = genericAmount.c
 
-  def amount: Long = fluidAmount.amount
+  def amount: Long = genericAmount.amount
 
-  def isEmpty: Boolean = fluidAmount.isEmpty
+  def isEmpty: Boolean = genericAmount.isEmpty
 }
 
 object Tank {
-  final val EMPTY: Tank = Tank(FluidAmount.EMPTY, 0L)
-  implicit final val eqTank: Eq[Tank] = Eq.and(Eq.by(_.fluidAmount), Eq.by(_.capacity))
+  final val EMPTY: Tank[Fluid] = Tank(FluidAmount.EMPTY, 0L)
+  implicit final val eqTank: Eq[Tank[Fluid]] = Eq.and(Eq.by(_.genericAmount), Eq.by(_.capacity))
 }

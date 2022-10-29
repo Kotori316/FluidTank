@@ -75,7 +75,7 @@ public final class LoadTest {
             assertFalse(tank.connection().isDummy());
             assertEquals(2, tank.connection().seq().size(), String.valueOf(tank.connection().seq()));
             assertEquals(24000L, tank.connection().amount());
-            assertEquals(Fluids.WATER, tank.connection().fluidType().fluid());
+            assertEquals(Fluids.WATER, tank.connection().fluidType().c());
         } else {
             fail("Tank entity is not presented at %s.".formatted(helper.absolutePos(pos)));
         }

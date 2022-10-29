@@ -4,6 +4,7 @@ import cats.data._
 import cats.implicits._
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.blocks.TankPos
+import com.kotori316.fluidtank.fluids.FluidAmount._
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}

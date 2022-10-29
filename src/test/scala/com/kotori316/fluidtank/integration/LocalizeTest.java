@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.material.Fluid;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,6 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.tiles.Tier;
 
 import static com.kotori316.fluidtank.integration.Localize.FLUID_NULL;
@@ -26,12 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LocalizeTest extends BeforeAllTest {
-    static CompoundTag createTankData(Tier tier, FluidAmount fluid) {
+    static CompoundTag createTankData(Tier tier, GenericAmount<Fluid> fluid) {
         long capacity = tier.amount();
         var tag = new CompoundTag();
         tag.putString(NBT_Tier, tier.toString());
         tag.putString(NBT_ConnectionFluidName,
-            Optional.of(fluid).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL));
+            Optional.of(fluid).filter(GenericAmount::nonEmpty).map(GenericAmount::getLocalizedName).orElse(FLUID_NULL));
         tag.putBoolean(NBT_Creative, tier == Tier.CREATIVE);
         tag.putLong(NBT_ConnectionAmount, fluid.amount());
         tag.putLong(NBT_ConnectionCapacity, capacity);

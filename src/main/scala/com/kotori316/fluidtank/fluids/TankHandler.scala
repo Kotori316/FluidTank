@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.fluids
 import cats.data.Chain
 import cats.implicits.{catsSyntaxEq, catsSyntaxFoldOps}
 import com.kotori316.fluidtank._
+import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
@@ -12,9 +13,9 @@ import net.minecraftforge.fluids.capability.IFluidHandler
  */
 class TankHandler extends IFluidHandler {
 
-  private[this] final var tank: Tank = Tank.EMPTY
+  private[this] final var tank: Tank[Fluid] = Tank.EMPTY
 
-  def setTank(newTank: Tank): Unit = {
+  def setTank(newTank: Tank[Fluid]): Unit = {
     if (this.tank =!= newTank) {
       this.tank = newTank
       onContentsChanged()
@@ -27,7 +28,7 @@ class TankHandler extends IFluidHandler {
     this.tank = newTank
   }
 
-  def getTank: Tank = tank
+  def getTank: Tank[Fluid] = tank
 
   def onContentsChanged(): Unit = ()
 
@@ -41,15 +42,15 @@ class TankHandler extends IFluidHandler {
   // Discards current state.
   override def isFluidValid(tank: Int, stack: FluidStack): Boolean = true
 
-  def getFillOperation(tank: Tank): TankOperation = fillOp(tank)
+  def getFillOperation(tank: Tank[Fluid]): TankOperation[Fluid] = fillOp(tank)
 
-  def getDrainOperation(tank: Tank): TankOperation = drainOp(tank)
+  def getDrainOperation(tank: Tank[Fluid]): TankOperation[Fluid] = drainOp(tank)
 
   override final def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
     Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
   }
 
-  private final def action(op: TankOperation, resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
+  private final def action(op: TankOperation[Fluid], resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
     val (log, left, newTank) = op.run((), resource)
     val moved: FluidAmount = resource - left
     if (action.execute())
@@ -86,7 +87,7 @@ object TankHandler {
     h
   }
 
-  def apply(tank: Tank): TankHandler = {
+  def apply(tank: Tank[Fluid]): TankHandler = {
     val h = new TankHandler()
     h setTank tank
     h

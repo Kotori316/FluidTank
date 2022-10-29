@@ -18,7 +18,7 @@ case class FluidKey(fluid: Fluid, tag: Option[CompoundTag]) {
 object FluidKey {
   def apply(fluid: Fluid, tag: Option[CompoundTag]): FluidKey = new FluidKey(fluid, tag.map(_.copy()))
 
-  def from(fluidAmount: FluidAmount): FluidKey = FluidKey(fluidAmount.fluid, fluidAmount.nbt)
+  def from(fluidAmount: FluidAmount): FluidKey = FluidKey(fluidAmount.c, fluidAmount.nbt)
 
   def from(stack: FluidStack): FluidKey = FluidKey(stack.getRawFluid, Option(stack.getTag))
 

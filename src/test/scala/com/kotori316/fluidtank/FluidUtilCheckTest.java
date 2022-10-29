@@ -106,12 +106,12 @@ final class FluidUtilCheckTest extends BeforeAllTest {
     void tryTransfer() {
         var tankStack = new ItemStack(BLOCK_TANK);
         var tank = TankHandler.apply(5000L);
-        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.EXECUTE);
 
         var container = ItemHandlerHelper.copyStackWithSize(tankStack, 1);
         FluidStack transfer = FluidUtil.tryFluidTransfer(tank, RecipeInventoryUtil.getFluidHandler(container), 1000, false);
         assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid());
-        assertEquals(Fluids.EMPTY, tank.getTank().fluid());
+        assertEquals(Fluids.EMPTY, tank.getTank().content());
         assertEquals(0L, tank.getTank().amount());
         assertEquals(FluidAmount.BUCKET_WATER(), FluidAmount.fromStack(transfer));
     }
@@ -121,7 +121,7 @@ final class FluidUtilCheckTest extends BeforeAllTest {
         var tankStack = new ItemStack(BLOCK_TANK);
         var tank = TankHandler.apply(5000L);
         var inv = new ItemHandler();
-        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.EXECUTE);
 
         assertTrue(tank.getTank().isEmpty(), "Content: %s".formatted(tank.getTank())); // Make sure the tank is empty before filling.
         var result = FluidUtil.tryEmptyContainerAndStow(tankStack, tank, inv, 1000, null, false);
@@ -136,14 +136,14 @@ final class FluidUtilCheckTest extends BeforeAllTest {
         var tankStack = new ItemStack(BLOCK_TANK);
         var tank = TankHandler.apply(5000L);
         var inv = new ItemHandler();
-        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(tankStack).fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.EXECUTE);
 
         var result = FluidUtil.tryEmptyContainerAndStow(tankStack, tank, inv, 1000, null, true);
         assertAll(
             () -> assertEquals(FluidAmount.BUCKET_WATER(), RecipeInventoryUtil.getFluidHandler(tankStack).getFluid()), // Input will not be changed.
             () -> assertTrue(RecipeInventoryUtil.getFluidHandler(result.getResult()).getFluid().isEmpty()),
             () -> assertTrue(result.isSuccess()),
-            () -> assertEquals(FluidAmount.BUCKET_WATER(), tank.getTank().fluidAmount())
+            () -> assertEquals(FluidAmount.BUCKET_WATER(), tank.getTank().genericAmount())
         );
     }
 }

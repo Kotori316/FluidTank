@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.fluids
 
-import cats._
+import cats.Monoid
 import cats.implicits._
 import com.kotori316.fluidtank._
 import net.minecraft.nbt.CompoundTag
@@ -9,63 +9,9 @@ import net.minecraft.world.item.{BucketItem, ItemStack, Items}
 import net.minecraft.world.level.material.{Fluid, Fluids}
 import net.minecraftforge.fluids.{FluidAttributes, FluidStack, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
-import org.jetbrains.annotations.{NotNull, Nullable}
+import org.jetbrains.annotations.Nullable
 
 import scala.util.chaining._
-
-case class FluidAmount(@NotNull fluid: Fluid, amount: Long, @NotNull nbt: Option[CompoundTag]) {
-  def setAmount(newAmount: Long): FluidAmount = {
-    if (newAmount === this.amount) this // No need to create new instance.
-    else FluidAmount(fluid, newAmount, nbt)
-  }
-
-  def write(tag: CompoundTag): CompoundTag = {
-    import com.kotori316.fluidtank.fluids.FluidAmount._
-
-    val fluidNBT = new CompoundTag()
-    fluidNBT.putString(NBT_fluid, FluidAmount.registry.getKey(fluid).toString)
-    fluidNBT.putLong(NBT_amount, amount)
-    this.nbt.foreach(fluidNBT.put(NBT_tag, _))
-
-    tag merge fluidNBT
-  }
-
-  def nonEmpty: Boolean = fluid != Fluids.EMPTY && amount > 0
-
-  def isEmpty: Boolean = !nonEmpty
-
-  def isGaseous: Boolean = fluid.getAttributes.isGaseous
-
-  def getLocalizedName: String = String.valueOf(FluidAmount.registry.getKey(fluid))
-
-  def +(that: FluidAmount): FluidAmount = {
-    if (this.isEmpty) that
-    else if (that.isEmpty) this
-    else setAmount(this.amount + that.amount)
-  }
-
-  def -(that: FluidAmount): FluidAmount = {
-    val subtracted = this.amount |-| that.amount
-    (this.fluid === Fluids.EMPTY, that.fluid === Fluids.EMPTY) match {
-      case (true, _) => that.copy(amount = subtracted)
-      case (false, true) => this.copy(amount = subtracted)
-      case (false, false) if this.fluid === that.fluid => this.copy(amount = subtracted)
-      case _ /*(false, false)*/ => FluidAmount.EMPTY
-    }
-  }
-
-  def *(times: Long): FluidAmount = times match {
-    case 0 => this.setAmount(0)
-    case 1 => this
-    case _ => this.setAmount(this.amount * times)
-  }
-
-  def fluidEqual(that: FluidAmount): Boolean = this.fluid === that.fluid && this.nbt === that.nbt
-
-  def toStack: FluidStack = if (this == FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(fluid, Utils.toInt(amount), nbt.orNull)
-
-  override def toString: String = FluidAmount.registry.getKey(fluid).getPath + "@" + amount + "mB" + nbt.fold("")(" " + _.toString)
-}
 
 object FluidAmount {
   final val NBT_fluid = "fluid"
@@ -75,6 +21,8 @@ object FluidAmount {
   val EMPTY: FluidAmount = FluidAmount(Fluids.EMPTY, 0, None)
   val BUCKET_LAVA: FluidAmount = FluidAmount(Fluids.LAVA, AMOUNT_BUCKET, None)
   val BUCKET_WATER: FluidAmount = FluidAmount(Fluids.WATER, AMOUNT_BUCKET, None)
+
+  def apply(fluid: Fluid, amount: Long, nbt: Option[CompoundTag]): FluidAmount = new FluidAmount(fluid, amount, nbt)
 
   def fromItem(stack: ItemStack): FluidAmount = {
     stack.getItem match {
@@ -104,14 +52,9 @@ object FluidAmount {
     }
   }
 
+  def toStack(amount: FluidAmount): FluidStack = if (amount === FluidAmount.EMPTY) FluidStack.EMPTY else new FluidStack(amount.c, Utils.toInt(amount.amount), amount.nbt.orNull)
+
   def registry: IForgeRegistry[Fluid] = ForgeRegistries.FLUIDS
 
-  implicit val showFA: Show[FluidAmount] = Show.fromToString
-  implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode
-  implicit val monoidFA: Monoid[FluidAmount] = new Monoid[FluidAmount] {
-    override def empty: FluidAmount = FluidAmount.EMPTY
-
-    override def combine(x: FluidAmount, y: FluidAmount): FluidAmount = x + y
-  }
-
+  def monoidFA: Monoid[FluidAmount] = GenericAmount.monoidFA
 }

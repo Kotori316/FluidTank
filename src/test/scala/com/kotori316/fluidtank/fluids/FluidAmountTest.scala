@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.fluids
 
 import cats.implicits._
 import com.kotori316.fluidtank.BeforeAllTest
+import com.kotori316.fluidtank.fluids.FluidAmount.monoidFA
 import net.minecraft.nbt.{CompoundTag, LongTag, StringTag}
 import net.minecraft.world.item.{ItemStack, Items}
 import net.minecraft.world.level.material.Fluids
@@ -175,7 +176,6 @@ object FluidAmountTest extends BeforeAllTest {
       }
       assertAll(
         () => assertTrue(FluidAmount.EMPTY.isEmpty),
-        () => assertTrue(FluidAmount.EMPTY.copy(nbt = tag).isEmpty),
         () => assertTrue(FluidAmount(Fluids.EMPTY, 10000, None).isEmpty),
         () => assertTrue(FluidAmount(Fluids.EMPTY, 10000, tag).isEmpty),
         () => assertTrue(FluidAmount(Fluids.LAVA, 0, None).isEmpty),
@@ -255,7 +255,7 @@ object FluidAmountTest extends BeforeAllTest {
     @MethodSource(Array("com.kotori316.fluidtank.fluids.FluidAmountTest#fluidKeysNonEmpty"))
     def adderEmpty2(key: FluidKey): Unit = {
       val a = key.toAmount(3000)
-      val e = FluidAmount.EMPTY.copy(nbt = Option(new CompoundTag()), amount = 2000L)
+      val e = FluidAmount(FluidAmount.EMPTY.fluid, nbt = Option(new CompoundTag()), amount = 2000L)
 
       assertEquals(3000L, (e |+| a).amount)
       assertEquals(a, a |+| e)
