@@ -46,10 +46,22 @@ class GasTankHandler extends IChemicalTank[Gas, GasStack] {
     this.action(getDrainOperation(this.tank), toDrain, action)
   }
 
+  /**
+   * Insert to tank.
+   *
+   * @return the stack which is NOT inserted to the tank.
+   */
   override final def insert(stack: GasStack, action: mekanism.api.Action, automationType: AutomationType): GasStack = {
-    this.fill(GasAmount.fromStack(stack), action).toStack
+    val filled = this.fill(GasAmount.fromStack(stack), action)
+    val left = stack.getAmount - filled.amount
+    new GasStack(stack, left)
   }
 
+  /**
+   * Drain from tank.
+   *
+   * @return the drained stack, which can be modified.
+   */
   override final def extract(amount: Long, action: mekanism.api.Action, automationType: AutomationType): GasStack = {
     this.drain(GasAmount.EMPTY.setAmount(amount), action).toStack
   }
