@@ -98,7 +98,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
             this.getBlockPos.show, this.connection)
         }
         if (this.connection.isDummy) {
-          FluidConnection.load(getLevel, getBlockPos)
+          Connection2.load(getLevel, getBlockPos, classOf[TileTank])
         }
         getLevel.getProfiler.pop()
       }))
@@ -136,7 +136,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
       case (None, None) => Seq(this)
     }
     if (downTank.exists(_.connection.isDummy) || upTank.exists(_.connection.isDummy)) {
-      FluidConnection.load(getLevel, getBlockPos)
+      Connection2.load(getLevel, getBlockPos, classOf[TileTank])
     } else {
       Connection2.createAndInit(newSeq)
     }

@@ -5,9 +5,8 @@ import cats.implicits.catsSyntaxFoldOps
 import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
-import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.core.Direction
 import net.minecraft.network.chat.{Component, TranslatableComponent}
-import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
@@ -111,17 +110,5 @@ object FluidConnection {
       }
       new FluidConnection(seq)
     }
-  }
-
-  def load(level: BlockGetter, pos: BlockPos): Unit = {
-    val lowest = Iterator.iterate(pos)(_.below()).takeWhile(p => level.getBlockEntity(p).isInstanceOf[TileTank])
-      .toList.lastOption.getOrElse {
-      FluidTank.LOGGER.fatal(ModObjects.MARKER_Connection, "No lowest tank", new IllegalStateException("No lowest tank"))
-      pos
-    }
-    val tanks = Iterator.iterate(lowest)(_.above()).map(level.getBlockEntity).takeWhile(_.isInstanceOf[TileTank])
-      .toList.map(_.asInstanceOf[TileTank])
-    //    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
-    Connection2.createAndInit(tanks)
   }
 }

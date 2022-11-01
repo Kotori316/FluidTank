@@ -61,8 +61,10 @@ object ConnectionHelper {
     def setChanged(): Unit = helper.setChanged(t)
 
     /**
+     * @param h implicit parameter of the connection helper, required to get the type of content type.
+     *          [[helper]] doesn't have the concrete type info.
      * @return Some(content) if the tank contains valid amount. None if it contains nothing or invalid(amount <= 0) amount.
      */
-    def getContent[C, H <: ListHandler[C]](implicit h: ConnectionHelper.Aux[T, C, H]): Option[GenericAmount[C]] = h.getContent(t)
+    def getContent[C](implicit h: ConnectionHelper.Aux[T, C, _]): Option[GenericAmount[C]] = h.getContent(t)
   }
 }
