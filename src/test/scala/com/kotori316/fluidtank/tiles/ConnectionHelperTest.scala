@@ -41,9 +41,22 @@ class ConnectionHelperTest {
     Assertions.assertTrue(s === "a")
   }
 
+  @Test
+  def instanceTypeCheck(): Unit = {
+    val s1: ConnectionHelper.Aux[StringTile, String, StringHandler]#Content = "String"
+    val h1: ConnectionHelper.Aux[StringTile, String, StringHandler]#Handler = StringHandler(Seq.empty)
+    val s2: String = "String"
+    val s3: SCH.Content = "String"
+
+    Assertions.assertNotNull(s1)
+    Assertions.assertNotNull(h1)
+    Assertions.assertTrue(s1 === s2)
+    Assertions.assertTrue(s3 === s2)
+  }
+
   implicit val SCH: ConnectionHelper.Aux[StringTile, String, StringHandler] = StringConnectionHelper
 
-  class StringConnection(s: Seq[StringTile])(override implicit val helper: ConnectionHelper.Aux[StringTile, String, StringHandler]) extends Connection2[StringTile](s) {
+  class StringConnection(s: Seq[StringTile])(override implicit val helper: ConnectionHelper.Aux[StringTile, String, StringHandler]) extends Connection[StringTile](s) {
     def content = this.contentType
 
     override def getTextComponent: Component = new TextComponent(s.map(_.tank.content).mkString(", "))
