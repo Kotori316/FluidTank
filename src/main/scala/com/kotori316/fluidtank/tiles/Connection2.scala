@@ -2,20 +2,20 @@ package com.kotori316.fluidtank.tiles
 
 import cats.implicits.{catsSyntaxApplicativeId, catsSyntaxEq}
 import com.kotori316.fluidtank.Cap
-import com.kotori316.fluidtank.fluids.GenericAmount
+import com.kotori316.fluidtank.fluids.{GenericAmount, ListHandler}
 import com.kotori316.fluidtank.tiles.ConnectionHelper._
 import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction
 
 import scala.collection.mutable.ArrayBuffer
 
 abstract class Connection2[TankType] protected(val sortedTanks: Seq[TankType]) extends ICapabilityProvider {
-  protected implicit val helper: ConnectionHelper[TankType]
+  implicit val helper: ConnectionHelper[TankType]
 
   val hasCreative: Boolean = sortedTanks.exists(_.isCreative)
   val hasVoid: Boolean = sortedTanks.exists(_.isVoid)
@@ -44,7 +44,8 @@ abstract class Connection2[TankType] protected(val sortedTanks: Seq[TankType]) e
 
   def capacity: Long = if (hasCreative) Tier.CREATIVE.amount else handler.getSumOfCapacity
 
-  def amount: Long = if (hasCreative && contentType.nonEmpty) Tier.CREATIVE.amount else this.sortedTanks.flatMap(_.getContent).map(_.amount).sum
+  def amount: Long = if (hasCreative && contentType.nonEmpty) Tier.CREATIVE.amount else
+    this.sortedTanks.flatMap(_.getContent(helper.asInstanceOf[Aux[TankType, Any, ListHandler[Any]]])).map(_.amount).sum
 
   def getContent: Option[GenericAmount[helper.Content]] =
     Option(contentType).filter(_.nonEmpty).map(_.setAmount(this.amount))
@@ -89,11 +90,16 @@ abstract class Connection2[TankType] protected(val sortedTanks: Seq[TankType]) e
       s"Connection of $name in creative. Comparator outputs $getComparatorLevel."
   }
 
+  def getTextComponent: Component
 }
 
 object Connection2 {
+
+  import net.minecraftforge.fluids.capability.IFluidHandler
+
   @scala.annotation.tailrec
-  def createAndInit[TankType](tankSeq: Seq[TankType])(implicit helper: ConnectionHelper[TankType]): Unit = {
+  def createAndInit[TankType, ContentType, HandlerType <: ListHandler[ContentType]]
+  (tankSeq: Seq[TankType])(implicit helper: ConnectionHelper.Aux[TankType, ContentType, HandlerType]): Unit = {
     if (tankSeq.nonEmpty) {
       val sorted = tankSeq.sortBy(_.getPos.getY)
       val kind = sorted.flatMap(_.getContent).find(_.nonEmpty)
@@ -103,8 +109,8 @@ object Connection2 {
       }
       require(s1.map(_.getContent).forall(c => c.isEmpty || c === kind))
       val connection = helper.createConnection(s1)
-      val content = connection.handler.drain(connection.helper.defaultAmount.setAmount(Long.MaxValue), FluidAction.EXECUTE)
-      connection.handler.fill(content, FluidAction.EXECUTE)
+      val content = connection.handler.drain(connection.helper.defaultAmount.setAmount(Long.MaxValue), IFluidHandler.FluidAction.EXECUTE)
+      connection.handler.fill(content, IFluidHandler.FluidAction.EXECUTE)
       s1 foreach helper.connectionSetter(connection)
 
       if (s2.nonEmpty) createAndInit(s2)

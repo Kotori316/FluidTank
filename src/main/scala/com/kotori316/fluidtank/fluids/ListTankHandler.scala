@@ -8,7 +8,7 @@ import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
-class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) extends IFluidHandler {
+class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) extends IFluidHandler with ListHandler[Fluid] {
   def this(t: Chain[TankHandler]) = {
     this(t, false)
   }

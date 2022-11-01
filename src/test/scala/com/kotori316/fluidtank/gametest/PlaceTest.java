@@ -26,7 +26,7 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Connection;
+import com.kotori316.fluidtank.tiles.FluidConnection;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 
@@ -48,7 +48,7 @@ public final class PlaceTest {
             .ifPresent(TileTank::onBlockPlacedBy);
     }
 
-    public static Connection getConnection(GameTestHelper helper, BlockPos pos) {
+    public static FluidConnection getConnection(GameTestHelper helper, BlockPos pos) {
         return Optional.ofNullable(helper.getBlockEntity(pos))
             .map(TileTank.class::cast)
             .map(TileTank::connection)
@@ -158,7 +158,7 @@ public final class PlaceTest {
         var connection = tile.connection();
         assertEquals(tile.internalTank().getTank().capacity() * 3L, connection.capacity(),
             "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.internalTank().getTank().capacity(), connection.capacity()));
-        assertEquals(3, connection.seq().length(), "Connection must contain 3 tanks. seq=" + connection.seq());
+        assertEquals(3, connection.sortedTanks().length(), "Connection must contain 3 tanks. seq=" + connection.sortedTanks());
 
         helper.succeed();
     }

@@ -50,7 +50,7 @@ object ConnectionHelper {
     type Handler = HandlerType
   }
 
-  implicit final class ConnectionHelperMethods[T, C, H <: ListHandler[C]](private val t: T)(implicit val helper: ConnectionHelper[T]) {
+  implicit final class ConnectionHelperMethods[T](private val t: T)(implicit val helper: ConnectionHelper[T]) {
 
     def getPos: BlockPos = helper.getPos(t)
 
@@ -63,6 +63,6 @@ object ConnectionHelper {
     /**
      * @return Some(content) if the tank contains valid amount. None if it contains nothing or invalid(amount <= 0) amount.
      */
-    def getContent: Option[GenericAmount[helper.Content]] = helper.getContent(t)
+    def getContent[C, H <: ListHandler[C]](implicit h: ConnectionHelper.Aux[T, C, H]): Option[GenericAmount[C]] = h.getContent(t)
   }
 }

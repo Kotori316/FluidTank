@@ -53,7 +53,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
           InteractionResult.SUCCESS
         } else if (!stack.getItem.isInstanceOf[ItemBlockTank]) {
           val result = for {
-            r <- if (!level.isClientSide) BucketEventHandler.transferFluid(tileTank.connection.handler,
+            r <- if (!level.isClientSide) BucketEventHandler.transferFluid(tileTank.connection.getFluidHandler,
               tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).map(_.toStack).getOrElse(FluidStack.EMPTY),
               stack)
             else BucketEventHandler.checkStack(stack)

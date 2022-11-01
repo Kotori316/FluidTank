@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.tiles
 import cats.implicits.catsSyntaxEq
 import com.kotori316.fluidtank.fluids.{GenericAccess, GenericAmount, GenericAmountTest, ListHandler, Tank, drainList, fillList}
 import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.{Component, TextComponent}
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.{Assertions, Test}
 
@@ -44,6 +45,8 @@ class ConnectionHelperTest {
 
   class StringConnection(s: Seq[StringTile])(override implicit val helper: ConnectionHelper.Aux[StringTile, String, StringHandler]) extends Connection2[StringTile](s) {
     def content = this.contentType
+
+    override def getTextComponent: Component = new TextComponent(s.map(_.tank.content).mkString(", "))
   }
 
   case class StringTile(pos: BlockPos, var tank: Tank[String], var connection: Option[StringConnection])
