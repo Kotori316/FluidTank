@@ -1,6 +1,6 @@
 package com.kotori316.fluidtank.tiles
 
-import cats.implicits.{catsSyntaxApplicativeId, catsSyntaxEq}
+import cats.implicits.catsSyntaxApplicativeId
 import com.kotori316.fluidtank.fluids.{GenericAmount, ListHandler}
 import com.kotori316.fluidtank.tiles.ConnectionHelper._
 import com.kotori316.fluidtank.{Cap, FluidTank, ModObjects}
@@ -16,7 +16,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent
 
 import scala.collection.mutable.ArrayBuffer
 
-abstract class Connection2[TankType] protected(val sortedTanks: Seq[TankType]) extends ICapabilityProvider {
+abstract class Connection[TankType] protected(val sortedTanks: Seq[TankType]) extends ICapabilityProvider {
   implicit val helper: ConnectionHelper[TankType]
 
   val hasCreative: Boolean = sortedTanks.exists(_.isCreative)
@@ -28,7 +28,7 @@ abstract class Connection2[TankType] protected(val sortedTanks: Seq[TankType]) e
   protected val handler: helper.Handler = helper.createHandler(this.sortedTanks)
 
   val capabilities: Cap[CapabilityDispatcher] = if (sortedTanks.nonEmpty) {
-    val event = new AttachCapabilitiesEvent[Connection2[_]](classOf[Connection2[_]], this)
+    val event = new AttachCapabilitiesEvent[Connection[_]](classOf[Connection[_]], this)
     MinecraftForge.EVENT_BUS.post(event)
     if (event.getCapabilities.isEmpty) {
       Cap.empty
@@ -95,7 +95,7 @@ abstract class Connection2[TankType] protected(val sortedTanks: Seq[TankType]) e
   def getTextComponent: Component
 }
 
-object Connection2 {
+object Connection {
 
   import net.minecraftforge.fluids.capability.IFluidHandler
 
@@ -104,12 +104,12 @@ object Connection2 {
   (tankSeq: Seq[TankType])(implicit helper: ConnectionHelper.Aux[TankType, ContentType, HandlerType]): Unit = {
     if (tankSeq.nonEmpty) {
       val sorted = tankSeq.sortBy(_.getPos.getY)
-      val kind = sorted.flatMap(_.getContent).find(_.nonEmpty)
+      val kind = sorted.flatMap(_.getContent).find(_.nonEmpty).getOrElse(helper.defaultAmount)
       val (s1, s2) = sorted.span { t =>
         val c = t.getContent
-        c.isEmpty || c === kind
+        c.forall(t => t contentEqual kind)
       }
-      require(s1.map(_.getContent).forall(c => c.isEmpty || c === kind))
+      require(s1.map(_.getContent).forall(c => c.forall(t => t contentEqual kind)))
       val connection = helper.createConnection(s1)
       val content = connection.handler.drain(connection.helper.defaultAmount.setAmount(Long.MaxValue), IFluidHandler.FluidAction.EXECUTE)
       connection.handler.fill(content, IFluidHandler.FluidAction.EXECUTE)

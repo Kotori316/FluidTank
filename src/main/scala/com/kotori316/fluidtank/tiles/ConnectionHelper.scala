@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos
 trait ConnectionHelper[TileType] {
   type Content
   type Handler <: ListHandler[Content]
-  type ConnectionType <: Connection2[TileType]
+  type ConnectionType <: Connection[TileType]
 
   def getPos(t: TileType): BlockPos
 

@@ -13,8 +13,7 @@ import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
 import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
-class FluidConnection(s: Seq[TileTank]) extends Connection2[TileTank](s) {
-  override implicit val helper: ConnectionHelper.Aux[TileTank, Fluid, ListTankHandler] = TileTank.fluidConnectionHelper
+class FluidConnection(s: Seq[TileTank])(override implicit val helper: ConnectionHelper.Aux[TileTank, Fluid, ListTankHandler]) extends Connection[TileTank](s) {
 
   private final val fluidHandler = LazyOptional.of(() => if (this.sortedTanks.nonEmpty) handler
   else if (Utils.isInDev) DebugFluidHandler.INSTANCE else EmptyFluidHandler.INSTANCE)
