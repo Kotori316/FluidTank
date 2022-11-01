@@ -19,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
@@ -32,6 +33,7 @@ import com.kotori316.fluidtank.tiles.TileTank;
 
 import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -159,6 +161,27 @@ public final class PlaceTest {
         assertEquals(tile.internalTank().getTank().capacity() * 3L, connection.capacity(),
             "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.internalTank().getTank().capacity(), connection.capacity()));
         assertEquals(3, connection.sortedTanks().length(), "Connection must contain 3 tanks. seq=" + connection.sortedTanks());
+
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    public void placeWaterOnEmpty(GameTestHelper helper) {
+        placeTank(helper, BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD));
+
+        helper.setBlock(BlockPos.ZERO.above(), ModObjects.tierToBlock().apply(Tier.STONE));
+        var stoneTile = (TileTank) Objects.requireNonNull(helper.getBlockEntity(BlockPos.ZERO.above()));
+        var preConnection = stoneTile.connection();
+        stoneTile.internalTank().fill(FluidAmount.BUCKET_WATER().setAmount(16000), IFluidHandler.FluidAction.EXECUTE);
+
+        stoneTile.onBlockPlacedBy();
+        var afterConnection = stoneTile.connection();
+        assertNotEquals(preConnection, afterConnection);
+        assertEquals(2, afterConnection.sortedTanks().size());
+        assertEquals(scala.Option.apply(FluidAmount.BUCKET_WATER().setAmount(16000)), afterConnection.getFluidStack());
+        var woodTank = (TileTank) Objects.requireNonNull(helper.getBlockEntity(BlockPos.ZERO));
+        assertEquals(Tier.WOOD, woodTank.tier());
+        assertEquals(woodTank.connection(), afterConnection);
 
         helper.succeed();
     }
