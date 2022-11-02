@@ -8,9 +8,7 @@ trait ListHandler[T] {
 
   def getSumOfCapacity: Long
 
-  protected def action
-  (op: ListTankOperation[ListType, T], resource: GenericAmount[T], action: IFluidHandler.FluidAction)
-  : GenericAmount[T] = {
+  protected def action(op: ListTankOperation[ListType, T], resource: GenericAmount[T], action: IFluidHandler.FluidAction): GenericAmount[T] = {
     val (log, left, newTanks) = op.run((), resource)
     val moved = resource - left
     if (action.execute())
