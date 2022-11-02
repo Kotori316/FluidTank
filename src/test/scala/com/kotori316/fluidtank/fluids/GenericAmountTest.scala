@@ -14,6 +14,8 @@ import scala.reflect.ClassTag
 
 class GenericAmountTest extends BeforeAllTest {
 
+  import GenericAmountTest.GenericAccessString
+
   @Test
   def otherTypeOfAmount(): Unit = {
     val a1 = new GenericAmount("A", 15, Option.empty)
@@ -48,6 +50,10 @@ class GenericAmountTest extends BeforeAllTest {
 
     assertEquals(a1.##, a2.##)
   }
+
+}
+
+object GenericAmountTest {
 
   implicit val GenericAccessString: GenericAccess[String] = GenericAccessStringImpl
 

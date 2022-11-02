@@ -5,10 +5,11 @@ import com.kotori316.fluidtank.fluids.{GenericAccess, GenericAmount, GenericAmou
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.{Component, TextComponent}
 import net.minecraftforge.fluids.capability.IFluidHandler
-import org.junit.jupiter.api.{Assertions, Test}
+import org.junit.jupiter.api.{Assertions, Nested, Test}
 
 class ConnectionHelperTest {
-  private implicit val a: GenericAccess[String] = new GenericAmountTest().GenericAccessString
+
+  import ConnectionHelperTest._
 
   @Test
   def instance(): Unit = {
@@ -54,7 +55,53 @@ class ConnectionHelperTest {
     Assertions.assertTrue(s3 === s2)
   }
 
+  @Nested
+  class HandlerTest {
+    def fillSimulateTest1(): Unit = {
+      val tile = ConnectionHelperTest.tile(BlockPos.ZERO, "a")
+      val handler = StringHandler(Seq(tile))
+      val filled = handler.fill(stringAmount("a", 100), IFluidHandler.FluidAction.SIMULATE)
+
+      Assertions.assertEquals(stringAmount("a", 100), filled)
+      Assertions.assertEquals(stringAmount("a", 1), tile.tank.genericAmount)
+    }
+
+    def fillSimulateTest2(): Unit = {
+      val tile = ConnectionHelperTest.tile(BlockPos.ZERO, "a")
+      val handler = StringHandler(Seq(tile))
+      val filled = handler.fill(stringAmount("b", 100), IFluidHandler.FluidAction.SIMULATE)
+
+      Assertions.assertTrue(filled.isEmpty)
+      Assertions.assertEquals(stringAmount("a", 1), tile.tank.genericAmount)
+    }
+
+    def fillSimulateTest3(): Unit = {
+      val tile = ConnectionHelperTest.tile(BlockPos.ZERO, "")
+      Assertions.assertTrue(tile.tank.isEmpty)
+      val handler = StringHandler(Seq(tile))
+      val filled = handler.fill(stringAmount("b", 100), IFluidHandler.FluidAction.SIMULATE)
+
+      Assertions.assertTrue(filled.isEmpty)
+      Assertions.assertEquals(stringAmount("a", 100), tile.tank.genericAmount)
+    }
+
+    def fillExecuteTest(): Unit = {
+      val tile = ConnectionHelperTest.tile(BlockPos.ZERO, "a")
+      val handler = StringHandler(Seq(tile))
+      val filled = handler.fill(stringAmount("a", 100), IFluidHandler.FluidAction.EXECUTE)
+
+      Assertions.assertEquals(stringAmount("a", 100), filled)
+      Assertions.assertEquals(stringAmount("a", 101), tile.tank.genericAmount)
+    }
+  }
+}
+
+object ConnectionHelperTest {
+  implicit val a: GenericAccess[String] = GenericAmountTest.GenericAccessString
+
   implicit val SCH: ConnectionHelper.Aux[StringTile, String, StringHandler] = StringConnectionHelper
+
+  def stringAmount(content: String, amount: Long): GenericAmount[String] = new GenericAmount[String](content, amount, Option.empty)
 
   class StringConnection(s: Seq[StringTile])(override implicit val helper: ConnectionHelper.Aux[StringTile, String, StringHandler]) extends Connection[StringTile](s) {
     def content = this.contentType
@@ -65,7 +112,7 @@ class ConnectionHelperTest {
   case class StringTile(pos: BlockPos, var tank: Tank[String], var connection: Option[StringConnection])
 
   def tile(pos: BlockPos, content: String): StringTile = {
-    StringTile(pos, Tank(new GenericAmount[String](content, 1, None), 100), Option.empty)
+    StringTile(pos, Tank(stringAmount(content, 1), 100), Option.empty)
   }
 
   case class StringHandler(s: Seq[StringTile]) extends ListHandler[String] {
@@ -118,4 +165,5 @@ class ConnectionHelperTest {
     }
 
   }
+
 }
