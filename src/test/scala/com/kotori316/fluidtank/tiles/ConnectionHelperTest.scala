@@ -1,7 +1,8 @@
 package com.kotori316.fluidtank.tiles
 
+import cats.data.Chain
 import cats.implicits.catsSyntaxEq
-import com.kotori316.fluidtank.fluids.{GenericAccess, GenericAmount, GenericAmountTest, ListHandler, Tank, drainList, fillList}
+import com.kotori316.fluidtank.fluids.{FluidTransferLog, GenericAccess, GenericAmount, GenericAmountTest, ListHandler, Tank, drainList, fillList}
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.{Component, TextComponent}
 import net.minecraftforge.fluids.capability.IFluidHandler
@@ -116,20 +117,24 @@ object ConnectionHelperTest {
   }
 
   case class StringHandler(s: Seq[StringTile]) extends ListHandler[String] {
+    override type ListType[A] = List[A]
+
     override def getSumOfCapacity: Long = s.map(_.tank.content.length).sum
 
     override def fill(resource: GenericAmount[String], action: IFluidHandler.FluidAction): GenericAmount[String] = {
       val op = fillList(s.map(_.tank).toList)
-      this.action[List](op, resource, action,
-        newTanks => (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank },
-        (_, _) => {})
+      this.action(op, resource, action)
     }
 
     override def drain(toDrain: GenericAmount[String], action: IFluidHandler.FluidAction): GenericAmount[String] = {
       val op = drainList(s.map(_.tank).toList)
-      this.action[List](op, toDrain, action,
-        newTanks => (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank },
-        (_, _) => {})
+      this.action(op, toDrain, action)
+    }
+
+    override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = ()
+
+    override protected def updateTanks(newTanks: List[Tank[String]]): Unit = {
+      (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank }
     }
   }
 

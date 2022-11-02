@@ -9,6 +9,8 @@ import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 
 class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) extends IFluidHandler with ListHandler[Fluid] {
+  override type ListType[A] = Chain[A]
+
   def this(t: Chain[TankHandler]) = {
     this(t, false)
   }
@@ -32,10 +34,6 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
 
   override final def fill(resource: FluidStack, action: IFluidHandler.FluidAction): Int = {
     Utils.toInt(fill(FluidAmount.fromStack(resource), action).amount)
-  }
-
-  protected def action(op: ListTankOperation[Chain, Fluid], resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
-    super.action(op, resource, action, updateTanks = this.updateTanks, outputLog = this.outputLog)
   }
 
   def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
