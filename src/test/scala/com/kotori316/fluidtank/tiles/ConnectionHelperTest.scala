@@ -120,22 +120,16 @@ object ConnectionHelperTest {
 
     override def fill(resource: GenericAmount[String], action: IFluidHandler.FluidAction): GenericAmount[String] = {
       val op = fillList(s.map(_.tank).toList)
-      val (_, left, newTanks) = op.run((), resource)
-      val moved = resource - left
-      if (action.execute()) {
-        (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank }
-      }
-      moved
+      this.action[List](op, resource, action,
+        newTanks => (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank },
+        (_, _) => {})
     }
 
     override def drain(toDrain: GenericAmount[String], action: IFluidHandler.FluidAction): GenericAmount[String] = {
       val op = drainList(s.map(_.tank).toList)
-      val (_, left, newTanks) = op.run((), toDrain)
-      val moved = toDrain - left
-      if (action.execute()) {
-        (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank }
-      }
-      moved
+      this.action[List](op, toDrain, action,
+        newTanks => (s zip newTanks).foreach { case (tile, tank) => tile.tank = tank },
+        (_, _) => {})
     }
   }
 

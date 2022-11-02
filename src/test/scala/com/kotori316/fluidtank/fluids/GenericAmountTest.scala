@@ -62,7 +62,7 @@ object GenericAmountTest {
 
     override def isGaseous(a: String): Boolean = a.startsWith(" ")
 
-    override def getKey(a: String): ResourceLocation = new ResourceLocation(a)
+    override def getKey(a: String): ResourceLocation = new ResourceLocation(a.toLowerCase)
 
     override def empty: String = ""
 

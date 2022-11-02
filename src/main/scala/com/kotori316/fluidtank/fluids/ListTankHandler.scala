@@ -35,12 +35,7 @@ class ListTankHandler(tankHandlers: Chain[TankHandler], limitOneFluid: Boolean) 
   }
 
   protected def action(op: ListTankOperation[Chain, Fluid], resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
-    val (log, left, newTanks) = op.run((), resource)
-    val moved = resource - left
-    if (action.execute())
-      updateTanks(newTanks)
-    outputLog(log, action)
-    moved
+    super.action(op, resource, action, updateTanks = this.updateTanks, outputLog = this.outputLog)
   }
 
   def fill(resource: FluidAmount, action: IFluidHandler.FluidAction): FluidAmount = {
