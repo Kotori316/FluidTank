@@ -24,14 +24,14 @@ record AEFluidInv(TileTank tank) implements MEStorage {
     @Override
     public long insert(AEKey what, long amount, Actionable actionable, IActionSource source) {
         var fluidAmount = fromAEStack(what, amount);
-        var filled = tank.connection().handler().fill(fluidAmount, actionable.getFluidAction());
+        var filled = tank.connection().getFluidHandler().fill(fluidAmount, actionable.getFluidAction());
         return filled.amount();
     }
 
     @Override
     public long extract(AEKey what, long amount, Actionable actionable, IActionSource source) {
         var fluidAmount = fromAEStack(what, amount);
-        var drained = tank.connection().handler().drain(fluidAmount, actionable.getFluidAction());
+        var drained = tank.connection().getFluidHandler().drain(fluidAmount, actionable.getFluidAction());
         return drained.amount();
     }
 
