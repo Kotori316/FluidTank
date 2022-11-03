@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/stone",
+  "textures": {
+    "1": "fluidtank:blocks/wood1",
+    "2": "fluidtank:blocks/wood2"
+  }
+}

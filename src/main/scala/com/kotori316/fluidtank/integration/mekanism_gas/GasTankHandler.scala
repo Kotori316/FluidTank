@@ -13,10 +13,14 @@ import net.minecraft.nbt.CompoundTag
 /**
  * Mutable
  */
-class GasTankHandler extends IChemicalTank[Gas, GasStack] {
+class GasTankHandler(setChanged: Runnable) extends IChemicalTank[Gas, GasStack] {
+  def this() {
+    this(() => {})
+  }
+
   private[this] var tank: Tank[Gas] = GasTankHandler.emptyTank
 
-  private final def setTank(tank: Tank[Gas]): Unit = {
+  final def setTank(tank: Tank[Gas]): Unit = {
     if (this.tank != tank) {
       this.tank = tank
       onContentsChanged()
@@ -102,7 +106,7 @@ class GasTankHandler extends IChemicalTank[Gas, GasStack] {
 
   override def isValid(stack: GasStack): Boolean = true
 
-  override def onContentsChanged(): Unit = ()
+  override def onContentsChanged(): Unit = this.setChanged.run()
 
   override def deserializeNBT(nbt: CompoundTag): Unit = {
     val stack = GasStack.readFromNBT(nbt.getCompound(NBTConstants.STORED))
@@ -140,6 +144,12 @@ object GasTankHandler {
   def apply(capacity: Long): GasTankHandler = {
     val handler = new GasTankHandler
     handler.setTank(handler.getTank.copy(capacity = capacity))
+    handler
+  }
+
+  def forTank(tileGasTank: TileGasTank): GasTankHandler = {
+    val handler = new GasTankHandler(() => tileGasTank.setChanged())
+    handler.setTank(handler.getTank.copy(capacity = tileGasTank.tier.amount()))
     handler
   }
 }

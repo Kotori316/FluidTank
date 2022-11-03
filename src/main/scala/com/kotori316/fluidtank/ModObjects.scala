@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks._
+import com.kotori316.fluidtank.integration.mekanism_gas.{BlockGasTank, TileGasTank}
 import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
@@ -45,6 +46,7 @@ object ModObjects {
   final val blockFluidPipe = new FluidPipeBlock
   final val blockItemPipe = new ItemPipeBlock
   final val blockSource = new FluidSourceBlock
+  final val woodGasTank = new BlockGasTank(Tier.WOOD)
 
   //---------- ITEMS ----------
   final val itemReservoirs = List(Tier.WOOD, Tier.STONE, Tier.IRON).map(t => new ReservoirItem(t))
@@ -59,6 +61,7 @@ object ModObjects {
   final val FLUID_PIPE_TYPE = createTileType((p, s) => new PipeTile(p, s), List(blockFluidPipe))
   final val ITEM_PIPE_TYPE = createTileType((p, s) => new ItemPipeTile(p, s), List(blockItemPipe))
   final val SOURCE_TYPE = createTileType((p, s) => new FluidSourceTile(p, s), List(blockSource))
+  final val GAS_TANK_TYPE = createTileType((p, s) => new TileGasTank(p, s), List())
 
   def createTileType[T <: BlockEntity](supplier: (BlockPos, BlockState) => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): BlockEntityType[T] = {
     val t = BlockEntityType.Builder.of[T]((p, s) => supplier(p, s), blocks: _*).build(DSL.emptyPartType())
