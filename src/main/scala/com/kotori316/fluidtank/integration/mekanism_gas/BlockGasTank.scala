@@ -34,7 +34,7 @@ class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(Mo
     }
   }
 
-  //noinspection ScalaDeprecation,deprecation
+  @scala.annotation.nowarn("cat=deprecation") //noinspection ScalaDeprecation,deprecation
   override def use(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player, pHand: InteractionHand, pHit: BlockHitResult): InteractionResult = {
     if (!isMekanismLoaded) {
       pPlayer.displayClientMessage(new TextComponent("Invalid request."), false)
