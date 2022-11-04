@@ -4,10 +4,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +19,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.tiles.Connection;
 
-final class TileInfo implements ICapabilityProvider {
+final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTag> {
     private final TileGasTank tile;
     private Object holder;
 
@@ -66,6 +68,30 @@ final class TileInfo implements ICapabilityProvider {
             Constant.LOGGER.warn("Called {}#getMessage when mekanism is not available.", getClass().getName());
             return new TextComponent("Invalid request.");
         }
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        var tag = new CompoundTag();
+        if (Constant.isMekanismLoaded())
+            serializeHolder(tag);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag nbt) {
+        if (Constant.isMekanismLoaded())
+            deserializeHolder(nbt);
+    }
+
+    private void serializeHolder(CompoundTag tag) {
+        var holder = (Holder) getHolder();
+        tag.merge(holder.gasTankHandler.serializeNBT());
+    }
+
+    private void deserializeHolder(CompoundTag tag) {
+        var holder = (Holder) getHolder();
+        holder.gasTankHandler.deserializeNBT(tag);
     }
 
     static final class Holder {

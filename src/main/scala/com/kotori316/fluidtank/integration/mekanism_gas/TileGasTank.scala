@@ -4,6 +4,8 @@ import com.kotori316.fluidtank.ModObjects
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.core.{BlockPos, Direction}
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.server.TickTask
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -38,6 +40,23 @@ class TileGasTank(p: BlockPos, s: BlockState, var tier: Tier) extends BlockEntit
     } else {
       super.getCapability(cap, side)
     }
+  }
 
+  override def saveAdditional(pTag: CompoundTag): Unit = {
+    pTag.merge(this.tileInfo.serializeNBT())
+    super.saveAdditional(pTag)
+  }
+
+  override def getUpdateTag: CompoundTag = saveWithoutMetadata()
+
+  override def getUpdatePacket: ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
+
+  override def load(pTag: CompoundTag): Unit = {
+    super.load(pTag)
+    getBlockState.getBlock match {
+      case b: BlockGasTank => setTier(b.tier)
+      case _ => Constant.LOGGER.error("What block contains this entity? {}, {}", getBlockPos, getBlockState)
+    }
+    this.tileInfo.deserializeNBT(pTag)
   }
 }
