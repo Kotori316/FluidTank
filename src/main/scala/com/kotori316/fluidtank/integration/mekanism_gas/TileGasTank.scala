@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.{LazyOptional, LogicalSidedProvider}
 import net.minecraftforge.fml.LogicalSide
 
 class TileGasTank(p: BlockPos, s: BlockState, var tier: Tier) extends BlockEntity(ModObjects.GAS_TANK_TYPE, p, s) {
-  def this(p: BlockPos, s: BlockState) {
+  def this(p: BlockPos, s: BlockState) = {
     this(p, s, Tier.Invalid)
   }
 

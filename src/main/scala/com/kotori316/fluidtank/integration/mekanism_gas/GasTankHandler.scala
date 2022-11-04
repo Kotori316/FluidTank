@@ -14,7 +14,7 @@ import net.minecraft.nbt.CompoundTag
  * Mutable
  */
 class GasTankHandler(setChanged: Runnable) extends IChemicalTank[Gas, GasStack] {
-  def this() {
+  def this() = {
     this(() => {})
   }
 
