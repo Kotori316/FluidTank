@@ -84,11 +84,13 @@ object ModObjects {
   // ---------- Markers ----------
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
   final val MARKER_TileTank = MarkerManager.getMarker("TileTank")
+  final val MARKER_TileGasTank = MarkerManager.getMarker("TileGasTank")
   final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
   final val MARKER_Connection = MarkerManager.getMarker("Connection")
   final val MARKER_PipeTileBase = MarkerManager.getMarker("PipeTileBase")
   final val MARKER_TankHandler = MarkerManager.getMarker("TankHandler")
   final val MARKER_ListTankHandler = MarkerManager.getMarker("ListTankHandler")
+  final val MARKER_GasListHandler = MarkerManager.getMarker("GasListHandler")
   final val MARKER_DebugFluidHandler = MarkerManager.getMarker("DebugFluidHandler")
   final val MARKER_GasHandler = MarkerManager.getMarker("GasHandler")
 }

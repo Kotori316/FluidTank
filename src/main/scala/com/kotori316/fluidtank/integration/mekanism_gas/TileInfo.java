@@ -80,12 +80,13 @@ final class TileInfo implements ICapabilityProvider {
         }
     }
 
+    @SuppressWarnings("SameParameterValue") // WHAT?
     static Runnable loadTask(TileGasTank tile) {
         return () -> {
             Objects.requireNonNull(tile.getLevel()).getProfiler().push("Connection Loading");
             var c = ((Holder) tile.tileInfo().getHolder()).gasConnection;
             if (Utils.isInDev()) {
-                FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank(),
+                FluidTank.LOGGER.debug(ModObjects.MARKER_TileGasTank(),
                     "Connection {} loaded in delayed task. At={}, connection={}",
                     c.isDummy() ? "will be" : "won't",
                     tile.getBlockPos(), c);

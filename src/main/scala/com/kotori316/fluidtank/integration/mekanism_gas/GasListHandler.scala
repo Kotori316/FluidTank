@@ -22,7 +22,7 @@ class GasListHandler(gasHandlers: Chain[GasTankHandler]) extends ListHandler[Gas
 
   override protected def outputLog(logs: Chain[FluidTransferLog], action: IFluidHandler.FluidAction): Unit = {
     if (Utils.isInDev && action.execute()) {
-      FluidTank.LOGGER.debug(ModObjects.MARKER_ListTankHandler, logs.mkString_(action.toString + " ", ", ", ""))
+      FluidTank.LOGGER.debug(ModObjects.MARKER_GasListHandler, logs.mkString_(action.toString + " ", ", ", ""))
     }
   }
 
