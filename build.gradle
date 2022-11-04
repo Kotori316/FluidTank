@@ -139,10 +139,11 @@ task deleteGateTestWorld(type: Delete) {
     onlyIf { file("${project.buildDir}/game_test").exists() }
 }
 
-task copyGameTestTemplate(type: Copy, dependsOn: deleteGateTestWorld) {
+task copyGameTestTemplate(type: Copy) {
     //noinspection SpellCheckingInspection
     from("src/test/resources/data/fluidtank/gameteststructures/")
     into("${project.buildDir}/game_test/gameteststructures/")
+    mustRunAfter(deleteGateTestWorld)
 }
 
 processResources {
