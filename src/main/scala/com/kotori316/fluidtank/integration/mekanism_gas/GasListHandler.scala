@@ -6,10 +6,10 @@ import com.kotori316.fluidtank.fluids.{FluidTransferLog, GenericAmount, ListHand
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
 import mekanism.api.Action
 import mekanism.api.chemical.IChemicalHandler
-import mekanism.api.chemical.gas.{Gas, GasStack}
+import mekanism.api.chemical.gas.{Gas, GasStack, IGasHandler}
 import net.minecraftforge.fluids.capability.IFluidHandler
 
-class GasListHandler(gasHandlers: Chain[GasTankHandler]) extends ListHandler[Gas] with IChemicalHandler[Gas, GasStack] {
+class GasListHandler(gasHandlers: Chain[GasTankHandler]) extends ListHandler[Gas] with IChemicalHandler[Gas, GasStack] with IGasHandler {
   override type ListType[A] = Chain[A]
 
   override def getSumOfCapacity: Long = gasHandlers.map(_.getCapacity).iterator.sum

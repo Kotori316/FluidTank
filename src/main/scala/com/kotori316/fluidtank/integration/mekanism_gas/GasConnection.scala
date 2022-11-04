@@ -26,7 +26,7 @@ class GasConnection(s: Seq[TileGasTank])(override implicit val helper: Connectio
   }
 
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
-    if (cap == mekanism.common.capabilities.Capabilities.GAS_HANDLER_CAPABILITY) {
+    if (cap == Constant.GAS_HANDLER_CAPABILITY) {
       this.gasCap.cast()
     } else {
       super.getCapability(cap, side)
