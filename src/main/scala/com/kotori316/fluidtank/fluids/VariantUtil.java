@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -94,7 +95,14 @@ public final class VariantUtil {
     }
 
     public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, ItemStack itemSource) {
-        var itemStorage = ContainerItemContext.withInitial(itemSource);
+        return fillFluidContainer(container, itemSource, ContainerItemContext.withInitial(itemSource));
+    }
+
+    public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, Player player, InteractionHand hand) {
+        return fillFluidContainer(container, player.getItemInHand(hand), ContainerItemContext.ofPlayerHand(player, hand));
+    }
+
+    public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, ItemStack itemSource, ContainerItemContext itemStorage) {
         var fluidStorage = FluidStorage.ITEM.find(itemSource, itemStorage);
         // Not a fluid storage item.
         if (fluidStorage == null || !fluidStorage.supportsExtraction()) return Option.empty();
@@ -133,7 +141,14 @@ public final class VariantUtil {
     }
 
     public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, ItemStack stack, FluidAmount tankContent) {
-        var itemStorage = ContainerItemContext.withInitial(stack);
+        return fillItemContainer(tank, stack, tankContent, ContainerItemContext.withInitial(stack));
+    }
+
+    public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, FluidAmount tankContent, Player player, InteractionHand hand) {
+        return fillItemContainer(tank, player.getItemInHand(hand), tankContent, ContainerItemContext.ofPlayerHand(player, hand));
+    }
+
+    public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, ItemStack stack, FluidAmount tankContent, ContainerItemContext itemStorage) {
         var fluidStorage = FluidStorage.ITEM.find(stack, itemStorage);
         // Not a fluid storage item.
         if (fluidStorage == null || !fluidStorage.supportsInsertion() || tankContent.isEmpty()) return Option.empty();

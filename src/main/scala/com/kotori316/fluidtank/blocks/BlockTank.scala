@@ -56,13 +56,13 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
           val result = for {
             r <- if (!level.isClientSide) BucketEventHandler.transferFluid(tileTank.connection.handler,
               tileTank.connection.getFluidStack.map(_.setAmount(Int.MaxValue)).getOrElse(FluidAmount.EMPTY),
-              stack)
+              player, hand)
             else BucketEventHandler.checkStack(stack)
             if r.result.isSuccess
           } yield r
           result match {
             case Some(value) =>
-              if (!level.isClientSide) BucketEventHandler.setItem(level, pos, player, hand, value, stack)
+              // if (!level.isClientSide) BucketEventHandler.setItem(level, pos, player, hand, value, stack)
               InteractionResult.SUCCESS
             case _ => InteractionResult.PASS
           }

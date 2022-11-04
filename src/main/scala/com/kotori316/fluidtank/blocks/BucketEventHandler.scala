@@ -26,6 +26,11 @@ object BucketEventHandler {
     tryFillTank(tank, stack) orElse tryFillContainer(tank, stack, tankContent)
   }
 
+  def transferFluid(tank: FluidContainer, tankContent: FluidAmount, player: Player, hand: InteractionHand): Option[TransferResult] = {
+    // Fill tank and drain from item
+    tryFillTank(tank, player, hand) orElse tryFillContainer(tank, player, hand, tankContent)
+  }
+
   def transferFluidTest(tank: FluidContainer, stack: ItemStack): Option[TransferResult] = {
     transferFluid(tank, tank.getFluid, stack)
   }
@@ -44,8 +49,16 @@ object BucketEventHandler {
     VariantUtil.fillFluidContainer(destination, stack)
   }
 
+  def tryFillTank(destination: FluidContainer, player: Player, hand: InteractionHand): Option[TransferResult] = {
+    VariantUtil.fillFluidContainer(destination, player, hand)
+  }
+
   def tryFillContainer(source: FluidContainer, stack: ItemStack, tankContent: FluidAmount): Option[TransferResult] = {
     VariantUtil.fillItemContainer(source, stack, tankContent)
+  }
+
+  def tryFillContainer(source: FluidContainer, player: Player, hand: InteractionHand, tankContent: FluidAmount): Option[TransferResult] = {
+    VariantUtil.fillItemContainer(source, tankContent, player, hand)
   }
 
   def setItem(level: Level, pos: BlockPos, player: Player, hand: InteractionHand, result: TransferResult, originalStack: ItemStack): Unit = {
