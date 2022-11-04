@@ -8,14 +8,27 @@ import com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE
 import mekanism.api.chemical.gas.{Gas, GasStack}
 import mekanism.api.{AutomationType, Action => MekanismAction}
 import mekanism.common.registries.MekanismGases
-import net.minecraft.gametest.framework.{GameTest, GameTestHelper}
+import net.minecraft.gametest.framework.{AfterBatch, BeforeBatch, GameTest, GameTestHelper}
+import net.minecraft.server.level.ServerLevel
 import net.minecraftforge.gametest.{GameTestHolder, PrefixGameTestTemplate}
 import org.junit.jupiter.api.Assertions._
+
+import scala.annotation.unused
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
 class MekanismGasTest {
   type TankAPI = mekanism.api.chemical.IChemicalTank[Gas, GasStack]
+
+  @BeforeBatch(batch = BATCH)
+  def beforeTest(@unused level: ServerLevel): Unit = {
+    com.kotori316.fluidtank.Utils.setInDev(false)
+  }
+
+  @AfterBatch(batch = BATCH)
+  def afterTest(@unused level: ServerLevel): Unit = {
+    com.kotori316.fluidtank.Utils.setInDev(true)
+  }
 
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
   def instance(helper: GameTestHelper): Unit = {
