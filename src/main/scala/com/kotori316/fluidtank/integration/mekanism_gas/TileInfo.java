@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -70,8 +71,8 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
         if (Constant.isMekanismLoaded()) {
             return ((Holder) getHolder()).gasConnection.getTextComponent();
         } else {
-            Constant.LOGGER.warn("Called {}#getMessage when mekanism is not available.", getClass().getName());
-            return new TextComponent("Invalid request.");
+            Constant.LOGGER.error("Called {}#getMessage. This is UNREACHABLE.", getClass().getName());
+            return new TextComponent("%sThis tile is unavailable.%s".formatted(ChatFormatting.RED, ChatFormatting.RESET));
         }
     }
 

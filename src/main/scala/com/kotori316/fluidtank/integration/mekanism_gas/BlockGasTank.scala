@@ -51,9 +51,12 @@ class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(Mo
       case tileGasTank: TileGasTank =>
         if (pPlayer.getMainHandItem.isEmpty) {
           if (SideProxy.isServer(tileGasTank))
-            pPlayer.displayClientMessage(tileGasTank.tileInfo.getMessage, false)
+            pPlayer.displayClientMessage(tileGasTank.tileInfo.getMessage, true)
+          InteractionResult.SUCCESS
+        } else {
+          // There are no items which can insert gases into tanks.
+          InteractionResult.PASS
         }
-        InteractionResult.SUCCESS
       case _ => super.use(pState, pLevel, pPos, pPlayer, pHand, pHit)
     }
   }
