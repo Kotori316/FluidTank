@@ -57,8 +57,8 @@ object BucketEventHandler {
       destination <- destinationGetter.value
       toFill = tankContent
       fillSimulation = toFill.copy()
-      _ = fillSimulation.setAmount(destination.fill(toFill, IFluidHandler.FluidAction.EXECUTE))
       if !fillSimulation.isEmpty
+      _ = fillSimulation.setAmount(destination.fill(toFill, IFluidHandler.FluidAction.EXECUTE))
       drained = source.drain(fillSimulation, IFluidHandler.FluidAction.EXECUTE)
       d2 <- destinationGetter.value
     } yield {
