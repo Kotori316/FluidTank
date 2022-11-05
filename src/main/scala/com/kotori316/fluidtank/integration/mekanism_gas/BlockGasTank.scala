@@ -36,9 +36,15 @@ class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(Mo
   }
 
   @scala.annotation.nowarn("cat=deprecation") //noinspection ScalaDeprecation,deprecation
+  override final def skipRendering(state: BlockState, adjacentBlockState: BlockState, side: Direction) = true
+
+  @scala.annotation.nowarn("cat=deprecation") //noinspection ScalaDeprecation,deprecation
+  override def getShape(state: BlockState, worldIn: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape = ModObjects.TANK_SHAPE
+
+  @scala.annotation.nowarn("cat=deprecation") //noinspection ScalaDeprecation,deprecation
   override def use(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player, pHand: InteractionHand, pHit: BlockHitResult): InteractionResult = {
     if (!isMekanismLoaded) {
-      pPlayer.displayClientMessage(new TextComponent("Invalid request."), false)
+      pPlayer.displayClientMessage(new TextComponent("This tank is not available."), true)
       return InteractionResult.PASS
     }
     pLevel.getBlockEntity(pPos) match {
