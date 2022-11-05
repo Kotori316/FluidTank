@@ -114,18 +114,19 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
     @SuppressWarnings("SameParameterValue") // WHAT?
     static Runnable loadTask(TileGasTank tile) {
         return () -> {
-            Objects.requireNonNull(tile.getLevel()).getProfiler().push("Connection Loading");
+            var level = Objects.requireNonNull(tile.getLevel());
+            level.getProfiler().push("Connection Loading");
             var c = ((Holder) tile.tileInfo().getHolder()).gasConnection;
             if (Utils.isInDev()) {
                 FluidTank.LOGGER.debug(ModObjects.MARKER_TileGasTank(),
-                    "Connection {} loaded in delayed task. At={}, connection={}",
-                    c.isDummy() ? "will be" : "won't",
+                    "Connection {} be loaded in delayed task. At={}, connection={}",
+                    c.isDummy() ? "will" : "won't",
                     tile.getBlockPos(), c);
             }
             if (c.isDummy()) {
-                Connection.load(tile.getLevel(), tile.getBlockPos(), TileGasTank.class, GasConnection.GasConnectionHelper());
+                Connection.load(level, tile.getBlockPos(), TileGasTank.class, GasConnection.GasConnectionHelper());
             }
-            tile.getLevel().getProfiler().pop();
+            level.getProfiler().pop();
         };
     }
 
