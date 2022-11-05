@@ -39,7 +39,7 @@ class GasListHandler(gasHandlers: Chain[GasTankHandler]) extends ListHandler[Gas
   override def getChemicalInTank(tank: Int): GasStack = drain(GasAmount.EMPTY.setAmount(Long.MaxValue), IFluidHandler.FluidAction.SIMULATE).toStack
 
   override def setChemicalInTank(tank: Int, stack: GasStack): Unit = {
-    drain(GasAmount.EMPTY.setAmount(Long.MaxValue), IFluidHandler.FluidAction.EXECUTE)
+    this.gasHandlers.iterator.foreach(_.setEmpty())
     fill(GasAmount.fromStack(stack), IFluidHandler.FluidAction.EXECUTE)
   }
 
