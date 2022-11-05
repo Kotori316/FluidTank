@@ -1,5 +1,6 @@
 package com.kotori316.fluidtank.integration.mekanism_gas;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -7,6 +8,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -17,7 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.Utils;
+import com.kotori316.fluidtank.integration.Localize;
 import com.kotori316.fluidtank.tiles.Connection;
+import com.kotori316.fluidtank.tiles.TileTank;
 
 final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTag> {
     private final TileGasTank tile;
@@ -127,5 +132,21 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
     static void unloadTask(TileGasTank tile) {
         var c = ((Holder) tile.tileInfo().getHolder()).gasConnection;
         c.remove(tile);
+    }
+
+    static void setItemTag(ItemStack stack, TileGasTank tile) {
+        var holder = (Holder) tile.tileInfo().getHolder();
+        if (!holder.gasTankHandler.isEmpty()) {
+            // Set tag only when the tank has content.
+            Utils.setTileTag(stack, tile.tileInfo().serializeNBT());
+        }
+    }
+
+    static void addItemDescription(CompoundTag stackTag, List<Component> texts) {
+        var c = stackTag.getLong(TileTank.NBT_Capacity());
+        var stored = stackTag.getCompound("stored");
+        var amount = stored.getLong("amount");
+        var gasName = stored.getString("gasName");
+        texts.add(new TranslatableComponent(Localize.TOOLTIP, gasName, amount, c));
     }
 }

@@ -8,13 +8,13 @@ import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
+import net.minecraft.world.item.{Item, ItemStack}
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.{Block, EntityBlock}
 import net.minecraft.world.level.{BlockGetter, Level}
-import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.{CollisionContext, VoxelShape}
+import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import net.minecraft.world.{InteractionHand, InteractionResult}
 import org.jetbrains.annotations.Nullable
 
@@ -69,6 +69,17 @@ class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(Mo
       }
       super.onRemove(state, level, pos, newState, moved)
     }
+  }
+
+  override final def getCloneItemStack(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
+    val stack = super.getCloneItemStack(state, target, level, pos, player)
+    if (isMekanismLoaded) {
+      level.getBlockEntity(pos) match {
+        case tank: TileGasTank => TileInfo.setItemTag(stack, tank)
+        case tile => FluidTank.LOGGER.error(ModObjects.MARKER_TileGasTank, "There is not TileGasTank at the pos : " + pos + " but " + tile)
+      }
+    }
+    stack
   }
 
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = {
