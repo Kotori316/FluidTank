@@ -1,3 +1,9 @@
+## v19.8
+
+* Fixed error when you use empty bucket to empty tank.
+
+Build with 1.19.2-43.1.39, Mapping: Parchment 1.19.2-2022.10.09-1.19.2
+
 ## v19.7
 
 * Improved text in tooltip mods.

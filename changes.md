@@ -1,5 +1,3 @@
-## v19.7
+## v19.8
 
-* Improved text in tooltip mods.
-  * Added a mode to use compact numbers(such as 1.0K, 2.3M)
-  * Added option to change format in TOP tooltip in FluidTank config.
+* Fixed error when you use empty bucket to empty tank.
