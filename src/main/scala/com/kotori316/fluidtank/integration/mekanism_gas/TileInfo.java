@@ -123,4 +123,9 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
             tile.getLevel().getProfiler().pop();
         };
     }
+
+    static void unloadTask(TileGasTank tile) {
+        var c = ((Holder) tile.tileInfo().getHolder()).gasConnection;
+        c.remove(tile);
+    }
 }

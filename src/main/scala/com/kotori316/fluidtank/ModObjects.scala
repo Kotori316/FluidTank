@@ -61,7 +61,7 @@ object ModObjects {
   final val FLUID_PIPE_TYPE = createTileType((p, s) => new PipeTile(p, s), List(blockFluidPipe))
   final val ITEM_PIPE_TYPE = createTileType((p, s) => new ItemPipeTile(p, s), List(blockItemPipe))
   final val SOURCE_TYPE = createTileType((p, s) => new FluidSourceTile(p, s), List(blockSource))
-  final val GAS_TANK_TYPE = createTileType((p, s) => new TileGasTank(p, s), List())
+  final val GAS_TANK_TYPE = createTileType((p, s) => new TileGasTank(p, s), List(woodGasTank))
 
   def createTileType[T <: BlockEntity](supplier: (BlockPos, BlockState) => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): BlockEntityType[T] = {
     val t = BlockEntityType.Builder.of[T]((p, s) => supplier(p, s), blocks: _*).build(DSL.emptyPartType())

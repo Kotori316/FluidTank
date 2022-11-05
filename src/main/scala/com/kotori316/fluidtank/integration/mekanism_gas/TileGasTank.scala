@@ -33,6 +33,12 @@ class TileGasTank(p: BlockPos, s: BlockState, var tier: Tier) extends BlockEntit
     }
   }
 
+  def onRemoved(): Unit = {
+    if (SideProxy.isServer(this) && Constant.isMekanismLoaded) {
+      TileInfo.unloadTask(this)
+    }
+  }
+
   override def getCapability[T](cap: Capability[T], side: Direction): LazyOptional[T] = {
     val t = tileInfo.getCapability(cap, side)
     if (t.isPresent) {
