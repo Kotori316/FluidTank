@@ -1,7 +1,7 @@
 {
-  "parent": "minecraft:block/stone",
+  "parent": "fluidtank:item/item_tank_invisible",
   "textures": {
-    "1": "fluidtank:blocks/wood1",
-    "2": "fluidtank:blocks/wood2"
+    "1": "fluidtank:blocks/gas_wood1",
+    "2": "fluidtank:blocks/gas_wood2"
   }
 }
