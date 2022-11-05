@@ -26,6 +26,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.blocks.TankPos;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.FluidConnection;
 import com.kotori316.fluidtank.tiles.Tier;
@@ -208,5 +209,26 @@ public final class PlaceTest {
     public void dummy(GameTestHelper helper) {
         // fail("Fail Test");
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    public void removeMiddleTank(GameTestHelper helper) {
+        helper.startSequence()
+            .thenExecute(() -> {
+                helper.setBlock(BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD));
+                helper.setBlock(BlockPos.ZERO.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
+                helper.setBlock(BlockPos.ZERO.above(2), ModObjects.tierToBlock().apply(Tier.WOOD));
+            })
+            .thenExecuteAfter(1, () -> {
+                helper.assertBlockProperty(BlockPos.ZERO, TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM);
+                helper.assertBlockProperty(BlockPos.ZERO.above(), TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE);
+                helper.assertBlockProperty(BlockPos.ZERO.above(2), TankPos.TANK_POS_PROPERTY, TankPos.TOP);
+            })
+            .thenExecuteAfter(1, () -> helper.setBlock(BlockPos.ZERO.above(), Blocks.AIR))
+            .thenExecuteAfter(1, () -> {
+                helper.assertBlockProperty(BlockPos.ZERO, TankPos.TANK_POS_PROPERTY, TankPos.SINGLE);
+                helper.assertBlockProperty(BlockPos.ZERO.above(2), TankPos.TANK_POS_PROPERTY, TankPos.SINGLE);
+            })
+            .thenSucceed();
     }
 }
