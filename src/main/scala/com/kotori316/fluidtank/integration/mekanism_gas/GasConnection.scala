@@ -81,7 +81,9 @@ object GasConnection {
       s.map(_.tileInfo.getHolder).collect { case holder: TileInfo.Holder => holder.gasTankHandler }
     ))
 
-    override def createConnection(s: Seq[TileGasTank]): GasConnection = new GasConnection(s)
+    override def createConnection(s: Seq[TileGasTank]): GasConnection = {
+      Connection.updatePosPropertyAndCreateConnection[TileGasTank, GasConnection](s, s => new GasConnection(s), invalid)
+    }
 
     override def connectionSetter(connection: GasConnection): TileGasTank => Unit =
       t => t.tileInfo.getHolder match {
@@ -92,4 +94,5 @@ object GasConnection {
         case _ =>
       }
   }
+
 }

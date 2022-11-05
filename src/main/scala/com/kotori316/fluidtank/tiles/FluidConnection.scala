@@ -2,7 +2,6 @@ package com.kotori316.fluidtank.tiles
 
 import cats.data.Chain
 import cats.implicits.catsSyntaxFoldOps
-import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
 import net.minecraft.core.Direction
@@ -88,26 +87,8 @@ object FluidConnection {
       if (hasCreative) super.drain(toDrain, IFluidHandler.FluidAction.SIMULATE) else super.drain(toDrain, action)
   }
 
+  @deprecated(message = "Use Connection.updatePosPropertyAndCreateConnection instead.", since = "18.7.0")
   def create(s: Seq[TileTank]): FluidConnection = {
-    if (s.isEmpty) {
-      invalid
-    } else {
-      val seq = s.sortBy(_.getBlockPos.getY)
-      // Property update
-      if (seq.lengthIs > 1) {
-        // HEAD
-        val head = seq.head
-        head.getLevel.setBlockAndUpdate(head.getBlockPos, head.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM))
-        // LAST
-        val last = seq.last
-        last.getLevel.setBlockAndUpdate(last.getBlockPos, last.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.TOP))
-        // MIDDLE
-        seq.tail.init.foreach(t => t.getLevel.setBlockAndUpdate(t.getBlockPos, t.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
-      } else {
-        // SINGLE
-        seq.foreach(t => t.getLevel.setBlockAndUpdate(t.getBlockPos, t.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE)))
-      }
-      new FluidConnection(seq)
-    }
+    Connection.updatePosPropertyAndCreateConnection[TileTank, FluidConnection](s, s => new FluidConnection(s), invalid)
   }
 }
