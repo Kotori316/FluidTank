@@ -109,6 +109,7 @@ public final class DropTest {
 
         var entityTag = BlockItem.getBlockEntityData(stack);
         assertNotNull(entityTag, "BE tag must not be null. " + stack);
+        entityTag.remove("ForgeCaps"); // Ignore it. It exists because AE2 add custom capability.
         // language=json
         var expected = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, GsonHelper.parse("""
             {
@@ -137,6 +138,7 @@ public final class DropTest {
 
         var entityTag = BlockItem.getBlockEntityData(stack);
         assertNotNull(entityTag, "BE tag must not be null. " + stack);
+        entityTag.remove("ForgeCaps"); // Ignore it. It exists because AE2 add custom capability.
         // language=json
         var expected = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, GsonHelper.parse("""
             {

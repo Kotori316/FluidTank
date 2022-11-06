@@ -1,0 +1,8 @@
+{
+  "parent": "fluidtank:block/tanks",
+  "textures": {
+    "particle": "fluidtank:blocks/gas_emerald1",
+    "side": "fluidtank:blocks/gas_emerald1",
+    "top": "fluidtank:blocks/gas_emerald2"
+  }
+}

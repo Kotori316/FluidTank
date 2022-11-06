@@ -30,7 +30,7 @@ class CombineRecipeGameTest {
 
   @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
   def noUnavailableTank(helper: GameTestHelper): Unit = {
-    val context = GameTestUtil.getContext(helper)
+    val context = ICondition.IContext.EMPTY
     try {
       Config.content.usableUnavailableTankInRecipe.set(false)
       val ingredient = Try(CombineRecipe.SERIALIZER.getClass.getDeclaredMethod("tankList", classOf[ICondition.IContext]))

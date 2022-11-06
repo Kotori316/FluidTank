@@ -3,11 +3,12 @@ package com.kotori316.fluidtank.recipes
 import java.lang.{Boolean => JBool}
 
 import com.google.gson.JsonElement
-import com.kotori316.fluidtank.blocks.{BlockCAT, BlockTank, FluidSourceBlock, TankPos}
+import com.kotori316.fluidtank.blocks.{BlockCAT, FluidSourceBlock, TankPos}
 import net.minecraft.core.Direction
 import net.minecraft.data.models.blockstates.{BlockStateGenerator, MultiVariantGenerator, PropertyDispatch, Variant, VariantProperties}
 import net.minecraft.data.models.model.ModelLocationUtils
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 
 case class ModelSerializerHelper(location: ResourceLocation, stateSupplier: BlockStateGenerator) {
@@ -17,7 +18,7 @@ case class ModelSerializerHelper(location: ResourceLocation, stateSupplier: Bloc
 }
 
 object ModelSerializerHelper {
-  def getTankModel(block: BlockTank): ModelSerializerHelper = {
+  def getTankModel(block: Block): ModelSerializerHelper = {
     val name = {
       val n = ModelLocationUtils.getModelLocation(block)
       new ResourceLocation(n.getNamespace,

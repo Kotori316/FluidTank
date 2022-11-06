@@ -139,10 +139,11 @@ task deleteGateTestWorld(type: Delete) {
     onlyIf { file("${project.buildDir}/game_test").exists() }
 }
 
-task copyGameTestTemplate(type: Copy, dependsOn: deleteGateTestWorld) {
+task copyGameTestTemplate(type: Copy) {
     //noinspection SpellCheckingInspection
     from("src/test/resources/data/fluidtank/gameteststructures/")
     into("${project.buildDir}/game_test/gameteststructures/")
+    mustRunAfter(deleteGateTestWorld)
 }
 
 processResources {
@@ -166,6 +167,7 @@ repositories {
         url = "https://modmaven.dev/"
         content {
             it.includeGroup("appeng")
+            it.includeVersion("mekanism", "Mekanism", project.mekanismVersion as String)
         }
     }
     maven {
@@ -219,11 +221,15 @@ dependencies {
         implementation(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         implementation(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         implementation(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+        implementation(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
     } else {
         compileOnly(fg.deobf("mezz.jei:jei-1.18.2-forge:" + project.jeiVersion))
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:3550084"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+        compileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion, classifier: "api"))
+        testImplementation(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
+        // Used in game test
     }
 
     // compileOnly(fg.deobf("curse.maven:look-at-that-355304:3035358"))

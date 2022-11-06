@@ -24,6 +24,7 @@ import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin;
+import com.kotori316.fluidtank.integration.mekanism_gas.BlockGasTank;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.SideProxy;
@@ -71,6 +72,7 @@ public class FluidTank {
             event.getRegistry().register(ModObjects.blockFluidPipe());
             event.getRegistry().register(ModObjects.blockItemPipe());
             event.getRegistry().register(ModObjects.blockSource());
+            CollectionConverters.asJava(ModObjects.gasTanks()).forEach(event.getRegistry()::register);
         }
 
         @SubscribeEvent
@@ -80,6 +82,7 @@ public class FluidTank {
             event.getRegistry().register(ModObjects.blockFluidPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockItemPipe().itemBlock());
             event.getRegistry().register(ModObjects.blockSource().itemBlock());
+            CollectionConverters.asJava(ModObjects.gasTanks()).stream().map(BlockGasTank::itemBlock).forEach(event.getRegistry()::register);
             CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(event.getRegistry()::register);
         }
 

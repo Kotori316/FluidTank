@@ -266,7 +266,9 @@ object TileTank {
     override def createHandler(s: Seq[TileTank]): ListTankHandler =
       new FluidConnection.ConnectionTankHandler(Chain.fromSeq(s.map(_.internalTank)), s.exists(isCreative))
 
-    override def createConnection(s: Seq[TileTank]): FluidConnection = FluidConnection.create(s)
+    override def createConnection(s: Seq[TileTank]): FluidConnection = {
+      Connection.updatePosPropertyAndCreateConnection[TileTank, FluidConnection](s, s => new FluidConnection(s), FluidConnection.invalid)
+    }
 
     override def connectionSetter(connection: FluidConnection): TileTank => Unit =
       t => t.connection = connection

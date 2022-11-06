@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank.tiles
 
 import cats.implicits.catsSyntaxApplicativeId
+import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{GenericAmount, ListHandler}
 import com.kotori316.fluidtank.tiles.ConnectionHelper._
 import com.kotori316.fluidtank.{Cap, FluidTank, ModObjects}
@@ -130,5 +131,29 @@ object Connection {
       .toList.map(tankClass.cast)
     //    tanks.foldLeft(Connection.invalid) { case (c, tank) => c.add(tank, Direction.UP) }
     createAndInit(tanks)
+  }
+
+  def updatePosPropertyAndCreateConnection[TileType <: BlockEntity, ConnectionType <: Connection[TileType]]
+  (s: Seq[TileType], constructor: Seq[TileType] => ConnectionType, invalid: => ConnectionType): ConnectionType = {
+    if (s.isEmpty) {
+      invalid
+    } else {
+      val seq = s.sortBy(_.getBlockPos.getY)
+      // Property update
+      if (seq.lengthIs > 1) {
+        // HEAD
+        val head = seq.head
+        head.getLevel.setBlockAndUpdate(head.getBlockPos, head.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM))
+        // LAST
+        val last = seq.last
+        last.getLevel.setBlockAndUpdate(last.getBlockPos, last.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.TOP))
+        // MIDDLE
+        seq.tail.init.foreach(t => t.getLevel.setBlockAndUpdate(t.getBlockPos, t.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE)))
+      } else {
+        // SINGLE
+        seq.foreach(t => t.getLevel.setBlockAndUpdate(t.getBlockPos, t.getBlockState.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE)))
+      }
+      constructor(seq)
+    }
   }
 }
