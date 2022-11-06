@@ -1,7 +1,9 @@
 package com.kotori316.fluidtank.integration.mekanism_gas
 
 import cats.Hash
+import mekanism.api.NBTConstants
 import mekanism.api.chemical.gas.{Gas, GasStack}
+import net.minecraft.nbt.CompoundTag
 
 object GasAmount {
 
@@ -11,6 +13,12 @@ object GasAmount {
   implicit val hashGas: Hash[Gas] = Hash.fromUniversalHashCode
 
   def fromStack(gasStack: GasStack): GasAmount = apply(gasStack.getRaw, gasStack.getAmount)
+
+  def fromTag(storedTag: CompoundTag): GasAmount = {
+    val gas = Gas.readFromNBT(storedTag)
+    val amount = storedTag.getLong(NBTConstants.AMOUNT)
+    apply(gas, amount)
+  }
 
   final val EMPTY: GasAmount = fromStack(GasStack.EMPTY)
 }

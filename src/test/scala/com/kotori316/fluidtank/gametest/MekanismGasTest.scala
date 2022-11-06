@@ -1,21 +1,25 @@
 package com.kotori316.fluidtank.gametest
 
 import cats.data.Chain
-import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.fluids.Tank
 import com.kotori316.fluidtank.gametest.MekanismGasTest.BATCH
 import com.kotori316.fluidtank.integration.mekanism_gas._
+import com.kotori316.fluidtank.tiles.{Tier, TileTank}
+import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
 import com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE
 import mekanism.api.chemical.gas.{Gas, GasStack}
-import mekanism.api.{AutomationType, Action => MekanismAction}
+import mekanism.api.{AutomationType, NBTConstants, Action => MekanismAction}
 import mekanism.common.registries.MekanismGases
 import net.minecraft.gametest.framework.{AfterBatch, BeforeBatch, GameTest, GameTestHelper}
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.item.{BlockItem, ItemStack}
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.gametest.{GameTestHolder, PrefixGameTestTemplate}
 import org.junit.jupiter.api.Assertions._
 
 import scala.annotation.unused
+import scala.util.chaining.scalaUtilChainingOps
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
@@ -179,6 +183,113 @@ class MekanismGasTest {
     assertEquals(GasAmount(MekanismGases.OXYGEN.get(), 4000), handler1.getTank.genericAmount)
     assertEquals(GasAmount(MekanismGases.OXYGEN.get(), 2000), handler2.getTank.genericAmount)
 
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerEmpty(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+
+    val content = handler.getChemicalInTank(0)
+    val capacity = handler.getTankCapacity(0)
+    assertEquals(GasStack.EMPTY, content)
+    assertEquals(4000, capacity)
+
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerFilled(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val tag = new CompoundTag()
+      .tap(_.putLong(TileTank.NBT_Capacity, 3000))
+      .tap(_.put("stored", MekanismGases.OXYGEN.get().write(new CompoundTag().tap(_.putLong(NBTConstants.AMOUNT, 2000)))))
+    Utils.setTileTag(stack, tag)
+
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+    assertEquals(3000, handler.getTankCapacity(0))
+    assertEquals(MekanismGases.OXYGEN.get().getStack(2000), handler.getChemicalInTank(0))
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerFillToEmpty1(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+
+    val remain = handler.insertChemical(MekanismGases.OXYGEN.get().getStack(1000), MekanismAction.SIMULATE)
+    assertTrue(remain.isEmpty)
+    assertFalse(stack.hasTag, "Simulation must not change tag.")
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerFillToEmpty2(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+
+    val remain = handler.insertChemical(MekanismGases.OXYGEN.get().getStack(1000), MekanismAction.EXECUTE)
+    assertTrue(remain.isEmpty)
+    assertTrue(stack.hasTag, "Execution must change tag.")
+    val tag = BlockItem.getBlockEntityData(stack)
+    assertNotNull(tag)
+    val amount = GasAmount.fromTag(tag.getCompound("stored"))
+    assertEquals(GasAmount(MekanismGases.OXYGEN.get(), 1000), amount)
+    assertEquals(4000, tag.getLong(TileTank.NBT_Capacity))
+
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerFillToEmpty3(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+
+    val remain = handler.insertChemical(MekanismGases.OXYGEN.get().getStack(5000), MekanismAction.EXECUTE)
+    val expected = MekanismGases.OXYGEN.get().getStack(1000)
+    assertEquals(expected, remain)
+    assertTrue(stack.hasTag, "Execution must change tag.")
+    val tag = BlockItem.getBlockEntityData(stack)
+    assertNotNull(tag)
+    val amount = GasAmount.fromTag(tag.getCompound("stored"))
+    assertEquals(GasAmount(MekanismGases.OXYGEN.get(), 4000), amount)
+    assertEquals(4000, tag.getLong(TileTank.NBT_Capacity))
+
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerDrain1(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val tag = new CompoundTag()
+      .tap(_.putLong(TileTank.NBT_Capacity, 3000))
+      .tap(_.put("stored", MekanismGases.OXYGEN.get().write(new CompoundTag().tap(_.putLong(NBTConstants.AMOUNT, 2000)))))
+    Utils.setTileTag(stack, tag)
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+
+    val extracted = handler.extractChemical(1500, MekanismAction.SIMULATE)
+    val expect = MekanismGases.OXYGEN.get().getStack(1500)
+    assertEquals(expect, extracted)
+    val content = GasAmount.fromStack(handler.getChemicalInTank(0))
+    assertEquals(GasAmount(MekanismGases.OXYGEN.get(), 2000), content)
+    helper.succeed()
+  }
+
+  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  def stackHandlerDrain2(helper: GameTestHelper): Unit = {
+    val stack = new ItemStack(ModObjects.woodGasTank)
+    val tag = new CompoundTag()
+      .tap(_.putLong(TileTank.NBT_Capacity, 3000))
+      .tap(_.put("stored", MekanismGases.OXYGEN.get().write(new CompoundTag().tap(_.putLong(NBTConstants.AMOUNT, 2000)))))
+    Utils.setTileTag(stack, tag)
+    val handler = new TankItemGasHandler(Tier.WOOD, stack)
+
+    val extracted = handler.extractChemical(1500, MekanismAction.EXECUTE)
+    val expect = MekanismGases.OXYGEN.get().getStack(1500)
+    assertEquals(expect, extracted)
+    val content = GasAmount.fromStack(handler.getChemicalInTank(0))
+    assertEquals(GasAmount(MekanismGases.OXYGEN.get(), 500), content)
     helper.succeed()
   }
 }

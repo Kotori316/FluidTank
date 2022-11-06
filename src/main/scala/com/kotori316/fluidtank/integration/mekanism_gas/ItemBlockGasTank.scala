@@ -3,10 +3,12 @@ package com.kotori316.fluidtank.integration.mekanism_gas
 import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.integration.Localize
 import net.minecraft.ChatFormatting
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
 import net.minecraft.world.item.{BlockItem, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.Level
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
+import net.minecraftforge.common.capabilities.ICapabilityProvider
 import org.jetbrains.annotations.Nullable
 
 class ItemBlockGasTank(val blockGasTank: BlockGasTank)
@@ -30,6 +32,15 @@ class ItemBlockGasTank(val blockGasTank: BlockGasTank)
       }
     } else {
       tooltip.add(new TextComponent(f"${ChatFormatting.RED}Gas Tank is unavailable.${ChatFormatting.RESET}"))
+    }
+  }
+
+  @Nullable
+  override def initCapabilities(stack: ItemStack, nbt: CompoundTag): ICapabilityProvider = {
+    if (Constant.isMekanismLoaded) {
+      new GasCapProvider(blockGasTank.tier, stack)
+    } else {
+      super.initCapabilities(stack, nbt)
     }
   }
 }
