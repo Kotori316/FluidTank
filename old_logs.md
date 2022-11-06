@@ -1,3 +1,11 @@
+## v18.7.1
+
+* Big internal change
+* Add Gas Tank for Mekanism Gases
+* Fixed a error when you interact empty tanks with empty bucket.
+
+Build with 1.18.2-40.1.73, Mapping: Official 1.18.2
+
 ## v18.6.1
 
 * Improved text in tooltip mods.
