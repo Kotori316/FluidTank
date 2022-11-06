@@ -327,6 +327,7 @@ curseforge {
         addArtifact srcJar
         relations {
             requiredDependency 'scalable-cats-force'
+            optionalDependency 'mekanism'
         }
     }
     options {
