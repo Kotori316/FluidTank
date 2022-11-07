@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ptp",
+    "tot",
+    "ptp"
+  ],
+  "key": {
+    "p": {
+      "item": "fluidtank:gas_tank_iron"
+    },
+    "t": {
+      "tag": "forge:ingots/gold"
+    },
+    "o": {
+      "tag": "forge:ingots/osmium"
+    }
+  },
+  "result": {
+    "item": "fluidtank:gas_tank_gold"
+  },
+  "conditions": [
+    {
+      "modid": "mekanism",
+      "type": "forge:mod_loaded"
+    },
+    {
+      "tag": "forge:ingots/osmium",
+      "type": "fluidtank:tag"
+    },
+    {
+      "tag": "forge:ingots/gold",
+      "type": "fluidtank:tag"
+    },
+    {
+      "type": "fluidtank:config"
+    }
+  ]
+}

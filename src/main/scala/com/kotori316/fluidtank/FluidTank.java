@@ -25,6 +25,7 @@ import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin;
+import com.kotori316.fluidtank.integration.mekanism_gas.BlockGasTank;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.SideProxy;
@@ -81,6 +82,7 @@ public class FluidTank {
             helper.register(ModObjects.blockFluidPipe().registryName, ModObjects.blockFluidPipe());
             helper.register(ModObjects.blockItemPipe().registryName, ModObjects.blockItemPipe());
             helper.register(ModObjects.blockSource().registryName(), ModObjects.blockSource());
+            CollectionConverters.asJava(ModObjects.gasTanks()).forEach(b -> helper.register(b.registryName(), b));
         }
 
         public static void registerItems(RegisterEvent.RegisterHelper<Item> helper) {
@@ -89,6 +91,7 @@ public class FluidTank {
             helper.register(ModObjects.blockFluidPipe().registryName, ModObjects.blockFluidPipe().itemBlock());
             helper.register(ModObjects.blockItemPipe().registryName, ModObjects.blockItemPipe().itemBlock());
             helper.register(ModObjects.blockSource().registryName(), ModObjects.blockSource().itemBlock());
+            CollectionConverters.asJava(ModObjects.gasTanks()).stream().map(BlockGasTank::itemBlock).forEach(b -> helper.register(b.registryName(), b));
             CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(b -> helper.register(b.registryName(), b));
         }
 

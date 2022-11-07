@@ -10,28 +10,28 @@ sealed trait FluidTransferLog {
 
 object FluidTransferLog {
 
-  case class FillFluid(toFill: FluidAmount, filled: FluidAmount, before: Tank, after: Tank) extends FluidTransferLog {
-    override def logString: String = s"FillFluid{Filled=$filled, ToFill=$toFill, Before={${before.fluidAmount}}, After={${after.fluidAmount}}}"
+  case class FillFluid[A](toFill: GenericAmount[A], filled: GenericAmount[A], before: Tank[A], after: Tank[A]) extends FluidTransferLog {
+    override def logString: String = s"FillFluid{Filled=$filled, ToFill=$toFill, Before={${before.genericAmount}}, After={${after.genericAmount}}}"
   }
 
-  case class FillFailed(fluid: FluidAmount, tank: Tank) extends FluidTransferLog {
-    override def logString: String = s"FillFailed{FailedToFill=$fluid, Tank={${tank.fluidAmount}}}"
+  case class FillFailed[A](fluid: GenericAmount[A], tank: Tank[A]) extends FluidTransferLog {
+    override def logString: String = s"FillFailed{FailedToFill=$fluid, Tank={${tank.genericAmount}}}"
   }
 
-  case class FillAll(fluid: FluidAmount, tank: Tank) extends FluidTransferLog {
-    override def logString: String = s"FillAll{Filled=$fluid, Tank={${tank.fluidAmount}}}"
+  case class FillAll[A](fluid: GenericAmount[A], tank: Tank[A]) extends FluidTransferLog {
+    override def logString: String = s"FillAll{Filled=$fluid, Tank={${tank.genericAmount}}}"
   }
 
-  case class DrainFluid(toDrain: FluidAmount, drained: FluidAmount, before: Tank, after: Tank) extends FluidTransferLog {
-    override def logString: String = s"DrainFluid{Drained=$drained, ToDrain=$toDrain, Before={${before.fluidAmount}}, After={${after.fluidAmount}}}"
+  case class DrainFluid[A](toDrain: GenericAmount[A], drained: GenericAmount[A], before: Tank[A], after: Tank[A]) extends FluidTransferLog {
+    override def logString: String = s"DrainFluid{Drained=$drained, ToDrain=$toDrain, Before={${before.genericAmount}}, After={${after.genericAmount}}}"
   }
 
-  case class DrainFailed(fluid: FluidAmount, tank: Tank) extends FluidTransferLog {
-    override def logString: String = s"DrainFailed{ToDrain=$fluid, Tank={${tank.fluidAmount}}}"
+  case class DrainFailed[A](fluid: GenericAmount[A], tank: Tank[A]) extends FluidTransferLog {
+    override def logString: String = s"DrainFailed{ToDrain=$fluid, Tank={${tank.genericAmount}}}"
   }
 
-  case class Empty(fluid: FluidAmount, tank: Tank) extends FluidTransferLog {
-    override def logString: String = s"Empty{s=$fluid, Tank={${tank.fluidAmount}}}"
+  case class Empty[A](fluid: GenericAmount[A], tank: Tank[A]) extends FluidTransferLog {
+    override def logString: String = s"Empty{s=$fluid, Tank={${tank.genericAmount}}}"
   }
 
   implicit val showFluidTransferLog: Show[FluidTransferLog] = _.logString

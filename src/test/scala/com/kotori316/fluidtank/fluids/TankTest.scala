@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.fluids
 
 import cats.syntax.eq._
 import com.kotori316.fluidtank.BeforeAllTest
+import net.minecraft.world.level.material.Fluid
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -18,13 +19,13 @@ class TankTest extends BeforeAllTest {
 
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.fluids.TankTest#emptyTankSeq"))
-  def empty(tank: Tank): Unit = {
+  def empty(tank: Tank[Fluid]): Unit = {
     assertTrue(tank.isEmpty, s"$tank is empty.")
   }
 
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.fluids.TankTest#nonEmptyTankSeq"))
-  def nonEmpty(tank: Tank): Unit = {
+  def nonEmpty(tank: Tank[Fluid]): Unit = {
     assertFalse(tank.isEmpty, s"$tank is not empty.")
   }
 
@@ -34,14 +35,14 @@ class TankTest extends BeforeAllTest {
     val b = Tank(FluidAmount.BUCKET_WATER, 5000)
     assertAll(
       () => assertEquals(a, b),
-      () => assertTrue(cats.Eq[Tank].eqv(a, b)),
+      () => assertTrue(cats.Eq[Tank[Fluid]].eqv(a, b)),
       () => assertTrue(a === b),
     )
   }
 
   @ParameterizedTest
   @MethodSource(Array("com.kotori316.fluidtank.fluids.TankTest#not5000Water"))
-  def notEq1(t: Tank): Unit = {
+  def notEq1(t: Tank[Fluid]): Unit = {
     val a = Tank(FluidAmount.BUCKET_WATER, 5000)
     assertTrue(a =!= t, s"a=$a, t=$t")
   }

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "tank_pos=bottom": {
+      "model": "fluidtank:block/gas_tank_iron"
+    },
+    "tank_pos=middle": {
+      "model": "fluidtank:block/gas_tank_iron"
+    },
+    "tank_pos=single": {
+      "model": "fluidtank:block/gas_tank_iron"
+    },
+    "tank_pos=top": {
+      "model": "fluidtank:block/gas_tank_iron"
+    }
+  }
+}

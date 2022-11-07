@@ -1,8 +1,9 @@
 package com.kotori316.fluidtank.tiles
 
+import cats.data.Chain
 import cats.implicits.toShow
 import com.kotori316.fluidtank._
-import com.kotori316.fluidtank.fluids.{FluidAmount, Tank, TankHandler}
+import com.kotori316.fluidtank.fluids.{FluidAmount, GenericAmount, ListTankHandler, Tank, TankHandler}
 import com.kotori316.fluidtank.network.{PacketHandler, SideProxy, TileMessage}
 import com.kotori316.fluidtank.render.Box
 import net.minecraft.core.{BlockPos, Direction}
@@ -14,6 +15,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.Nameable
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.{LazyOptional, LogicalSidedProvider}
 import net.minecraftforge.fml.LogicalSide
@@ -36,14 +38,14 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
   }
 
   val internalTank: TankHandler with TileTank.RealTank = new InternalTank(tier.amount)
-  private final var mConnection: Connection = Connection.invalid
-  final val connectionAttaches: ArrayBuffer[Connection => Unit] = ArrayBuffer.empty
+  private final var mConnection: FluidConnection = FluidConnection.invalid
+  final val connectionAttaches: ArrayBuffer[FluidConnection => Unit] = ArrayBuffer.empty
   var loading = false
   var stackName: Component = _
 
-  def connection: Connection = mConnection
+  def connection: FluidConnection = mConnection
 
-  def connection_=(c: Connection): Unit = {
+  def connection_=(c: FluidConnection): Unit = {
     mConnection = c
     connectionAttaches.foreach(_.apply(c))
   }
@@ -96,7 +98,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
             this.getBlockPos.show, this.connection)
         }
         if (this.connection.isDummy) {
-          Connection.load(getLevel, getBlockPos)
+          Connection.load(getLevel, getBlockPos, classOf[TileTank])
         }
         getLevel.getProfiler.pop()
       }))
@@ -128,13 +130,13 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
     val downTank = Option(getLevel.getBlockEntity(getBlockPos.below())).collect { case t: TileTank => t }
     val upTank = Option(getLevel.getBlockEntity(getBlockPos.above())).collect { case t: TileTank => t }
     val newSeq = (downTank, upTank) match {
-      case (Some(dT), Some(uT)) => dT.connection.seq :+ this :++ uT.connection.seq
-      case (None, Some(uT)) => this +: uT.connection.seq
-      case (Some(dT), None) => dT.connection.seq :+ this
+      case (Some(dT), Some(uT)) => dT.connection.sortedTanks :+ this :++ uT.connection.sortedTanks
+      case (None, Some(uT)) => this +: uT.connection.sortedTanks
+      case (Some(dT), None) => dT.connection.sortedTanks :+ this
       case (None, None) => Seq(this)
     }
     if (downTank.exists(_.connection.isDummy) || upTank.exists(_.connection.isDummy)) {
-      Connection.load(getLevel, getBlockPos)
+      Connection.load(getLevel, getBlockPos, classOf[TileTank])
     } else {
       Connection.createAndInit(newSeq)
     }
@@ -188,7 +190,7 @@ object TileTank {
     // Util methods
     def getFluidAmount: Long = this.getTank.amount
 
-    def getFluid: FluidAmount = this.getTank.fluidAmount
+    def getFluid: FluidAmount = this.getTank.genericAmount
 
     protected def capacity = this.getTank.capacity
 
@@ -210,7 +212,7 @@ object TileTank {
     }
 
     def readFromNBT(nbt: CompoundTag): TankHandler with TileTank.RealTank = {
-      val newTank: Tank = Tank(FluidAmount.fromNBT(nbt), nbt.getLong(TileTank.NBT_Capacity))
+      val newTank = Tank(FluidAmount.fromNBT(nbt), nbt.getLong(TileTank.NBT_Capacity))
       setTank(newTank)
       self
     }
@@ -240,5 +242,35 @@ object TileTank {
     } else {
       (lowerBound, lowerBound + height)
     }
+  }
+
+  implicit final val fluidConnectionHelper: ConnectionHelper.Aux[TileTank, Fluid, ListTankHandler] = FluidConnectionHelperImpl
+
+  private final object FluidConnectionHelperImpl extends ConnectionHelper[TileTank] {
+    override type Content = Fluid
+    override type Handler = ListTankHandler
+    override type ConnectionType = FluidConnection
+
+    override def getPos(t: TileTank): BlockPos = t.getBlockPos
+
+    override def isCreative(t: TileTank): Boolean = t.isInstanceOf[TileTankCreative]
+
+    override def isVoid(t: TileTank): Boolean = t.isInstanceOf[TileTankVoid]
+
+    override def setChanged(t: TileTank): Unit = t.setChanged()
+
+    override def getContentRaw(t: TileTank): GenericAmount[Fluid] = t.internalTank.getFluid
+
+    override def defaultAmount: GenericAmount[Fluid] = FluidAmount.EMPTY
+
+    override def createHandler(s: Seq[TileTank]): ListTankHandler =
+      new FluidConnection.ConnectionTankHandler(Chain.fromSeq(s.map(_.internalTank)), s.exists(isCreative))
+
+    override def createConnection(s: Seq[TileTank]): FluidConnection = {
+      Connection.updatePosPropertyAndCreateConnection[TileTank, FluidConnection](s, s => new FluidConnection(s), FluidConnection.invalid)
+    }
+
+    override def connectionSetter(connection: FluidConnection): TileTank => Unit =
+      t => t.connection = connection
   }
 }

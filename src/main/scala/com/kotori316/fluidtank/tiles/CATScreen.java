@@ -9,9 +9,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.Fluid;
 
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 
 public class CATScreen extends AbstractContainerScreen<CATContainer> {
 
@@ -34,9 +35,9 @@ public class CATScreen extends AbstractContainerScreen<CATContainer> {
     @Override
     protected void renderLabels(PoseStack matrices, int mouseX, int mouseY) {
         super.renderLabels(matrices, mouseX, mouseY);
-        List<FluidAmount> stacks = catTile.fluidCache;
+        List<GenericAmount<Fluid>> stacks = catTile.fluidCache;
         for (int i = 0; i < stacks.size(); i++) {
-            FluidAmount a = stacks.get(i);
+            var a = stacks.get(i);
             this.font.draw(matrices, a.toString(), 8, 16 + 10 * i, 0x404040);
         }
     }

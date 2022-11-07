@@ -17,7 +17,7 @@ import snownee.jade.api.TooltipPosition;
 import snownee.jade.api.config.IPluginConfig;
 
 import com.kotori316.fluidtank.FluidTank;
-import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.integration.Localize;
 import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.fluidtank.tiles.TileTankVoid;
@@ -52,7 +52,7 @@ final class JadeTankDataProvider implements IServerDataProvider<BlockEntity>, IB
         tag.putString(NBT_Tier, tank.tier().toString());
         if (tank instanceof TileTankVoid) return;
         tag.putString(NBT_ConnectionFluidName,
-            OptionConverters.toJava(tank.connection().getFluidStack()).filter(FluidAmount::nonEmpty).map(FluidAmount::getLocalizedName).orElse(FLUID_NULL));
+            OptionConverters.toJava(tank.connection().getFluidStack()).filter(GenericAmount::nonEmpty).map(GenericAmount::getLocalizedName).orElse(FLUID_NULL));
         if (!tank.connection().hasCreative()) {
             tag.putBoolean(NBT_Creative, false);
             tag.putLong(NBT_ConnectionAmount, tank.connection().amount());

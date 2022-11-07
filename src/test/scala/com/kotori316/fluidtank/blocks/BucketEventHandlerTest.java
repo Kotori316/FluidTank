@@ -25,7 +25,7 @@ class BucketEventHandlerTest extends BeforeAllTest {
         var result = assertDoesNotThrow(() ->
             OptionConverters.<BucketEventHandler.TransferResult>toJava(BucketEventHandler.transferFluidTest(handler, stack))
                 .orElseThrow());
-        assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1000L), handler.getTank().fluidAmount());
+        assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1000L), handler.getTank().genericAmount());
         assertEquals(Items.BUCKET, result.result().getResult().getItem());
         assertTrue(ItemStack.matches(stack, new ItemStack(Items.LAVA_BUCKET)));
     }
@@ -39,7 +39,7 @@ class BucketEventHandlerTest extends BeforeAllTest {
         var result = assertDoesNotThrow(() ->
             OptionConverters.<BucketEventHandler.TransferResult>toJava(BucketEventHandler.transferFluidTest(handler, stack))
                 .orElseThrow());
-        assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1000L), handler.getTank().fluidAmount());
+        assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1000L), handler.getTank().genericAmount());
         assertEquals(Items.BUCKET, result.result().getResult().getItem());
         assertTrue(ItemStack.matches(stack, new ItemStack(Items.LAVA_BUCKET, stackSize)));
     }

@@ -156,7 +156,7 @@ class ListTankHandlerTest extends BeforeAllTest {
       locally {
         val drained = h.drain(15000, IFluidHandler.FluidAction.EXECUTE)
         assertEquals(FluidAmount.BUCKET_WATER.setAmount(10000), FluidAmount.fromStack(drained))
-        assertTrue(h.getTankList.forall(_.fluidAmount.isEmpty))
+        assertTrue(h.getTankList.forall(_.genericAmount.isEmpty))
       }
     }
 

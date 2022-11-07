@@ -20,7 +20,7 @@ import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Blocks
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
-import net.minecraftforge.common.crafting.conditions.{ICondition, NotCondition, TagEmptyCondition}
+import net.minecraftforge.common.crafting.conditions.{ICondition, ModLoadedCondition, NotCondition, TagEmptyCondition}
 import net.minecraftforge.data.event.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
@@ -195,8 +195,25 @@ object FluidTankDataProvider {
       val COPPER = RecipeSerializeHelper(new TierFinishedRecipe(ID("tank_copper_vanilla"), Tier.COPPER, Ingredient.of(Items.COPPER_INGOT)))
         .addCondition(tankConfigCondition)
         .addCondition(new TagEmptyCondition("forge", "ingots/copper"))
+      val GAS_TANKS = (ModObjects.gasTanks zip
+        (ModObjects.tierToBlock(Tier.WOOD) :: ModObjects.gasTanks) zip
+        Seq(ItemTags.LOGS, Tags.Items.INGOTS_IRON, Tags.Items.INGOTS_GOLD, Tags.Items.GEMS_DIAMOND, Tags.Items.GEMS_EMERALD)
+        ).map { case ((tank, preTank), tag) => RecipeSerializeHelper.by(
+        ShapedRecipeBuilder.shaped(tank)
+          .pattern("ptp")
+          .pattern("tot")
+          .pattern("ptp")
+          .define('p', preTank)
+          .define('t', tag)
+          .define('o', ItemTags.create(new ResourceLocation("forge", "ingots/osmium")))
+      )
+        .addCondition(configCondition)
+        .addTagCondition(tag)
+        .addTagCondition(ItemTags.create(new ResourceLocation("forge", "ingots/osmium")))
+        .addCondition(new ModLoadedCondition("mekanism"))
+      }
 
-      val recipes = RESERVOIRS ::: COMBINE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: COPPER :: TANKS
+      val recipes = RESERVOIRS ::: COMBINE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: COPPER :: TANKS ::: GAS_TANKS
 
       for (recipe <- recipes) {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
@@ -220,6 +237,7 @@ object FluidTankDataProvider {
       lootTables ++= ModObjects.blockTanks.map(LootTableSerializerHelper.withTankContent)
       lootTables ++= Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe)
         .map(LootTableSerializerHelper.withDrop)
+      models ++= ModObjects.gasTanks.map(ModelSerializerHelper.getTankModel)
 
       for (table <- lootTables) {
         val out = path.resolve(s"data/${table.location.getNamespace}/loot_tables/blocks/${table.location.getPath}.json")

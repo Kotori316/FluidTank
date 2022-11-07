@@ -73,9 +73,9 @@ public final class LoadTest {
         if (bottomTank instanceof TileTank tank) {
             // tank.onBlockPlacedBy(); not needed.
             assertFalse(tank.connection().isDummy());
-            assertEquals(2, tank.connection().seq().size(), String.valueOf(tank.connection().seq()));
+            assertEquals(2, tank.connection().sortedTanks().size(), String.valueOf(tank.connection().sortedTanks()));
             assertEquals(24000L, tank.connection().amount());
-            assertEquals(Fluids.WATER, tank.connection().fluidType().fluid());
+            assertEquals(Fluids.WATER, tank.connection().fluidType().c());
         } else {
             fail("Tank entity is not presented at %s.".formatted(helper.absolutePos(pos)));
         }

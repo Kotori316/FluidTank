@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks._
+import com.kotori316.fluidtank.integration.mekanism_gas.{BlockGasTank, TileGasTank}
 import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
@@ -45,6 +46,8 @@ object ModObjects {
   final val blockFluidPipe = new FluidPipeBlock
   final val blockItemPipe = new ItemPipeBlock
   final val blockSource = new FluidSourceBlock
+  final val woodGasTank = new BlockGasTank(Tier.WOOD)
+  final val gasTanks = woodGasTank :: List(Tier.IRON, Tier.GOLD, Tier.DIAMOND, Tier.EMERALD).map(t => new BlockGasTank(t))
 
   //---------- ITEMS ----------
   final val itemReservoirs = List(Tier.WOOD, Tier.STONE, Tier.IRON).map(t => new ReservoirItem(t))
@@ -59,6 +62,7 @@ object ModObjects {
   final val FLUID_PIPE_TYPE = createTileType((p, s) => new PipeTile(p, s), List(blockFluidPipe))
   final val ITEM_PIPE_TYPE = createTileType((p, s) => new ItemPipeTile(p, s), List(blockItemPipe))
   final val SOURCE_TYPE = createTileType((p, s) => new FluidSourceTile(p, s), List(blockSource))
+  final val GAS_TANK_TYPE = createTileType((p, s) => new TileGasTank(p, s), gasTanks)
 
   def createTileType[T <: BlockEntity](supplier: (BlockPos, BlockState) => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): BlockEntityType[T] = {
     val t = BlockEntityType.Builder.of[T]((p, s) => supplier(p, s), blocks: _*).build(DSL.emptyPartType())
@@ -80,12 +84,15 @@ object ModObjects {
   // ---------- Markers ----------
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
   final val MARKER_TileTank = MarkerManager.getMarker("TileTank")
+  final val MARKER_TileGasTank = MarkerManager.getMarker("TileGasTank")
   final val MARKER_RenderItemTank = MarkerManager.getMarker("RenderItemTank")
   final val MARKER_Connection = MarkerManager.getMarker("Connection")
   final val MARKER_PipeTileBase = MarkerManager.getMarker("PipeTileBase")
   final val MARKER_TankHandler = MarkerManager.getMarker("TankHandler")
   final val MARKER_ListTankHandler = MarkerManager.getMarker("ListTankHandler")
+  final val MARKER_GasListHandler = MarkerManager.getMarker("GasListHandler")
   final val MARKER_DebugFluidHandler = MarkerManager.getMarker("DebugFluidHandler")
+  final val MARKER_GasHandler = MarkerManager.getMarker("GasHandler")
 
   class NamedEntry[+T](val name: ResourceLocation, val t: T)
 }

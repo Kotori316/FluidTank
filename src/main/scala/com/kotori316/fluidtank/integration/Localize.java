@@ -66,7 +66,7 @@ public class Localize {
                 if (!tankData.contains(NBT_Creative)) {
                     return Collections.singletonList(
                         Component.translatable(WAILA_SHORT,
-                            fluidNameFormatter.apply(tank.internalTank().getTank().fluidAmount().getLocalizedName()),
+                            fluidNameFormatter.apply(tank.internalTank().getTank().genericAmount().getLocalizedName()),
                             numberFormat.apply(tank.internalTank().getTank().amount()),
                             numberFormat.apply(tank.internalTank().getTank().capacity()))
                     );

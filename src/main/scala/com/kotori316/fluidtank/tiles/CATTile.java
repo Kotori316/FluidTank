@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -32,10 +33,11 @@ import org.jetbrains.annotations.Nullable;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 
 public class CATTile extends BlockEntity implements MenuProvider {
     // The direction of FACING is facing to you, people expect to use itemBlock targeting an inventory so the chest exists on the opposite side of FACING.
-    public List<FluidAmount> fluidCache = Collections.emptyList();
+    public List<GenericAmount<Fluid>> fluidCache = Collections.emptyList();
 
     public CATTile(BlockPos pos, BlockState state) {
         super(ModObjects.CAT_TYPE(), pos, state);
@@ -164,22 +166,22 @@ public class CATTile extends BlockEntity implements MenuProvider {
             return first.map(s -> this.drain(new FluidStack(s, Math.min(maxDrain, s.getAmount())), action)).orElse(FluidStack.EMPTY);
         }
 
-        public List<FluidAmount> fluidList() {
+        public List<GenericAmount<Fluid>> fluidList() {
             return getFluidAmountStream().collect(Collectors.toList());
         }
 
         @NotNull
-        public Stream<FluidAmount> getFluidAmountStream() {
+        public Stream<GenericAmount<Fluid>> getFluidAmountStream() {
             return IntStream.range(0, this.getTanks())
                 .mapToObj(this::getFluidInTank)
                 .collect(Collectors.groupingBy(FluidKey::from, LinkedHashMap::new, Collectors.summingLong(FluidStack::getAmount)))
                 .entrySet().stream()
                 .map(e -> e.getKey().toAmount(e.getValue()))
-                .filter(FluidAmount::nonEmpty);
+                .filter(GenericAmount::nonEmpty);
         }
     }
 
-    public List<FluidAmount> fluidAmountList() {
+    public List<GenericAmount<Fluid>> fluidAmountList() {
         Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
         LazyOptional<FluidHandlerWrapper> opt = getFluidHandler(direction);
         return opt.map(FluidHandlerWrapper::fluidList).orElse(Collections.emptyList());

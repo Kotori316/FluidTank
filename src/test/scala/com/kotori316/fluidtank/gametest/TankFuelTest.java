@@ -48,7 +48,7 @@ final class TankFuelTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLavaStacked() {
         var stack = new ItemStack(bronzeTank, 2);
-        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA()), IFluidHandler.FluidAction.EXECUTE);
 
         Assertions.assertEquals(-1, stack.getBurnTime(RecipeType.SMELTING));
     }
@@ -56,7 +56,7 @@ final class TankFuelTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLava0() {
         var stack = new ItemStack(bronzeTank);
-        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().setAmount(0).toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(0)), IFluidHandler.FluidAction.EXECUTE);
 
         Assertions.assertEquals(-1, stack.getBurnTime(RecipeType.SMELTING));
     }
@@ -71,7 +71,7 @@ final class TankFuelTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLava2() {
         var stack = new ItemStack(bronzeTank);
-        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().setAmount(500).toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(500)), IFluidHandler.FluidAction.EXECUTE);
 
         Assertions.assertEquals(50 * 200, stack.getBurnTime(RecipeType.SMELTING));
     }
@@ -79,7 +79,7 @@ final class TankFuelTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLava3() {
         var stack = new ItemStack(bronzeTank);
-        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().setAmount(100).toStack(), IFluidHandler.FluidAction.EXECUTE);
+        RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(100)), IFluidHandler.FluidAction.EXECUTE);
 
         Assertions.assertEquals(10 * 200, stack.getBurnTime(RecipeType.SMELTING));
     }

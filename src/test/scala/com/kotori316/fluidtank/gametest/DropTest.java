@@ -19,6 +19,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -26,6 +27,7 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.testutil.GameTestUtil;
@@ -77,11 +79,11 @@ public final class DropTest {
             .toList();
     }
 
-    void dropOfWaterTank1(GameTestHelper helper, FluidAmount amount) {
+    void dropOfWaterTank1(GameTestHelper helper, GenericAmount<Fluid> amount) {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
-        connection.handler().fill(amount, IFluidHandler.FluidAction.EXECUTE);
+        connection.getFluidHandler().fill(amount, IFluidHandler.FluidAction.EXECUTE);
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
@@ -99,7 +101,7 @@ public final class DropTest {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
-        connection.handler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
+        connection.getFluidHandler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
             helper.getBlockEntity(pos), helper.makeMockPlayer(), ItemStack.EMPTY);
         assertEquals(1, drops.size(), "Drop was " + drops);
@@ -107,6 +109,7 @@ public final class DropTest {
 
         var entityTag = BlockItem.getBlockEntityData(stack);
         assertNotNull(entityTag, "BE tag must not be null. " + stack);
+        entityTag.remove("ForgeCaps"); // Ignore it. It exists because AE2 add custom capability.
         // language=json
         var expected = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, GsonHelper.parse("""
             {
@@ -128,13 +131,14 @@ public final class DropTest {
         var pos = BlockPos.ZERO.east();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
-        connection.handler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
+        connection.getFluidHandler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
 
         var stack = new ItemStack(ModObjects.tierToBlock().apply(Tier.WOOD));
         ModObjects.tierToBlock().apply(Tier.WOOD).saveTankNBT(helper.getBlockEntity(pos), stack);
 
         var entityTag = BlockItem.getBlockEntityData(stack);
         assertNotNull(entityTag, "BE tag must not be null. " + stack);
+        entityTag.remove("ForgeCaps"); // Ignore it. It exists because AE2 add custom capability.
         // language=json
         var expected = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, GsonHelper.parse("""
             {

@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
@@ -30,6 +31,7 @@ import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.tiles.Tier;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -78,12 +80,12 @@ final class TierRecipeTest extends BeforeAllTest {
     void mixWaterLava() {
         {
             ItemStack stack = new ItemStack(woodTank);
-            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.EXECUTE);
             inventory.setItem(0, stack);
         }
         {
             ItemStack stack = new ItemStack(woodTank);
-            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA()), IFluidHandler.FluidAction.EXECUTE);
             inventory.setItem(2, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
@@ -96,10 +98,10 @@ final class TierRecipeTest extends BeforeAllTest {
         assertFalse(recipe.matches(inventory, null));
     }
 
-    static FluidAmount[] fluids1() {
+    static Stream<GenericAmount<Fluid>> fluids1() {
         return LongStream.of(500, 1000, 2000, 3000, 4000).boxed().flatMap(l ->
             Stream.of(FluidAmount.BUCKET_WATER(), FluidAmount.BUCKET_LAVA())
-                .map(f -> f.setAmount(l))).toArray(FluidAmount[]::new);
+                .map(f -> f.setAmount(l)));
     }
 
     static Stream<Object[]> tierWithContext() {
@@ -109,15 +111,15 @@ final class TierRecipeTest extends BeforeAllTest {
     @Test
     void dummy() {
         assertTrue(tierWithContext().findAny().isPresent());
-        assertTrue(fluids1().length > 0);
+        assertTrue(fluids1().findAny().isPresent());
     }
 
     @ParameterizedTest
     @MethodSource("fluids1")
-    void combineFluidTest(FluidAmount amount) {
+    void combineFluidTest(GenericAmount<Fluid> amount) {
         {
             ItemStack stack = new ItemStack(woodTank);
-            RecipeInventoryUtil.getFluidHandler(stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(amount), IFluidHandler.FluidAction.EXECUTE);
             inventory.setItem(0, stack);
         }
         ItemStack stack = new ItemStack(woodTank);
@@ -134,10 +136,10 @@ final class TierRecipeTest extends BeforeAllTest {
 
     @ParameterizedTest
     @MethodSource("fluids1")
-    void combine2FluidTest(FluidAmount amount) {
+    void combine2FluidTest(GenericAmount<Fluid> amount) {
         {
             ItemStack stack = new ItemStack(woodTank);
-            RecipeInventoryUtil.getFluidHandler(stack).fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
+            RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(amount), IFluidHandler.FluidAction.EXECUTE);
             inventory.setItem(0, stack);
             inventory.setItem(2, stack);
         }

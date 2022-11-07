@@ -25,6 +25,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -41,6 +42,7 @@ import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.fluids.FluidKey;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.items.ItemBlockTank;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
@@ -127,7 +129,7 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
                tankStacks.stream().map(BlockItem::getBlockEntityData)
                    .filter(Objects::nonNull)
                    .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
-                   .filter(FluidAmount::nonEmpty)
+                   .filter(GenericAmount::nonEmpty)
                    .map(FluidKey::from)
                    .distinct()
                    .count() <= 1;
@@ -141,13 +143,13 @@ public class TierRecipe implements CraftingRecipe, IShapedRecipe<CraftingContain
             return ItemStack.EMPTY;
         }
         ItemStack result = getResultItem();
-        FluidAmount fluidAmount = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem)
+        GenericAmount<Fluid> fluidAmount = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(BlockItem::getBlockEntityData)
             .filter(Objects::nonNull)
             .map(nbt -> FluidAmount.fromNBT(nbt.getCompound(TileTank.NBT_Tank())))
-            .filter(FluidAmount::nonEmpty)
-            .reduce(FluidAmount::$plus).orElse(FluidAmount.EMPTY());
+            .filter(GenericAmount::nonEmpty)
+            .reduce(FluidAmount.monoidFA()::combine).orElse(FluidAmount.EMPTY());
 
         if (fluidAmount.nonEmpty()) {
             CompoundTag compound = new CompoundTag();

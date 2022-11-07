@@ -27,8 +27,9 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.blocks.TankPos;
 import com.kotori316.fluidtank.fluids.FluidAmount;
-import com.kotori316.fluidtank.tiles.Connection;
+import com.kotori316.fluidtank.tiles.FluidConnection;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.testutil.GameTestUtil;
@@ -36,6 +37,7 @@ import com.kotori316.testutil.GameTestUtil;
 import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,7 +54,7 @@ public final class PlaceTest {
             .ifPresent(TileTank::onBlockPlacedBy);
     }
 
-    public static Connection getConnection(GameTestHelper helper, BlockPos pos) {
+    public static FluidConnection getConnection(GameTestHelper helper, BlockPos pos) {
         return Optional.ofNullable(helper.getBlockEntity(pos))
             .map(TileTank.class::cast)
             .map(TileTank::connection)
@@ -162,7 +164,28 @@ public final class PlaceTest {
         var connection = tile.connection();
         assertEquals(tile.internalTank().getTank().capacity() * 3L, connection.capacity(),
             "Tank capacity must be 3 times of each tank. Tank=%d, Connection=%d".formatted(tile.internalTank().getTank().capacity(), connection.capacity()));
-        assertEquals(3, connection.seq().length(), "Connection must contain 3 tanks. seq=" + connection.seq());
+        assertEquals(3, connection.sortedTanks().length(), "Connection must contain 3 tanks. seq=" + connection.sortedTanks());
+
+        helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    public void placeWaterOnEmpty(GameTestHelper helper) {
+        placeTank(helper, BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD));
+
+        helper.setBlock(BlockPos.ZERO.above(), ModObjects.tierToBlock().apply(Tier.STONE));
+        var stoneTile = (TileTank) Objects.requireNonNull(helper.getBlockEntity(BlockPos.ZERO.above()));
+        var preConnection = stoneTile.connection();
+        stoneTile.internalTank().fill(FluidAmount.BUCKET_WATER().setAmount(16000), IFluidHandler.FluidAction.EXECUTE);
+
+        stoneTile.onBlockPlacedBy();
+        var afterConnection = stoneTile.connection();
+        assertNotEquals(preConnection, afterConnection);
+        assertEquals(2, afterConnection.sortedTanks().size());
+        assertEquals(scala.Option.apply(FluidAmount.BUCKET_WATER().setAmount(16000)), afterConnection.getFluidStack());
+        var woodTank = (TileTank) Objects.requireNonNull(helper.getBlockEntity(BlockPos.ZERO));
+        assertEquals(Tier.WOOD, woodTank.tier());
+        assertEquals(woodTank.connection(), afterConnection);
 
         helper.succeed();
     }
@@ -262,5 +285,26 @@ public final class PlaceTest {
     public void dummy(GameTestHelper helper) {
         // fail("Fail Test");
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    public void removeMiddleTank(GameTestHelper helper) {
+        helper.startSequence()
+            .thenExecute(() -> {
+                helper.setBlock(BlockPos.ZERO, ModObjects.tierToBlock().apply(Tier.WOOD));
+                helper.setBlock(BlockPos.ZERO.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
+                helper.setBlock(BlockPos.ZERO.above(2), ModObjects.tierToBlock().apply(Tier.WOOD));
+            })
+            .thenExecuteAfter(1, () -> {
+                helper.assertBlockProperty(BlockPos.ZERO, TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM);
+                helper.assertBlockProperty(BlockPos.ZERO.above(), TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE);
+                helper.assertBlockProperty(BlockPos.ZERO.above(2), TankPos.TANK_POS_PROPERTY, TankPos.TOP);
+            })
+            .thenExecuteAfter(1, () -> helper.setBlock(BlockPos.ZERO.above(), Blocks.AIR))
+            .thenExecuteAfter(1, () -> {
+                helper.assertBlockProperty(BlockPos.ZERO, TankPos.TANK_POS_PROPERTY, TankPos.SINGLE);
+                helper.assertBlockProperty(BlockPos.ZERO.above(2), TankPos.TANK_POS_PROPERTY, TankPos.SINGLE);
+            })
+            .thenSucceed();
     }
 }
