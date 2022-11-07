@@ -45,12 +45,12 @@ public final class PlaceMekanismTankTest {
             .thenExecute(() -> helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank()))
             .thenExecute(() -> {
                 var cap = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO))
-                    .getCapability(Capabilities.GAS_HANDLER_CAPABILITY);
+                    .getCapability(Capabilities.GAS_HANDLER);
                 assertTrue(cap.isPresent());
             })
             .thenExecuteAfter(1, () -> {
                 var tank = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO));
-                var cap = tank.getCapability(Capabilities.GAS_HANDLER_CAPABILITY).resolve();
+                var cap = tank.getCapability(Capabilities.GAS_HANDLER).resolve();
                 cap.ifPresentOrElse(h -> assertEquals(1, h.getTanks()), () -> fail("No capability at %s".formatted(tank)));
             })
             .thenSucceed();
@@ -62,10 +62,10 @@ public final class PlaceMekanismTankTest {
         helper.startSequence()
             .thenExecute(() -> helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank()))
             .thenExecute(() -> ref.set(Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO))
-                .getCapability(Capabilities.GAS_HANDLER_CAPABILITY)))
+                .getCapability(Capabilities.GAS_HANDLER)))
             .thenExecuteAfter(1, () -> assertFalse(ref.get().isPresent()))
             .thenExecuteAfter(1, () -> assertTrue(Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO))
-                .getCapability(Capabilities.GAS_HANDLER_CAPABILITY).isPresent()))
+                .getCapability(Capabilities.GAS_HANDLER).isPresent()))
             .thenSucceed();
     }
 

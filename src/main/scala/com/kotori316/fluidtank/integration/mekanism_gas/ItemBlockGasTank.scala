@@ -4,7 +4,8 @@ import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.integration.Localize
 import net.minecraft.ChatFormatting
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BlockItem, ItemStack, Rarity, TooltipFlag}
 import net.minecraft.world.level.Level
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
@@ -13,9 +14,9 @@ import org.jetbrains.annotations.Nullable
 
 class ItemBlockGasTank(val blockGasTank: BlockGasTank)
   extends BlockItem(blockGasTank, FluidTank.proxy.getTankProperties) {
-  setRegistryName(FluidTank.modID, "gas_tank_" + blockGasTank.tier.toString.toLowerCase)
+  final val registryName = new ResourceLocation(FluidTank.modID, "gas_tank_" + blockGasTank.tier.toString.toLowerCase)
 
-  override def toString: String = String.valueOf(getRegistryName)
+  override def toString: String = String.valueOf(registryName)
 
   override def getRarity(stack: ItemStack): Rarity =
     if (BlockItem.getBlockEntityData(stack) != null) Rarity.RARE
@@ -28,10 +29,10 @@ class ItemBlockGasTank(val blockGasTank: BlockGasTank)
       if (nbt != null) {
         TileInfo.addItemDescription(nbt, tooltip)
       } else {
-        tooltip.add(new TranslatableComponent(Localize.CAPACITY, blockGasTank.tier.amount))
+        tooltip.add(Component.translatable(Localize.CAPACITY, blockGasTank.tier.amount))
       }
     } else {
-      tooltip.add(new TextComponent(f"${ChatFormatting.RED}Gas Tank is unavailable.${ChatFormatting.RESET}"))
+      tooltip.add(Component.literal(f"${ChatFormatting.RED}Gas Tank is unavailable.${ChatFormatting.RESET}"))
     }
   }
 

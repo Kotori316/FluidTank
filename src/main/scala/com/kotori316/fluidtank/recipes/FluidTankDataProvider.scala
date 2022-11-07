@@ -207,7 +207,7 @@ object FluidTankDataProvider {
           .define('t', tag)
           .define('o', ItemTags.create(new ResourceLocation("forge", "ingots/osmium")))
       )
-        .addCondition(configCondition)
+        .addCondition(tankConfigCondition)
         .addTagCondition(tag)
         .addTagCondition(ItemTags.create(new ResourceLocation("forge", "ingots/osmium")))
         .addCondition(new ModLoadedCondition("mekanism"))
@@ -237,7 +237,6 @@ object FluidTankDataProvider {
       lootTables ++= ModObjects.blockTanks.map(LootTableSerializerHelper.withTankContent)
       lootTables ++= Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe)
         .map(LootTableSerializerHelper.withDrop)
-      models ++= ModObjects.gasTanks.map(ModelSerializerHelper.getTankModel)
 
       for (table <- lootTables) {
         val out = path.resolve(s"data/${table.location.getNamespace}/loot_tables/blocks/${table.location.getPath}.json")

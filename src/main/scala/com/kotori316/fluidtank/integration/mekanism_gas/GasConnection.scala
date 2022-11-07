@@ -5,14 +5,14 @@ import com.kotori316.fluidtank.tiles.{Connection, ConnectionHelper, Tier}
 import mekanism.api.chemical.IChemicalHandler
 import mekanism.api.chemical.gas.{Gas, GasStack}
 import net.minecraft.core.{BlockPos, Direction}
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.Component
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.LazyOptional
 
 class GasConnection(s: Seq[TileGasTank])(override implicit val helper: ConnectionHelper.Aux[TileGasTank, Gas, GasListHandler]) extends Connection[TileGasTank](s) {
   override def getTextComponent: Component = {
-    new TranslatableComponent("chat.fluidtank.connection",
-      getContent.map(_.toStack.getTextComponent).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
+    Component.translatable("chat.fluidtank.connection",
+      getContent.map(_.toStack.getTextComponent).getOrElse(Component.translatable("chat.fluidtank.empty")),
       Long.box(amount),
       Long.box(capacity),
       Int.box(getComparatorLevel))
@@ -54,7 +54,7 @@ object GasConnection {
 
     override def remove(tileTank: TileGasTank): Unit = ()
 
-    override def getTextComponent: Component = new TextComponent(toString)
+    override def getTextComponent: Component = Component.literal(toString)
   }
 
   private object GasConnectionHelperImpl extends ConnectionHelper[TileGasTank] {

@@ -7,7 +7,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BucketItem, ItemStack, Items}
 import net.minecraft.world.level.material.{Fluid, Fluids}
-import net.minecraftforge.common.Tags
 import net.minecraftforge.fluids.{FluidStack, FluidType, FluidUtil}
 import net.minecraftforge.registries.{ForgeRegistries, IForgeRegistry}
 import org.jetbrains.annotations.Nullable

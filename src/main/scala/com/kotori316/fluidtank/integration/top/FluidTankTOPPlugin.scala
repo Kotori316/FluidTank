@@ -10,7 +10,7 @@ import com.kotori316.fluidtank.integration.mekanism_gas.GasTankTOPDataProvider
 import com.kotori316.fluidtank.tiles.Tier
 import mcjty.theoneprobe.api.ITheOneProbe
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.{Component, TextComponent, TranslatableComponent}
+import net.minecraft.network.chat.Component
 import net.minecraftforge.fml.{InterModComms, ModList}
 
 object FluidTankTOPPlugin {
@@ -61,18 +61,18 @@ object FluidTankTOPPlugin {
     val amountStr = numberFormatter(Long.box(amount))
     val capacityStr = numberFormatter(Long.box(capacity))
     if (short) {
-      if (hasCreative) Seq(new TextComponent(content))
-      else Seq(new TranslatableComponent(WAILA_SHORT, content, amountStr, capacityStr))
+      if (hasCreative) Seq(Component.literal(content))
+      else Seq(Component.translatable(WAILA_SHORT, content, amountStr, capacityStr))
     } else {
-      val tierStr = new TranslatableComponent(TIER, tier)
-      val contentStr = new TranslatableComponent(CONTENT, content)
+      val tierStr = Component.translatable(TIER, tier)
+      val contentStr = Component.translatable(CONTENT, content)
       if (hasCreative) Seq(tierStr, contentStr)
       else Seq(
         tierStr,
         contentStr,
-        new TranslatableComponent(AMOUNT, amountStr),
-        new TranslatableComponent(CAPACITY, capacityStr),
-        new TranslatableComponent(COMPARATOR, Int.box(comparatorLevel)),
+        Component.translatable(AMOUNT, amountStr),
+        Component.translatable(CAPACITY, capacityStr),
+        Component.translatable(COMPARATOR, Int.box(comparatorLevel)),
       )
     }
   }

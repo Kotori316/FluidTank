@@ -49,7 +49,7 @@ class TankTest extends BeforeAllTest {
 }
 
 object TankTest {
-  def emptyTankSeq(): java.util.stream.Stream[Tank] = {
+  def emptyTankSeq(): java.util.stream.Stream[Tank[Fluid]] = {
     val tanks = for {
       f <- Seq(FluidAmount.BUCKET_WATER.setAmount(0), FluidAmount.BUCKET_LAVA.setAmount(0), FluidAmount.EMPTY.setAmount(5000))
       a <- Range.inclusive(0, 2000, 500)
@@ -57,7 +57,7 @@ object TankTest {
     StreamConverters.asJavaSeqStream(Tank.EMPTY +: tanks)
   }
 
-  def nonEmptyTankSeq(): java.util.stream.Stream[Tank] = {
+  def nonEmptyTankSeq(): java.util.stream.Stream[Tank[Fluid]] = {
     val tanks = for {
       f <- Seq(FluidAmount.BUCKET_WATER, FluidAmount.BUCKET_LAVA, FluidAmount.BUCKET_WATER.setAmount(2000), FluidAmount.BUCKET_LAVA.setAmount(2000))
       a <- Range.inclusive(0, 2000, 500)
@@ -65,7 +65,7 @@ object TankTest {
     StreamConverters.asJavaSeqStream(tanks)
   }
 
-  def not5000Water(): java.util.stream.Stream[Tank] = {
+  def not5000Water(): java.util.stream.Stream[Tank[Fluid]] = {
     StreamConverters.asJavaSeqStream(
       Seq(0, 1000, 2000, 500, 10000).map(Tank(FluidAmount.BUCKET_WATER, _)) ++
         Seq(0, 1000, 2000, 5000, 10000).flatMap(i => Seq(FluidAmount.BUCKET_LAVA, FluidAmount.EMPTY).map(Tank(_, i)))

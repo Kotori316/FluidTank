@@ -11,7 +11,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ForgeCapabilities, ICapabilityProvider}
+import net.minecraftforge.common.capabilities.{Capability, CapabilityDispatcher, ICapabilityProvider}
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.event.AttachCapabilitiesEvent
 

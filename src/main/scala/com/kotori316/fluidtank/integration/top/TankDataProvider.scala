@@ -4,7 +4,6 @@ import com.kotori316.fluidtank.integration.Localize._
 import com.kotori316.fluidtank.tiles.{FluidSourceTile, TileTank, TileTankVoid}
 import com.kotori316.fluidtank.{Config, FluidTank}
 import mcjty.theoneprobe.api.{IProbeHitData, IProbeInfo, IProbeInfoProvider, ProbeMode}
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player

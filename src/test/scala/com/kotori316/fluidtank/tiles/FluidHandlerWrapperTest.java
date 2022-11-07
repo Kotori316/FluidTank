@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -22,6 +23,7 @@ import com.kotori316.fluidtank.BeforeAllTest;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.items.TankItemFluidHandler;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 
@@ -91,7 +93,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void fillEmpty() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.EMPTY().toStack(), IFluidHandler.FluidAction.SIMULATE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.EMPTY()), IFluidHandler.FluidAction.SIMULATE);
             assertEquals(0, filled);
         }
 
@@ -99,7 +101,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water1000BucketSimulate() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.SIMULATE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.SIMULATE);
             assertEquals(1000, filled);
             assertEquals(Items.BUCKET, items.getStackInSlot(0).getItem());
         }
@@ -108,7 +110,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water1000Bucket() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.EXECUTE);
             assertEquals(1000, filled);
             assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
         }
@@ -117,7 +119,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water1000Bucket2() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET), new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER()), IFluidHandler.FluidAction.EXECUTE);
             assertEquals(1000, filled);
             assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
             assertEquals(Items.BUCKET, items.getStackInSlot(1).getItem());
@@ -127,7 +129,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water2000Bucket2() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET), new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().setAmount(2000).toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(2000)), IFluidHandler.FluidAction.EXECUTE);
             assertEquals(2000, filled);
             assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
             assertEquals(Items.WATER_BUCKET, items.getStackInSlot(1).getItem());
@@ -137,7 +139,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water1500Bucket2() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET), new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().setAmount(1500).toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(1500)), IFluidHandler.FluidAction.EXECUTE);
             assertEquals(1000, filled, "Just one bucket must be filled and the other must be empty.");
             assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
             assertEquals(Items.BUCKET, items.getStackInSlot(1).getItem());
@@ -147,7 +149,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water1500Tank() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET), new ItemStack(woodTank)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().setAmount(1500).toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(1500)), IFluidHandler.FluidAction.EXECUTE);
             assertEquals(1500, filled);
             assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
             var tankHandler = new TankItemFluidHandler(woodTank.tier(), items.getStackInSlot(1));
@@ -158,7 +160,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void water500Tank() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.BUCKET), new ItemStack(woodTank)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_WATER().setAmount(500).toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(500)), IFluidHandler.FluidAction.EXECUTE);
             var tankHandler = new TankItemFluidHandler(woodTank.tier(), items.getStackInSlot(1));
             assertAll(
                 () -> assertEquals(500, filled),
@@ -171,7 +173,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         void fillLava() {
             var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.WATER_BUCKET), new ItemStack(Items.BUCKET)));
             var handler = new CATTile.FluidHandlerWrapper(items);
-            var filled = handler.fill(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
+            var filled = handler.fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA()), IFluidHandler.FluidAction.EXECUTE);
             assertEquals(1000, filled);
             assertEquals(Items.LAVA_BUCKET, items.getStackInSlot(1).getItem());
         }
@@ -231,15 +233,15 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
 
             @ParameterizedTest
             @MethodSource("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids")
-            void drain1500FromTank(FluidAmount amount) {
+            void drain1500FromTank(GenericAmount<Fluid>  amount) {
                 ItemStackHandler items;
                 {
                     var tank1 = new ItemStack(woodTank);
                     var tank2 = new ItemStack(woodTank);
                     var h1 = new TankItemFluidHandler(woodTank.tier(), tank1);
                     var h2 = new TankItemFluidHandler(woodTank.tier(), tank2);
-                    h1.fill(amount.setAmount(800).toStack(), IFluidHandler.FluidAction.EXECUTE);
-                    h2.fill(amount.setAmount(1000).toStack(), IFluidHandler.FluidAction.EXECUTE);
+                    h1.fill(FluidAmount.toStack(amount.setAmount(800)), IFluidHandler.FluidAction.EXECUTE);
+                    h2.fill(FluidAmount.toStack(amount.setAmount(1000)), IFluidHandler.FluidAction.EXECUTE);
                     items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, tank1, tank2));
                 }
                 var handler = new CATTile.FluidHandlerWrapper(items);
@@ -277,7 +279,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
         class DrainFluid {
             @TestFactory
             Stream<DynamicTest> drainFromEmpty() {
-                return Stream.of(FluidStack.EMPTY, FluidAmount.BUCKET_WATER().toStack(), FluidAmount.BUCKET_LAVA().toStack())
+                return Stream.of(FluidStack.EMPTY, FluidAmount.toStack(FluidAmount.BUCKET_WATER()), FluidAmount.toStack(FluidAmount.BUCKET_LAVA()))
                     .map(f -> DynamicTest.dynamicTest(f.getDisplayName().getString(), () -> drainFromEmpty(f)));
             }
 
@@ -293,7 +295,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
             void drain1000FromWaterSimulate(int amount) {
                 var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.WATER_BUCKET), new ItemStack(Items.BUCKET)));
                 var handler = new CATTile.FluidHandlerWrapper(items);
-                var drained = handler.drain(FluidAmount.BUCKET_WATER().setAmount(amount).toStack(), IFluidHandler.FluidAction.SIMULATE);
+                var drained = handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(amount)), IFluidHandler.FluidAction.SIMULATE);
                 assertEquals(FluidAmount.BUCKET_WATER(), FluidAmount.fromStack(drained));
                 assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
             }
@@ -303,7 +305,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
             void drain1000FromWater(int amount) {
                 var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.WATER_BUCKET), new ItemStack(Items.BUCKET)));
                 var handler = new CATTile.FluidHandlerWrapper(items);
-                var drained = handler.drain(FluidAmount.BUCKET_WATER().setAmount(amount).toStack(), IFluidHandler.FluidAction.EXECUTE);
+                var drained = handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(amount)), IFluidHandler.FluidAction.EXECUTE);
                 assertEquals(FluidAmount.BUCKET_WATER(), FluidAmount.fromStack(drained));
                 assertEquals(Items.BUCKET, items.getStackInSlot(0).getItem());
             }
@@ -312,7 +314,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
             void drainLavaFromWater() {
                 var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.WATER_BUCKET), new ItemStack(Items.BUCKET)));
                 var handler = new CATTile.FluidHandlerWrapper(items);
-                var drained = handler.drain(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
+                var drained = handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_LAVA()), IFluidHandler.FluidAction.EXECUTE);
                 assertTrue(FluidAmount.fromStack(drained).isEmpty());
                 assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
             }
@@ -321,7 +323,7 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
             void drainLava() {
                 var items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY, new ItemStack(Items.WATER_BUCKET), new ItemStack(Items.LAVA_BUCKET)));
                 var handler = new CATTile.FluidHandlerWrapper(items);
-                var drained = handler.drain(FluidAmount.BUCKET_LAVA().toStack(), IFluidHandler.FluidAction.EXECUTE);
+                var drained = handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_LAVA()), IFluidHandler.FluidAction.EXECUTE);
                 assertEquals(FluidAmount.BUCKET_LAVA(), FluidAmount.fromStack(drained));
                 assertEquals(Items.WATER_BUCKET, items.getStackInSlot(0).getItem());
                 assertEquals(Items.BUCKET, items.getStackInSlot(1).getItem());
@@ -329,14 +331,14 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
 
             @ParameterizedTest
             @MethodSource("com.kotori316.fluidtank.fluids.TransferOperationTest#normalFluids")
-            void drain1500FromTank(FluidAmount amount) {
+            void drain1500FromTank(GenericAmount<Fluid> amount) {
                 ItemStackHandler items = new ItemStackHandler(NonNullList.of(ItemStack.EMPTY,
                     RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount.setAmount(800)),
                     RecipeInventoryUtil.getFilledTankStack(Tier.WOOD, amount.setAmount(1000))
                 ));
                 var handler = new CATTile.FluidHandlerWrapper(items);
                 var toDrain = amount.setAmount(1500);
-                var drained = handler.drain(toDrain.toStack(), IFluidHandler.FluidAction.EXECUTE);
+                var drained = handler.drain(FluidAmount.toStack(toDrain), IFluidHandler.FluidAction.EXECUTE);
                 assertEquals(toDrain, FluidAmount.fromStack(drained));
                 var h1 = new TankItemFluidHandler(woodTank.tier(), items.getStackInSlot(0));
                 var h2 = new TankItemFluidHandler(woodTank.tier(), items.getStackInSlot(1));
@@ -354,9 +356,9 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
                 var handler = new CATTile.FluidHandlerWrapper(items);
 
                 assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1500), FluidAmount.fromStack(
-                    handler.drain(FluidAmount.BUCKET_LAVA().setAmount(1500).toStack(), IFluidHandler.FluidAction.SIMULATE)));
+                    handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(1500)), IFluidHandler.FluidAction.SIMULATE)));
                 assertEquals(FluidAmount.BUCKET_LAVA().setAmount(1500), FluidAmount.fromStack(
-                    handler.drain(FluidAmount.BUCKET_LAVA().setAmount(1500).toStack(), IFluidHandler.FluidAction.EXECUTE)));
+                    handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(1500)), IFluidHandler.FluidAction.EXECUTE)));
 
                 assertAll(
                     () -> assertTrue(RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(0)).getFluid().isEmpty()),
@@ -375,9 +377,9 @@ class FluidHandlerWrapperTest extends BeforeAllTest {
                 var handler = new CATTile.FluidHandlerWrapper(items);
 
                 assertEquals(FluidAmount.BUCKET_WATER().setAmount(1000), FluidAmount.fromStack(
-                    handler.drain(FluidAmount.BUCKET_WATER().setAmount(1500).toStack(), IFluidHandler.FluidAction.SIMULATE)));
+                    handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(1500)), IFluidHandler.FluidAction.SIMULATE)));
                 assertEquals(FluidAmount.BUCKET_WATER().setAmount(1000), FluidAmount.fromStack(
-                    handler.drain(FluidAmount.BUCKET_WATER().setAmount(1500).toStack(), IFluidHandler.FluidAction.EXECUTE)));
+                    handler.drain(FluidAmount.toStack(FluidAmount.BUCKET_WATER().setAmount(1500)), IFluidHandler.FluidAction.EXECUTE)));
 
                 assertAll(
                     () -> assertTrue(RecipeInventoryUtil.getFluidHandler(items.getStackInSlot(1)).getFluid().isEmpty()),

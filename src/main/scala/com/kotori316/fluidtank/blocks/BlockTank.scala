@@ -42,7 +42,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
     new TileTank(tier, pos, state)
   }
 
-   //noinspection ScalaDeprecation,deprecation
+  //noinspection ScalaDeprecation,deprecation
   override def use(state: BlockState, level: Level, pos: BlockPos, player: Player, hand: InteractionHand, hit: BlockHitResult): InteractionResult = {
     level.getBlockEntity(pos) match {
       case tileTank: TileTank =>

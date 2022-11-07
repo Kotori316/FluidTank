@@ -5,6 +5,7 @@ import com.kotori316.fluidtank._
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.material.{Fluid, Fluids}
+import net.minecraftforge.common.Tags
 import net.minecraftforge.registries.ForgeRegistries
 
 import scala.reflect.ClassTag
@@ -29,7 +30,7 @@ object GenericAccess {
 
     override def isEmpty(fluid: Fluid): Boolean = fluid === Fluids.EMPTY
 
-    override def isGaseous(fluid: Fluid): Boolean = fluid.getAttributes.isGaseous
+    override def isGaseous(fluid: Fluid): Boolean = Utils.isInTag(fluid, Tags.Fluids.GASEOUS)
 
     override def getKey(fluid: Fluid): ResourceLocation = ForgeRegistries.FLUIDS.getKey(fluid)
 

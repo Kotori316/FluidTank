@@ -9,6 +9,7 @@ import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -19,6 +20,7 @@ import scala.jdk.javaapi.CollectionConverters;
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.fluids.FluidAmount;
+import com.kotori316.fluidtank.fluids.GenericAmount;
 import com.kotori316.fluidtank.items.ReservoirItem;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 import com.kotori316.testutil.GameTestUtil;
@@ -30,11 +32,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class ReservoirFuelTest {
     static final String BATCH = "reservoirFuelTestBatch";
 
-    void burn(ReservoirItem reservoirItem, @Nullable FluidAmount amount, int expect) {
+    void burn(ReservoirItem reservoirItem, @Nullable GenericAmount<Fluid> amount, int expect) {
         var stack = new ItemStack(reservoirItem);
         var handler = RecipeInventoryUtil.getFluidHandler(stack);
         if (amount != null)
-            handler.fill(amount.toStack(), IFluidHandler.FluidAction.EXECUTE);
+            handler.fill(FluidAmount.toStack(amount), IFluidHandler.FluidAction.EXECUTE);
 
         var result = stack.getBurnTime(RecipeType.SMELTING);
         assertEquals(expect, result);

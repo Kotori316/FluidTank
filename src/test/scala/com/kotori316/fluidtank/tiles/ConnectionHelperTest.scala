@@ -4,7 +4,7 @@ import cats.data.Chain
 import cats.implicits.catsSyntaxEq
 import com.kotori316.fluidtank.fluids.{FluidTransferLog, GenericAccess, GenericAmount, GenericAmountTest, ListHandler, Tank, drainList, fillList}
 import net.minecraft.core.BlockPos
-import net.minecraft.network.chat.{Component, TextComponent}
+import net.minecraft.network.chat.Component
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.{Assertions, Nested, Test}
 
@@ -107,7 +107,7 @@ object ConnectionHelperTest {
   class StringConnection(s: Seq[StringTile])(override implicit val helper: ConnectionHelper.Aux[StringTile, String, StringHandler]) extends Connection[StringTile](s) {
     def content = this.contentType
 
-    override def getTextComponent: Component = new TextComponent(s.map(_.tank.content).mkString(", "))
+    override def getTextComponent: Component = Component.literal(s.map(_.tank.content).mkString(", "))
   }
 
   case class StringTile(pos: BlockPos, var tank: Tank[String], var connection: Option[StringConnection])

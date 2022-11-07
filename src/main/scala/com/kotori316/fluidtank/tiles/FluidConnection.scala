@@ -5,12 +5,12 @@ import cats.implicits.catsSyntaxFoldOps
 import com.kotori316.fluidtank.fluids.{DebugFluidHandler, FluidAmount, FluidTransferLog, ListTankHandler, TankHandler, fillAll}
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
 import net.minecraft.core.Direction
-import net.minecraft.network.chat.{Component, TranslatableComponent}
+import net.minecraft.network.chat.Component
 import net.minecraft.world.level.material.Fluid
-import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.capabilities.{Capability, ForgeCapabilities}
 import net.minecraftforge.common.util.LazyOptional
+import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler
-import net.minecraftforge.fluids.capability.{CapabilityFluidHandler, IFluidHandler}
 
 class FluidConnection(s: Seq[TileTank])(override implicit val helper: ConnectionHelper.Aux[TileTank, Fluid, ListTankHandler]) extends Connection[TileTank](s) {
 
@@ -23,7 +23,7 @@ class FluidConnection(s: Seq[TileTank])(override implicit val helper: Connection
   }
 
   override def getCapability[T](capability: Capability[T], side: Direction): LazyOptional[T] = {
-    if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+    if (capability == ForgeCapabilities.FLUID_HANDLER) {
       fluidHandler.cast()
     } else {
       super.getCapability(capability, side)
@@ -32,12 +32,12 @@ class FluidConnection(s: Seq[TileTank])(override implicit val helper: Connection
 
   def getTextComponent: Component = {
     if (hasCreative)
-      new TranslatableComponent("chat.fluidtank.connection_creative",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
+      Component.translatable("chat.fluidtank.connection_creative",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
         Int.box(getComparatorLevel))
     else
-      new TranslatableComponent("chat.fluidtank.connection",
-        getFluidStack.map(_.toStack.getDisplayName).getOrElse(new TranslatableComponent("chat.fluidtank.empty")),
+      Component.translatable("chat.fluidtank.connection",
+        getFluidStack.map(_.toStack.getDisplayName).getOrElse(Component.translatable("chat.fluidtank.empty")),
         Long.box(amount),
         Long.box(capacity),
         Int.box(getComparatorLevel))

@@ -8,8 +8,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -72,7 +70,7 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
             return ((Holder) getHolder()).gasConnection.getTextComponent();
         } else {
             Constant.LOGGER.error("Called {}#getMessage. This is UNREACHABLE.", getClass().getName());
-            return new TextComponent("%sThis tile is unavailable.%s".formatted(ChatFormatting.RED, ChatFormatting.RESET));
+            return Component.literal("%sThis tile is unavailable.%s".formatted(ChatFormatting.RED, ChatFormatting.RESET));
         }
     }
 
@@ -149,6 +147,6 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
         var stored = stackTag.getCompound("stored");
         var amount = stored.getLong("amount");
         var gasName = stored.getString("gasName");
-        texts.add(new TranslatableComponent(Localize.TOOLTIP, gasName, amount, c));
+        texts.add(Component.translatable(Localize.TOOLTIP, gasName, amount, c));
     }
 }

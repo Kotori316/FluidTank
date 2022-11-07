@@ -6,7 +6,8 @@ import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.minecraft.core.{BlockPos, Direction}
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.{Item, ItemStack}
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -20,7 +21,7 @@ import org.jetbrains.annotations.Nullable
 
 class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(1f).dynamicShape())
   with EntityBlock {
-  setRegistryName(FluidTank.modID, "gas_tank_" + tier.toString.toLowerCase)
+  final val registryName = new ResourceLocation(FluidTank.modID, "gas_tank_" + tier.toString.toLowerCase)
   registerDefaultState(this.getStateDefinition.any.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
   final val itemBlock = new ItemBlockGasTank(this)
 
@@ -44,7 +45,7 @@ class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(Mo
   @scala.annotation.nowarn("cat=deprecation") //noinspection ScalaDeprecation,deprecation
   override def use(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player, pHand: InteractionHand, pHit: BlockHitResult): InteractionResult = {
     if (!isMekanismLoaded) {
-      pPlayer.displayClientMessage(new TextComponent("This tank is not available."), true)
+      pPlayer.displayClientMessage(Component.literal("This tank is not available."), true)
       return InteractionResult.PASS
     }
     pLevel.getBlockEntity(pPos) match {
