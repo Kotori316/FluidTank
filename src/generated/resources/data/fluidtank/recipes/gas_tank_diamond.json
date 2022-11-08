@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mekanism"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/osmium"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:gems/diamond"
+    },
+    {
+      "type": "fluidtank:config"
+    }
+  ],
+  "key": {
+    "o": {
+      "tag": "forge:ingots/osmium"
+    },
+    "p": {
+      "item": "fluidtank:gas_tank_gold"
+    },
+    "t": {
+      "tag": "forge:gems/diamond"
+    }
+  },
+  "pattern": [
+    "ptp",
+    "tot",
+    "ptp"
+  ],
+  "result": {
+    "item": "fluidtank:gas_tank_diamond"
+  }
+}

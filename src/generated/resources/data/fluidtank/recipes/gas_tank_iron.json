@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mekanism"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/osmium"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/iron"
+    },
+    {
+      "type": "fluidtank:config"
+    }
+  ],
+  "key": {
+    "o": {
+      "tag": "forge:ingots/osmium"
+    },
+    "p": {
+      "item": "fluidtank:gas_tank_wood"
+    },
+    "t": {
+      "tag": "forge:ingots/iron"
+    }
+  },
+  "pattern": [
+    "ptp",
+    "tot",
+    "ptp"
+  ],
+  "result": {
+    "item": "fluidtank:gas_tank_iron"
+  }
+}

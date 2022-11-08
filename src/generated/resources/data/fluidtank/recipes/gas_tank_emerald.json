@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "mekanism"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:ingots/osmium"
+    },
+    {
+      "type": "fluidtank:tag",
+      "tag": "forge:gems/emerald"
+    },
+    {
+      "type": "fluidtank:config"
+    }
+  ],
+  "key": {
+    "o": {
+      "tag": "forge:ingots/osmium"
+    },
+    "p": {
+      "item": "fluidtank:gas_tank_diamond"
+    },
+    "t": {
+      "tag": "forge:gems/emerald"
+    }
+  },
+  "pattern": [
+    "ptp",
+    "tot",
+    "ptp"
+  ],
+  "result": {
+    "item": "fluidtank:gas_tank_emerald"
+  }
+}

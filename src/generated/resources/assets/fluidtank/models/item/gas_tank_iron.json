@@ -1,5 +1,5 @@
 {
-  "parent": "fluidtank:item/item_tank_invisible",
+  "parent": "fluidtank:item/gas_item_tank",
   "textures": {
     "1": "fluidtank:blocks/gas_iron1",
     "2": "fluidtank:blocks/gas_iron2"

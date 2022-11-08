@@ -16,6 +16,7 @@ import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockCAT;
 import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.blocks.FluidSourceBlock;
+import com.kotori316.fluidtank.integration.mekanism_gas.BlockGasTank;
 import com.kotori316.fluidtank.items.ReservoirItem;
 import com.kotori316.fluidtank.transport.PipeBlock;
 
@@ -34,6 +35,7 @@ final class StateAndModelProvider extends BlockStateProvider {
         sourceBlock();
         tankBase();
         StreamConverters.asJavaSeqStream(ModObjects.blockTanks()).forEach(this::tank);
+        StreamConverters.asJavaSeqStream(ModObjects.gasTanks()).forEach(this::gasTank);
         pipeBase();
         pipe(ModObjects.blockFluidPipe(), "fluid_pipe");
         pipe(ModObjects.blockItemPipe(), "item_pipe");
@@ -100,6 +102,20 @@ final class StateAndModelProvider extends BlockStateProvider {
                     faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
                 }
             });
+        itemModels().withExistingParent("item/gas_item_tank", mcLoc("block/block"))
+            .ao(false)
+            .texture("particle", "#1")
+            .texture("side", "#1")
+            .texture("top", "#2")
+            .element()
+            .from(2.0f, 0.0f, 2.0f).to(14.0f, 16.0f, 14.0f)
+            .allFaces((direction, faceBuilder) -> {
+                if (direction.getAxis() == Direction.Axis.Y) {
+                    faceBuilder.texture("#top").uvs(0.0f, 0.0f, 12.0f, 12.0f);
+                } else {
+                    faceBuilder.texture("#side").uvs(0.0f, 0.0f, 12.0f, 16.0f);
+                }
+            });
     }
 
     void tank(BlockTank blockTank) {
@@ -116,6 +132,22 @@ final class StateAndModelProvider extends BlockStateProvider {
         itemModels().withExistingParent(blockTank.registryName().getPath(), new ResourceLocation(FluidTank.modID, "item/item_tank"))
             .texture("1", blockTexture(tier.lowerName() + "1"))
             .texture("2", blockTexture(tier.lowerName() + "2"));
+    }
+
+    void gasTank(BlockGasTank blockGasTank) {
+        var tier = blockGasTank.tier();
+        getVariantBuilder(blockGasTank)
+            .forAllStates(blockState -> new ConfiguredModel[]{
+                new ConfiguredModel(models().withExistingParent("gas_tank_" + tier.lowerName(), new ResourceLocation(FluidTank.modID, "block/tanks"))
+                    .texture("particle", blockTexture("gas_%s1".formatted(tier.lowerName())))
+                    .texture("side", blockTexture("gas_%s1".formatted(tier.lowerName())))
+                    .texture("top", blockTexture("gas_%s2".formatted(tier.lowerName())))
+                    .renderType("cutout")
+                )
+            });
+        itemModels().withExistingParent(blockGasTank.registryName().getPath(), new ResourceLocation(FluidTank.modID, "item/gas_item_tank"))
+            .texture("1", blockTexture("gas_%s1".formatted(tier.lowerName())))
+            .texture("2", blockTexture("gas_%s2".formatted(tier.lowerName())));
     }
 
     @SuppressWarnings("SpellCheckingInspection")
