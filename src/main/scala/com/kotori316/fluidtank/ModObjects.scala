@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank
 
 import com.kotori316.fluidtank.blocks._
-import com.kotori316.fluidtank.integration.mekanism_gas.{BlockGasTank, TileGasTank}
+import com.kotori316.fluidtank.integration.mekanism_gas.{BlockGasTank, GasContentLootFunction, TileGasTank}
 import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
@@ -81,6 +81,9 @@ object ModObjects {
   final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
     new ResourceLocation(FluidTank.modID, "content_tank"),
     new LootItemFunctionType(new ContentTankSerializer))
+  final val GAS_TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
+    new ResourceLocation(FluidTank.modID, GasContentLootFunction.NAME),
+    new LootItemFunctionType(new GasContentLootFunction.GasContentTankSerializer()))
 
   // ---------- Markers ----------
   final val MARKER_BlockTank = MarkerManager.getMarker("BlockTank")
