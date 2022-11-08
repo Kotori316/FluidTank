@@ -215,7 +215,7 @@ public final class PlaceTest {
         placeTank(helper, pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
         var tank = (TileTank) helper.getBlockEntity(pos);
         assertNotNull(tank, "Tank should not be null");
-        tank.connection().handler().fill(FluidAmount.BUCKET_WATER().setAmount(2000), IFluidHandler.FluidAction.EXECUTE);
+        tank.connection().getFluidHandler().fill(FluidAmount.BUCKET_WATER().setAmount(2000), IFluidHandler.FluidAction.EXECUTE);
 
         var player = GameTestUtil.getSurvivalPlayer(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET));
@@ -237,7 +237,7 @@ public final class PlaceTest {
         placeTank(helper, pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
         var tank = (TileTank) helper.getBlockEntity(pos);
         assertNotNull(tank, "Tank should not be null");
-        tank.connection().handler().fill(FluidAmount.BUCKET_WATER().setAmount(2000), IFluidHandler.FluidAction.EXECUTE);
+        tank.connection().getFluidHandler().fill(FluidAmount.BUCKET_WATER().setAmount(2000), IFluidHandler.FluidAction.EXECUTE);
 
         var player = GameTestUtil.getSurvivalPlayer(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET, 2));
@@ -259,7 +259,7 @@ public final class PlaceTest {
         placeTank(helper, pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
         var tank = (TileTank) helper.getBlockEntity(pos);
         assertNotNull(tank, "Tank should not be null");
-        tank.connection().handler().fill(FluidAmount.BUCKET_WATER().setAmount(2000), IFluidHandler.FluidAction.EXECUTE);
+        tank.connection().getFluidHandler().fill(FluidAmount.BUCKET_WATER().setAmount(2000), IFluidHandler.FluidAction.EXECUTE);
 
         var player = GameTestUtil.getSurvivalPlayer(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BUCKET, 2));

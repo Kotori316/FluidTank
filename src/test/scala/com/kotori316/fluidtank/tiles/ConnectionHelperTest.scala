@@ -2,13 +2,14 @@ package com.kotori316.fluidtank.tiles
 
 import cats.data.Chain
 import cats.implicits.catsSyntaxEq
+import com.kotori316.fluidtank.BeforeAllTest
 import com.kotori316.fluidtank.fluids.{FluidTransferLog, GenericAccess, GenericAmount, GenericAmountTest, ListHandler, Tank, drainList, fillList}
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.junit.jupiter.api.{Assertions, Nested, Test}
 
-class ConnectionHelperTest {
+class ConnectionHelperTest extends BeforeAllTest {
 
   import ConnectionHelperTest._
 

@@ -89,7 +89,7 @@ object GasConnection {
       t => t.tileInfo.getHolder match {
         case holder: TileInfo.Holder =>
           holder.gasConnection.invalidate()
-          holder.gasConnection = connection
+          holder.setGasConnection(connection)
           t.setChanged()
         case _ =>
       }

@@ -108,6 +108,10 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
             this.gasTankHandler = GasTankHandler.forTank(tile);
             this.gasConnection = GasConnection.invalid();
         }
+
+        void setGasConnection(@NotNull GasConnection gasConnection) {
+            this.gasConnection = gasConnection;
+        }
     }
 
     @SuppressWarnings("SameParameterValue") // WHAT?

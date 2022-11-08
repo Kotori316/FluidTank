@@ -1,11 +1,12 @@
 package com.kotori316.fluidtank.tiles
 
+import com.kotori316.fluidtank.BeforeAllTest
 import com.kotori316.fluidtank.fluids.Tank
 import net.minecraft.core.BlockPos
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{Nested, Test}
 
-class ConnectionTest {
+class ConnectionTest extends BeforeAllTest {
 
   import ConnectionHelperTest._
 
