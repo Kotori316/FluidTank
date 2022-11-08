@@ -1,10 +1,11 @@
 package com.kotori316.fluidtank.integration.mekanism_gas
 
+import cats.implicits.toShow
 import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.integration.mekanism_gas.Constant.isMekanismLoaded
 import com.kotori316.fluidtank.network.SideProxy
 import com.kotori316.fluidtank.tiles.Tier
-import com.kotori316.fluidtank.{FluidTank, ModObjects}
+import com.kotori316.fluidtank.{FluidTank, ModObjects, showPos}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -78,12 +79,17 @@ class BlockGasTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(Mo
   override final def getCloneItemStack(state: BlockState, target: HitResult, level: BlockGetter, pos: BlockPos, player: Player): ItemStack = {
     val stack = super.getCloneItemStack(state, target, level, pos, player)
     if (isMekanismLoaded) {
-      level.getBlockEntity(pos) match {
-        case tank: TileGasTank => TileInfo.setItemTag(stack, tank)
-        case tile => FluidTank.LOGGER.error(ModObjects.MARKER_TileGasTank, "There is not TileGasTank at the pos : " + pos + " but " + tile)
-      }
+      val entity = level.getBlockEntity(pos)
+      saveTankTag(entity, stack, pos)
     }
     stack
+  }
+
+  def saveTankTag(entity: BlockEntity, stack: ItemStack, pos: BlockPos): Unit = {
+    entity match {
+      case tank: TileGasTank => TileInfo.setItemTag(stack, tank)
+      case tile => FluidTank.LOGGER.error(ModObjects.MARKER_TileGasTank, "There is not TileGasTank at " + pos.show + " but " + tile)
+    }
   }
 
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = {

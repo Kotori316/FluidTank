@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.recipes
 
 import com.google.gson.JsonElement
 import com.kotori316.fluidtank.blocks.{BlockTank, ContentLootFunction}
+import com.kotori316.fluidtank.integration.mekanism_gas.{BlockGasTank, GasContentLootFunction}
 import net.minecraft.data.loot.BlockLoot
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.Block
@@ -33,4 +34,7 @@ object LootTableSerializerHelper {
 
   def withTankContent(tankBlock: BlockTank): LootTableSerializerHelper =
     new LootTableSerializerHelper(tankBlock, List(ContentLootFunction.builder))
+
+  def withGasTankContent(gasTankBlock: BlockGasTank): LootTableSerializerHelper =
+    new LootTableSerializerHelper(gasTankBlock, List(GasContentLootFunction.builder))
 }

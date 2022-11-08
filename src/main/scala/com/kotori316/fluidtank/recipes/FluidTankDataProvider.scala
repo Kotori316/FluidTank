@@ -237,6 +237,7 @@ object FluidTankDataProvider {
       lootTables ++= ModObjects.blockTanks.map(LootTableSerializerHelper.withTankContent)
       lootTables ++= Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe)
         .map(LootTableSerializerHelper.withDrop)
+      lootTables ++= ModObjects.gasTanks.map(LootTableSerializerHelper.withGasTankContent)
 
       for (table <- lootTables) {
         val out = path.resolve(s"data/${table.location.getNamespace}/loot_tables/blocks/${table.location.getPath}.json")
