@@ -1,5 +1,3 @@
-## v18.7.1
+## v18.7.2
 
-* Big internal change
-* Add Gas Tank for Mekanism Gases
-* Fixed an error when you interact empty tanks with empty bucket.
+* Added loot table for gas tanks.

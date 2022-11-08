@@ -1,3 +1,9 @@
+## v18.7.2
+
+* Added loot table for gas tanks.
+
+Build with 1.18.2-40.1.73, Mapping: Official 1.18.2
+
 ## v18.7.1
 
 * Big internal change
