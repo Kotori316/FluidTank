@@ -101,6 +101,6 @@ jobs:
         run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: GameTest
-        run: chmod +x ./gradlew && ./gradlew copyGameTestTemplate runGameTestServer
+        run: chmod +x ./gradlew && ./gradlew runGameTestServer
         env:
           IGNORE_OTHER_MODS_IN_RUNTIME: true
