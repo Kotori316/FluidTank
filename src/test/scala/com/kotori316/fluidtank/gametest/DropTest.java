@@ -56,7 +56,7 @@ public final class DropTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void dropOfEmptyTank(GameTestHelper helper) {
-        var pos = BlockPos.ZERO.east();
+        var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
 
         var drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos),
@@ -80,7 +80,7 @@ public final class DropTest {
     }
 
     void dropOfWaterTank1(GameTestHelper helper, GenericAmount<Fluid> amount) {
-        var pos = BlockPos.ZERO.east();
+        var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
         connection.getFluidHandler().fill(amount, IFluidHandler.FluidAction.EXECUTE);
@@ -98,7 +98,7 @@ public final class DropTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void dropOfLavaTank2(GameTestHelper helper) {
-        var pos = BlockPos.ZERO.east();
+        var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
         connection.getFluidHandler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
@@ -128,7 +128,7 @@ public final class DropTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void pickLavaTank3(GameTestHelper helper) {
-        var pos = BlockPos.ZERO.east();
+        var pos = BlockPos.ZERO.above();
         placeTank(helper, pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var connection = getConnection(helper, pos);
         connection.getFluidHandler().fill(FluidAmount.BUCKET_LAVA(), IFluidHandler.FluidAction.EXECUTE);
