@@ -35,6 +35,7 @@ import com.kotori316.fluidtank.tiles.TileTank;
 import com.kotori316.testutil.GameTestUtil;
 
 import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
+import static com.kotori316.testutil.GameTestUtil.NO_PLACE_STRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -285,7 +286,7 @@ public final class PlaceTest {
         helper.succeed();
     }
 
-    @GameTest(template = EMPTY_STRUCTURE)
+    @GameTest(template = NO_PLACE_STRUCTURE)
     public void dummy(GameTestHelper helper) {
         // fail("Fail Test");
         helper.succeed();

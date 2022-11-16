@@ -52,7 +52,7 @@ final class ReservoirFuelTest {
             .toList();
     }
 
-    @GameTest(template = GameTestUtil.EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = GameTestUtil.NO_PLACE_STRUCTURE, batch = BATCH)
     void nullFluid() {
         burn(ModObjects.itemReservoirs().apply(0), null, -1);
     }

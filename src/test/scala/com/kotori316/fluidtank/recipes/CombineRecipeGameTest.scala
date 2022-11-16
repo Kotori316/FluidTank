@@ -2,7 +2,7 @@ package com.kotori316.fluidtank.recipes
 
 import com.kotori316.fluidtank.{Config, FluidTank, ModObjects}
 import com.kotori316.testutil.GameTestUtil
-import com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE
+import com.kotori316.testutil.GameTestUtil.NO_PLACE_STRUCTURE
 import net.minecraft.gametest.framework.{GameTest, GameTestAssertException, GameTestHelper}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
@@ -21,14 +21,14 @@ import scala.util.Try
 class CombineRecipeGameTest {
   final val BATCH = "recipeTestBatch"
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def readTag(helper: GameTestHelper): Unit = {
     val r = new ItemStack(Blocks.STONE).is(Tags.Items.STONE)
     if (!r) throw new GameTestAssertException("Tags.Items.STONE is not for Blocks.STONE")
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def noUnavailableTank(helper: GameTestHelper): Unit = {
     val context = ICondition.IContext.EMPTY
     try {
@@ -50,7 +50,7 @@ class CombineRecipeGameTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def okUnavailableTank(helper: GameTestHelper): Unit = {
     val context = GameTestUtil.getContext(helper)
     try {

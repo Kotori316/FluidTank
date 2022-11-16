@@ -23,7 +23,7 @@ import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.testutil.GameTestUtil;
 
-import static com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE;
+import static com.kotori316.testutil.GameTestUtil.NO_PLACE_STRUCTURE;
 
 @GameTestHolder(value = FluidTank.modID)
 @PrefixGameTestTemplate(value = false)
@@ -31,21 +31,21 @@ final class TankFuelTest {
     static final String BATCH = "tankFuelTestBatch";
     private final BlockTank bronzeTank = ModObjects.tierToBlock().apply(Tier.BRONZE);
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
     void checkFuelValueOfWater() {
         var stack = RecipeInventoryUtil.getFilledTankStack(Tier.BRONZE, FluidAmount.BUCKET_WATER());
 
         Assertions.assertEquals(-1, stack.getBurnTime(RecipeType.SMELTING));
     }
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
     void checkFuelValueOfEmpty() {
         var stack = new ItemStack(bronzeTank);
 
         Assertions.assertEquals(-1, stack.getBurnTime(RecipeType.SMELTING));
     }
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLavaStacked() {
         var stack = new ItemStack(bronzeTank, 2);
         RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA()), IFluidHandler.FluidAction.EXECUTE);
@@ -53,7 +53,7 @@ final class TankFuelTest {
         Assertions.assertEquals(-1, stack.getBurnTime(RecipeType.SMELTING));
     }
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLava0() {
         var stack = new ItemStack(bronzeTank);
         RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(0)), IFluidHandler.FluidAction.EXECUTE);
@@ -68,7 +68,7 @@ final class TankFuelTest {
         Assertions.assertEquals(100 * 200, stack.getBurnTime(RecipeType.SMELTING));
     }
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLava2() {
         var stack = new ItemStack(bronzeTank);
         RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(500)), IFluidHandler.FluidAction.EXECUTE);
@@ -76,7 +76,7 @@ final class TankFuelTest {
         Assertions.assertEquals(50 * 200, stack.getBurnTime(RecipeType.SMELTING));
     }
 
-    @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+    @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
     void checkFuelValueOfLava3() {
         var stack = new ItemStack(bronzeTank);
         RecipeInventoryUtil.getFluidHandler(stack).fill(FluidAmount.toStack(FluidAmount.BUCKET_LAVA().setAmount(100)), IFluidHandler.FluidAction.EXECUTE);
