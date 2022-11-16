@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.BlockItem;
@@ -75,7 +76,8 @@ public final class DropTest {
                 FluidAmount.BUCKET_WATER(),
                 FluidAmount.BUCKET_LAVA()
             ).flatMap(f -> IntStream.of(500, 1000, 1500, 2000, 3000, 4000).mapToObj(f::setAmount))
-            .map(f -> GameTestUtil.create(FluidTank.modID, BATCH, "dropOfFilledTank" + f, g -> dropOfWaterTank1(g, f)))
+            .map(f -> GameTestUtil.create(FluidTank.modID, BATCH, "dropOfFilledTank_" + contentString(f),
+                g -> dropOfWaterTank1(g, f)))
             .toList();
     }
 
@@ -153,5 +155,11 @@ public final class DropTest {
         ((CompoundTag) expected).getCompound("tank").putLong("capacity", 4000L); // replace int value to long
         assertEquals(expected, entityTag);
         helper.succeed();
+    }
+
+    static String contentString(GenericAmount<?> content){
+        var name = new ResourceLocation(content.getLocalizedName()).getPath();
+        var amount = content.amount();
+        return name + "_" + amount;
     }
 }

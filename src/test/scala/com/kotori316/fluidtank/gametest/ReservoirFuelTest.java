@@ -25,6 +25,7 @@ import com.kotori316.fluidtank.items.ReservoirItem;
 import com.kotori316.fluidtank.recipes.RecipeInventoryUtil;
 import com.kotori316.testutil.GameTestUtil;
 
+import static com.kotori316.fluidtank.gametest.DropTest.contentString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @GameTestHolder(value = FluidTank.modID)
@@ -47,7 +48,7 @@ final class ReservoirFuelTest {
         return Stream.of(FluidAmount.EMPTY(), FluidAmount.BUCKET_WATER())
             .flatMap(f -> IntStream.of(0, 10, 100, 1000, 1001, 5000).mapToObj(f::setAmount))
             .flatMap(f -> CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
-                .map(i -> GameTestUtil.create(FluidTank.modID, BATCH, "notBurn(%s, %s)".formatted(i, f),
+                .map(i -> GameTestUtil.create(FluidTank.modID, BATCH, "notBurn_%s_%s".formatted(i.registryName().getPath(), contentString(f)),
                     () -> burn(i, f, -1))))
             .toList();
     }
@@ -68,7 +69,7 @@ final class ReservoirFuelTest {
         );
         return CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
             .flatMap(item -> pairs.stream().map(p ->
-                GameTestUtil.create(FluidTank.modID, BATCH, "lavaBurn(%s, %d)".formatted(item, p.getLeft()),
+                GameTestUtil.create(FluidTank.modID, BATCH, "lavaBurn_%s_%d".formatted(item.registryName().getPath(), p.getLeft()),
                     () -> burn(item, FluidAmount.BUCKET_LAVA().setAmount(p.getLeft()), p.getRight()))
             )).toList();
     }
