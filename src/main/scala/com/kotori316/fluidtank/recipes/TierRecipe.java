@@ -193,7 +193,7 @@ public class TierRecipe implements CraftingRecipe {
         for (int i = 0; i < stacks.size(); ++i) {
             ItemStack item = inv.getItem(i);
             if (item.getItem().hasCraftingRemainingItem() && !(item.getItem() instanceof ItemBlockTank)) {
-                stacks.set(i, new ItemStack(item.getItem().getCraftingRemainingItem()));
+                stacks.set(i, item.getRecipeRemainder());
             }
         }
 

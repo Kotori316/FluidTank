@@ -83,5 +83,9 @@ class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new I
     }
   }
 
+  override def getRecipeRemainder(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
+
+  override def hasCraftingRemainingItem: Boolean = true
+
   override def toString: String = String.valueOf(registryName)
 }

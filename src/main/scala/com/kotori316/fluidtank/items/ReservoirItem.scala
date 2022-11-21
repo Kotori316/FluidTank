@@ -79,6 +79,11 @@ class ReservoirItem(val tier: Tier) extends Item(new Item.Properties().tab(ModOb
     }
   }
 
+  // ---------- Fluid Handler ----------
+  override def getRecipeRemainder(itemStack: ItemStack): ItemStack = ItemUtil.removeOneBucket(itemStack)
+
+  override def hasCraftingRemainingItem: Boolean = true
+
   // ---------- Information ----------
   @Environment(EnvType.CLIENT)
   override def appendHoverText(stack: ItemStack, worldIn: Level, tooltip: java.util.List[Component], flagIn: TooltipFlag): Unit = {

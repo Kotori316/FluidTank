@@ -17,9 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      {
-        "value": "com.kotori316.fluidtank.FluidTank"
-      }
+      "com.kotori316.fluidtank.FluidTank"
     ],
     "client": [
       "com.kotori316.fluidtank.FluidTankClientInit"
@@ -36,7 +34,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.14.0",
-    "fabric": ">=0.55.3+1.19",
+    "fabric": ">=0.67.0+1.19.2",
     "minecraft": "1.19.x",
     "fabric-language-scala": ">=0.3.0"
   },
