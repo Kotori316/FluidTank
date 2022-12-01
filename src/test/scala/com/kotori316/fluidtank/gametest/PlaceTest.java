@@ -52,7 +52,10 @@ public final class PlaceTest {
         helper.setBlock(pos, block);
         Optional.ofNullable(helper.getBlockEntity(pos))
             .map(TileTank.class::cast)
-            .ifPresent(TileTank::onBlockPlacedBy);
+            .ifPresent(t -> {
+                t.skipLoadingLog_$eq(true);
+                t.onBlockPlacedBy();
+            });
     }
 
     public static FluidConnection getConnection(GameTestHelper helper, BlockPos pos) {
@@ -86,6 +89,7 @@ public final class PlaceTest {
         helper.setBlock(pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var entity = helper.getBlockEntity(pos);
         if (entity instanceof TileTank tank) {
+            tank.skipLoadingLog_$eq(true);
             var connection = tank.connection();
             assertTrue(connection.isDummy(), "Connection before initialization must be invalid. " + connection);
         } else {
@@ -100,6 +104,7 @@ public final class PlaceTest {
         helper.setBlock(pos, ModObjects.tierToBlock().apply(Tier.WOOD));
         var entity = helper.getBlockEntity(pos);
         if (entity instanceof TileTank tank) {
+            tank.skipLoadingLog_$eq(true);
             tank.onBlockPlacedBy();
             var connection = tank.connection();
             assertEquals(connection.capacity(), Tier.WOOD.amount(), "Capacity of Wood Tank is 4000. " + connection);
@@ -297,9 +302,10 @@ public final class PlaceTest {
         var pos = BlockPos.ZERO.above();
         helper.startSequence()
             .thenExecute(() -> {
-                helper.setBlock(pos, ModObjects.tierToBlock().apply(Tier.WOOD));
-                helper.setBlock(pos.above(), ModObjects.tierToBlock().apply(Tier.WOOD));
-                helper.setBlock(pos.above(2), ModObjects.tierToBlock().apply(Tier.WOOD));
+                for (int i = 0; i < 3; i++) {
+                    helper.setBlock(pos.above(i), ModObjects.tierToBlock().apply(Tier.WOOD));
+                    Objects.requireNonNull((TileTank) helper.getBlockEntity(pos.above(i))).skipLoadingLog_$eq(true);
+                }
             })
             .thenExecuteAfter(1, () -> {
                 helper.assertBlockProperty(pos, TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM);
