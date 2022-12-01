@@ -97,7 +97,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
             if (this.connection.isDummy) "will be" else "won't",
             this.getBlockPos.show, this.connection)
         }
-        if (this.connection.isDummy) {
+        if (this.connection.isDummy && !this.isRemoved) {
           Connection.load(getLevel, getBlockPos, classOf[TileTank])
         }
         getLevel.getProfiler.pop()
