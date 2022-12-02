@@ -34,22 +34,24 @@ public final class PlaceMekanismTankTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void placeWood(GameTestHelper helper) {
-        helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank());
-        helper.assertBlockPresent(ModObjects.woodGasTank(), BlockPos.ZERO);
+        var pos = BlockPos.ZERO.above();
+        helper.setBlock(pos, ModObjects.woodGasTank());
+        helper.assertBlockPresent(ModObjects.woodGasTank(), pos);
         helper.succeed();
     }
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void capabilityExist(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
         helper.startSequence()
-            .thenExecute(() -> helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank()))
+            .thenExecute(() -> helper.setBlock(pos, ModObjects.woodGasTank()))
             .thenExecute(() -> {
-                var cap = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO))
+                var cap = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(pos))
                     .getCapability(Capabilities.GAS_HANDLER);
                 assertTrue(cap.isPresent());
             })
             .thenExecuteAfter(1, () -> {
-                var tank = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO));
+                var tank = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(pos));
                 var cap = tank.getCapability(Capabilities.GAS_HANDLER).resolve();
                 cap.ifPresentOrElse(h -> assertEquals(1, h.getTanks()), () -> fail("No capability at %s".formatted(tank)));
             })
@@ -59,26 +61,28 @@ public final class PlaceMekanismTankTest {
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void capabilityValid(GameTestHelper helper) {
         AtomicReference<LazyOptional<IGasHandler>> ref = new AtomicReference<>();
+        var pos = BlockPos.ZERO.above();
         helper.startSequence()
-            .thenExecute(() -> helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank()))
-            .thenExecute(() -> ref.set(Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO))
+            .thenExecute(() -> helper.setBlock(pos, ModObjects.woodGasTank()))
+            .thenExecute(() -> ref.set(Objects.requireNonNull((TileGasTank) helper.getBlockEntity(pos))
                 .getCapability(Capabilities.GAS_HANDLER)))
             .thenExecuteAfter(1, () -> assertFalse(ref.get().isPresent()))
-            .thenExecuteAfter(1, () -> assertTrue(Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO))
+            .thenExecuteAfter(1, () -> assertTrue(Objects.requireNonNull((TileGasTank) helper.getBlockEntity(pos))
                 .getCapability(Capabilities.GAS_HANDLER).isPresent()))
             .thenSucceed();
     }
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place2AtOnce(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
         helper.startSequence()
             .thenExecute(() -> {
-                helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank());
-                helper.setBlock(BlockPos.ZERO.above(), ModObjects.woodGasTank());
+                helper.setBlock(pos, ModObjects.woodGasTank());
+                helper.setBlock(pos.above(), ModObjects.woodGasTank());
             })
             .thenExecuteAfter(1, () -> {
-                var c1 = TileInfoAccess.getConnection(helper, BlockPos.ZERO);
-                var c2 = TileInfoAccess.getConnection(helper, BlockPos.ZERO.above());
+                var c1 = TileInfoAccess.getConnection(helper, pos);
+                var c2 = TileInfoAccess.getConnection(helper, pos.above());
                 assertEquals(c1, c2);
                 assertEquals(2, c1.sortedTanks().size());
             })
@@ -87,16 +91,17 @@ public final class PlaceMekanismTankTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void place2AfterPlaced(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
         helper.startSequence()
-            .thenExecute(() -> helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank()))
+            .thenExecute(() -> helper.setBlock(pos, ModObjects.woodGasTank()))
             .thenExecuteAfter(1, () -> {
-                var c1 = TileInfoAccess.getConnection(helper, BlockPos.ZERO);
+                var c1 = TileInfoAccess.getConnection(helper, pos);
                 assertEquals(1, c1.sortedTanks().size());
             })
-            .thenExecuteAfter(1, () -> helper.setBlock(BlockPos.ZERO.above(), ModObjects.woodGasTank()))
+            .thenExecuteAfter(1, () -> helper.setBlock(pos.above(), ModObjects.woodGasTank()))
             .thenExecuteAfter(1, () -> {
-                var c1 = TileInfoAccess.getConnection(helper, BlockPos.ZERO);
-                var c2 = TileInfoAccess.getConnection(helper, BlockPos.ZERO.above());
+                var c1 = TileInfoAccess.getConnection(helper, pos);
+                var c2 = TileInfoAccess.getConnection(helper, pos.above());
                 assertEquals(c1, c2);
                 assertEquals(2, c1.sortedTanks().size());
             })
@@ -105,10 +110,11 @@ public final class PlaceMekanismTankTest {
 
     @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
     public void loadNbt(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
         helper.startSequence()
             .thenExecute(() -> {
-                helper.setBlock(BlockPos.ZERO, ModObjects.woodGasTank());
-                var tile = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(BlockPos.ZERO));
+                helper.setBlock(pos, ModObjects.woodGasTank());
+                var tile = Objects.requireNonNull((TileGasTank) helper.getBlockEntity(pos));
                 var tag = new CompoundTag();
                 {
                     tag.putLong(TileTank.NBT_Capacity(), 4000L);
@@ -120,7 +126,7 @@ public final class PlaceMekanismTankTest {
                 tile.load(tag);
             })
             .thenExecuteAfter(1, () -> {
-                var h = TileInfoAccess.getHandler(helper, BlockPos.ZERO);
+                var h = TileInfoAccess.getHandler(helper, pos);
                 assertEquals(3000, h.getStored());
                 assertEquals(4000, h.getCapacity());
                 var tank = h.getTank();

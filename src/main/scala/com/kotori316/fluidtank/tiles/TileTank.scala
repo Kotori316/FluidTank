@@ -19,6 +19,7 @@ import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.{LazyOptional, LogicalSidedProvider}
 import net.minecraftforge.fml.LogicalSide
+import org.jetbrains.annotations.VisibleForTesting
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -42,6 +43,8 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
   final val connectionAttaches: ArrayBuffer[FluidConnection => Unit] = ArrayBuffer.empty
   var loading = false
   var stackName: Component = _
+  @VisibleForTesting
+  var skipLoadingLog = false
 
   def connection: FluidConnection = mConnection
 
@@ -91,13 +94,13 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
       val executor = LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)
       executor.tell(new TickTask(0, () => {
         getLevel.getProfiler.push("Connection Loading")
-        if (Utils.isInDev) {
+        if (Utils.isInDev && !skipLoadingLog) {
           FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
             "Connection {} loaded in delayed task. At={}, connection={}",
             if (this.connection.isDummy) "will be" else "won't",
             this.getBlockPos.show, this.connection)
         }
-        if (this.connection.isDummy) {
+        if (this.connection.isDummy && !this.isRemoved) {
           Connection.load(getLevel, getBlockPos, classOf[TileTank])
         }
         getLevel.getProfiler.pop()
@@ -119,7 +122,7 @@ class TileTank(var tier: Tier, t: BlockEntityType[_ <: TileTank], p: BlockPos, s
   def getComparatorLevel: Int = connection.getComparatorLevel
 
   def onBlockPlacedBy(): Unit = {
-    if (Utils.isInDev) {
+    if (Utils.isInDev && !skipLoadingLog) {
       FluidTank.LOGGER.debug(ModObjects.MARKER_TileTank,
         "Connection {} loaded in onBlockPlacedBy. At={}, connection={}",
         if (this.connection.isDummy) "will be" else "won't",

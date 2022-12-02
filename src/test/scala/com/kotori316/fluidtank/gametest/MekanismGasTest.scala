@@ -6,7 +6,7 @@ import com.kotori316.fluidtank.gametest.MekanismGasTest.BATCH
 import com.kotori316.fluidtank.integration.mekanism_gas._
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
 import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
-import com.kotori316.testutil.GameTestUtil.EMPTY_STRUCTURE
+import com.kotori316.testutil.GameTestUtil.NO_PLACE_STRUCTURE
 import mekanism.api.chemical.gas.{Gas, GasStack}
 import mekanism.api.{AutomationType, NBTConstants, Action => MekanismAction}
 import mekanism.common.registries.MekanismGases
@@ -36,7 +36,7 @@ class MekanismGasTest {
     com.kotori316.fluidtank.Utils.setInDev(true)
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def instance(helper: GameTestHelper): Unit = {
     val handler = new GasTankHandler
     assertTrue(handler.isEmpty)
@@ -44,7 +44,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def filledInstance(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(Tank(GasAmount(MekanismGases.OXYGEN.get(), 1000), 4000))
     assertFalse(handler.isEmpty)
@@ -54,7 +54,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def setCapacity(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(6000)
     assertTrue(handler.isEmpty)
@@ -62,7 +62,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def insertToEmpty1Simulate(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(6000)
 
@@ -73,7 +73,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def insertToEmpty1Execute(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(6000)
 
@@ -86,7 +86,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def insertToEmpty2(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(6000)
     val simulate = handler.fill(GasAmount.EMPTY, MekanismAction.SIMULATE)
@@ -94,7 +94,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def insertToEmpty3GasAPI(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(6000)
     val tank: TankAPI = handler
@@ -104,7 +104,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def drainGasAPI1(helper: GameTestHelper): Unit = {
     val stack = MekanismGases.OXYGEN.getStack(2000)
     val handler = GasTankHandler(Tank(GasAmount.fromStack(stack), 6000))
@@ -116,7 +116,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def drainGasAPI2(helper: GameTestHelper): Unit = {
     val stack = MekanismGases.OXYGEN.getStack(2000)
     val handler = GasTankHandler(Tank(GasAmount.fromStack(stack), 6000))
@@ -128,7 +128,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def setStack1(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(4000)
     handler.setStack(GasAmount(MekanismGases.OXYGEN.get(), 1000).toStack)
@@ -137,7 +137,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def setStack2(helper: GameTestHelper): Unit = {
     val handler = GasTankHandler(4000)
     handler.fill(GasAmount(MekanismGases.ANTIMATTER.get(), 1000), MekanismAction.EXECUTE)
@@ -147,7 +147,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def list1Simulate(helper: GameTestHelper): Unit = {
     val handler1 = GasTankHandler(4000)
     val handler2 = GasTankHandler(4000)
@@ -160,7 +160,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def list1Execute(helper: GameTestHelper): Unit = {
     val handler1 = GasTankHandler(4000)
     val handler2 = GasTankHandler(4000)
@@ -173,7 +173,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def list1Set(helper: GameTestHelper): Unit = {
     val handler1 = GasTankHandler(4000)
     val handler2 = GasTankHandler(4000)
@@ -186,7 +186,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerEmpty(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val handler = new TankItemGasHandler(Tier.WOOD, stack)
@@ -199,7 +199,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerFilled(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val tag = new CompoundTag()
@@ -213,7 +213,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerFillToEmpty1(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val handler = new TankItemGasHandler(Tier.WOOD, stack)
@@ -224,7 +224,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerFillToEmpty2(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val handler = new TankItemGasHandler(Tier.WOOD, stack)
@@ -241,7 +241,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerFillToEmpty3(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val handler = new TankItemGasHandler(Tier.WOOD, stack)
@@ -259,7 +259,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerDrain1(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val tag = new CompoundTag()
@@ -276,7 +276,7 @@ class MekanismGasTest {
     helper.succeed()
   }
 
-  @GameTest(template = EMPTY_STRUCTURE, batch = BATCH)
+  @GameTest(template = NO_PLACE_STRUCTURE, batch = BATCH)
   def stackHandlerDrain2(helper: GameTestHelper): Unit = {
     val stack = new ItemStack(ModObjects.woodGasTank)
     val tag = new CompoundTag()

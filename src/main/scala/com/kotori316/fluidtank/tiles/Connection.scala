@@ -1,10 +1,10 @@
 package com.kotori316.fluidtank.tiles
 
-import cats.implicits.catsSyntaxApplicativeId
+import cats.implicits.{catsSyntaxApplicativeId, toShow}
 import com.kotori316.fluidtank.blocks.TankPos
 import com.kotori316.fluidtank.fluids.{GenericAmount, ListHandler}
 import com.kotori316.fluidtank.tiles.ConnectionHelper._
-import com.kotori316.fluidtank.{Cap, FluidTank, ModObjects}
+import com.kotori316.fluidtank.{Cap, FluidTank, ModObjects, showPos}
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
@@ -124,7 +124,7 @@ object Connection {
   (level: BlockGetter, pos: BlockPos, tankClass: Class[TankType])(implicit helper: ConnectionHelper.Aux[TankType, ContentType, HandlerType]): Unit = {
     val lowest = Iterator.iterate(pos)(_.below()).takeWhile(p => tankClass.isInstance(level.getBlockEntity(p)))
       .toList.lastOption.getOrElse {
-      FluidTank.LOGGER.fatal(ModObjects.MARKER_Connection, "No lowest tank", new IllegalStateException("No lowest tank"))
+      FluidTank.LOGGER.fatal(ModObjects.MARKER_Connection, f"No lowest tank at ${pos.show}, ${level.getBlockState(pos)}", new IllegalStateException("No lowest tank"))
       pos
     }
     val tanks = Iterator.iterate(lowest)(_.above()).map(level.getBlockEntity).takeWhile(tankClass.isInstance)

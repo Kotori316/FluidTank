@@ -126,7 +126,7 @@ final class TileInfo implements ICapabilityProvider, INBTSerializable<CompoundTa
                     c.isDummy() ? "will" : "won't",
                     tile.getBlockPos(), c);
             }
-            if (c.isDummy()) {
+            if (c.isDummy() && !tile.isRemoved()) {
                 Connection.load(level, tile.getBlockPos(), TileGasTank.class, GasConnection.GasConnectionHelper());
             }
             level.getProfiler().pop();

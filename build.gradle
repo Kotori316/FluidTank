@@ -103,6 +103,15 @@ minecraft {
             // Your access token, you can find it in your '.minecraft/launcher_profiles.json' file
             // If not set, use "0" to prevent authentication exception.
             args '--accessToken', project.findProperty('mc_token') ?: "0"
+            property 'forge.enabledGameTestNamespaces', 'fluidtank'
+            mods {
+                fluidtank {
+                    source sourceSets.test
+                }
+            }
+            lazyToken("minecraft_classpath") {
+                configurations.game_test.collect { it.absolutePath }.join(File.pathSeparator)
+            }
         }
 
         server {
