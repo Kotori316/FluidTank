@@ -81,8 +81,8 @@ jobs:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Set version
-        run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
+      # - name: Set version
+      #   run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: RunData
         run: chmod +x ./gradlew && ./gradlew runData
@@ -97,8 +97,8 @@ jobs:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Set version
-        run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
+      # - name: Set version
+      #   run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: GameTest
         run: chmod +x ./gradlew && ./gradlew runGameTestServer
