@@ -298,6 +298,13 @@ sourceSets {
             srcDir 'src/generated/resources'
         }
     }
+    test {
+        scala {
+            // TODO remove this test after mekanism is released.
+            exclude("**/*Mekanism*")
+            exclude("**/TileInfoAccess*")
+        }
+    }
 }
 
 // Example configuration to allow publishing using the maven-publish task
