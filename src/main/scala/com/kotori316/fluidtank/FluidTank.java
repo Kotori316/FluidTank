@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -12,6 +12,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -23,9 +24,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.Logger;
 import scala.jdk.javaapi.CollectionConverters;
 
-import com.kotori316.fluidtank.blocks.BlockTank;
 import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin;
-import com.kotori316.fluidtank.integration.mekanism_gas.BlockGasTank;
 import com.kotori316.fluidtank.integration.top.FluidTankTOPPlugin;
 import com.kotori316.fluidtank.network.PacketHandler;
 import com.kotori316.fluidtank.network.SideProxy;
@@ -69,11 +68,11 @@ public class FluidTank {
 
         @SubscribeEvent
         public static void register(RegisterEvent event) {
-            event.register(Registry.BLOCK_REGISTRY, Register::registerBlocks);
-            event.register(Registry.ITEM_REGISTRY, Register::registerItems);
-            event.register(Registry.BLOCK_ENTITY_TYPE_REGISTRY, Register::registerTiles);
-            event.register(Registry.MENU_REGISTRY, Register::registerContainerType);
-            event.register(Registry.RECIPE_SERIALIZER_REGISTRY, Register::registerSerializer);
+            event.register(Registries.BLOCK, Register::registerBlocks);
+            event.register(Registries.ITEM, Register::registerItems);
+            event.register(Registries.BLOCK_ENTITY_TYPE, Register::registerTiles);
+            event.register(Registries.MENU, Register::registerContainerType);
+            event.register(Registries.RECIPE_SERIALIZER, Register::registerSerializer);
         }
 
         public static void registerBlocks(RegisterEvent.RegisterHelper<Block> helper) {
@@ -86,13 +85,9 @@ public class FluidTank {
         }
 
         public static void registerItems(RegisterEvent.RegisterHelper<Item> helper) {
-            CollectionConverters.asJava(ModObjects.blockTanks()).stream().map(BlockTank::itemBlock).forEach(b -> helper.register(b.registryName(), b));
-            helper.register(ModObjects.blockCat().registryName(), ModObjects.blockCat().itemBlock());
-            helper.register(ModObjects.blockFluidPipe().registryName, ModObjects.blockFluidPipe().itemBlock());
-            helper.register(ModObjects.blockItemPipe().registryName, ModObjects.blockItemPipe().itemBlock());
-            helper.register(ModObjects.blockSource().registryName(), ModObjects.blockSource().itemBlock());
-            CollectionConverters.asJava(ModObjects.gasTanks()).stream().map(BlockGasTank::itemBlock).forEach(b -> helper.register(b.registryName(), b));
-            CollectionConverters.asJava(ModObjects.itemReservoirs()).forEach(b -> helper.register(b.registryName(), b));
+            CollectionConverters.asJava(ModObjects.allItems()).forEach(e ->
+                helper.register(e.name(), e.t())
+            );
         }
 
         public static void registerTiles(RegisterEvent.RegisterHelper<BlockEntityType<?>> helper) {
@@ -116,6 +111,11 @@ public class FluidTank {
         @SubscribeEvent
         public static void gatherData(GatherDataEvent event) {
             FluidTankDataProvider.gatherData(event);
+        }
+
+        @SubscribeEvent
+        public static void registerCreativeTab(CreativeModeTabEvent.Register event) {
+            event.registerCreativeModeTab(new ResourceLocation(FluidTank.modID, "tab"), ModObjects::createTab);
         }
     }
 

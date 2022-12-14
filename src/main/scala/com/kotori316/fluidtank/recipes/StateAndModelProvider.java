@@ -22,7 +22,7 @@ import com.kotori316.fluidtank.transport.PipeBlock;
 
 final class StateAndModelProvider extends BlockStateProvider {
     StateAndModelProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
-        super(gen, FluidTank.modID, exFileHelper);
+        super(gen.getPackOutput(), FluidTank.modID, exFileHelper);
     }
 
     private ResourceLocation blockTexture(String name) {

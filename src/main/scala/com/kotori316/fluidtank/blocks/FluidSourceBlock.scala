@@ -4,12 +4,12 @@ import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.FluidSourceItem
 import com.kotori316.fluidtank.tiles.FluidSourceTile
-import net.minecraft.core.{BlockPos, NonNullList}
+import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.{CreativeModeTab, Item, ItemStack, Items, TooltipFlag}
+import net.minecraft.world.item.{Item, ItemStack, Items, TooltipFlag}
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable
 
 class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Material.METAL).strength(0.5f)) {
   final val registryName = new ResourceLocation(FluidTank.modID, FluidSourceBlock.NAME)
-  val itemBlock = new FluidSourceItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
+  val itemBlock = new FluidSourceItem(this, new Item.Properties())
   registerDefaultState(this.getStateDefinition.any.setValue(FluidSourceBlock.CHEAT_MODE, Boolean.box(false)))
 
   //noinspection ScalaDeprecation,deprecation
@@ -51,13 +51,6 @@ class FluidSourceBlock extends BaseEntityBlock(BlockBehaviour.Properties.of(Mate
       stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
     }
     stack
-  }
-
-  override def fillItemCategory(group: CreativeModeTab, items: NonNullList[ItemStack]): Unit = {
-    items.add(new ItemStack(this))
-    val stack = new ItemStack(this)
-    stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
-    items.add(stack)
   }
 
   //noinspection ScalaDeprecation,deprecation

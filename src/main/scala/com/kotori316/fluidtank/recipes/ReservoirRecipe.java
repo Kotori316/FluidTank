@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
@@ -41,7 +42,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
     private final List<Ingredient> subIngredients;
 
     public ReservoirRecipe(ResourceLocation idIn, Tier tier, List<Ingredient> subIngredients) {
-        super(idIn, GROUP, findOutput(tier), findIngredients(tier, subIngredients));
+        super(idIn, GROUP, CraftingBookCategory.MISC, findOutput(tier), findIngredients(tier, subIngredients));
         this.tier = tier;
         this.subIngredients = subIngredients;
         LOGGER.debug("{} instance({}) created for Tier {}({}).", getClass().getSimpleName(), idIn, tier, getResultItem());

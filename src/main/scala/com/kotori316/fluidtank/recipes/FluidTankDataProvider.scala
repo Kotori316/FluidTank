@@ -1,23 +1,29 @@
 package com.kotori316.fluidtank.recipes
 
-import java.io.IOException
-import java.nio.file.Path
+import java.util.Collections
+import java.util.concurrent.CompletableFuture
 
-import com.google.gson.{JsonArray, JsonElement}
+import com.google.gson.JsonArray
 import com.kotori316.fluidtank._
+import com.kotori316.fluidtank.blocks.{BlockTank, ContentLootFunction}
+import com.kotori316.fluidtank.integration.mekanism_gas.{BlockGasTank, GasContentLootFunction}
 import com.kotori316.fluidtank.recipes.FluidTankConditions.{PipeConfigCondition, TankConfigCondition}
 import com.kotori316.fluidtank.recipes.ReservoirRecipe.ReservoirFinishedRecipe
 import com.kotori316.fluidtank.recipes.TierRecipe.TierFinishedRecipe
 import com.kotori316.fluidtank.tiles.Tier
 import net.minecraft.advancements.critereon.{EntityPredicate, FilledBucketTrigger, InventoryChangeTrigger, ItemPredicate, MinMaxBounds}
-import net.minecraft.core.Registry
-import net.minecraft.data.recipes.ShapedRecipeBuilder
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.loot.{BlockLootSubProvider, LootTableProvider}
+import net.minecraft.data.recipes.{RecipeCategory, ShapedRecipeBuilder}
 import net.minecraft.data.{CachedOutput, DataGenerator, DataProvider}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.{ItemTags, TagKey}
+import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.storage.loot.LootTable
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraftforge.common.Tags
 import net.minecraftforge.common.crafting.CraftingHelper
 import net.minecraftforge.common.crafting.conditions.{ICondition, ModLoadedCondition, NotCondition, TagEmptyCondition}
@@ -25,7 +31,6 @@ import net.minecraftforge.data.event.GatherDataEvent
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.MarkerManager
 
-import scala.collection.mutable
 import scala.jdk.javaapi.CollectionConverters
 
 object FluidTankDataProvider {
@@ -35,20 +40,18 @@ object FluidTankDataProvider {
     event.getGenerator.addProvider(event.includeServer, new AdvancementProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeServer, new RecipeProvider(event.getGenerator))
     event.getGenerator.addProvider(event.includeClient, new StateAndModelProvider(event.getGenerator, event.getExistingFileHelper))
-    event.getGenerator.addProvider(event.includeServer, new LootTableProvider(event.getGenerator))
+    event.getGenerator.addProvider(event.includeServer, new LootTableProvider(event.getGenerator.getPackOutput, Collections.emptySet(),
+      CollectionConverters.asJava(Seq(new LootTableProvider.SubProviderEntry(() => new LootSubProvider, LootContextParamSets.BLOCK)))
+    ))
   }
 
   private[this] final def ID(s: String) = new ResourceLocation(FluidTank.modID, s)
 
-  private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registry.ITEM_REGISTRY, name)
-
-  private def saveData(pCache: CachedOutput, pJsonElement: JsonElement, path: Path): Unit = {
-    DataProvider.saveStable(pCache, pJsonElement, path)
-  }
+  private def tag(name: ResourceLocation): TagKey[Item] = TagKey.create(Registries.ITEM, name)
 
   class AdvancementProvider(generatorIn: DataGenerator) extends DataProvider {
-    override def run(cache: CachedOutput): Unit = {
-      val path = generatorIn.getOutputFolder
+    override def run(cache: CachedOutput): CompletableFuture[_] = {
+      val path = generatorIn.getPackOutput.getOutputFolder
 
       val easyCondition = new FluidTankConditions.EasyCondition()
       val woodLocation = ID("tank_wood")
@@ -80,22 +83,19 @@ object FluidTankDataProvider {
       val recipeAdvancements = FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY ::
         CAT :: TANK_WOOD :: TANK_WOOD_EASY :: VOID_TANK :: TANKS
 
-      for (advancement <- recipeAdvancements) {
+      val outputWork = for (advancement <- recipeAdvancements) yield {
         val out = path.resolve(s"data/${advancement.location.getNamespace}/advancements/recipes/tank/${advancement.location.getPath}.json")
-        try {
-          saveData(cache, advancement.build, out)
-        } catch {
-          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save advancement ${advancement.location}.", e)
-        }
+        DataProvider.saveStable(cache, advancement.build, out)
       }
+      CompletableFuture.allOf(outputWork: _*)
     }
 
     override def getName = "Advancement of FluidTank"
   }
 
   class RecipeProvider(generatorIn: DataGenerator) extends DataProvider {
-    override def run(cache: CachedOutput): Unit = {
-      val path = generatorIn.getOutputFolder
+    override def run(cache: CachedOutput): CompletableFuture[_] = {
+      val path = generatorIn.getPackOutput.getOutputFolder
 
       val tankWoodItem = ForgeRegistries.ITEMS.getValue(ID("tank_wood"))
       val woodTanks = Ingredient.of(ModObjects.tierToBlock(Tier.WOOD))
@@ -103,7 +103,7 @@ object FluidTankDataProvider {
       val pipeConfigCondition = new PipeConfigCondition()
       val easyCondition = new FluidTankConditions.EasyCondition()
       val WOOD = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(tankWoodItem)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, tankWoodItem)
           .define('x', Tags.Items.GLASS).define('p', ItemTags.LOGS)
           .pattern("x x")
           .pattern("xpx")
@@ -112,7 +112,7 @@ object FluidTankDataProvider {
         .addCondition(new NotCondition(easyCondition))
         .addCondition(new TagCondition(Tags.Items.GLASS.location))
       val EASY_WOOD = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(tankWoodItem)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, tankWoodItem)
           .define('x', Tags.Items.GLASS).define('p', ItemTags.PLANKS)
           .pattern("p p")
           .pattern("p p")
@@ -121,21 +121,21 @@ object FluidTankDataProvider {
         .addCondition(easyCondition)
         .addCondition(new TagCondition(Tags.Items.GLASS.location))
       val VOID = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ForgeRegistries.ITEMS.getValue(ID("tank_void")))
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.tierToBlock(Tier.VOID))
           .define('o', Tags.Items.OBSIDIAN).define('t', woodTanks)
           .pattern("ooo")
           .pattern("oto")
           .pattern("ooo"))
         .addCondition(tankConfigCondition)
       val CAT = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ModObjects.blockCat)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.blockCat)
           .define('x', woodTanks)
           .define('p', ingredientArray(Ingredient.of(Tags.Items.CHESTS), Ingredient.of(Blocks.BARREL)))
           .pattern("x x")
           .pattern("xpx")
           .pattern("xxx"))
       val PIPE = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ModObjects.blockFluidPipe)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.blockFluidPipe)
           .define('t', woodTanks)
           .define('g', Tags.Items.GLASS)
           .define('e', ingredientArray(Ingredient.of(Tags.Items.ENDER_PEARLS), Ingredient.of(Items.ENDER_EYE)))
@@ -145,7 +145,7 @@ object FluidTankDataProvider {
         .addCondition(new NotCondition(easyCondition))
         .addCondition(pipeConfigCondition)
       val PIPE_EASY = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ModObjects.blockFluidPipe, 2)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.blockFluidPipe, 2)
           .define('t', woodTanks)
           .define('g', Tags.Items.GLASS)
           .pattern("gtg")
@@ -154,7 +154,7 @@ object FluidTankDataProvider {
         .addCondition(easyCondition)
         .addCondition(pipeConfigCondition)
       val ITEM_PIPE = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ModObjects.blockItemPipe, 4)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.blockItemPipe, 4)
           .define('t', woodTanks)
           .define('g', Tags.Items.GLASS)
           .define('e', ingredientArray(Ingredient.of(Tags.Items.ENDER_PEARLS), Ingredient.of(Items.ENDER_EYE)))
@@ -164,7 +164,7 @@ object FluidTankDataProvider {
         .addCondition(new NotCondition(easyCondition))
         .addCondition(pipeConfigCondition)
       val ITEM_PIPE_EASY = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ModObjects.blockItemPipe, 8)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.blockItemPipe, 8)
           .define('t', woodTanks)
           .define('g', Tags.Items.GLASS)
           .pattern("g g")
@@ -177,7 +177,7 @@ object FluidTankDataProvider {
           .addTagCondition(tag(new ResourceLocation(tier.tagName)))
           .addCondition(tankConfigCondition))
       val FLUID_SOURCE = RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(ModObjects.blockSource)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModObjects.blockSource)
           .pattern("wiw")
           .pattern("gIg")
           .pattern("wdw")
@@ -199,7 +199,7 @@ object FluidTankDataProvider {
         (ModObjects.tierToBlock(Tier.WOOD) :: ModObjects.gasTanks) zip
         Seq(ItemTags.LOGS, Tags.Items.INGOTS_IRON, Tags.Items.INGOTS_GOLD, Tags.Items.GEMS_DIAMOND, Tags.Items.GEMS_EMERALD)
         ).map { case ((tank, preTank), tag) => RecipeSerializeHelper.by(
-        ShapedRecipeBuilder.shaped(tank)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, tank)
           .pattern("ptp")
           .pattern("tot")
           .pattern("ptp")
@@ -215,42 +215,33 @@ object FluidTankDataProvider {
 
       val recipes = RESERVOIRS ::: COMBINE :: FLUID_SOURCE :: PIPE :: PIPE_EASY :: ITEM_PIPE :: ITEM_PIPE_EASY :: CAT :: WOOD :: EASY_WOOD :: VOID :: COPPER :: TANKS ::: GAS_TANKS
 
-      for (recipe <- recipes) {
+      val outputWork = for (recipe <- recipes) yield {
         val out = path.resolve(s"data/${recipe.location.getNamespace}/recipes/${recipe.location.getPath}.json")
-        try {
-          saveData(cache, recipe.build, out)
-        } catch {
-          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}.", e)
-          case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save recipe ${recipe.location}. Check the serializer registered.", e)
-        }
+        DataProvider.saveStable(cache, recipe.build, out)
       }
+      CompletableFuture.allOf(outputWork: _*)
     }
 
     override def getName = "Recipe of FluidTank"
 
   }
 
-  class LootTableProvider(generatorIn: DataGenerator) extends DataProvider {
-    override def run(cache: CachedOutput): Unit = {
-      val path = generatorIn.getOutputFolder
-      val lootTables: mutable.Buffer[LootTableSerializerHelper] = mutable.Buffer.empty
-      lootTables ++= ModObjects.blockTanks.map(LootTableSerializerHelper.withTankContent)
-      lootTables ++= Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe)
-        .map(LootTableSerializerHelper.withDrop)
-      lootTables ++= ModObjects.gasTanks.map(LootTableSerializerHelper.withGasTankContent)
-
-      for (table <- lootTables) {
-        val out = path.resolve(s"data/${table.location.getNamespace}/loot_tables/blocks/${table.location.getPath}.json")
-        try {
-          saveData(cache, table.build, out)
-        } catch {
-          case e: IOException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${table.location}.", e)
-          case e: NullPointerException => FluidTank.LOGGER.error(MARKER, s"Failed to save model ${table.location}. Check the condition registered.", e)
-        }
+  final class LootSubProvider extends BlockLootSubProvider(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags()) {
+    override def generate(): Unit = {
+      ModObjects.blockTanks.foreach { b =>
+        this.add(b, tankContent(b))
+      }
+      Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe).foreach { b =>
+        this.dropSelf(b)
+      }
+      ModObjects.gasTanks.foreach { b =>
+        this.add(b, gasTankContent(b))
       }
     }
 
-    override def getName: String = "LootTables of FluidTank"
+    private def tankContent(tankBlock: BlockTank): LootTable.Builder = createSingleItemTable(tankBlock).apply(ContentLootFunction.builder)
+
+    private def gasTankContent(gasTankBlock: BlockGasTank): LootTable.Builder = createSingleItemTable(gasTankBlock).apply(GasContentLootFunction.builder)
   }
 
   def makeConditionArray(conditions: List[ICondition]): JsonArray = {

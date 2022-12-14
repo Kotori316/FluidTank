@@ -6,9 +6,10 @@ import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
 import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPipeTile, PipeTile}
 import com.mojang.datafixers.DSL
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.{BlockPos, Registry}
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.{CreativeModeTab, ItemStack}
+import net.minecraft.world.item.{CreativeModeTab, Item, ItemStack}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
@@ -23,9 +24,18 @@ import scala.reflect.ClassTag
 object ModObjects {
   //---------- Objects used in block and items ----------
 
-  final val CREATIVE_TABS = new CreativeModeTab(FluidTank.modID) {
-    override def makeIcon() = new ItemStack(woodTank)
+  final def createTab(builder: CreativeModeTab.Builder): Unit = {
+    builder.icon(() => new ItemStack(woodTank))
+    builder.displayItems { (_, output, _) =>
+      allItems.foreach(entry => output.accept(entry.t))
+      locally {
+        val stack = new ItemStack(blockSource)
+        stack.getOrCreateTag().putBoolean(FluidSourceBlock.KEY_CHEAT, true)
+        output.accept(stack)
+      }
+    }
   }
+
   final val MATERIAL = new Material(MaterialColor.NONE, false, true, true, false,
     false, false, PushReaction.BLOCK)
   final val MATERIAL_PIPE = new Material(MaterialColor.NONE, false, false, true, false,
@@ -51,6 +61,16 @@ object ModObjects {
 
   //---------- ITEMS ----------
   final val itemReservoirs = List(Tier.WOOD, Tier.STONE, Tier.IRON).map(t => new ReservoirItem(t))
+  final val allItems: Seq[NamedEntry[Item]] =
+    blockTanks.map(_.itemBlock).map(i => new NamedEntry(i.registryName, i)) ++
+      Seq(
+        new NamedEntry(blockCat.registryName, blockCat.itemBlock),
+        new NamedEntry(blockFluidPipe.registryName, blockFluidPipe.itemBlock),
+        new NamedEntry(blockItemPipe.registryName, blockItemPipe.itemBlock),
+        new NamedEntry(blockSource.registryName, blockSource.itemBlock),
+      ) ++
+      gasTanks.map(_.itemBlock).map(i => new NamedEntry(i.registryName, i)) ++
+      itemReservoirs.map(i => new NamedEntry(i.registryName, i))
 
   //---------- TileEntities ----------
 
@@ -77,10 +97,10 @@ object ModObjects {
   final val CAT_CONTAINER_TYPE = CATContainer.makeType()
 
   //---------- LootFunction ----------
-  final val TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
+  final val TANK_CONTENT_LOOT = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
     new ResourceLocation(FluidTank.modID, ContentLootFunction.NAME),
     new LootItemFunctionType(new ContentLootFunction.ContentTankSerializer()))
-  final val GAS_TANK_CONTENT_LOOT = Registry.register(Registry.LOOT_FUNCTION_TYPE,
+  final val GAS_TANK_CONTENT_LOOT = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
     new ResourceLocation(FluidTank.modID, GasContentLootFunction.NAME),
     new LootItemFunctionType(new GasContentLootFunction.GasContentTankSerializer()))
 

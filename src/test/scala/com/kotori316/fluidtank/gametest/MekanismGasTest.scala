@@ -5,7 +5,7 @@ import com.kotori316.fluidtank.fluids.Tank
 import com.kotori316.fluidtank.gametest.MekanismGasTest.BATCH
 import com.kotori316.fluidtank.integration.mekanism_gas._
 import com.kotori316.fluidtank.tiles.{Tier, TileTank}
-import com.kotori316.fluidtank.{FluidTank, ModObjects, Utils}
+import com.kotori316.fluidtank.{ModObjects, Utils}
 import com.kotori316.testutil.GameTestUtil.NO_PLACE_STRUCTURE
 import mekanism.api.chemical.gas.{Gas, GasStack}
 import mekanism.api.{AutomationType, NBTConstants, Action => MekanismAction}
@@ -15,14 +15,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.item.{BlockItem, ItemStack}
 import net.minecraftforge.fluids.capability.IFluidHandler
-import net.minecraftforge.gametest.{GameTestHolder, PrefixGameTestTemplate}
 import org.junit.jupiter.api.Assertions._
 
 import scala.annotation.unused
 import scala.util.chaining.scalaUtilChainingOps
 
-@GameTestHolder(value = FluidTank.modID)
-@PrefixGameTestTemplate(value = false)
+// @GameTestHolder(value = FluidTank.modID) // TODO enable this test after mekanism is released.
+// @PrefixGameTestTemplate(value = false)
 class MekanismGasTest {
   type TankAPI = mekanism.api.chemical.IChemicalTank[Gas, GasStack]
 

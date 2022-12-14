@@ -5,7 +5,7 @@ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger
 import net.minecraft.data.recipes.{FinishedRecipe, RecipeBuilder, SpecialRecipeBuilder}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer
+import net.minecraft.world.item.crafting.{CraftingRecipe, RecipeSerializer}
 import net.minecraftforge.common.crafting.conditions.ICondition
 
 case class RecipeSerializeHelper(recipe: FinishedRecipe,
@@ -35,7 +35,7 @@ case class RecipeSerializeHelper(recipe: FinishedRecipe,
 object RecipeSerializeHelper {
   def by(c: RecipeBuilder, saveName: ResourceLocation = null): RecipeSerializeHelper = new RecipeSerializeHelper(c, saveName)
 
-  def bySpecial(serializer: SimpleRecipeSerializer[_], recipeId: String, saveName: ResourceLocation = null): RecipeSerializeHelper = {
+  def bySpecial(serializer: RecipeSerializer[_ <: CraftingRecipe], recipeId: String, saveName: ResourceLocation = null): RecipeSerializeHelper = {
     val c = SpecialRecipeBuilder.special(serializer)
     var t: FinishedRecipe = null
     c.save(p => t = p, recipeId)

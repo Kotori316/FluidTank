@@ -52,12 +52,12 @@ public class ClientProxy extends SideProxy {
 
     @Override
     public Item.Properties getTankProperties() {
-        return new Item.Properties().tab(ModObjects.CREATIVE_TABS());
+        return new Item.Properties();
     }
 
     @Override
     public Item.Properties getReservoirProperties() {
-        return new Item.Properties().tab(ModObjects.CREATIVE_TABS());
+        return new Item.Properties();
     }
 
 
@@ -85,25 +85,18 @@ public class ClientProxy extends SideProxy {
     }
 
     @SubscribeEvent
-    public void onBake(ModelEvent.BakingCompleted event) {
+    public void onBake(ModelEvent.ModifyBakingResult event) {
         CollectionConverters.asJava(ModObjects.itemReservoirs()).stream()
             .map(ForgeRegistries.ITEMS::getKey)
             .filter(Objects::nonNull)
             .map(n -> new ModelResourceLocation(n, "inventory"))
-            .forEach(n -> event.getModels().put(n, new ModelWrapper(event.getModelManager().getModel(n))));
-    }
-
-    @SubscribeEvent
-    public void registerTexture(TextureStitchEvent.Pre event) {
-        if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-            event.addSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
-        }
+            .forEach(n -> event.getModels().put(n, new ModelWrapper(event.getModels().get(n))));
     }
 
     @SubscribeEvent
     public void putTexture(TextureStitchEvent.Post event) {
         if (event.getAtlas().location().equals(InventoryMenu.BLOCK_ATLAS)) {
-            whiteTexture = event.getAtlas().getSprite(new ResourceLocation(FluidTank.modID, "blocks/white"));
+            whiteTexture = event.getAtlas().getSprite(new ResourceLocation(FluidTank.modID, "block/white"));
         }
     }
 }

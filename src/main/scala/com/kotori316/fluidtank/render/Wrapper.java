@@ -2,8 +2,8 @@ package com.kotori316.fluidtank.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector4f;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 record Wrapper(VertexConsumer buffer) {
 
@@ -13,7 +13,7 @@ record Wrapper(VertexConsumer buffer) {
         Matrix4f matrix4f = matrix.last().pose();
 
         vector4f.set(x, y, z, 1.0F);
-        vector4f.transform(matrix4f);
+        vector4f.mul(matrix4f);
         return vector4f;
     }
 

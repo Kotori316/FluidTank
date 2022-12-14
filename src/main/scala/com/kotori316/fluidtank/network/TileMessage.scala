@@ -3,7 +3,8 @@ package com.kotori316.fluidtank.network
 import java.util.function.Supplier
 
 import com.kotori316.fluidtank.FluidTank
-import net.minecraft.core.{BlockPos, Registry}
+import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceKey
@@ -38,7 +39,7 @@ class TileMessage(pos: BlockPos, dim: ResourceKey[Level], tag: CompoundTag) {
 object TileMessage {
   def apply(buffer: FriendlyByteBuf): TileMessage = {
     val pos = buffer.readBlockPos()
-    val dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, buffer.readResourceLocation())
+    val dim = ResourceKey.create(Registries.DIMENSION, buffer.readResourceLocation())
     val nbt = buffer.readNbt()
     new TileMessage(pos, dim, nbt)
   }
