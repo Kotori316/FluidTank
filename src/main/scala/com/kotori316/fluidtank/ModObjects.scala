@@ -8,6 +8,7 @@ import com.kotori316.fluidtank.transport.{FluidPipeBlock, ItemPipeBlock, ItemPip
 import com.mojang.datafixers.DSL
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.{BlockPos, Registry}
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{CreativeModeTab, Item, ItemStack}
 import net.minecraft.world.level.block.Block
@@ -26,6 +27,7 @@ object ModObjects {
 
   final def createTab(builder: CreativeModeTab.Builder): Unit = {
     builder.icon(() => new ItemStack(woodTank))
+    builder.title(Component.translatable("itemGroup.fluidtank"))
     builder.displayItems { (_, output, _) =>
       allItems.foreach(entry => output.accept(entry.t))
       locally {

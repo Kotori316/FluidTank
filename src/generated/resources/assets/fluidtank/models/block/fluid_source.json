@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/cube_column",
   "textures": {
-    "end": "fluidtank:blocks/white",
-    "side": "fluidtank:blocks/fluid_source"
+    "end": "fluidtank:block/white",
+    "side": "fluidtank:block/fluid_source"
   }
 }

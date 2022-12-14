@@ -26,7 +26,7 @@ final class StateAndModelProvider extends BlockStateProvider {
     }
 
     private ResourceLocation blockTexture(String name) {
-        return modLoc("blocks/" + name);
+        return modLoc("block/" + name);
     }
 
     @Override
@@ -251,6 +251,6 @@ final class StateAndModelProvider extends BlockStateProvider {
         ResourceLocation item = reservoirItem.registryName();
         itemModels().getBuilder(item.toString())
             .parent(new ModelFile.UncheckedModelFile("item/generated"))
-            .texture("layer0", new ResourceLocation(item.getNamespace(), "items/" + item.getPath()));
+            .texture("layer0", new ResourceLocation(item.getNamespace(), "item/" + item.getPath()));
     }
 }

@@ -1,5 +1,10 @@
 {
   "type": "minecraft:block",
+  "functions": [
+    {
+      "function": "fluidtank:content_tank"
+    }
+  ],
   "pools": [
     {
       "bonus_rolls": 0.0,
@@ -11,11 +16,6 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "fluidtank:content_tank"
-            }
-          ],
           "name": "fluidtank:creative"
         }
       ],

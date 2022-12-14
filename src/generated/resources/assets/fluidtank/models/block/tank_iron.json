@@ -2,8 +2,8 @@
   "parent": "fluidtank:block/tanks",
   "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "fluidtank:blocks/iron1",
-    "side": "fluidtank:blocks/iron1",
-    "top": "fluidtank:blocks/iron2"
+    "particle": "fluidtank:block/iron1",
+    "side": "fluidtank:block/iron1",
+    "top": "fluidtank:block/iron2"
   }
 }

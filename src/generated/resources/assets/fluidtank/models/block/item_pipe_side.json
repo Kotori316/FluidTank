@@ -1,7 +1,7 @@
 {
   "parent": "fluidtank:block/pipe_side",
   "textures": {
-    "particle": "fluidtank:blocks/item_frame",
-    "texture": "fluidtank:blocks/item_frame"
+    "particle": "fluidtank:block/item_frame",
+    "texture": "fluidtank:block/item_frame"
   }
 }

@@ -21,7 +21,7 @@ import net.minecraft.tags.{ItemTags, TagKey}
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.{Item, Items}
-import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.{Block, Blocks}
 import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraftforge.common.Tags
@@ -237,6 +237,14 @@ object FluidTankDataProvider {
       ModObjects.gasTanks.foreach { b =>
         this.add(b, gasTankContent(b))
       }
+    }
+
+    override def getKnownBlocks: java.lang.Iterable[Block] = {
+      CollectionConverters.asJava(
+        ModObjects.blockTanks ++
+          Seq(ModObjects.blockSource, ModObjects.blockCat, ModObjects.blockItemPipe, ModObjects.blockFluidPipe) ++
+          ModObjects.gasTanks
+      )
     }
 
     private def tankContent(tankBlock: BlockTank): LootTable.Builder = createSingleItemTable(tankBlock).apply(ContentLootFunction.builder)
