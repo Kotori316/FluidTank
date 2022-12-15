@@ -226,7 +226,7 @@ object FluidTankDataProvider {
 
   }
 
-  final class LootSubProvider extends BlockLootSubProvider(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags()) {
+  final class LootSubProvider extends BlockLootSubProvider(Collections.emptySet(), FeatureFlags.DEFAULT_FLAGS) {
     override def generate(): Unit = {
       ModObjects.blockTanks.foreach { b =>
         this.add(b, tankContent(b))
