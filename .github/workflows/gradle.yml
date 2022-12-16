@@ -39,7 +39,7 @@ jobs:
   cross-check-JUnit:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19.3
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -76,7 +76,7 @@ jobs:
   run-data:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19.3
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -92,7 +92,7 @@ jobs:
   game-test:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19
+      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19.3
       credentials:
         username: kotori316
         password: ${{ secrets.GITHUB_TOKEN }}
