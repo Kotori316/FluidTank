@@ -249,7 +249,7 @@ dependencies {
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
         compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
         compileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion, classifier: "api"))
-        testImplementation(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
+        testCompileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
         // Used in game test
     }
     compileOnly(fg.deobf("mcp.mobius.waila:wthit-api:forge-${project.wthit_version}"))
