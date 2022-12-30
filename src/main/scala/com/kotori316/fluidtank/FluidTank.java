@@ -7,6 +7,8 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -44,11 +46,11 @@ public class FluidTank implements ModInitializer {
 
     public static class Register {
         public static void register() {
-            register(Registry.BLOCK_REGISTRY, Register::registerBlocks);
-            register(Registry.ITEM_REGISTRY, Register::registerItems);
-            register(Registry.BLOCK_ENTITY_TYPE_REGISTRY, Register::registerTiles);
-            register(Registry.MENU_REGISTRY, Register::registerContainerType);
-            register(Registry.RECIPE_SERIALIZER_REGISTRY, Register::registerSerializer);
+            register(Registries.BLOCK, Register::registerBlocks);
+            register(Registries.ITEM, Register::registerItems);
+            register(Registries.BLOCK_ENTITY_TYPE, Register::registerTiles);
+            register(Registries.MENU, Register::registerContainerType);
+            register(Registries.RECIPE_SERIALIZER, Register::registerSerializer);
         }
 
         private static <T> void register(ResourceKey<Registry<T>> registry, Consumer<RegisterHelper<T>> adderMethod) {
@@ -59,7 +61,7 @@ public class FluidTank implements ModInitializer {
         private record RegisterHelper<T>(ResourceKey<Registry<T>> key) {
             @SuppressWarnings("unchecked")
             void register(ResourceLocation location, T t) {
-                var registry = (Registry<T>) Registry.REGISTRY.get(key.location());
+                var registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());
                 assert registry != null;
                 Registry.register(registry, location, t);
             }

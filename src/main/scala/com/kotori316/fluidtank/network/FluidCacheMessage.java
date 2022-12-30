@@ -9,6 +9,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -36,7 +37,7 @@ public class FluidCacheMessage implements IMessage<FluidCacheMessage> {
 
     public FluidCacheMessage(FriendlyByteBuf buffer) {
         pos = buffer.readBlockPos();
-        dimensionId = ResourceKey.create(Registry.DIMENSION_REGISTRY, buffer.readResourceLocation());
+        dimensionId = ResourceKey.create(Registries.DIMENSION, buffer.readResourceLocation());
         int size = buffer.readInt();
         amounts = Stream.generate(buffer::readNbt).limit(size)
             .map(FluidAmount::fromNBT)

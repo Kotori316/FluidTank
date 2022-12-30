@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/cube_top",
   "textures": {
-    "side": "fluidtank:blocks/cat_side",
-    "top": "fluidtank:blocks/cat_front"
+    "side": "fluidtank:block/cat_side",
+    "top": "fluidtank:block/cat_front"
   }
 }

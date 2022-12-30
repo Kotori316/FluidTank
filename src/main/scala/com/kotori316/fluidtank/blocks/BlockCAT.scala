@@ -21,7 +21,7 @@ import scala.jdk.OptionConverters._
 class BlockCAT extends BaseEntityBlock(BlockBehaviour.Properties.of(ModObjects.MATERIAL).strength(0.7f)) {
   // Chest as Tank
   final val registryName = new ResourceLocation(FluidTank.modID, BlockCAT.NAME)
-  val itemBlock = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS))
+  val itemBlock = new BlockItem(this, new Item.Properties())
   registerDefaultState(this.getStateDefinition.any.setValue(FACING, Direction.NORTH))
 
   override def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit = builder.add(FACING)

@@ -1,7 +1,7 @@
 {
   "parent": "fluidtank:item/item_tank",
   "textures": {
-    "1": "fluidtank:blocks/tin1",
-    "2": "fluidtank:blocks/tin2"
+    "1": "fluidtank:block/tin1",
+    "2": "fluidtank:block/tin2"
   }
 }

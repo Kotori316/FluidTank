@@ -15,6 +15,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -146,7 +147,7 @@ public class Utils {
 
     @SuppressWarnings("unchecked")
     public static <T> Set<T> getTagElements(TagKey<T> tag) {
-        return Registry.REGISTRY.entrySet().stream()
+        return BuiltInRegistries.REGISTRY.entrySet().stream()
             .filter(e -> tag.isFor(e.getKey()))
             .map(Map.Entry::getValue)
             .findFirst()

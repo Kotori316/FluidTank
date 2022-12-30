@@ -2,8 +2,8 @@
   "parent": "fluidtank:block/tanks",
   "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "fluidtank:blocks/star1",
-    "side": "fluidtank:blocks/star1",
-    "top": "fluidtank:blocks/star2"
+    "particle": "fluidtank:block/star1",
+    "side": "fluidtank:block/star1",
+    "top": "fluidtank:block/star2"
   }
 }

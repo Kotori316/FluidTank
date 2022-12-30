@@ -16,7 +16,7 @@ import net.minecraft.world.level.{ClipContext, Level}
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.{InteractionHand, InteractionResult, InteractionResultHolder}
 
-class ReservoirItem(val tier: Tier) extends Item(new Item.Properties().tab(ModObjects.CREATIVE_TABS).stacksTo(1)) {
+class ReservoirItem(val tier: Tier) extends Item(new Item.Properties().stacksTo(1)) {
   final val registryName = new ResourceLocation(FluidTank.modID, "reservoir_" + tier.lowerName)
 
   // ---------- Fluid Interaction ----------

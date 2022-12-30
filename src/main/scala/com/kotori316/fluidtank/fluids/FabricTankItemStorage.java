@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ public final class FabricTankItemStorage implements SingleSlotStorage<FluidVaria
     }
 
     static String tankId() {
-        return Optional.ofNullable(Registry.BLOCK_ENTITY_TYPE.getKey(ModObjects.TANK_TYPE()))
+        return Optional.ofNullable(BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(ModObjects.TANK_TYPE()))
             .map(ResourceLocation::toString)
             .orElseThrow(() -> new IllegalStateException("No key for tank entity type."));
     }

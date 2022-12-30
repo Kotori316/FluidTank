@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.fluids
 import cats.implicits.catsSyntaxEq
 import cats.{Hash, Monoid, Show}
 import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -100,7 +101,7 @@ object FluidAmount {
     FluidAmount(fluid, amount, nbt)
   }
 
-  def registry: Registry[Fluid] = Registry.FLUID
+  def registry: Registry[Fluid] = BuiltInRegistries.FLUID
 
   implicit val showFA: Show[FluidAmount] = Show.fromToString
   implicit val hashFA: Hash[FluidAmount] = Hash.fromUniversalHashCode

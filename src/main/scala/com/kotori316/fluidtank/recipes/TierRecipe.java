@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -22,6 +23,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -225,6 +227,11 @@ public class TierRecipe implements CraftingRecipe {
         return Stream.concat(Stream.of(Pair.of(4, Ingredient.EMPTY)), Stream.concat(tankItemWithSlot(), subItemWithSlot()));
     }
 
+    @Override
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;
+    }
+
     public static final String KEY_TIER = "tier";
     public static final String KEY_SUB_ITEM = "sub_item";
 
@@ -251,7 +258,7 @@ public class TierRecipe implements CraftingRecipe {
             LOGGER.debug("Serializer loaded {} from packet for tier {}, sub {}.", recipeId, tier, Utils.convertIngredientToString(subItem));
             var ingredientTanks = buffer.readCollection(ArrayList::new, FriendlyByteBuf::readResourceLocation)
                 .stream()
-                .map(Registry.BLOCK::get)
+                .map(BuiltInRegistries.BLOCK::get)
                 .mapMulti(Utils.cast(BlockTank.class))
                 .collect(Collectors.toSet());
             return new TierRecipe(recipeId, tier, subItem, ingredientTanks);
@@ -276,7 +283,7 @@ public class TierRecipe implements CraftingRecipe {
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier) {
             this.recipeId = recipeId;
             this.tier = tier;
-            this.ingredient = Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(this.tier.tagName())));
+            this.ingredient = Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(this.tier.tagName())));
         }
 
         public TierFinishedRecipe(ResourceLocation recipeId, Tier tier, Ingredient ingredient) {

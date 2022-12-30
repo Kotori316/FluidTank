@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import org.jetbrains.annotations.Nullable
 
-class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties().tab(ModObjects.CREATIVE_TABS)) {
+class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties()) {
   final val registryName = new ResourceLocation(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
 
   override def getRarity(stack: ItemStack): Rarity =

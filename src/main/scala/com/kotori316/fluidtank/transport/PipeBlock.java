@@ -102,7 +102,7 @@ public abstract class PipeBlock extends Block implements EntityBlock {
                 .setValue(DOWN, Connection.NO_CONNECTION)
 //            .with(WATERLOGGED, false)
         );
-        blockItem = new BlockItem(this, new Item.Properties().tab(ModObjects.CREATIVE_TABS()));
+        blockItem = new BlockItem(this, new Item.Properties());
     }
 
     @NotNull
