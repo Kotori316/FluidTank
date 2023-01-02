@@ -22,6 +22,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.gametest.ForgeGameTestHooks;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.VisibleForTesting;
 import scala.jdk.javaapi.CollectionConverters;
 
 import com.kotori316.fluidtank.integration.ae2.TankAE2Plugin;
@@ -44,8 +45,16 @@ public class FluidTank {
     public static final SideProxy proxy = SideProxy.get();
 
     public FluidTank() {
+        registerConfig(false);
+        ForgeMod.enableMilkFluid();
+        FMLJavaModLoadingContext.get().getModEventBus().register(Register.class);
+        FMLJavaModLoadingContext.get().getModEventBus().register(proxy);
+    }
+
+    @VisibleForTesting
+    static void registerConfig(boolean inJUnitTest) {
         var configSpec = Config.sync(new ForgeConfigSpec.Builder());
-        if (ForgeGameTestHooks.isGametestServer()) {
+        if (inJUnitTest || ForgeGameTestHooks.isGametestServer()) {
             // In game test. Use in-memory config.
             final CommentedConfig commentedConfig = CommentedConfig.inMemory();
             configSpec.correct(commentedConfig);
@@ -53,9 +62,6 @@ public class FluidTank {
         } else {
             ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, configSpec);
         }
-        ForgeMod.enableMilkFluid();
-        FMLJavaModLoadingContext.get().getModEventBus().register(Register.class);
-        FMLJavaModLoadingContext.get().getModEventBus().register(proxy);
     }
 
     public static class Register {
