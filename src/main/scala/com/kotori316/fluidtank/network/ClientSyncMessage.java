@@ -6,7 +6,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -61,10 +60,12 @@ public final class ClientSyncMessage implements IMessage<ClientSyncMessage> {
             var world = client.level;
             if (world != null && world.dimension().equals(message.dim)) {
                 client.execute(() -> {
-                    if (world.getBlockEntity(message.pos) instanceof ClientSync tile) {
+                    var maybeTank = world.getBlockEntity(message.pos);
+                    if (maybeTank instanceof ClientSync tile) {
                         tile.fromClientTag(message.tag);
                     } else {
-                        FluidTank.LOGGER.warn("Tried to sync to {} in {}, but the tile isn't ClientSync", message.pos, message.dim);
+                        FluidTank.LOGGER.warn("Tried to sync to {} in {}, but the tile isn't ClientSync({})",
+                            message.pos, message.dim, maybeTank);
                     }
                 });
             }
