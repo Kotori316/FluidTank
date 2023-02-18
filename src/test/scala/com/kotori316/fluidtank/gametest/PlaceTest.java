@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 
 import com.kotori316.fluidtank.ModObjects;
 import com.kotori316.fluidtank.blocks.BlockTank;
+import com.kotori316.fluidtank.blocks.TankPos;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.Tier;
 import com.kotori316.fluidtank.tiles.TileTank;
@@ -157,5 +158,27 @@ public final class PlaceTest implements FabricGameTest {
     public void dummy(GameTestHelper helper) {
         // assert false : "Fail Test";
         helper.succeed();
+    }
+
+    @GameTest(template = EMPTY_STRUCTURE)
+    public void removeMiddleTank(GameTestHelper helper) {
+        var pos = BlockPos.ZERO.above();
+        helper.startSequence()
+            .thenExecute(() -> {
+                for (int i = 0; i < 3; i++) {
+                    helper.setBlock(pos.above(i), ModObjects.tierToBlock().apply(Tier.WOOD));
+                }
+            })
+            .thenExecuteAfter(1, () -> {
+                helper.assertBlockProperty(pos, TankPos.TANK_POS_PROPERTY, TankPos.BOTTOM);
+                helper.assertBlockProperty(pos.above(), TankPos.TANK_POS_PROPERTY, TankPos.MIDDLE);
+                helper.assertBlockProperty(pos.above(2), TankPos.TANK_POS_PROPERTY, TankPos.TOP);
+            })
+            .thenExecuteAfter(1, () -> helper.setBlock(pos.above(), Blocks.AIR))
+            .thenExecuteAfter(1, () -> {
+                helper.assertBlockProperty(pos, TankPos.TANK_POS_PROPERTY, TankPos.SINGLE);
+                helper.assertBlockProperty(pos.above(2), TankPos.TANK_POS_PROPERTY, TankPos.SINGLE);
+            })
+            .thenSucceed();
     }
 }

@@ -10,6 +10,7 @@
       "com.kotori316.fluidtank.gametest.SerializeTest",
       "com.kotori316.fluidtank.gametest.FillTest",
       "com.kotori316.fluidtank.gametest.RuntimeOnlyTest",
+      "com.kotori316.fluidtank.gametest.InteractionTest",
       "com.kotori316.fluidtank.gametest.DropTest"
     ]
   }
