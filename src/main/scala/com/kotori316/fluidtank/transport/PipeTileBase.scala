@@ -1,7 +1,7 @@
 package com.kotori316.fluidtank.transport
 
 import cats.implicits._
-import com.kotori316.fluidtank.network.{ClientSyncMessage, PacketHandler}
+import com.kotori316.fluidtank.network.ClientSync
 import com.kotori316.fluidtank.transport.NeighborInstance._
 import com.kotori316.fluidtank.{FluidTank, _}
 import net.minecraft.core.BlockPos
@@ -10,7 +10,7 @@ import net.minecraft.world.item.DyeColor
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.state.BlockState
 
-abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, s: BlockState) extends BlockEntity(t, p, s) {
+abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, s: BlockState) extends BlockEntity(t, p, s) with ClientSync {
   var connection: PipeConnection2[BlockPos] = getEmptyConnection
   private[this] final var color = FluidTank.config.pipeColor
 
@@ -65,6 +65,13 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
 
   override def getUpdateTag: CompoundTag = saveWithoutMetadata()
 
+  override def fromClientTag(tag: CompoundTag): Unit = load(tag)
+
+  override def toClientTag(tag: CompoundTag): CompoundTag = {
+    saveAdditional(tag)
+    tag
+  }
+
   def changeColor(color: DyeColor): Unit = changeColor(colorInt = color.getMaterialColor.col)
 
   def changeColor(colorInt: Int): Unit =
@@ -72,9 +79,7 @@ abstract class PipeTileBase(t: BlockEntityType[_ <: PipeTileBase], p: BlockPos, 
 
   def setColor(c: Int): Unit = {
     this.color = c
-    if (level != null && !level.isClientSide) {
-      PacketHandler.sendToClientWorld(new ClientSyncMessage(this), level)
-    }
+    this.sync()
   }
 
   def getColor: Int = this.color

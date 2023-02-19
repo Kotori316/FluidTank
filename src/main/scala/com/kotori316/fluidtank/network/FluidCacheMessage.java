@@ -8,7 +8,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.Utils;
 import com.kotori316.fluidtank.fluids.FluidAmount;
 import com.kotori316.fluidtank.tiles.CATTile;
 
@@ -63,8 +63,13 @@ public class FluidCacheMessage implements IMessage<FluidCacheMessage> {
             var world = client.level;
             if (world != null && world.dimension().equals(message.dimensionId)) {
                 client.execute(() -> {
-                    if (world.getBlockEntity(message.pos) instanceof CATTile tile) {
+                    var maybeCat = world.getBlockEntity(message.pos);
+                    if (maybeCat instanceof CATTile tile) {
                         tile.fluidCache = message.amounts;
+                    } else {
+                        Utils.runOnce("%s-%s-%s".formatted(message.dimensionId.location(), message.pos, Utils.getClassName(maybeCat)),
+                            () -> FluidTank.LOGGER.error("Tried to sync to {} in {}, but the tile isn't CATTile({})",
+                                message.pos, message.dimensionId, maybeCat));
                     }
                 });
             }

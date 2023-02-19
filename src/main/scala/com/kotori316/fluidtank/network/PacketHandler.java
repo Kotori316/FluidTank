@@ -53,7 +53,7 @@ public class PacketHandler {
         ServerPlayNetworking.send(player, message.getIdentifier(), packet);
     }
 
-    public static void sendToClientWorld(@NotNull IMessage<?> message, Level level) {
+    public static void sendToClientWorld(@NotNull IMessage<?> message, @NotNull Level level) {
         var packet = PacketByteBufs.create();
         message.writeToBuffer(packet);
         for (ServerPlayer player : PlayerLookup.world((ServerLevel) level)) {

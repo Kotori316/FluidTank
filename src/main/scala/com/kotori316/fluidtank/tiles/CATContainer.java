@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import com.kotori316.fluidtank.FluidTank;
 import com.kotori316.fluidtank.ModObjects;
@@ -17,6 +18,7 @@ import com.kotori316.fluidtank.network.PacketHandler;
 
 public class CATContainer extends AbstractContainerMenu {
     public static final String GUI_ID = FluidTank.modID + ":gui_chest_as_tank";
+    @NotNull
     public final CATTile catTile;
 
     /**
@@ -28,8 +30,7 @@ public class CATContainer extends AbstractContainerMenu {
 
     public CATContainer(int id, Player player, BlockPos pos) {
         super(ModObjects.CAT_CONTAINER_TYPE(), id);
-        catTile = (CATTile) player.getCommandSenderWorld().getBlockEntity(pos);
-        Objects.requireNonNull(catTile);
+        catTile = Objects.requireNonNull((CATTile) player.getCommandSenderWorld().getBlockEntity(pos));
 
         int oneBox = 18;
         for (int h = 0; h < 3; h++) {
@@ -50,7 +51,7 @@ public class CATContainer extends AbstractContainerMenu {
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
-        PacketHandler.sendToClientWorld(new FluidCacheMessage(catTile), catTile.getLevel());
+        PacketHandler.sendToClientWorld(new FluidCacheMessage(catTile), Objects.requireNonNull(catTile.getLevel()));
     }
 
     @Override
