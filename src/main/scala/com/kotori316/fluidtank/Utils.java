@@ -1,6 +1,7 @@
 package com.kotori316.fluidtank;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -172,5 +173,18 @@ public class Utils {
 
     public static boolean isServer(BlockEntity entity) {
         return entity.getLevel() != null && !entity.getLevel().isClientSide;
+    }
+
+    private static final ThreadLocal<Set<String>> runOnceMap = ThreadLocal.withInitial(HashSet::new);
+
+    public static void runOnce(String key, Runnable action) {
+        if (runOnceMap.get().add(key)) {
+            action.run();
+        }
+    }
+
+    public static String getClassName(@Nullable Object o) {
+        if (o == null) return "null";
+        return o.getClass().getName();
     }
 }
