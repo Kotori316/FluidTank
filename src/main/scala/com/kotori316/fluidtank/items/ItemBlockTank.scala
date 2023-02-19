@@ -1,10 +1,12 @@
 package com.kotori316.fluidtank.items
 
+import java.util.Locale
+
+import com.kotori316.fluidtank.FluidTank
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
 import com.kotori316.fluidtank.tiles.TileTank
-import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import net.fabricmc.api.{EnvType, Environment}
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
@@ -19,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState
 import org.jetbrains.annotations.Nullable
 
 class ItemBlockTank(val blockTank: BlockTank) extends BlockItem(blockTank, new Item.Properties()) {
-  final val registryName = new ResourceLocation(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase)
+  final val registryName = new ResourceLocation(FluidTank.modID, blockTank.namePrefix + blockTank.tier.toString.toLowerCase(Locale.ROOT))
 
   override def getRarity(stack: ItemStack): Rarity =
     if (BlockItem.getBlockEntityData(stack) != null) Rarity.RARE

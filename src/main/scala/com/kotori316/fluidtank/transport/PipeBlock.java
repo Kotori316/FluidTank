@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.transport;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -290,7 +291,7 @@ public abstract class PipeBlock extends Block implements EntityBlock {
         OUTPUT;
 
         public String getName() {
-            return name().toLowerCase();
+            return name().toLowerCase(Locale.ROOT);
         }
 
         public boolean is(Connection c1, Connection... cs) {

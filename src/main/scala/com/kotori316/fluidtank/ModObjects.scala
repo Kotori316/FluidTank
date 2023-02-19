@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank
 
+import java.util.Locale
+
 import com.kotori316.fluidtank.blocks._
 import com.kotori316.fluidtank.items.ReservoirItem
 import com.kotori316.fluidtank.tiles._
@@ -83,7 +85,7 @@ object ModObjects {
 
   def createTileType[T <: BlockEntity](supplier: (BlockPos, BlockState) => T, blocks: Seq[Block])(implicit tag: ClassTag[T]): BlockEntityType[T] = {
     val t = BlockEntityType.Builder.of[T]((p, s) => supplier(p, s), blocks: _*).build(DSL.emptyPartType())
-    types = new NamedEntry(new ResourceLocation(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase), t) :: types
+    types = new NamedEntry(new ResourceLocation(FluidTank.modID, tag.runtimeClass.getSimpleName.toLowerCase(Locale.ROOT)), t) :: types
     t
   }
 

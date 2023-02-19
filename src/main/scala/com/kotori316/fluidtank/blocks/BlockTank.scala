@@ -1,5 +1,7 @@
 package com.kotori316.fluidtank.blocks
 
+import java.util.Locale
+
 import com.kotori316.fluidtank._
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.items.ItemBlockTank
@@ -28,7 +30,7 @@ class BlockTank(val tier: Tier) extends Block(BlockBehaviour.Properties.of(ModOb
   Invisible tank -> "fluidtank:invisible_tank_wood"
   Creative Tank -> "fluidtank:creative"
    */
-  final val registryName = new ResourceLocation(FluidTank.modID, namePrefix + tier.toString.toLowerCase)
+  final val registryName = new ResourceLocation(FluidTank.modID, namePrefix + tier.toString.toLowerCase(Locale.ROOT))
   registerDefaultState(this.getStateDefinition.any.setValue(TankPos.TANK_POS_PROPERTY, TankPos.SINGLE))
   final val itemBlock: ItemBlockTank = createTankItem()
 
