@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import com.kotori316.fluidtank.FluidTank;
+import com.kotori316.fluidtank.Utils;
 
 /**
  * To Client Only.
@@ -64,8 +65,9 @@ public final class ClientSyncMessage implements IMessage<ClientSyncMessage> {
                     if (maybeTank instanceof ClientSync tile) {
                         tile.fromClientTag(message.tag);
                     } else {
-                        FluidTank.LOGGER.warn("Tried to sync to {} in {}, but the tile isn't ClientSync({})",
-                            message.pos, message.dim, maybeTank);
+                        Utils.runOnce("%s-%s-%s".formatted(message.dim.location(), message.pos, Utils.getClassName(maybeTank)),
+                            () -> FluidTank.LOGGER.error("Tried to sync to {} in {}, but the tile isn't ClientSync({})",
+                                message.pos, message.dim, maybeTank));
                     }
                 });
             }
