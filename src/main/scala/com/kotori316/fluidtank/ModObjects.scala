@@ -64,8 +64,8 @@ object ModObjects {
     blockTanks.map(_.itemBlock).map(i => new NamedEntry(i.registryName, i)) ++
       Seq(
         new NamedEntry(blockCat.registryName, blockCat.itemBlock),
-        new NamedEntry(blockFluidPipe.registryName, blockFluidPipe.itemBlock),
-        new NamedEntry(blockItemPipe.registryName, blockItemPipe.itemBlock),
+        // new NamedEntry(blockFluidPipe.registryName, blockFluidPipe.itemBlock),
+        // new NamedEntry(blockItemPipe.registryName, blockItemPipe.itemBlock),
         new NamedEntry(blockSource.registryName, blockSource.itemBlock),
       ) ++
       // gasTanks.map(_.itemBlock).map(i => new NamedEntry(i.registryName, i)) ++
