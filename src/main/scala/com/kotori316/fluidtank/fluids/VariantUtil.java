@@ -49,12 +49,12 @@ public final class VariantUtil {
     }
 
     public static boolean isFluidContainer(ItemStack stack) {
-        var storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack));
+        var storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
         return storage != null;
     }
 
     public static FluidAmount getFluidInItem(ItemStack stack) {
-        var storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack));
+        var storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
         if (storage != null) {
             for (StorageView<FluidVariant> view : storage) {
                 var variant = view.getResource();
@@ -95,14 +95,14 @@ public final class VariantUtil {
     }
 
     public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, ItemStack itemSource) {
-        return fillFluidContainer(container, itemSource, ContainerItemContext.withInitial(itemSource));
+        return fillFluidContainer(container, itemSource, ContainerItemContext.withConstant(itemSource), false);
     }
 
     public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, Player player, InteractionHand hand) {
-        return fillFluidContainer(container, player.getItemInHand(hand), ContainerItemContext.ofPlayerHand(player, hand));
+        return fillFluidContainer(container, player.getItemInHand(hand), ContainerItemContext.forPlayerInteraction(player, hand), player.isCreative());
     }
 
-    public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, ItemStack itemSource, ContainerItemContext itemStorage) {
+    public static Option<BucketEventHandler.TransferResult> fillFluidContainer(FluidContainer container, ItemStack itemSource, ContainerItemContext itemStorage, boolean isCreative) {
         var fluidStorage = FluidStorage.ITEM.find(itemSource, itemStorage);
         // Not a fluid storage item.
         if (fluidStorage == null || !fluidStorage.supportsExtraction()) return Option.empty();
@@ -132,7 +132,12 @@ public final class VariantUtil {
         try (var transaction = Transaction.openOuter()) {
             var result = fluidStorage.extract(convert(fillSimulation), fillSimulation.fabricAmount(), transaction);
             drainExecution = fillSimulation.setAmountF(result);
-            transaction.commit();
+            if (isCreative) {
+                // Remove emptied item.
+                transaction.abort();
+            } else {
+                transaction.commit();
+            }
         }
         container.fill(drainExecution, FluidAction.EXECUTE);
         var drainedItem = itemStorage.getItemVariant().toStack(Utils.toInt(itemStorage.getAmount()));
@@ -141,14 +146,14 @@ public final class VariantUtil {
     }
 
     public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, ItemStack stack, FluidAmount tankContent) {
-        return fillItemContainer(tank, stack, tankContent, ContainerItemContext.withInitial(stack));
+        return fillItemContainer(tank, stack, tankContent, ContainerItemContext.withConstant(stack), false);
     }
 
     public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, FluidAmount tankContent, Player player, InteractionHand hand) {
-        return fillItemContainer(tank, player.getItemInHand(hand), tankContent, ContainerItemContext.ofPlayerHand(player, hand));
+        return fillItemContainer(tank, player.getItemInHand(hand), tankContent, ContainerItemContext.forPlayerInteraction(player, hand), player.isCreative());
     }
 
-    public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, ItemStack stack, FluidAmount tankContent, ContainerItemContext itemStorage) {
+    public static Option<BucketEventHandler.TransferResult> fillItemContainer(FluidContainer tank, ItemStack stack, FluidAmount tankContent, ContainerItemContext itemStorage, boolean isCreative) {
         var fluidStorage = FluidStorage.ITEM.find(stack, itemStorage);
         // Not a fluid storage item.
         if (fluidStorage == null || !fluidStorage.supportsInsertion() || tankContent.isEmpty()) return Option.empty();
@@ -164,7 +169,8 @@ public final class VariantUtil {
         var drainExecution = tank.drain(drained, FluidAction.EXECUTE);
         try (var transaction = Transaction.openOuter()) {
             fluidStorage.insert(convert(drainExecution), drainExecution.fabricAmount(), transaction);
-            transaction.commit();
+            // Insert filled stack in survival only.
+            if (!isCreative) transaction.commit();
         }
         var filledItem = itemStorage.getItemVariant().toStack(Utils.toInt(itemStorage.getAmount()));
         var fillSound = FluidVariantAttributes.getFillSound(convert(drainExecution));
