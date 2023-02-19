@@ -256,7 +256,7 @@ def joinedLog = String.join("\n", List.of(
         "",
         "See https://github.com/Kotori316/FluidTank/tree/${BRANCH} to get all change log.",
         "",
-        "Built with:",
+        "Libs:",
         "",
         "* Minecraft ${project.minecraft_version}",
         "* Mapping Official ${project.minecraft_version}",
@@ -342,7 +342,7 @@ publishing {
             from components.java
             pom {
                 name = archivesBaseName
-                description = "FluidTank for Minecraft ${project.minecraft_version}, build with Fabric ${project.fabric_version}"
+                description = "FluidTank for Minecraft ${project.minecraft_version}, built with Fabric ${project.fabric_version}"
                 url = 'https://github.com/Kotori316/FluidTank/commits/' + BRANCH
                 packaging = "jar"
                 withXml {
