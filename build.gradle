@@ -79,7 +79,7 @@ sourceSets {
 @SuppressWarnings("SpellCheckingInspection")
 private static boolean isInCI() {
     return Boolean.parseBoolean(System.getenv("GITHUB_ACTIONS")) || Boolean.parseBoolean(System.getenv("CI")) ||
-            (!System.getProperty("os.name").toLowerCase().startsWith("windows") && Files.exists(Paths.get("/", ".dockerenv")))
+            (!System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows") && Files.exists(Paths.get("/", ".dockerenv")))
 }
 
 repositories {
@@ -95,8 +95,8 @@ repositories {
         name = "Azure-SLP"
         url = uri("https://pkgs.dev.azure.com/Kotori316/minecraft/_packaging/mods/maven/v1")
         content {
-            it.includeModule("com.kotori316", "ScalableCatsForce".toLowerCase())
-            it.includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase())
+            it.includeModule("com.kotori316", "ScalableCatsForce".toLowerCase(Locale.ROOT))
+            it.includeModule("com.kotori316", "ScalableCatsForce-MixIn".toLowerCase(Locale.ROOT))
             it.includeModule("org.typelevel", "cats-core_2.13")
             it.includeModule("org.typelevel", "cats-kernel_2.13")
             it.includeVersion("com.kotori316", "test_utility_dependency", "1.0-SNAPSHOT")
@@ -332,7 +332,7 @@ publishing {
     }
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "FluidTank".toLowerCase()
+            artifactId = "FluidTank".toLowerCase(Locale.ROOT)
             if (isInCI()) {
                 version = "${project.snapshot_version}.0-fabric-SNAPSHOT"
             } else {

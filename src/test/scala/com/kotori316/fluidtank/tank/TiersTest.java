@@ -2,6 +2,7 @@ package com.kotori316.fluidtank.tank;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -76,8 +77,8 @@ class TiersTest extends BeforeAllTest {
     @ParameterizedTest
     @MethodSource("fieldNames")
     void ignoreCase(String name, Field field) {
-        var lowerCase = FluidTank.config.capacity.get(name.toLowerCase());
-        var upperCase = FluidTank.config.capacity.get(name.toUpperCase());
+        var lowerCase = FluidTank.config.capacity.get(name.toLowerCase(Locale.ROOT));
+        var upperCase = FluidTank.config.capacity.get(name.toUpperCase(Locale.ROOT));
         assertEquals(lowerCase, upperCase, field.getName());
     }
 }
