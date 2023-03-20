@@ -14,28 +14,6 @@ on:
       - "1.19"
 
 jobs:
-  assemble:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19.3
-      credentials:
-        username: kotori316
-        password: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Make Java dir
-        run: mkdir -p src/main/java
-      - name: Assemble
-        run: chmod +x ./gradlew && ./gradlew assemble --no-daemon
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish
-        uses: actions/upload-artifact@v3
-        if: github.event_name != 'pull_request'
-        with:
-          path: build/libs/*
-          name: ${{ github.event.repository.name }}-${{ github.run_number }}
-
   cross-check-JUnit:
     runs-on: ubuntu-latest
     container:
@@ -46,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        forge: [ 1.19.3, default ]
+        forge: [ 1.19.4, default ]
     steps:
       - uses: actions/checkout@v3
       - name: Get latest version
@@ -61,46 +39,18 @@ jobs:
       - name: Java Toolchains
         if: ${{ env.SAME_DEFAULT == 'false' }}
         run: chmod +x ./gradlew && ./gradlew checkMethod javaToolchains --no-daemon
+      - name: Assemble
+        if: ${{ env.SAME_DEFAULT == 'false' }}
+        run: chmod +x ./gradlew && ./gradlew assemble --no-daemon
       - name: Test with JUnit
         if: ${{ env.SAME_DEFAULT == 'false' }}
-        run: chmod +x ./gradlew && ./gradlew --no-daemon test
+        run: chmod +x ./gradlew && ./gradlew --no-daemon test runGameTestServer runData
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IGNORE_OTHER_MODS_IN_RUNTIME: true
       - name: Upload failed test report
         if: failure()
         uses: actions/upload-artifact@v3
         with:
           path: build/reports/tests/*
           name: Test-Report-${{ github.run_number }}-${{ matrix.forge }}
-
-  run-data:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19.3
-      credentials:
-        username: kotori316
-        password: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Set version
-        run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
-      - name: RunData
-        run: chmod +x ./gradlew && ./gradlew runData
-        env:
-          IGNORE_OTHER_MODS_IN_RUNTIME: true
-
-  game-test:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/kotori316/fictional-meme/fictional-meme:1.19.3
-      credentials:
-        username: kotori316
-        password: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Set version
-        run: echo "CI_FORGE=$(cat /forge.txt)" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
-      - name: GameTest
-        run: chmod +x ./gradlew && ./gradlew runGameTestServer
-        env:
-          IGNORE_OTHER_MODS_IN_RUNTIME: true
