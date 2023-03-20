@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -91,7 +92,7 @@ public class CombineRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv) {
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess access) {
         Optional<GenericAmount<Fluid>> fluid = IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
             .map(s -> getHandler(s)

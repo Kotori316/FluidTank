@@ -39,7 +39,7 @@ object FluidTankTOPPlugin {
 
   def toInfo(compact: Boolean, short: Boolean, contentName: String, amount: Long, capacity: Long, tier: Tier, comparatorLevel: Int, hasCreative: Boolean): Seq[Component] = {
     val numberFormatter: Number => String = if (compact) {
-      val locale = Minecraft.getInstance.getLanguageManager.getSelected.getJavaLocale
+      val locale = Minecraft.getInstance.getLanguageManager.getJavaLocale
       val formatter = NumberFormat.getCompactNumberInstance(locale, NumberFormat.Style.SHORT)
       formatter.setMinimumFractionDigits(1)
       formatter.setRoundingMode(RoundingMode.DOWN)

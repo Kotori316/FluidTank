@@ -28,7 +28,7 @@ object ModObjects {
   final def createTab(builder: CreativeModeTab.Builder): Unit = {
     builder.icon(() => new ItemStack(woodTank))
     builder.title(Component.translatable("itemGroup.fluidtank"))
-    builder.displayItems { (_, output, _) =>
+    builder.displayItems { (_, output) =>
       allItems.foreach(entry => output.accept(entry.t))
       locally {
         val stack = new ItemStack(blockSource)

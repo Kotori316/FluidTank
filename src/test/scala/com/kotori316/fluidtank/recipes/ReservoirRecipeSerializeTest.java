@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBufAllocator;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -53,9 +54,9 @@ final class ReservoirRecipeSerializeTest extends BeforeAllTest {
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
-            () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+            () -> assertNotEquals(Items.AIR, read.getResultItem(RegistryAccess.EMPTY).getItem()),
             () -> assertEquals(convertIngredients(recipe.getIngredients()), convertIngredients(read.getIngredients()), "All ingredients must be same."),
-            () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
+            () -> assertEquals(recipe.getResultItem(RegistryAccess.EMPTY).getItem(), read.getResultItem(RegistryAccess.EMPTY).getItem())
         );
     }
 
@@ -70,9 +71,9 @@ final class ReservoirRecipeSerializeTest extends BeforeAllTest {
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
-            () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
+            () -> assertNotEquals(Items.AIR, read.getResultItem(RegistryAccess.EMPTY).getItem()),
             () -> assertEquals(convertIngredients(recipe.getIngredients()), convertIngredients(read.getIngredients()), "All ingredients must be same."),
-            () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem())
+            () -> assertEquals(recipe.getResultItem(RegistryAccess.EMPTY).getItem(), read.getResultItem(RegistryAccess.EMPTY).getItem())
         );
     }
 

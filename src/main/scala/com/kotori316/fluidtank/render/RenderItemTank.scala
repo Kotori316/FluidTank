@@ -7,12 +7,11 @@ import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.block.model.ItemTransforms
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.{BlockEntityWithoutLevelRenderer, MultiBufferSource}
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.BlockPos
-import net.minecraft.world.item.{BlockItem, ItemStack}
+import net.minecraft.world.item.{BlockItem, ItemDisplayContext, ItemStack}
 import net.minecraftforge.api.distmarker.{Dist, OnlyIn}
 
 import scala.collection.mutable
@@ -23,7 +22,7 @@ class RenderItemTank extends BlockEntityWithoutLevelRenderer(Minecraft.getInstan
   lazy val tileTank = new TileTank(BlockPos.ZERO, ModObjects.blockTanks.head.defaultBlockState())
   private final val modelWrapperMap = mutable.Map.empty[BakedModel, TankModelWrapper]
 
-  override def renderByItem(stack: ItemStack, cameraType: ItemTransforms.TransformType, matrixStack: PoseStack,
+  override def renderByItem(stack: ItemStack, cameraType: ItemDisplayContext, matrixStack: PoseStack,
                             renderTypeBuffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: ItemBlockTank =>
@@ -42,7 +41,7 @@ class RenderItemTank extends BlockEntityWithoutLevelRenderer(Minecraft.getInstan
         val compound = BlockItem.getBlockEntityData(stack)
         if (compound != null)
           tileTank.readNBTClient(compound)
-//        RenderHelper.disableStandardItemLighting()
+        //        RenderHelper.disableStandardItemLighting()
         Minecraft.getInstance.getBlockEntityRenderDispatcher.renderItem(
           tileTank, matrixStack, renderTypeBuffer, light, otherLight
         )
@@ -56,7 +55,7 @@ class RenderItemTank extends BlockEntityWithoutLevelRenderer(Minecraft.getInstan
     val tankModelWrapper = modelWrapperMap.getOrElseUpdate(model, new TankModelWrapper(model))
     matrixStack.pushPose()
     matrixStack.translate(0.5D, 0.5D, 0.5D)
-    renderer.render(stack, ItemTransforms.TransformType.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, tankModelWrapper)
+    renderer.render(stack, ItemDisplayContext.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, tankModelWrapper)
     matrixStack.popPose()
   }
 

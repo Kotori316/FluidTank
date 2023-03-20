@@ -39,7 +39,7 @@ public class Localize {
     public static final String NBT_Creative = "Creative";
 
     public static List<? extends Component> getTooltipText(CompoundTag tankData, TileTank tank, boolean shortInfo, boolean compactAmount) {
-        return getTooltipText(tankData, tank, shortInfo, compactAmount, Minecraft.getInstance().getLanguageManager().getSelected().getJavaLocale());
+        return getTooltipText(tankData, tank, shortInfo, compactAmount, Minecraft.getInstance().getLanguageManager().getJavaLocale());
     }
 
     public static List<? extends Component> getTooltipText(CompoundTag tankData, TileTank tank, boolean shortInfo, boolean compactAmount, Locale locale) {

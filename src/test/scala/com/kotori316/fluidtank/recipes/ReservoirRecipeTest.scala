@@ -3,6 +3,7 @@ package com.kotori316.fluidtank.recipes
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.tiles.Tier
 import com.kotori316.fluidtank.{BeforeAllTest, FluidTank, ModObjects}
+import net.minecraft.core.RegistryAccess
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.{ItemStack, Items}
@@ -24,7 +25,7 @@ class ReservoirRecipeTest extends BeforeAllTest {
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
-    assertFalse(recipe.assemble(inv).hasTag)
+    assertFalse(recipe.assemble(inv, RegistryAccess.EMPTY).hasTag)
   }
 
   @Test
@@ -32,7 +33,7 @@ class ReservoirRecipeTest extends BeforeAllTest {
     val recipe = new ReservoirRecipe(new ResourceLocation(FluidTank.modID, "stone"), Tier.STONE, List(Ingredient.of(Items.BUCKET)).asJava)
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(stone), 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
-    assertFalse(recipe.assemble(inv).hasTag)
+    assertFalse(recipe.assemble(inv, RegistryAccess.EMPTY).hasTag)
   }
 
   @Test
@@ -61,7 +62,7 @@ class ReservoirRecipeTest extends BeforeAllTest {
       assertTrue(recipe.matches(inv, null))
       val stacks = recipe.getRemainingItems(inv)
       assertTrue(stacks.stream().allMatch(_.isEmpty))
-      assertFalse(recipe.assemble(inv).hasTag)
+      assertFalse(recipe.assemble(inv, RegistryAccess.EMPTY).hasTag)
     }
     locally {
       val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> new ItemStack(wood), 'b' -> new ItemStack(Items.BUCKET)))
@@ -81,7 +82,7 @@ class ReservoirRecipeTest extends BeforeAllTest {
       assertTrue(recipe.matches(inv, null))
       val stacks = recipe.getRemainingItems(inv)
       assertTrue(stacks.stream().allMatch(_.isEmpty))
-      assertFalse(recipe.assemble(inv).hasTag)
+      assertFalse(recipe.assemble(inv, RegistryAccess.EMPTY).hasTag)
     }
     val invalidRecipes: Seq[Executable] = "alt".combinations(2).flatMap(_.permutations).map[Executable] { recipeStr =>
       val inv = RecipeInventoryUtil.getInv(recipeStr, itemMap = itemMap)
@@ -99,7 +100,7 @@ class ReservoirRecipeTest extends BeforeAllTest {
     val inv = RecipeInventoryUtil.getInv("tb", itemMap = Map('t' -> tank, 'b' -> new ItemStack(Items.BUCKET)))
     assertTrue(recipe.matches(inv, null))
 
-    val result = recipe.assemble(inv)
+    val result = recipe.assemble(inv, RegistryAccess.EMPTY)
     val handler = RecipeInventoryUtil.getFluidHandler(result)
     assertEquals(fluid, handler.getFluid)
     assertEquals(Tier.STONE.amount, handler.getCapacity)

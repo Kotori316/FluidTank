@@ -1,10 +1,10 @@
 package com.kotori316.fluidtank.recipes;
 
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -82,12 +82,12 @@ final class StateAndModelProvider extends BlockStateProvider {
             .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
             .guiLight(BlockModel.GuiLight.SIDE)
             .transforms()
-            .transform(ItemTransforms.TransformType.GUI).scale(0.625f).translation(0, 0, 0).rotation(30, 225, 0).end()
-            .transform(ItemTransforms.TransformType.GROUND).scale(0.25f).translation(0, 3, 0).rotation(0, 0, 0).end()
-            .transform(ItemTransforms.TransformType.FIXED).scale(0.5f).translation(0, 0, 0).rotation(0, 0, 0).end()
-            .transform(ItemTransforms.TransformType.THIRD_PERSON_RIGHT_HAND).scale(0.375f).translation(0, 2.5f, 0).rotation(75, 45, 0).end()
-            .transform(ItemTransforms.TransformType.FIRST_PERSON_RIGHT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 45, 0).end()
-            .transform(ItemTransforms.TransformType.FIRST_PERSON_LEFT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 225, 0).end()
+            .transform(ItemDisplayContext.GUI).scale(0.625f).translation(0, 0, 0).rotation(30, 225, 0).end()
+            .transform(ItemDisplayContext.GROUND).scale(0.25f).translation(0, 3, 0).rotation(0, 0, 0).end()
+            .transform(ItemDisplayContext.FIXED).scale(0.5f).translation(0, 0, 0).rotation(0, 0, 0).end()
+            .transform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND).scale(0.375f).translation(0, 2.5f, 0).rotation(75, 45, 0).end()
+            .transform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 45, 0).end()
+            .transform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND).scale(0.4f).translation(0, 0, 0).rotation(0, 225, 0).end()
             .end()
             .ao(false)
             .texture("particle", "#1")
@@ -190,8 +190,8 @@ final class StateAndModelProvider extends BlockStateProvider {
         // Item
         itemModels().withExistingParent("item/" + "pipe_base", "block/block")
             .transforms()
-            .transform(ItemTransforms.TransformType.GUI).rotation(30, 225, 0).scale(0.8f).end()
-            .transform(ItemTransforms.TransformType.FIXED).scale(0.8f).end()
+            .transform(ItemDisplayContext.GUI).rotation(30, 225, 0).scale(0.8f).end()
+            .transform(ItemDisplayContext.FIXED).scale(0.8f).end()
             .end()
             .ao(false)
             .element()

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBufAllocator;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -72,7 +73,7 @@ final class TierRecipeTest extends BeforeAllTest {
         }
 
         assertTrue(recipe.matches(inventory, null));
-        ItemStack result = recipe.assemble(inventory);
+        ItemStack result = recipe.assemble(inventory, RegistryAccess.EMPTY);
         assertFalse(result.hasTag());
     }
 
@@ -130,7 +131,7 @@ final class TierRecipeTest extends BeforeAllTest {
             inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
         assertTrue(recipe.matches(inventory, null));
-        ItemStack result = recipe.assemble(inventory);
+        ItemStack result = recipe.assemble(inventory, RegistryAccess.EMPTY);
         assertEquals(amount, RecipeInventoryUtil.getFluidHandler(result).getFluid());
     }
 
@@ -151,7 +152,7 @@ final class TierRecipeTest extends BeforeAllTest {
             inventory.setItem(i, new ItemStack(Blocks.STONE));
         }
         assertTrue(recipe.matches(inventory, null));
-        ItemStack result = recipe.assemble(inventory);
+        ItemStack result = recipe.assemble(inventory, RegistryAccess.EMPTY);
         assertEquals(amount.setAmount(amount.amount() * 2), RecipeInventoryUtil.getFluidHandler(result).getFluid());
     }
 
@@ -199,8 +200,8 @@ final class TierRecipeTest extends BeforeAllTest {
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
-            () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
-            () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem()),
+            () -> assertNotEquals(Items.AIR, read.getResultItem(RegistryAccess.EMPTY).getItem()),
+            () -> assertEquals(recipe.getResultItem(RegistryAccess.EMPTY).getItem(), read.getResultItem(RegistryAccess.EMPTY).getItem()),
             () -> assertEquals(recipe.getSubItems().toJson(), read.getSubItems().toJson())
         );
     }
@@ -216,8 +217,8 @@ final class TierRecipeTest extends BeforeAllTest {
         assertNotNull(read);
         assertAll(
             () -> assertEquals(recipe.getTier(), read.getTier()),
-            () -> assertNotEquals(Items.AIR, read.getResultItem().getItem()),
-            () -> assertEquals(recipe.getResultItem().getItem(), read.getResultItem().getItem()),
+            () -> assertNotEquals(Items.AIR, read.getResultItem(RegistryAccess.EMPTY).getItem()),
+            () -> assertEquals(recipe.getResultItem(RegistryAccess.EMPTY).getItem(), read.getResultItem(RegistryAccess.EMPTY).getItem()),
             () -> assertEquals(recipe.getSubItems().toJson(), read.getSubItems().toJson())
         );
     }

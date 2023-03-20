@@ -5,11 +5,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,7 +29,7 @@ public class RenderReservoirItem extends BlockEntityWithoutLevelRenderer {
     }
 
     @Override
-    public void renderByItem(ItemStack stack, ItemTransforms.TransformType cameraType, PoseStack matrixStack,
+    public void renderByItem(ItemStack stack, ItemDisplayContext cameraType, PoseStack matrixStack,
                              MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (stack.getItem() instanceof ReservoirItem) {
             BakedModel itemModel = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(stack);
@@ -41,7 +41,7 @@ public class RenderReservoirItem extends BlockEntityWithoutLevelRenderer {
                     false, matrixStack, buffer, combinedLight, combinedOverlay, original);
                 matrixStack.popPose();
 
-                if (cameraType == ItemTransforms.TransformType.GUI) {
+                if (cameraType == ItemDisplayContext.GUI) {
                     matrixStack.pushPose();
                     stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
                         .map(h -> Pair.of(h.getFluidInTank(0), h.getTankCapacity(0)))
