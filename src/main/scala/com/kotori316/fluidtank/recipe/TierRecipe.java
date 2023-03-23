@@ -13,10 +13,11 @@ import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -273,7 +274,7 @@ public class TierRecipe extends ShapedRecipe {
         @Override
         public JsonObject serializeAdvancement() {
             var advancement = Advancement.Builder.advancement();
-            var inventoryCriterion = RecipeProvider.has(tier.getTag());
+            var inventoryCriterion = InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(tier.getTag()).build());
             advancement.parent(new ResourceLocation("recipes/root"))
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(getId()))
                 .addCriterion("has_" + tier.toString().toLowerCase(Locale.ROOT), inventoryCriterion)

@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
 import net.minecraft.advancements.critereon.FilledBucketTrigger;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -39,7 +40,7 @@ final class RecipeGenerator extends FabricRecipeProvider {
             .pattern("xxx")
             .define('x', ConventionalItemTags.GLASS_BLOCKS)
             .define('p', ItemTags.LOGS)
-            .unlockedBy("has_glass", FabricRecipeProvider.has(Items.GLASS))
+            .unlockedBy("has_glass", InventoryChangeTrigger.TriggerInstance.hasItems(Items.GLASS))
             .unlockedBy("has_bucket", FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.WATER_BUCKET).build()))
             .save(withConditions(exporter, new RecipeConfigCondition.Provider()));
         ShapedRecipeBuilder.shaped(ModTank.Entries.VOID_TANK)
@@ -48,8 +49,8 @@ final class RecipeGenerator extends FabricRecipeProvider {
             .pattern("ooo")
             .define('o', Items.OBSIDIAN)
             .define('t', ModTank.Entries.WOOD_TANK)
-            .unlockedBy("has_obsidian", FabricRecipeProvider.has(Items.OBSIDIAN))
-            .unlockedBy("has_tank", FabricRecipeProvider.has(ModTank.Entries.WOOD_TANK))
+            .unlockedBy("has_obsidian", InventoryChangeTrigger.TriggerInstance.hasItems(Items.OBSIDIAN))
+            .unlockedBy("has_tank", InventoryChangeTrigger.TriggerInstance.hasItems(ModTank.Entries.WOOD_TANK))
             .save(exporter);
     }
 

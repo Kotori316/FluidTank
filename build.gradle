@@ -6,7 +6,7 @@ plugins {
     id "scala"
     id("maven-publish")
     // https://maven.fabricmc.net/net/fabricmc/fabric-loom/
-    id 'fabric-loom' version "0.13-SNAPSHOT"
+    id 'fabric-loom' version "1.1-SNAPSHOT"
     // id 'maven-publish'
     //noinspection SpellCheckingInspection
     id "com.github.breadmoirai.github-release" version "2.2.12"
@@ -99,6 +99,7 @@ repositories {
         content {
             it.includeVersion("mcp.mobius.waila", "wthit-api", "fabric-${project.wthit_version}")
             it.includeVersion("mcp.mobius.waila", "wthit", "fabric-${project.wthit_version}")
+            it.includeModule("lol.bai", "badpackets")
         }
     }
     maven {
