@@ -2,11 +2,11 @@ package com.kotori316.fluidtank;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
@@ -39,8 +39,8 @@ public class FluidTankClientInit implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ModObjects.blockFluidPipe(), renderType);
         BlockRenderLayerMap.INSTANCE.putBlock(ModObjects.blockItemPipe(), renderType);
 
-        BlockEntityRendererRegistry.register(ModObjects.TANK_TYPE(), RenderTank::new);
-        BlockEntityRendererRegistry.register(ModObjects.TANK_CREATIVE_TYPE(), d ->
+        BlockEntityRenderers.register(ModObjects.TANK_TYPE(), RenderTank::new);
+        BlockEntityRenderers.register(ModObjects.TANK_CREATIVE_TYPE(), d ->
             (BlockEntityRenderer<TileTankCreative>) ((BlockEntityRenderer<?>) new RenderTank(d)));
         // FluidRenderHandlerRegistry.INSTANCE.register(ModTank.Entries.MILK_FLUID, (view, pos, state) -> new TextureAtlasSprite[]{STILL_IDENTIFIER.sprite(), FLOW_IDENTIFIER.sprite()});
         CollectionConverters.asJava(ModObjects.blockTanks()).forEach(b -> BuiltinItemRendererRegistry.INSTANCE.register(b, RENDER_ITEM_TANK));

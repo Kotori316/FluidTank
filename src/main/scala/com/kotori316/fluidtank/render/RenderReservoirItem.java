@@ -7,9 +7,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 import com.kotori316.fluidtank.fluids.FluidAmount;
@@ -25,7 +25,7 @@ public class RenderReservoirItem implements BuiltinItemRendererRegistry.DynamicI
     }
 
     @Override
-    public void render(ItemStack stack, ItemTransforms.TransformType cameraType, PoseStack matrixStack,
+    public void render(ItemStack stack, ItemDisplayContext cameraType, PoseStack matrixStack,
                        MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (stack.getItem() instanceof ReservoirItem reservoirItem) {
             BakedModel itemModel = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(stack);
@@ -33,11 +33,11 @@ public class RenderReservoirItem implements BuiltinItemRendererRegistry.DynamicI
                 matrixStack.pushPose();
                 matrixStack.translate(0.5D, 0.5D, 0.5D);
                 BakedModel original = ((ModelCustomWrapper) itemModel).getOriginalModel();
-                Minecraft.getInstance().getItemRenderer().render(stack, ItemTransforms.TransformType.NONE,
+                Minecraft.getInstance().getItemRenderer().render(stack, ItemDisplayContext.NONE,
                     false, matrixStack, buffer, combinedLight, combinedOverlay, original);
                 matrixStack.popPose();
 
-                if (cameraType == ItemTransforms.TransformType.GUI) {
+                if (cameraType == ItemDisplayContext.GUI) {
                     matrixStack.pushPose();
                     var handler = new TankItemFluidHandler(reservoirItem.tier(), stack);
                     var fluid = handler.getFluid();

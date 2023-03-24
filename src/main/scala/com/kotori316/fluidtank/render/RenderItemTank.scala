@@ -11,11 +11,10 @@ import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.block.model.ItemTransforms
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.BlockPos
-import net.minecraft.world.item.{BlockItem, ItemStack}
+import net.minecraft.world.item.{BlockItem, ItemDisplayContext, ItemStack}
 
 @Environment(EnvType.CLIENT)
 class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
@@ -23,7 +22,7 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
   lazy val tileTank = new TileTank(BlockPos.ZERO, ModObjects.blockTanks.head.defaultBlockState())
   private val internalModel = new ModelWrapper(null)
 
-  override def render(stack: ItemStack, cameraType: ItemTransforms.TransformType, matrixStack: PoseStack,
+  override def render(stack: ItemStack, cameraType: ItemDisplayContext, matrixStack: PoseStack,
                       renderTypeBuffer: MultiBufferSource, light: Int, otherLight: Int): Unit = {
     stack.getItem match {
       case tankItem: ItemBlockTank =>
@@ -61,7 +60,7 @@ class RenderItemTank extends BuiltinItemRendererRegistry.DynamicItemRenderer {
     internalModel.setModel(model)
     matrixStack.pushPose()
     matrixStack.translate(0.5D, 0.5D, 0.5D)
-    renderer.render(stack, ItemTransforms.TransformType.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, internalModel)
+    renderer.render(stack, ItemDisplayContext.NONE, false, matrixStack, renderTypeBuffer, light, otherLight, internalModel)
     matrixStack.popPose()
   }
 

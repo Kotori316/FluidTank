@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -132,13 +133,13 @@ public class TierRecipe implements CraftingRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv) {
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess access) {
         if (!this.checkInv(inv)) {
             LOGGER.error("Requested to return crafting result for invalid inventory. {}",
                 IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem).collect(Collectors.toList()));
             return ItemStack.EMPTY;
         }
-        ItemStack result = getResultItem();
+        ItemStack result = getResultItem(access);
         FluidAmount fluidAmount = IntStream.range(0, inv.getContainerSize()).mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
             .map(BlockItem::getBlockEntityData)
@@ -174,7 +175,7 @@ public class TierRecipe implements CraftingRecipe {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public ItemStack getResultItem(RegistryAccess access) {
         return result.copy();
     }
 

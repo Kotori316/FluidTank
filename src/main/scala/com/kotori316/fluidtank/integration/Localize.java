@@ -39,7 +39,7 @@ public class Localize {
     public static final String NBT_Creative = "Creative";
 
     public static List<? extends Component> getTooltipText(CompoundTag tankData, TileTank tank, boolean shortInfo, boolean compactAmount) {
-        var languageSplit = Minecraft.getInstance().getLanguageManager().getSelected().getCode().split("_", 2);
+        var languageSplit = Minecraft.getInstance().getLanguageManager().getSelected().split("_", 2);
         Locale locale;
         if (languageSplit.length == 2) {
             locale = new Locale(languageSplit[0], languageSplit[1].toUpperCase(Locale.ROOT));

@@ -30,7 +30,7 @@ object ModObjects {
   final val CREATIVE_TABS = FabricItemGroup.builder(new ResourceLocation(FluidTank.modID, FluidTank.modID))
     .icon(() => new ItemStack(ModObjects.tierToBlock(Tier.WOOD)))
     .title(Component.translatable("itemGroup.fluidtank"))
-    .displayItems { (_, output, _) =>
+    .displayItems { (_, output) =>
       allItems.foreach(entry => output.accept(entry.t))
       locally {
         val stack = new ItemStack(blockSource)

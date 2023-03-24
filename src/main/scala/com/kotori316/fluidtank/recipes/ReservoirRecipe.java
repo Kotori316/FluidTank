@@ -11,6 +11,7 @@ import java.util.stream.StreamSupport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -44,7 +45,7 @@ public class ReservoirRecipe extends ShapelessRecipe {
         super(idIn, GROUP, CraftingBookCategory.MISC, findOutput(tier), findIngredients(tier, subIngredients));
         this.tier = tier;
         this.subIngredients = subIngredients;
-        LOGGER.debug("{} instance({}) created for Tier {}({}).", getClass().getSimpleName(), idIn, tier, getResultItem());
+        LOGGER.debug("{} instance({}) created for Tier {}({}).", getClass().getSimpleName(), idIn, tier, getResultItem(RegistryAccess.EMPTY));
     }
 
     ReservoirRecipe(ResourceLocation idIn, Tier tier) {
@@ -53,8 +54,8 @@ public class ReservoirRecipe extends ShapelessRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer inv) {
-        ItemStack result = super.assemble(inv);
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess access) {
+        ItemStack result = super.assemble(inv, access);
         IntStream.range(0, inv.getContainerSize())
             .mapToObj(inv::getItem)
             .filter(s -> s.getItem() instanceof ItemBlockTank)
