@@ -37,13 +37,5 @@
     "fabric": ">=0.67.0+1.19.2",
     "minecraft": "1.19.x",
     "fabric-language-scala": ">=0.3.0"
-  },
-  "custom": {
-    "waila:plugins": [
-      {
-        "id": "fluidtank:wthit_plugin",
-        "initializer": "com.kotori316.fluidtank.integration.wthit.WthitTankWailaPlugin"
-      }
-    ]
   }
 }
