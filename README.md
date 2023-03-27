@@ -1,6 +1,6 @@
 # FluidTank
 
-For Minecraft 1.19.2 (1.19 branch)
+For Minecraft 1.19.4 (1.19 branch)
 
 [![](http://cf.way2muchnoise.eu/versions/largefluidtank.svg)][CurseForge]
 [![](http://cf.way2muchnoise.eu/full_largefluidtank_downloads.svg)][CurseForge]
@@ -10,7 +10,7 @@ For Minecraft 1.19.2 (1.19 branch)
 [CurseForge]: https://www.curseforge.com/minecraft/mc-mods/largefluidtank
 
 LICENSE: MIT License  
-Copyright (c) 2019-2022 Kotori316
+Copyright (c) 2019-2023 Kotori316
 
 Add large tanks that can have up to 1048576 buckets of fluid.
 
@@ -26,7 +26,7 @@ See [wiki page](https://github.com/Kotori316/FluidTank/wiki) to get more informa
 ## APIs
 
 * **REQUIRED** [Forge](https://github.com/MinecraftForge/MinecraftForge)
-  * For Minecraft 1.19.2
+  * For Minecraft 1.19.4
 
 * **REQUIRED** [Scala](https://github.com/scala/scala)
   * Version 2.13.10

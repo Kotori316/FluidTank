@@ -1,4 +1,4 @@
-FluidTank for 1.19.3 and Forge
+FluidTank for 1.19.4 and Forge
 
 **This mod requires [Scalable Cat's Force](https://www.curseforge.com/minecraft/mc-mods/scalable-cats-force) to work.**
 

@@ -1,3 +1,9 @@
+## v19.10
+
+* Update to 1.19.4
+
+Build with 1.19.4-45.0.9, Mapping: Parchment 1.19.3-2023.03.12-1.19.4
+
 ## v19.9
 
 * Update to 1.19.3
