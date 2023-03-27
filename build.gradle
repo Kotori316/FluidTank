@@ -165,7 +165,7 @@ repositories {
         name = "ModMaven.k-4u.nl"
         url = "https://modmaven.dev/"
         content {
-            it.includeModule("appeng", "appliedenergistics2")
+            it.includeModule("appeng", "appliedenergistics2-forge")
             it.includeVersion("mekanism", "Mekanism", project.mekanismVersion as String)
         }
     }
@@ -235,7 +235,7 @@ dependencies {
         })
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
-        compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+        compileOnly(fg.deobf("appeng:appliedenergistics2-forge:${project.ae2Version}"))
         // runtimeOnly(fg.deobf("mcp.mobius.waila:wthit:forge-${project.wthit_version}"))
         // runtimeOnly(fg.deobf("lol.bai:badpackets:forge-${project.badpackets_version}"))
         compileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
@@ -247,7 +247,7 @@ dependencies {
         })
         compileOnly(fg.deobf("curse.maven:jade-324717:${project.jade_id}"))
         compileOnly(fg.deobf("curse.maven:the-one-probe-245211:${project.top_id}"))
-        compileOnly(fg.deobf("appeng:appliedenergistics2:${project.ae2Version}"))
+        compileOnly(fg.deobf("appeng:appliedenergistics2-forge:${project.ae2Version}"))
         compileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion, classifier: "api"))
         testCompileOnly(fg.deobf(group: "mekanism", name: "Mekanism", version: project.mekanismVersion))
         // Used in game test
