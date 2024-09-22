@@ -1,8 +1,7 @@
 package com.kotori316.fluidtank.items
 
 import java.util.Locale
-
-import com.kotori316.fluidtank.FluidTank
+import com.kotori316.fluidtank.{FluidTank, ModObjects}
 import com.kotori316.fluidtank.blocks.BlockTank
 import com.kotori316.fluidtank.fluids.FluidAmount
 import com.kotori316.fluidtank.integration.Localize
