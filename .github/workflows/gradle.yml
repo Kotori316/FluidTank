@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
     branches:
-      - "1.19-fabric"
+      - "1.19.2-fabric"
     paths:
       - "src/main/scala/**"
       - "src/test/**"
@@ -11,7 +11,7 @@ on:
       - ".github/workflows/gradle.yml"
   pull_request:
     branches:
-      - "1.19-fabric"
+      - "1.19.2-fabric"
 
 jobs:
   build:
